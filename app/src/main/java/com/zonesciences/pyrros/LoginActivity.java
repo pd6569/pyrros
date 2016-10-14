@@ -1,5 +1,6 @@
 package com.zonesciences.pyrros;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -103,6 +104,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             Log.d(TAG, "createUserWithEmail:onComplete" + task.isSuccessful());
                             Toast.makeText(LoginActivity.this, R.string.account_created, Toast.LENGTH_SHORT).show();
                             hideProgressDialog();
+                            loadApp();
                         }
 
                     }
@@ -135,6 +137,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     Log.d(TAG, "signInWithEmail :onComplete:" + task.isSuccessful());
                     hideProgressDialog();
                     Toast.makeText(LoginActivity.this, R.string.auth_successful, Toast.LENGTH_SHORT).show();
+                    loadApp();
                 }
 
             }
@@ -176,6 +179,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         } /*else if (i == R.id.sign_out_button) {
             signOut();
         }*/
+    }
+
+    public void loadApp(){
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
     }
 
 }
