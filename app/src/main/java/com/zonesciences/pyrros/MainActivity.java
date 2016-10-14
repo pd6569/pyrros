@@ -1,6 +1,7 @@
 package com.zonesciences.pyrros;
 
 import android.content.Intent;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,7 +18,8 @@ public class MainActivity extends BaseActivity {
     private FirebaseUser mFirebaseUser;
 
     private TextView welcomeTextView;
-    private Button logoutButton;
+
+    private ViewPager mViewPager;
 
     private String mUserId;
 
@@ -34,19 +36,12 @@ public class MainActivity extends BaseActivity {
             loadLoginView();
         } else{
             mUserId = mFirebaseUser.getUid();
-            Log.d("FUCK YOU", "LOGGED IN SUCCESSFULLY RUNNING MAIN ACTIVITY");
-            welcomeTextView = (TextView) findViewById(R.id.welcome_user);
-            welcomeTextView.setText("Welcome " + mUserId);
+
+            mViewPager = (ViewPager) findViewById(R.id.viewpager_homescreen);
+
         }
 
-        logoutButton = (Button) findViewById(R.id.logout_button);
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mFirebaseAuth.signOut();
-                loadLoginView();
-            }
-        });
+
 
     }
 
@@ -57,4 +52,11 @@ public class MainActivity extends BaseActivity {
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
     }
+
+    public void signOut(){
+        mFirebaseAuth.signOut();
+        loadLoginView();
+    }
+
+
 }

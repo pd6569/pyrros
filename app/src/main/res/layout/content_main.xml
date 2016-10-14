@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/welcome_user"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:textSize="36dp"
-        android:text="welcome user: id12039812"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_homescreen"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
         />
 
-    <Button
-        android:id="@+id/logout_button"
-        android:layout_width="wrap_content"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/sliding_tabs_homescreen"
+        android:layout_below="@id/toolbar_homescreen"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Logout"/>
+        app:tabMode="scrollable" />
 
-</LinearLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager_homescreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_below="@+id/sliding_tabs_homescreen"
+        tools:context=".FlashcardMenuPagerActivity"/>
+
+</RelativeLayout>
