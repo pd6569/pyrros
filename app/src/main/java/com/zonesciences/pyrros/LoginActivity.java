@@ -42,6 +42,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // Buttons
         findViewById(R.id.email_sign_in_button).setOnClickListener(this);
         findViewById(R.id.email_create_account_button).setOnClickListener(this);
+
+
         mAuth = FirebaseAuth.getInstance();
 
         //Create new listener. Check whether user is signed in or out and act accordingly
@@ -86,7 +88,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "createUserWithEmail:onComplete" + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
@@ -95,10 +96,49 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         if (!task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, R.string.auth_failed,
                                     Toast.LENGTH_SHORT).show();
+                            mEmailField.setText("");
+                            mPasswordField.setText("");
+                            hideProgressDialog();
+                        } else {
+                            Log.d(TAG, "createUserWithEmail:onComplete" + task.isSuccessful());
+                            Toast.makeText(LoginActivity.this, R.string.account_created, Toast.LENGTH_SHORT).show();
+                            hideProgressDialog();
                         }
 
                     }
                 });
+    }
+
+    public void signIn(String email, String password){
+
+        Log.d(TAG, "signIn:" + email);
+        if (!validateForm()) {
+            return;
+        }
+
+        showProgressDialog();
+
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                // if sign in fails, display a message to the user. If sign in succeeds the auth state listener will be notified and logic to hanld the signed in user can be handled in the listener.
+                if (!task.isSuccessful()){
+                    Log.w(TAG, "signInWithEmail:failed", task.getException());
+
+                    hideProgressDialog();
+                    Toast.makeText(LoginActivity.this, R.string.auth_failed, Toast.LENGTH_SHORT).show();
+                    mEmailField.setText("");
+                    mPasswordField.setText("");
+
+                } else {
+                    Log.d(TAG, "signInWithEmail :onComplete:" + task.isSuccessful());
+                    hideProgressDialog();
+                    Toast.makeText(LoginActivity.this, R.string.auth_successful, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
     }
 
 
@@ -131,9 +171,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         int i = v.getId();
         if (i == R.id.email_create_account_button) {
             createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString());
-        } /*else if (i == R.id.email_sign_in_button) {
+        } else if (i == R.id.email_sign_in_button) {
             signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
-        } else if (i == R.id.sign_out_button) {
+        } /*else if (i == R.id.sign_out_button) {
             signOut();
         }*/
     }
