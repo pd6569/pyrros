@@ -29,5 +29,14 @@
         android:layout_below="@+id/sliding_tabs_homescreen"
         tools:context=".FlashcardMenuPagerActivity"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_new_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_create_white_24dp"
+        android:layout_margin="16dp"/>
+
 </RelativeLayout>
 

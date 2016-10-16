@@ -3,6 +3,7 @@ package com.zonesciences.pyrros;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,14 +19,23 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import com.zonesciences.pyrros.fragment.DashboardFragment;
+import com.zonesciences.pyrros.fragment.TrainerFragment;
+import com.zonesciences.pyrros.fragment.WorkoutsFragment;
 
 public class MainActivity extends BaseActivity {
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
+    private DatabaseReference mDatabase;
+
     private TextView welcomeTextView;
 
+    private FragmentPagerAdapter mPagerAdapter;
     private ViewPager mViewPager;
 
     private String mUserId;
@@ -39,6 +49,9 @@ public class MainActivity extends BaseActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+
         if (mFirebaseUser == null) {
             loadLoginView();
         } else{
@@ -46,8 +59,8 @@ public class MainActivity extends BaseActivity {
 
             mViewPager = (ViewPager) findViewById(R.id.viewpager_homescreen);
 
-            FragmentPagerAdapter pagerAdapter = new FragmentHomescreenPagerAdapter(getSupportFragmentManager(), MainActivity.this);
-            mViewPager.setAdapter(pagerAdapter);
+            mPagerAdapter = new FragmentHomescreenPagerAdapter(getSupportFragmentManager());
+            mViewPager.setAdapter(mPagerAdapter);
 
             //Give the TabLayout for region selection the ViewPager
             TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs_homescreen);
@@ -57,6 +70,15 @@ public class MainActivity extends BaseActivity {
             setSupportActionBar(toolbar);
             toolbar.setTitleTextColor(Color.WHITE);
             getSupportActionBar().setTitle("Pyros Trainer");
+
+            //Button launches NewWorkoutActivity
+            findViewById(R.id.fab_new_workout).setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view) {
+                    // Launch new Activity
+                }
+            });
         }
 
 
@@ -76,25 +98,34 @@ public class MainActivity extends BaseActivity {
         loadLoginView();
     }
 
+
     class FragmentHomescreenPagerAdapter extends FragmentPagerAdapter {
-        String tabTitles[] = new String[]{"Trainer", "Workout", "Food Log", "Analytics", "Calendar", "Leaderboard"};
-        Context context;
+
+        private final Fragment[] mFragments = new Fragment[] {
+                new TrainerFragment(),
+                new WorkoutsFragment(),
+                new DashboardFragment(),
+        };
+
+        String tabTitles[] = new String[]{
+                "Trainer",
+                "Workouts",
+                "Dashboard"
+        };
 
         //constructor
-        public FragmentHomescreenPagerAdapter(FragmentManager fm, Context context){
+        public FragmentHomescreenPagerAdapter(FragmentManager fm){
             super(fm);
-            this.context = context;
         }
 
         @Override
         public Fragment getItem(int position) {
-            Log.d("MainActivity", "Position: " + position);
-            return HomeScreenPagerFragment.newInstance(position);
+            return mFragments[position];
         }
 
         @Override
         public int getCount() {
-            return tabTitles.length;
+            return mFragments.length;
         }
 
         @Override
