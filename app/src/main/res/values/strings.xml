@@ -23,6 +23,22 @@
     <string name="fragment_workouts">Workouts content will be here</string>
     <string name="menu_logout">Logout</string>
     <string name="title_activity_new_workout">NewWorkoutActivity</string>
+    <string name="search_hint">search for exercise...</string>
+
+    <string-array name="exercise_categories">
+        <item>Biceps</item>
+        <item>Triceps</item>
+        <item>Shoulders</item>
+        <item>Back</item>
+        <item>Chest</item>
+        <item>Thighs</item>
+        <item>Hamstrings</item>
+        <item>Calves</item>
+        <item>Abdomen</item>
+        <item>Olympic lifts</item>
+        <item>Bodyweight</item>
+        <item>Cardio</item>
+    </string-array>
 
 
 </resources>
