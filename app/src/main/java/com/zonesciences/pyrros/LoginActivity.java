@@ -16,6 +16,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.zonesciences.pyrros.models.User;
+
+import java.util.Date;
+import java.util.HashMap;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
@@ -25,6 +32,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private EditText mPasswordField;
 
 
+    private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
 
     //Listener which implemented onAuthStateChanged
@@ -35,6 +43,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
 
         // Views
         mEmailField = (EditText) findViewById(R.id.field_email);
@@ -45,7 +55,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         findViewById(R.id.email_create_account_button).setOnClickListener(this);
 
 
-        mAuth = FirebaseAuth.getInstance();
+
 
         //Create new listener. Check whether user is signed in or out and act accordingly
         mAuthListener = new FirebaseAuth.AuthStateListener(){
@@ -102,14 +112,19 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             hideProgressDialog();
                         } else {
                             Log.d(TAG, "createUserWithEmail:onComplete" + task.isSuccessful());
-                            Toast.makeText(LoginActivity.this, R.string.account_created, Toast.LENGTH_SHORT).show();
                             hideProgressDialog();
-                            loadApp();
+                            Toast.makeText(LoginActivity.this, R.string.account_created, Toast.LENGTH_SHORT).show();
+                            onAuthSuccess(task.getResult().getUser());
+
                         }
 
                     }
+
+
                 });
     }
+
+
 
     public void signIn(String email, String password){
 
@@ -137,7 +152,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     Log.d(TAG, "signInWithEmail :onComplete:" + task.isSuccessful());
                     hideProgressDialog();
                     Toast.makeText(LoginActivity.this, R.string.auth_successful, Toast.LENGTH_SHORT).show();
-                    loadApp();
+                    onAuthSuccess(task.getResult().getUser());
                 }
 
             }
@@ -145,7 +160,33 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
 
+    private void onAuthSuccess (FirebaseUser user){
+        String username = usernameFromEmail(user.getEmail());
 
+        //Write new user
+        writeNewUser(user.getUid(), username, user.getEmail());
+
+        // Go to MainActivity
+        loadApp();
+        finish();
+
+    }
+
+
+    private String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0];
+        } else {
+            return email;
+        }
+    }
+
+    //Write user to database
+    private void writeNewUser(String userId, String name, String email) {
+        User user = new User(name, email);
+        mDatabase.child("users").child(userId).setValue(user);
+
+    }
 
     private boolean validateForm() {
         boolean valid = true;
@@ -168,6 +209,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         return valid;
     }
+
+
 
     @Override
     public void onClick(View v) {
