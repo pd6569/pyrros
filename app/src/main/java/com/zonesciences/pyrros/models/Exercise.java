@@ -1,5 +1,10 @@
 package com.zonesciences.pyrros.models;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Peter on 18/10/2016.
  */
@@ -22,4 +27,13 @@ public class Exercise {
     }
 
 
+    // [START post_to_map]
+    @Exclude
+    public Map<String, Object> toMap(){
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("exercise", name);
+        result.put("group", muscleGroup);
+
+        return result;
+    }
 }

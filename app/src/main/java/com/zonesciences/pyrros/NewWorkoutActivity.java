@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
 
@@ -117,14 +118,20 @@ public class NewWorkoutActivity extends BaseActivity {
         //Create new workout at /user-workouts/$user-id/$postid and at
         // /workouts/$workoutid simultaneously
 
-        String key = mDatabase.child("workouts").push().getKey();
+        String workoutKey = mDatabase.child("workouts").push().getKey();
+        String exerciseKey = mDatabase.child("user-exercises").push().getKey();
+
         Workout workout = new Workout(userId, username, "No title", true);
         workout.addExercise(exercise);
         Map<String, Object> workoutValues = workout.toMap();
 
+        Exercise exerciseName = new Exercise(exercise);
+        Map<String, Object> exerciseValues = exerciseName.toMap();
+
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/workouts/" + key, workoutValues);
-        childUpdates.put("/user-workouts/" + userId + "/" + key, workoutValues);
+        childUpdates.put("/workouts/" + workoutKey, workoutValues);
+        childUpdates.put("/user-workouts/" + userId + "/" + workoutKey, workoutValues);
+        childUpdates.put("/user-exercises/" + exerciseKey, exerciseValues);
 
         mDatabase.updateChildren(childUpdates);
     }
