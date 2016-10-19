@@ -21,10 +21,7 @@ public class Workout {
     public String name;
     public boolean isPublic;
     public int userCount;
-
-    public String serverTimeStamp;
     public String clientTimeStamp;
-
     public Map<String, Boolean> users = new HashMap<>();
     public Map<String, Boolean> exercises = new HashMap<>();
 
@@ -46,7 +43,6 @@ public class Workout {
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
         result.put("uid", uid);
-        result.put("server timestamp", serverTimeStamp);
         result.put("client timestamp", clientTimeStamp);
         result.put("creator", creator);
         result.put("name", name);

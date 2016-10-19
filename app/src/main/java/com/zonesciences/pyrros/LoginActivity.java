@@ -23,6 +23,7 @@ import com.zonesciences.pyrros.models.User;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
@@ -184,8 +185,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     //Write user to database
     private void writeNewUser(String userId, String name, String email) {
         User user = new User(name, email);
-        mDatabase.child("users").child(userId).setValue(user);
 
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/users/" + userId, user);
+        childUpdates.put("/timestamps/users/" + userId + "/created", ServerValue.TIMESTAMP);
+
+        mDatabase.updateChildren(childUpdates);
     }
 
     private boolean validateForm() {

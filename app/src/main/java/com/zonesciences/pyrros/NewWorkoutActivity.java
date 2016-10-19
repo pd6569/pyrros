@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
@@ -125,6 +126,7 @@ public class NewWorkoutActivity extends BaseActivity {
         String workoutKey = mDatabase.child("workouts").push().getKey();
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
+
         Workout workout = new Workout(userId, username, getClientTimeStamp(), "No title", true, exerciseKey);
 
         Map<String, Object> workoutValues = workout.toMap();
@@ -133,11 +135,12 @@ public class NewWorkoutActivity extends BaseActivity {
         Exercise exerciseName = new Exercise(exercise);
         Map<String, Object> exerciseValues = exerciseName.toMap();
 
-        //Create map object to push updates to nodes
+        //Create map object to push multiple updates to multiple nodes
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workouts/" + workoutKey, workoutValues);
         childUpdates.put("/user-workouts/" + userId + "/" + workoutKey, workoutValues);
         childUpdates.put("/user-exercises/" + userId + "/" + exerciseKey, exerciseValues);
+        childUpdates.put("/timestamps/workouts/" + workoutKey + "/created/", ServerValue.TIMESTAMP);
 
         mDatabase.updateChildren(childUpdates);
     }
