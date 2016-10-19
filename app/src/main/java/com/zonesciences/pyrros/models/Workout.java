@@ -63,6 +63,11 @@ public class Workout {
         return this.exercises;
     }
 
+    public List getExerciseKeys(){
+        List<String> exerciseKeys = new ArrayList<String>(exercises.keySet());
+        return exerciseKeys;
+    }
+
     // [END post_to_map]
 }
 
