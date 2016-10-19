@@ -13,6 +13,8 @@ import java.util.Map;
  * Created by Peter on 18/10/2016.
  */
 
+// [START workout_class]
+
 @IgnoreExtraProperties
 public class Workout {
 
@@ -53,6 +55,7 @@ public class Workout {
 
         return result;
     }
+    // [END post_to_map]
 
     //adds exercise to workout object via Key
     @Exclude
@@ -63,12 +66,12 @@ public class Workout {
         return this.exercises;
     }
 
+    @Exclude
     public List getExerciseKeys(){
         List<String> exerciseKeys = new ArrayList<String>(exercises.keySet());
         return exerciseKeys;
     }
 
-    // [END post_to_map]
-}
 
+}
 //[END workout_class]

@@ -119,7 +119,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
     // [START write_fan_out]
     private void writeNewWorkout(String userId, String username, String exercise) {
-        //Create new workout at /user-workouts/$user-id/$postid and at
+        //Create new workout at /user-workouts/$user-id/$workout-id and at
         // /workouts/$workoutid simultaneously
 
 

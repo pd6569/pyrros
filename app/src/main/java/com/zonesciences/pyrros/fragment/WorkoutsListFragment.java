@@ -81,6 +81,7 @@ public abstract class WorkoutsListFragment extends Fragment {
 
                 //Set click listener for the whole workout view
                 final String workoutKey = workoutRef.getKey();
+
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -100,6 +101,7 @@ public abstract class WorkoutsListFragment extends Fragment {
                 viewHolder.bindToWorkout(model, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
                         //Need to write to both places the workout is stored
                         DatabaseReference globalWorkoutRef = mDatabase.child("workouts").child(workoutRef.getKey());
                         DatabaseReference userPostRef = mDatabase.child("user-workouts").child(model.uid).child(workoutRef.getKey());
