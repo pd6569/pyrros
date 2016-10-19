@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -25,6 +26,8 @@ import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
 
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,7 +125,7 @@ public class NewWorkoutActivity extends BaseActivity {
         String workoutKey = mDatabase.child("workouts").push().getKey();
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
-        Workout workout = new Workout(userId, username, "No title", true, exerciseKey);
+        Workout workout = new Workout(userId, username, getClientTimeStamp(), "No title", true, exerciseKey);
 
         Map<String, Object> workoutValues = workout.toMap();
 
@@ -147,5 +150,11 @@ public class NewWorkoutActivity extends BaseActivity {
         } else {
             mSubmitExercise.setVisibility(View.GONE);
         }
+    }
+
+    private String getClientTimeStamp(){
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+        String date = df.format(Calendar.getInstance().getTime());
+        return date;
     }
 }

@@ -21,6 +21,10 @@ public class Workout {
     public String name;
     public boolean isPublic;
     public int userCount;
+
+    public String serverTimeStamp;
+    public String clientTimeStamp;
+
     public Map<String, Boolean> users = new HashMap<>();
     public Map<String, Boolean> exercises = new HashMap<>();
 
@@ -28,9 +32,10 @@ public class Workout {
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
     }
 
-    public Workout(String uid, String creator, String name, boolean isPublic, String exerciseKey){
+    public Workout(String uid, String creator, String clientTimeStamp, String name, boolean isPublic, String exerciseKey){
         this.uid = uid;
         this.creator = creator;
+        this.clientTimeStamp = clientTimeStamp;
         this.name = name;
         this.isPublic = isPublic;
         addExercise(exerciseKey);
@@ -41,6 +46,8 @@ public class Workout {
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
         result.put("uid", uid);
+        result.put("server timestamp", serverTimeStamp);
+        result.put("client timestamp", clientTimeStamp);
         result.put("creator", creator);
         result.put("name", name);
         result.put("shared", isPublic);
