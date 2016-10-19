@@ -122,8 +122,10 @@ public class NewWorkoutActivity extends BaseActivity {
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
         Workout workout = new Workout(userId, username, "No title", true);
-        workout.addExercise(exercise);
+        workout.addExercise(exerciseKey);
+
         Map<String, Object> workoutValues = workout.toMap();
+
 
         Exercise exerciseName = new Exercise(exercise);
         Map<String, Object> exerciseValues = exerciseName.toMap();
@@ -131,7 +133,7 @@ public class NewWorkoutActivity extends BaseActivity {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workouts/" + workoutKey, workoutValues);
         childUpdates.put("/user-workouts/" + userId + "/" + workoutKey, workoutValues);
-        childUpdates.put("/user-exercises/" + exerciseKey, exerciseValues);
+        childUpdates.put("/user-exercises/" + userId + "/" + exerciseKey, exerciseValues);
 
         mDatabase.updateChildren(childUpdates);
     }

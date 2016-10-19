@@ -22,7 +22,7 @@ public class Workout {
     public boolean isPublic;
     public int userCount;
     public Map<String, Boolean> users = new HashMap<>();
-    public ArrayList<Exercise> exercises = new ArrayList<>();
+    public Map<String, Boolean> exercises = new HashMap<>();
 
     public Workout(){
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
@@ -51,10 +51,11 @@ public class Workout {
     }
 
     @Exclude
-    public ArrayList<Exercise> addExercise (String name){
-        ArrayList<Exercise> list = this.exercises;
-        list.add(new Exercise(name));
-        return list;
+    public Map<String, Boolean> addExercise (String exerciseKey){
+        HashMap<String, Boolean> map = new HashMap<>();
+        map.put(exerciseKey, true);
+        this.exercises = map;
+        return this.exercises;
     }
 
     // [END post_to_map]
