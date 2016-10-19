@@ -118,18 +118,19 @@ public class NewWorkoutActivity extends BaseActivity {
         //Create new workout at /user-workouts/$user-id/$postid and at
         // /workouts/$workoutid simultaneously
 
+
         String workoutKey = mDatabase.child("workouts").push().getKey();
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
-        Workout workout = new Workout(userId, username, "No title", true);
-        workout.addExercise(exerciseKey);
+        Workout workout = new Workout(userId, username, "No title", true, exerciseKey);
 
         Map<String, Object> workoutValues = workout.toMap();
 
-
+        //Create new exercise object
         Exercise exerciseName = new Exercise(exercise);
         Map<String, Object> exerciseValues = exerciseName.toMap();
 
+        //Create map object to push updates to nodes
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workouts/" + workoutKey, workoutValues);
         childUpdates.put("/user-workouts/" + userId + "/" + workoutKey, workoutValues);

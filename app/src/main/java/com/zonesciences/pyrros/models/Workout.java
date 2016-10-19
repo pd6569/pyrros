@@ -28,11 +28,12 @@ public class Workout {
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
     }
 
-    public Workout(String uid, String creator, String name, boolean isPublic){
+    public Workout(String uid, String creator, String name, boolean isPublic, String exerciseKey){
         this.uid = uid;
         this.creator = creator;
         this.name = name;
         this.isPublic = isPublic;
+        addExercise(exerciseKey);
     }
 
     // [START post_to_map]
@@ -50,6 +51,7 @@ public class Workout {
         return result;
     }
 
+    //adds exercise to workout object via Key
     @Exclude
     public Map<String, Boolean> addExercise (String exerciseKey){
         HashMap<String, Boolean> map = new HashMap<>();
