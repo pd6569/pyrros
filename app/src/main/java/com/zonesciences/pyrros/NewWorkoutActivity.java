@@ -126,8 +126,7 @@ public class NewWorkoutActivity extends BaseActivity {
         String workoutKey = mDatabase.child("workouts").push().getKey();
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
-
-        Workout workout = new Workout(userId, username, getClientTimeStamp(), "No title", true, exerciseKey);
+        Workout workout = new Workout(userId, username, getClientTimeStamp(), "No title", new Boolean(true), exerciseKey);
 
         Map<String, Object> workoutValues = workout.toMap();
 

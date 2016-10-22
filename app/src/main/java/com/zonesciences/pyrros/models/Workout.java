@@ -21,7 +21,7 @@ public class Workout {
     public String uid;
     public String creator;
     public String name;
-    public boolean isPublic;
+    public Boolean shared;
     public int userCount;
     public String clientTimeStamp;
     public Map<String, Boolean> users = new HashMap<>();
@@ -31,12 +31,12 @@ public class Workout {
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
     }
 
-    public Workout(String uid, String creator, String clientTimeStamp, String name, boolean isPublic, String exerciseKey){
+    public Workout(String uid, String creator, String clientTimeStamp, String name, Boolean shared, String exerciseKey){
         this.uid = uid;
         this.creator = creator;
         this.clientTimeStamp = clientTimeStamp;
         this.name = name;
-        this.isPublic = isPublic;
+        this.shared = shared;
         addExercise(exerciseKey);
     }
 
@@ -45,10 +45,10 @@ public class Workout {
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
         result.put("uid", uid);
-        result.put("client timestamp", clientTimeStamp);
+        result.put("clientTimeStamp", clientTimeStamp);
         result.put("creator", creator);
         result.put("name", name);
-        result.put("shared", isPublic);
+        result.put("shared", shared);
         result.put("userCount", userCount);
         result.put("users", users);
         result.put("exercises", exercises);
@@ -72,6 +72,29 @@ public class Workout {
         return exerciseKeys;
     }
 
+    @Exclude
+    public Boolean getShared() {
+        return shared;
+    }
 
+    @Exclude
+    public String getCreator() {
+        return creator;
+    }
+
+    @Exclude
+    public String getClientTimeStamp() {
+        return clientTimeStamp;
+    }
+
+    @Exclude
+    public String getUid() {
+        return uid;
+    }
+
+    @Exclude
+    public String getName() {
+        return name;
+    }
 }
 //[END workout_class]
