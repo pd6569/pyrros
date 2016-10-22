@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class NewWorkoutActivity extends BaseActivity {
     private static final String REQUIRED = "Required";
@@ -160,7 +161,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
         //Create new exercise object
         Exercise exerciseName = new Exercise(exercise);
-        mDatabase.child("user-exercises").child(userId).setValue(exerciseName);
+        mDatabase.child("user-exercises").child(userId).child(exerciseKey).setValue(exerciseName);
 
 
         //Get current workout object and add exercise
