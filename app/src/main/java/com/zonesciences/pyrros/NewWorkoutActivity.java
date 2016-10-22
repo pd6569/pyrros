@@ -159,9 +159,16 @@ public class NewWorkoutActivity extends BaseActivity {
         //Create unique exercise key
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
-        //Create new exercise object
+        //Create new exercise object and add it to user-exercises directory
         Exercise exerciseName = new Exercise(exercise);
         mDatabase.child("user-exercises").child(userId).child(exerciseKey).setValue(exerciseName);
+
+        //Add this exercise to current workout via unique exercise key
+        mCurrentWorkout.addExercise(exerciseKey);
+
+
+        //add new current workout object and to database)
+        mDatabase.child("workouts").child(mWorkoutKey).child("exercises").setValue(mCurrentWorkout.exercises);
 
 
         //Get current workout object and add exercise
