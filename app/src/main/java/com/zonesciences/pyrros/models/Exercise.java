@@ -14,7 +14,7 @@ public class Exercise {
     public String muscleGroup;
 
     public Exercise(){
-
+        // Default constructor required for calls to DataSnapshot.getValue(Exercise.class)
     }
 
     public Exercise (String name){

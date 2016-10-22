@@ -97,5 +97,9 @@ public class Workout {
     public String getName() {
         return name;
     }
+
+    public Map<String, Boolean> getExercises() {
+        return exercises;
+    }
 }
 //[END workout_class]
