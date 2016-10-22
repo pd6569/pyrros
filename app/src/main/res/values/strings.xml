@@ -24,6 +24,7 @@
     <string name="menu_logout">Logout</string>
     <string name="title_activity_new_workout">NewWorkoutActivity</string>
     <string name="search_hint">search for exercise...</string>
+    <string name="start_new_workout">No exercises added yet, search above or use the drop down list to select an exercise to add to your workout</string>
 
     <string-array name="exercise_categories">
         <item>Biceps</item>

@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -36,9 +37,11 @@ public class NewWorkoutActivity extends BaseActivity {
     private static final String REQUIRED = "Required";
     private static final String TAG = "NewWorkoutActivity";
 
+    //need reference to database to read/write data.
     private DatabaseReference mDatabase;
 
     private EditText mExerciseField;
+    private ListView mListView;
     private FloatingActionButton mSubmitExercise;
 
     @Override
@@ -53,6 +56,9 @@ public class NewWorkoutActivity extends BaseActivity {
         getSupportActionBar().setTitle("New Workout");
 
         mExerciseField = (EditText) findViewById(R.id.field_new_exercise);
+
+        mListView = (ListView) findViewById(R.id.listview_exercises);
+
 
         mSubmitExercise = (FloatingActionButton) findViewById(R.id.fab_new_workout);
         mSubmitExercise.setOnClickListener(new View.OnClickListener() {

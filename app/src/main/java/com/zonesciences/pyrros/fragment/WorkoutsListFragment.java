@@ -124,11 +124,6 @@ public abstract class WorkoutsListFragment extends Fragment {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
                 Workout w = mutableData.getValue(Workout.class);
-                Log.d(TAG, "Testing workout object. workout.shared = " + w.getShared());
-                Log.d(TAG, "Testing workout object. workout.getCreator = " + w.getCreator());
-                Log.d(TAG, "Testing workout object. workout.getTimeStamp = " + w.getClientTimeStamp());
-                Log.d(TAG, "Testing workout object. workout.getUID = " + w.getUid());
-                Log.d(TAG, "Testing workout object. workout.getName = " + w.getName());
 
                 if (w == null) {
                     return Transaction.success(mutableData);

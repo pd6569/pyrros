@@ -18,6 +18,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Workout {
 
+    //variable names must match key name in hashmap method below
     public String uid;
     public String creator;
     public String name;
