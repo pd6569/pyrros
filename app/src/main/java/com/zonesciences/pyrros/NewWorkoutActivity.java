@@ -166,9 +166,16 @@ public class NewWorkoutActivity extends BaseActivity {
     // [START write_fan_out]
     private void writeNewWorkout(String userId, String username, String exercise, String exerciseKey) {
 
+        Exercise exerciseName;
+        Map<String, Object> exerciseValues = new HashMap<>();
+
+        //if the exercise already exists, exercise key is passed in, if not a brand new exercise key is generated
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
         if (exerciseKey == null) {
             mExerciseKey = mDatabase.child("user-exercises").push().getKey();
+            mUserExercises.add(exercise);
+            exerciseName = new Exercise(exercise);
+            exerciseValues = new HashMap<>(exerciseName.toMap());
         } else {
             mExerciseKey = exerciseKey;
         }
@@ -178,14 +185,16 @@ public class NewWorkoutActivity extends BaseActivity {
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();
 
         //Create new exercise object and map values to push to user-exercises directory
-        Exercise exerciseName = new Exercise(exercise);
-        Map<String, Object> exerciseValues = exerciseName.toMap();
+        /*Exercise exerciseName = new Exercise(exercise);
+        Map<String, Object> exerciseValues = exerciseName.toMap();*/
 
         //Create map object to push multiple updates to multiple nodes
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workouts/" + mWorkoutKey, workoutValues);
         childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey, workoutValues);
-        childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, exerciseValues);
+        if(exerciseKey == null) { // add new exercise if it does not already exist
+            childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, exerciseValues);
+        }
         childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
 
         mDatabase.updateChildren(childUpdates);
@@ -198,26 +207,31 @@ public class NewWorkoutActivity extends BaseActivity {
     private void addNewExercise(String userId, String username, String workoutKey, final String exercise, String exerciseKey) {
         //Add exercise to existing workout that has just been created
 
-        //Create unique exercise key
+        Exercise exerciseName;
+
+        //Create unique exercise key if the exercise is new, otherwise use key for existing exercise
         if (exerciseKey == null){
             mExerciseKey = mDatabase.child("user-exercises").push().getKey();
+            Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
+            mUserExercises.add(exercise);
+            exerciseName = new Exercise(exercise);
+            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(exerciseName);
         } else {
+            Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
             mExerciseKey = exerciseKey;
         }
 
-        //Create new exercise object and add it to user-exercises directory
-        Exercise exerciseName = new Exercise(exercise);
-        mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(exerciseName);
 
         //Add this exercise to current workout via unique exercise key
         mCurrentWorkout.addExercise(mExerciseKey);
 
-
         //add new current workout object and to database)
-        mDatabase.child("workouts").child(mWorkoutKey).child("exercises").setValue(mCurrentWorkout.exercises);
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workouts/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
+        childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
 
-
-        //Get current workout object and add exercise
+        mDatabase.updateChildren(childUpdates);
+        /*mDatabase.child("workouts").child(mWorkoutKey).child("exercises").setValue(mCurrentWorkout.exercises);*/
 
 
         //locations to update: user-exercises, user-workouts, workouts
