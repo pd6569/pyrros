@@ -21,10 +21,11 @@ import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class NewWorkoutActivity extends BaseActivity {
     private static final String REQUIRED = "Required";
@@ -40,6 +41,9 @@ public class NewWorkoutActivity extends BaseActivity {
     private int numExercises = 0;
     private String mWorkoutKey;
     private Workout mCurrentWorkout;
+
+    private List<String> mUserExercises = new ArrayList<String>();
+    private boolean mFirstLoad = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +69,24 @@ public class NewWorkoutActivity extends BaseActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Get list of current exercises for user and creates array.
+        mDatabase.child("user-exercises").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot exerciseSnapshot : dataSnapshot.getChildren()) {
+                    Exercise exercise = exerciseSnapshot.getValue(Exercise.class);
+                    String s = exercise.getName();
+                    mUserExercises.add(s);
+                    Log.d(TAG, "Exercise " + s + " added to userExercise List");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void addExercise(){
@@ -75,6 +97,8 @@ public class NewWorkoutActivity extends BaseActivity {
             mExerciseField.setError(REQUIRED);
             return;
         }
+
+
 
         Toast.makeText(this, "Submitting...", Toast.LENGTH_SHORT).show();
 
@@ -98,6 +122,7 @@ public class NewWorkoutActivity extends BaseActivity {
                     Log.e(TAG, "User " + userId + " is unexpectedly null");
                     Toast.makeText(NewWorkoutActivity.this, "Error: could not fetch user.", Toast.LENGTH_SHORT).show();
                 } else {
+
                     //create new workout
                     if (mCurrentWorkout == null) {
                         writeNewWorkout(userId, user.username, exercise);
@@ -105,6 +130,7 @@ public class NewWorkoutActivity extends BaseActivity {
                         addNewExercise(userId, user.username, mWorkoutKey, exercise);
                     }
                 }
+
 
 
                 // [END_EXCLUDE]
@@ -124,10 +150,13 @@ public class NewWorkoutActivity extends BaseActivity {
     }
 
 
+
     // [START write_fan_out]
     private void writeNewWorkout(String userId, String username, String exercise) {
         //Create new workout at /user-workouts/$user-id/$workout-id and at
         // /workouts/$workoutid simultaneously
+
+        checkExerciseExists(exercise);
 
 
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
@@ -150,11 +179,16 @@ public class NewWorkoutActivity extends BaseActivity {
 
         mDatabase.updateChildren(childUpdates);
     }
+
+
     // [END write_fan_out]
 
 
-    private void addNewExercise(String userId, String username, String workoutKey, String exercise) {
+    private void addNewExercise(String userId, String username, String workoutKey, final String exercise) {
         //Add exercise to existing workout that has just been created
+
+        //Check if this exercise already exists in user-exercises
+        checkExerciseExists(exercise);
 
         //Create unique exercise key
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
@@ -176,6 +210,15 @@ public class NewWorkoutActivity extends BaseActivity {
 
         //locations to update: user-exercises, user-workouts, workouts
     }
+
+    private void checkExerciseExists(String exercise) {
+        if (mUserExercises.contains(exercise)){
+            Log.i(TAG, "Exercise already exists");
+        } else {
+            return;
+        }
+    }
+
 
     private String getClientTimeStamp(){
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");

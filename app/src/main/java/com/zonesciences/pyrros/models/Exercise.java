@@ -31,9 +31,18 @@ public class Exercise {
     @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
-        result.put("exercise", name);
+        result.put("name", name);
         result.put("group", muscleGroup);
 
         return result;
+    }
+    @Exclude
+    public String getName() {
+        return name;
+    }
+
+    @Exclude
+    public String getMuscleGroup() {
+        return muscleGroup;
     }
 }
