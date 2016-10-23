@@ -150,40 +150,24 @@ public class NewWorkoutActivity extends BaseActivity {
 
     // [START write_fan_out]
     private void writeNewWorkout(String userId, String username, String exercise) {
-        //Create new workout at /user-workouts/$user-id/$workout-id and at
-        // /workouts/$workoutid simultaneously
-
-        Exercise exerciseName;
-        Map<String, Object> exerciseValues = new HashMap<>();
-
-        if (checkExerciseExists(exercise)) {
-            getExerciseKey(userId, exercise);
-            Log.i(TAG, "mExerciseKey = " + mExerciseKey);
-        } else {
-            mExerciseKey = mDatabase.child("user-exercises").push().getKey();
-
-            //Create new exercise object and map values to push to user-exercises directory
-            exerciseName = new Exercise(exercise);
-            exerciseValues = exerciseName.toMap();
-        }
-
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
+        String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
         //Create new workout object and map values. Add exercise via exerciseKey.
-        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true), mExerciseKey);
+        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true), exerciseKey);
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();
 
-
+        //Create new exercise object and map values to push to user-exercises directory
+        Exercise exerciseName = new Exercise(exercise);
+        Map<String, Object> exerciseValues = exerciseName.toMap();
 
         //Create map object to push multiple updates to multiple nodes
         Map<String, Object> childUpdates = new HashMap<>();
-
         childUpdates.put("/workouts/" + mWorkoutKey, workoutValues);
         childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey, workoutValues);
-        if (checkExerciseExists(exercise) == false) {
-            childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, exerciseValues);
-        }
+        childUpdates.put("/user-exercises/" + userId + "/" + exerciseKey, exerciseValues);
         childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
+
         mDatabase.updateChildren(childUpdates);
     }
 
