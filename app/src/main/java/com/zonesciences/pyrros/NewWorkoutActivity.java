@@ -125,6 +125,9 @@ public class NewWorkoutActivity extends BaseActivity {
                 } else {
 
                     //create new workout
+                    //check if there is an existing workout being added to, or if this is a brand new workout.
+                    // and check if the exercise being added already exists in user-exercise or not.
+                    //if exists call method getExerciseKey
                     boolean newWorkout;
                         if (mCurrentWorkout == null) {
                             newWorkout = true;
@@ -169,11 +172,12 @@ public class NewWorkoutActivity extends BaseActivity {
         Exercise exerciseName;
         Map<String, Object> exerciseValues = new HashMap<>();
 
-        //if the exercise already exists, exercise key is passed in, if not a brand new exercise key is generated
+        //if the exercise already exists, exercise key is passed in, if not a brand new exercise key
+        //is generated
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
         if (exerciseKey == null) {
             mExerciseKey = mDatabase.child("user-exercises").push().getKey();
-            mUserExercises.add(exercise);
+            mUserExercises.add(exercise); // add exercise to list for tracking purposes
             exerciseName = new Exercise(exercise);
             exerciseValues = new HashMap<>(exerciseName.toMap());
         } else {
@@ -225,7 +229,7 @@ public class NewWorkoutActivity extends BaseActivity {
         //Add this exercise to current workout via unique exercise key
         mCurrentWorkout.addExercise(mExerciseKey);
 
-        //add new current workout object and to database)
+        //add new exercises from current workout object to workouts and user-workouts directory
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workouts/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
         childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
@@ -254,6 +258,7 @@ public class NewWorkoutActivity extends BaseActivity {
         return date;
     }
 
+    //get exercise key for existing exercises
     public void getExerciseKey(final String userId, final String username, final String exercise, final boolean newWorkout) {
         Log.i(TAG, "getExerciseKey called. userId: " + userId + " exercise: " + exercise);
 
