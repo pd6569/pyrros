@@ -10,10 +10,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.models.Exercise;
@@ -44,6 +46,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
     private List<String> mUserExercises = new ArrayList<String>();
     private boolean mFirstLoad = true;
+    private String mExerciseKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +101,6 @@ public class NewWorkoutActivity extends BaseActivity {
             return;
         }
 
-
-
         Toast.makeText(this, "Submitting...", Toast.LENGTH_SHORT).show();
 
         // [START single_value_read
@@ -130,11 +131,7 @@ public class NewWorkoutActivity extends BaseActivity {
                         addNewExercise(userId, user.username, mWorkoutKey, exercise);
                     }
                 }
-
-
-
                 // [END_EXCLUDE]
-
             }
 
             @Override
@@ -156,27 +153,37 @@ public class NewWorkoutActivity extends BaseActivity {
         //Create new workout at /user-workouts/$user-id/$workout-id and at
         // /workouts/$workoutid simultaneously
 
-        checkExerciseExists(exercise);
+        Exercise exerciseName;
+        Map<String, Object> exerciseValues = new HashMap<>();
 
+        if (checkExerciseExists(exercise)) {
+            getExerciseKey(userId, exercise);
+            Log.i(TAG, "mExerciseKey = " + mExerciseKey);
+        } else {
+            mExerciseKey = mDatabase.child("user-exercises").push().getKey();
+
+            //Create new exercise object and map values to push to user-exercises directory
+            exerciseName = new Exercise(exercise);
+            exerciseValues = exerciseName.toMap();
+        }
 
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
-        String exerciseKey = mDatabase.child("user-exercises").push().getKey();
 
         //Create new workout object and map values. Add exercise via exerciseKey.
-        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true), exerciseKey);
+        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true), mExerciseKey);
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();
 
-        //Create new exercise object and map values to push to user-exercises directory
-        Exercise exerciseName = new Exercise(exercise);
-        Map<String, Object> exerciseValues = exerciseName.toMap();
+
 
         //Create map object to push multiple updates to multiple nodes
         Map<String, Object> childUpdates = new HashMap<>();
+
         childUpdates.put("/workouts/" + mWorkoutKey, workoutValues);
         childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey, workoutValues);
-        childUpdates.put("/user-exercises/" + userId + "/" + exerciseKey, exerciseValues);
+        if (checkExerciseExists(exercise) == false) {
+            childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, exerciseValues);
+        }
         childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
-
         mDatabase.updateChildren(childUpdates);
     }
 
@@ -188,7 +195,10 @@ public class NewWorkoutActivity extends BaseActivity {
         //Add exercise to existing workout that has just been created
 
         //Check if this exercise already exists in user-exercises
-        checkExerciseExists(exercise);
+        if (checkExerciseExists(exercise)){
+            getExerciseKey(userId, exercise);
+            Log.i(TAG, "mExerciseKey = " + mExerciseKey);
+        };
 
         //Create unique exercise key
         String exerciseKey = mDatabase.child("user-exercises").push().getKey();
@@ -211,11 +221,13 @@ public class NewWorkoutActivity extends BaseActivity {
         //locations to update: user-exercises, user-workouts, workouts
     }
 
-    private void checkExerciseExists(String exercise) {
+    private boolean checkExerciseExists(String exercise) {
         if (mUserExercises.contains(exercise)){
             Log.i(TAG, "Exercise already exists");
+            return true;
         } else {
-            return;
+            Log.i(TAG, "Exercise does not exist");
+            return false;
         }
     }
 
@@ -225,4 +237,38 @@ public class NewWorkoutActivity extends BaseActivity {
         String date = df.format(Calendar.getInstance().getTime());
         return date;
     }
+
+    public void getExerciseKey(String userId, String exercise) {
+        Log.i(TAG, "getExerciseKey called. userId: " + userId + " exercise: " + exercise);
+
+        Query queryRef = mDatabase.child("user-exercises").child(userId).orderByChild("name").equalTo(exercise);
+        queryRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "" + dataSnapshot.getKey());
+                mExerciseKey = dataSnapshot.getKey();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "onchildchanged called");
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onchildremoved called");
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "onchildmoved called");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.i(TAG, "onchildcancelled called");
+            }
+        });
+
+    };
 }
