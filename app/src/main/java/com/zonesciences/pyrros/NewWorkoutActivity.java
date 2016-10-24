@@ -10,9 +10,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,10 +21,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.adapters.ExercisesAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
-import com.zonesciences.pyrros.viewholder.ExerciseViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,13 +39,16 @@ public class NewWorkoutActivity extends BaseActivity {
 
     //need reference to database to read/write data.
     private DatabaseReference mDatabase;
+    private DatabaseReference mWorkoutExercisesReference;
 
     // setup for recyclerview to display exercises in current workout
 
-    private RecyclerView mRecycler;
+    private RecyclerView mExercisesRecycler;
+    private ExercisesAdapter mAdapter;
     private LinearLayoutManager mLayoutManager;
 
     private EditText mExerciseField;
+    private TextView mNoExercises;
     private ListView mListView;
     private FloatingActionButton mSubmitExercise;
 
@@ -54,7 +57,8 @@ public class NewWorkoutActivity extends BaseActivity {
     private Workout mCurrentWorkout;
 
     private List<String> mUserExercises = new ArrayList<String>();
-    private boolean mFirstLoad = true;
+    private List<String> mCurrentExercises = new ArrayList<String>();
+
     private String mExerciseKey = new String();
 
     @Override
@@ -62,16 +66,23 @@ public class NewWorkoutActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_workout);
 
+        //Initialise Database
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        //Create unique workout key
+        mWorkoutKey = mDatabase.child("workouts").push().getKey();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("New Workout");
 
         mExerciseField = (EditText) findViewById(R.id.field_new_exercise);
+        mNoExercises = (TextView) findViewById(R.id.textview_no_exercises);
 
-        mRecycler = (RecyclerView) findViewById(R.id.recycler_exercises);
-        mRecycler.setHasFixedSize(true);
+        mExercisesRecycler = (RecyclerView) findViewById(R.id.recycler_exercises);
+        mExercisesRecycler.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mExercisesRecycler.setLayoutManager(mLayoutManager);
 
         mSubmitExercise = (FloatingActionButton) findViewById(R.id.fab_new_workout);
         mSubmitExercise.setOnClickListener(new View.OnClickListener() {
@@ -99,8 +110,14 @@ public class NewWorkoutActivity extends BaseActivity {
 
             }
         });
+    }
 
+    @Override
+    public void onStart(){
+        super.onStart();
 
+        mAdapter = new ExercisesAdapter(mCurrentExercises);
+        mExercisesRecycler.setAdapter(mAdapter);
     }
 
     private void addExercise(){
@@ -110,9 +127,14 @@ public class NewWorkoutActivity extends BaseActivity {
         if (TextUtils.isEmpty(exercise)) {
             mExerciseField.setError(REQUIRED);
             return;
+        } else {
+            if (exerciseInCurrentWorkout(exercise)){
+                Toast.makeText(this, "This workout already contains this exercise", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            mNoExercises.setVisibility(View.INVISIBLE);
+            mCurrentExercises.add(exercise);
         }
-
-        Toast.makeText(this, "Submitting...", Toast.LENGTH_SHORT).show();
 
         // [START single_value_read
         final String userId = getUid();
@@ -176,7 +198,6 @@ public class NewWorkoutActivity extends BaseActivity {
     }
 
 
-
     // [START write_fan_out]
     private void writeNewWorkout(String userId, String username, String exercise, String exerciseKey) {
 
@@ -185,7 +206,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
         //if the exercise already exists, exercise key is passed in, if not a brand new exercise key
         //is generated
-        mWorkoutKey = mDatabase.child("workouts").push().getKey();
+
         if (exerciseKey == null) {
             mExerciseKey = mDatabase.child("user-exercises").push().getKey();
             mUserExercises.add(exercise); // add exercise to list for tracking purposes
@@ -194,6 +215,8 @@ public class NewWorkoutActivity extends BaseActivity {
         } else {
             mExerciseKey = exerciseKey;
         }
+
+
 
         //Create new workout object and map values. Add exercise via exerciseKey.
         mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true), mExerciseKey);
@@ -218,9 +241,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
     // [END write_fan_out]
 
-
+    //Add exercise to existing workout that has just been created
     private void addNewExercise(String userId, String username, String workoutKey, final String exercise, String exerciseKey) {
-        //Add exercise to existing workout that has just been created
 
         Exercise exerciseName;
 
@@ -260,6 +282,13 @@ public class NewWorkoutActivity extends BaseActivity {
             Log.i(TAG, "Exercise does not exist");
             return false;
         }
+    }
+
+    private boolean exerciseInCurrentWorkout(String exercise) {
+        if(mCurrentExercises.contains(exercise)){
+            return true;
+        }
+        return false;
     }
 
 
