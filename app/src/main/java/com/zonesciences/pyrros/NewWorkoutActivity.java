@@ -41,7 +41,7 @@ public class NewWorkoutActivity extends BaseActivity {
     private DatabaseReference mDatabase;
 
     // setup for recyclerview to display exercises in current workout
-    private FirebaseRecyclerAdapter<Exercise, ExerciseViewHolder> mAdapter;
+
     private RecyclerView mRecycler;
     private LinearLayoutManager mLayoutManager;
 
@@ -71,8 +71,7 @@ public class NewWorkoutActivity extends BaseActivity {
         mExerciseField = (EditText) findViewById(R.id.field_new_exercise);
 
         mRecycler = (RecyclerView) findViewById(R.id.recycler_exercises);
-
-
+        mRecycler.setHasFixedSize(true);
 
         mSubmitExercise = (FloatingActionButton) findViewById(R.id.fab_new_workout);
         mSubmitExercise.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +82,7 @@ public class NewWorkoutActivity extends BaseActivity {
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Get list of current exercises for user and creates array.
+        //Get list of current exercises for user and create working list.
         mDatabase.child("user-exercises").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -100,6 +99,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
             }
         });
+
+
     }
 
     private void addExercise(){
