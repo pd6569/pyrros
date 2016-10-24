@@ -2,6 +2,8 @@ package com.zonesciences.pyrros;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.viewholder.ExerciseViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +39,11 @@ public class NewWorkoutActivity extends BaseActivity {
 
     //need reference to database to read/write data.
     private DatabaseReference mDatabase;
+
+    // setup for recyclerview to display exercises in current workout
+    private FirebaseRecyclerAdapter<Exercise, ExerciseViewHolder> mAdapter;
+    private RecyclerView mRecycler;
+    private LinearLayoutManager mLayoutManager;
 
     private EditText mExerciseField;
     private ListView mListView;
@@ -61,7 +70,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
         mExerciseField = (EditText) findViewById(R.id.field_new_exercise);
 
-        mListView = (ListView) findViewById(R.id.listview_exercises);
+        mRecycler = (RecyclerView) findViewById(R.id.recycler_exercises);
+
 
 
         mSubmitExercise = (FloatingActionButton) findViewById(R.id.fab_new_workout);

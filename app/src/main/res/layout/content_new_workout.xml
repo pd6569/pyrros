@@ -39,11 +39,13 @@
         android:textSize="18dp"
         android:text="@string/start_new_workout"/>
 
-    <ListView
-        android:id="@+id/listview_exercises"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_exercises"
         android:layout_below="@+id/field_new_exercise"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-    </ListView>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_exercise">
+    </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>
