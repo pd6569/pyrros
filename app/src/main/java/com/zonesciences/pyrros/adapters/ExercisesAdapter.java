@@ -1,12 +1,17 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -26,16 +31,33 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.View
     public static final String TAG = "ExerciseAdapter";
 
     private List<String> mExercises = new ArrayList<>();
+    private Context mContext;
+    private DatabaseReference mDatabaseReference;
+    private ChildEventListener mChildEventListener;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView exerciseName;
+        public RelativeLayout exerciseContainer;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             exerciseName = (TextView) itemView.findViewById(R.id.exercise_name);
+
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            Log.i(TAG, "onClick");
+            mExercises.remove(getAdapterPosition());
+            Snackbar snackbar = Snackbar.make(view, "Exercise: " + mExercises.get(getAdapterPosition()), Snackbar.LENGTH_LONG);
+
+            snackbar.show();
+        }
+
     }
 
     // Provide suitable constructor
@@ -50,7 +72,6 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.View
 
         //create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_exercise, parent, false);
-
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }

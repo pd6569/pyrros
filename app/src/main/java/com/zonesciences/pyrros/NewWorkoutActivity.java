@@ -41,7 +41,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
     //need reference to database to read/write data.
     private DatabaseReference mDatabase;
-    private DatabaseReference mWorkoutExercisesReference;
+    private DatabaseReference mExercisesReference;
 
     // setup for recyclerview to display exercises in current workout
 
@@ -51,12 +51,11 @@ public class NewWorkoutActivity extends BaseActivity {
 
     private EditText mExerciseField;
     private TextView mNoExercises;
-    private ListView mListView;
     private FloatingActionButton mSubmitExercise;
 
-    private int numExercises = 0;
     private String mWorkoutKey;
     private Workout mCurrentWorkout;
+    private Exercise mExercise;
 
     private List<String> mUserExercises = new ArrayList<String>();
     private List<String> mCurrentExercises = new ArrayList<String>();
@@ -74,7 +73,7 @@ public class NewWorkoutActivity extends BaseActivity {
         //Create unique workout key
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
 
-        mWorkoutExercisesReference = mDatabase.child("workouts").child(mWorkoutKey).child("exercises");
+        mExercisesReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -121,6 +120,7 @@ public class NewWorkoutActivity extends BaseActivity {
     @Override
     public void onStart(){
         super.onStart();
+
 
         mAdapter = new ExercisesAdapter(mCurrentExercises);
         mExercisesRecycler.setAdapter(mAdapter);
@@ -243,8 +243,7 @@ public class NewWorkoutActivity extends BaseActivity {
     // [START write_fan_out]
     private void writeNewWorkout(String userId, String username, String exercise, String exerciseKey) {
 
-        final Exercise exerciseName;
-        Map<String, Object> exerciseValues = new HashMap<>();
+        Map<String, Object> exerciseValues;
 
         //if the exercise already exists, exercise key is passed in, if not a brand new exercise key
         //is generated
@@ -252,10 +251,26 @@ public class NewWorkoutActivity extends BaseActivity {
         if (exerciseKey == null) {
             mExerciseKey = exercise;
             mUserExercises.add(exercise); // add exercise to list for tracking purposes
-            exerciseName = new Exercise(exercise);
-            exerciseValues = new HashMap<>(exerciseName.toMap());
+
+            //create new exercise to add to user-exercises
+            mExercise = new Exercise(userId, exercise);
         } else {
             mExerciseKey = exerciseKey;
+
+            //Exercise already exists in user-exercise. Pass existing values from this exercise into the current exercise object for this workout
+            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    mExercise = dataSnapshot.getValue(Exercise.class);
+                    Log.i(TAG, "Adding existing exercise to new workout, setting exercise object to existing exercise values: " + mExercise.getName());
+                    updateWorkoutExercises(mExercise);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
 
         //Create new workout object and map values. Add exercise via exerciseKey.
@@ -265,54 +280,69 @@ public class NewWorkoutActivity extends BaseActivity {
         //Create map object to push multiple updates to multiple nodes
         Map<String, Object> childUpdates = new HashMap<>();
 
+        childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
         childUpdates.put("/workouts/" + mWorkoutKey, workoutValues);
         childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey, workoutValues);
-        if(exerciseKey == null) { // add new exercise if it does not already exist
-            childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, exerciseValues);
+        if(exerciseKey == null) { // create new exercise if it does not already exist in user-exercises and add it to workout-exercises
+            childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, mExercise);
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
         }
-        childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
-
         mDatabase.updateChildren(childUpdates);
     }
-
-    private void addExercisesFromKey(String exerciseKey) {
-
-    }
-
-
     // [END write_fan_out]
 
     //Add exercise to existing workout that has just been created
     private void addNewExercise(String userId, String username, String workoutKey, final String exercise, String exerciseKey) {
 
-        Exercise exerciseName;
 
         //Create unique exercise key if the exercise is new, otherwise use key for existing exercise
         if (exerciseKey == null){
             mExerciseKey = exercise;
             Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
             mUserExercises.add(exercise);
-            exerciseName = new Exercise(exercise);
-            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(exerciseName);
+            mExercise = new Exercise(userId, exercise);
+            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
         } else {
             Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
             mExerciseKey = exerciseKey;
+            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    mExercise = dataSnapshot.getValue(Exercise.class);
+                    Log.i(TAG, "Adding existing exercise to current workout, setting exercise object to existing exercise values: " + mExercise.getName());
+                    mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
 
+        Log.i(TAG, "mExercise = " + mExercise);
 
-        //Add this exercise to current workout via unique exercise key
+        //Add this exercise to current workout via exercise key
         mCurrentWorkout.addExercise(mExerciseKey);
 
         //add new exercises from current workout object to workouts and user-workouts directory
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workouts/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
         childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
-
+        if (exerciseKey == null) {
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+        }
         mDatabase.updateChildren(childUpdates);
         /*mDatabase.child("workouts").child(mWorkoutKey).child("exercises").setValue(mCurrentWorkout.exercises);*/
 
 
         //locations to update: user-exercises, user-workouts, workouts
+    }
+
+    private void updateWorkoutExercises(Exercise exercise) {
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+        mDatabase.updateChildren(childUpdates);
     }
 
     private boolean checkExerciseExists(String exercise) {
@@ -341,9 +371,9 @@ public class NewWorkoutActivity extends BaseActivity {
 
     //get exercise key for existing exercises
     public void getExerciseKey(final String userId, final String username, final String exercise, final boolean newWorkout) {
-        Log.i(TAG, "getExerciseKey called. userId: " + userId + " exercise: " + exercise);
+        Log.i(TAG, "getExerciseKey()");
 
-        Query queryRef = mDatabase.child("user-exercises").child(userId).orderByChild("name").equalTo(exercise).limitToFirst(1);
+        Query queryRef = mDatabase.child("user-exercises").child(userId).orderByChild("name").equalTo(exercise);
         queryRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

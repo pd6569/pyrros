@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public class Exercise {
 
+    public String uid;
     public String name;
     public String muscleGroup;
 
@@ -17,11 +18,14 @@ public class Exercise {
         // Default constructor required for calls to DataSnapshot.getValue(Exercise.class)
     }
 
-    public Exercise (String name){
+    public Exercise (String uid, String name){
+        this.uid = uid;
         this.name = name;
     }
 
-    public Exercise (String name, String muscleGroup){
+
+    public Exercise (String uid, String name, String muscleGroup){
+        this.uid = uid;
         this.name = name;
         this.muscleGroup = muscleGroup;
     }
@@ -31,11 +35,18 @@ public class Exercise {
     @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
         result.put("name", name);
         result.put("group", muscleGroup);
 
         return result;
     }
+
+    @Exclude
+    public String getUid() {
+        return uid;
+    }
+
     @Exclude
     public String getName() {
         return name;
@@ -45,4 +56,6 @@ public class Exercise {
     public String getMuscleGroup() {
         return muscleGroup;
     }
+
+
 }
