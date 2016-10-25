@@ -26,59 +26,143 @@ import java.util.List;
 /**
  * Created by Peter on 24/10/2016.
  */
-public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder> {
+public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ExerciseViewHolder> {
 
     public static final String TAG = "ExerciseAdapter";
 
-    private List<String> mExercises = new ArrayList<>();
+
     private Context mContext;
     private DatabaseReference mDatabaseReference;
     private ChildEventListener mChildEventListener;
 
+    private List<String> mExerciseIds = new ArrayList<>();
+    private List<Exercise> mExercises = new ArrayList<>();
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    public class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
         public TextView exerciseName;
-        public RelativeLayout exerciseContainer;
 
-        public ViewHolder(View itemView) {
+        public ExerciseViewHolder(View itemView) {
             super(itemView);
 
             exerciseName = (TextView) itemView.findViewById(R.id.exercise_name);
 
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            Log.i(TAG, "onClick");
-            mExercises.remove(getAdapterPosition());
-            Snackbar snackbar = Snackbar.make(view, "Exercise: " + mExercises.get(getAdapterPosition()), Snackbar.LENGTH_LONG);
-
-            snackbar.show();
         }
 
     }
 
     // Provide suitable constructor
-    public ExercisesAdapter(List<String> exercises) {
+    public ExercisesAdapter(final Context context, DatabaseReference ref) {
+        mContext = context;
+        mDatabaseReference = ref;
 
-        mExercises = exercises;
+        // Create child event listener
+        // [START child_event_listener_recycler]
+        ChildEventListener childEventListener = new ChildEventListener(){
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName){
+                Log.d(TAG, "onChildAdded: " + dataSnapshot.getKey());
 
+                // A new exercise has been added, add it to the displayed list
+                Exercise exercise = dataSnapshot.getValue(Exercise.class);
+
+                // [START_EXCLUDE]
+                // Update RecyclerView
+                mExerciseIds.add(dataSnapshot.getKey());
+                mExercises.add(exercise);
+                notifyItemInserted(mExercises.size() - 1);
+                // [END_EXCLUDE]
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.d(TAG, "onChildChanged :" + dataSnapshot.getKey());
+
+                // An exercise has changed, use the key to determine if we are displaying this
+                // exercise and if so display the changed exercise.
+
+                Exercise newExercise = dataSnapshot.getValue(Exercise.class);
+                String exerciseKey = dataSnapshot.getKey();
+
+                // [START_EXCLUDE]
+                int exerciseIndex = mExerciseIds.indexOf(exerciseKey);
+                if (exerciseIndex > -1) {
+                    // Replace with the new data
+                    mExercises.set(exerciseIndex, newExercise);
+
+                    // Update the RecyclerView
+                    notifyItemChanged(exerciseIndex);
+                } else {
+                    Log.v(TAG, "onChildChanged:unknown_child" + exerciseKey);
+                }
+                // [END_EXCLUDE]
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onChildRemoved: " + dataSnapshot.getKey());
+
+                // An exercise has changed, use the key to determine if we are displaying this
+                // exercise and if so remove it.
+
+                String exerciseKey = dataSnapshot.getKey();
+
+                // [START_EXCLUDE]
+                int exerciseIndex = mExerciseIds.indexOf(exerciseKey);
+                if (exerciseIndex > -1) {
+                    // Remove data from the list
+                    mExerciseIds.remove(exerciseIndex);
+                    mExercises.remove(exerciseIndex);
+
+                    //Update the RecyclerView
+                    notifyItemRemoved(exerciseIndex);
+                } else {
+                    Log.v(TAG, "onChildRemoved:unknown_child: " + exerciseKey);
+                }
+                //[END_EXCLUDE]
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.d(TAG, "onChildMoved: " + dataSnapshot.getKey());
+
+                // An exercise has changed position, use the key to dtermine if we are displaying
+                // this comment and if so move it.
+                Exercise movedExercise = dataSnapshot.getValue(Exercise.class);
+                String exerciseKey = dataSnapshot.getKey();
+
+                // ...
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.v(TAG, "postComments:onCancelled", databaseError.toException());
+                Toast.makeText(mContext, "Failed to load exercises", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        ref.addChildEventListener(childEventListener);
+        // [END child_event_listener_recycler]
+
+        //Store reference to listener so it can be removed on app stop
+        mChildEventListener = childEventListener;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ExerciseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        //create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_exercise, parent, false);
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View view = inflater.inflate(R.layout.item_exercise, parent, false);
+        return new ExerciseViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ExercisesAdapter.ViewHolder holder, int position) {
-        holder.exerciseName.setText(mExercises.get(position));
+    public void onBindViewHolder(ExerciseViewHolder holder, int position) {
+        Exercise exercise = mExercises.get(position);
+        holder.exerciseName.setText(exercise.getName());
     }
 
 
@@ -86,4 +170,5 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.View
     public int getItemCount() {
         return mExercises.size();
     }
+
 }

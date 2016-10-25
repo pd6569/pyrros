@@ -73,7 +73,7 @@ public class NewWorkoutActivity extends BaseActivity {
         //Create unique workout key
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
 
-        mExercisesReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
+        mExercisesReference = mDatabase.child("workout-exercises").child(mWorkoutKey);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -122,7 +122,7 @@ public class NewWorkoutActivity extends BaseActivity {
         super.onStart();
 
 
-        mAdapter = new ExercisesAdapter(mCurrentExercises);
+        mAdapter = new ExercisesAdapter(this, mExercisesReference);
         mExercisesRecycler.setAdapter(mAdapter);
 
         //add listener for new exercises added/removed from this workout
