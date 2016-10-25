@@ -1,7 +1,9 @@
 package com.zonesciences.pyrros;
 
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -132,6 +134,8 @@ public class NewWorkoutActivity extends BaseActivity {
                 mCurrentExercises.add(exerciseKey);
                 mAdapter.notifyDataSetChanged();
                 Log.i(TAG, "exercise added using key: " + exerciseKey + " to mCurrentExercise. Number of exercises in workout: " + mCurrentExercises.size());
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout_new_workout), "Added " + exerciseKey + " to  workout", Snackbar.LENGTH_LONG);
+                snackbar.show();
 
             }
 
