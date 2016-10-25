@@ -3,13 +3,10 @@ package com.zonesciences.pyrros.adapters;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +14,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
 
@@ -32,11 +30,14 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
 
     private Context mContext;
-    private DatabaseReference mDatabaseReference;
+    private DatabaseReference mWorkoutExerciseReference;
+    private DatabaseReference mDatabaseRoot;
     private ChildEventListener mChildEventListener;
 
-    private List<String> mExerciseIds = new ArrayList<>();
+    private List<String> mExerciseKeys = new ArrayList<>();
     private List<Exercise> mExercises = new ArrayList<>();
+
+    private String mWorkoutKey;
 
 
     public class ExerciseViewHolder extends RecyclerView.ViewHolder {
@@ -48,14 +49,25 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
             exerciseName = (TextView) itemView.findViewById(R.id.exercise_name);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i(TAG, "onClick");
+                    Snackbar snackbar = Snackbar.make(view, "Removing exercise: " + mExercises.get(getAdapterPosition()).getName(), Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                    mWorkoutExerciseReference.child(mExerciseKeys.get(getAdapterPosition())).removeValue();
+                }
+            });
         }
 
     }
 
     // Provide suitable constructor
-    public ExercisesAdapter(final Context context, DatabaseReference ref) {
+    public ExercisesAdapter(final Context context, DatabaseReference workoutExercisesRef, DatabaseReference databaseRoot, String workoutKey) {
         mContext = context;
-        mDatabaseReference = ref;
+        mWorkoutExerciseReference = workoutExercisesRef;
+        mDatabaseRoot = databaseRoot;
+        mWorkoutKey = workoutKey;
 
         // Create child event listener
         // [START child_event_listener_recycler]
@@ -69,7 +81,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
                 // [START_EXCLUDE]
                 // Update RecyclerView
-                mExerciseIds.add(dataSnapshot.getKey());
+                mExerciseKeys.add(dataSnapshot.getKey());
                 mExercises.add(exercise);
                 notifyItemInserted(mExercises.size() - 1);
                 // [END_EXCLUDE]
@@ -86,7 +98,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                 String exerciseKey = dataSnapshot.getKey();
 
                 // [START_EXCLUDE]
-                int exerciseIndex = mExerciseIds.indexOf(exerciseKey);
+                int exerciseIndex = mExerciseKeys.indexOf(exerciseKey);
                 if (exerciseIndex > -1) {
                     // Replace with the new data
                     mExercises.set(exerciseIndex, newExercise);
@@ -110,10 +122,10 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                 String exerciseKey = dataSnapshot.getKey();
 
                 // [START_EXCLUDE]
-                int exerciseIndex = mExerciseIds.indexOf(exerciseKey);
+                int exerciseIndex = mExerciseKeys.indexOf(exerciseKey);
                 if (exerciseIndex > -1) {
                     // Remove data from the list
-                    mExerciseIds.remove(exerciseIndex);
+                    mExerciseKeys.remove(exerciseIndex);
                     mExercises.remove(exerciseIndex);
 
                     //Update the RecyclerView
@@ -144,7 +156,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
             }
         };
 
-        ref.addChildEventListener(childEventListener);
+        mWorkoutExerciseReference.addChildEventListener(childEventListener);
         // [END child_event_listener_recycler]
 
         //Store reference to listener so it can be removed on app stop

@@ -1,9 +1,7 @@
 package com.zonesciences.pyrros;
 
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -11,7 +9,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +54,7 @@ public class NewWorkoutActivity extends BaseActivity {
     private Workout mCurrentWorkout;
     private Exercise mExercise;
 
-    private List<String> mUserExercises = new ArrayList<String>();
+    private List<String> mUserExerciseKeys = new ArrayList<String>();
     private List<String> mCurrentExercises = new ArrayList<String>();
 
     private String mExerciseKey = new String();
@@ -101,10 +98,9 @@ public class NewWorkoutActivity extends BaseActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot exerciseSnapshot : dataSnapshot.getChildren()) {
-                    Exercise exercise = exerciseSnapshot.getValue(Exercise.class);
-                    String s = exercise.getName();
-                    mUserExercises.add(s);
-                    Log.d(TAG, "Exercise " + s + " added to userExercise List");
+                    String s = exerciseSnapshot.getKey();
+                    mUserExerciseKeys.add(s);
+                    Log.d(TAG, "Exercise " + s + " added to UserExerciseKeys List");
                 }
             }
 
@@ -114,52 +110,16 @@ public class NewWorkoutActivity extends BaseActivity {
             }
         });
 
-
     }
 
     @Override
     public void onStart(){
         super.onStart();
 
-
-        mAdapter = new ExercisesAdapter(this, mExercisesReference);
+        // Adapter sets listener on workout-exercises directory detecting exercises that are added/removed/moved and updates the
+        // recycler view as appropriate
+        mAdapter = new ExercisesAdapter(this, mExercisesReference, mDatabase, mWorkoutKey);
         mExercisesRecycler.setAdapter(mAdapter);
-
-        //add listener for new exercises added/removed from this workout
-        mDatabase.child("workouts").child(mWorkoutKey).child("exercises").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "onChildAdded(). Exercise added to workout: " + dataSnapshot.getKey());
-                String exerciseKey = dataSnapshot.getKey();
-                mCurrentExercises.add(exerciseKey);
-                mAdapter.notifyDataSetChanged();
-                Log.i(TAG, "exercise added using key: " + exerciseKey + " to mCurrentExercise. Number of exercises in workout: " + mCurrentExercises.size());
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout_new_workout), "Added " + exerciseKey + " to  workout", Snackbar.LENGTH_LONG);
-                snackbar.show();
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "onChildChanged");
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
 
     }
 
@@ -181,12 +141,9 @@ public class NewWorkoutActivity extends BaseActivity {
         // [START single_value_read
         final String userId = getUid();
 
-        //ListenerForSingleValue event is useful for data that needs to be loaded once and isn't expected
-        //to change frequently or require active listening.
         //Listener under "users" path - checks that user exists, if exists then writes new workout
         mDatabase.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
 
-            // onDataChange() method reads static snapshot of contents as they exist at time of event
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //Get user value
@@ -203,25 +160,33 @@ public class NewWorkoutActivity extends BaseActivity {
                     //check if there is an existing workout being added to, or if this is a brand new workout.
                     // and check if the exercise being added already exists in user-exercise or not.
                     //if exists call method getExerciseKey
+                    String exerciseKey;
                     boolean newWorkout;
                         if (mCurrentWorkout == null) {
                             newWorkout = true;
                             if (checkExerciseExists(exercise)){
+                                //Exercise already exists, set exercise key
+                                exerciseKey = exercise;
                                 Log.i(TAG, "Creating brand new workout, with existing exercise");
-                                getExerciseKey(userId, user.username, exercise, newWorkout);
+
                             } else {
+                                // Exercise does not exist, set exercise key null
+                                exerciseKey = null;
                                 Log.i(TAG, "Creating brand new workout, with new exercise");
-                                writeNewWorkout(userId, user.username, exercise, null);
                             }
+                            writeNewWorkout(userId, user.username, exercise, exerciseKey);
                         } else {
                             newWorkout = false;
                             if (checkExerciseExists(exercise)){
+                                // Exercise already exists, set exercise key
+                                exerciseKey = exercise;
                                 Log.i(TAG, "Adding existing exercise to current workout");
-                                getExerciseKey(userId, user.username, exercise, newWorkout);
                             } else {
+                                // Exercise does not exist, set exercise key null
+                                exerciseKey = null;
                                 Log.i(TAG, "Adding new exercise to current workout");
-                                addNewExercise(userId, user.username, mWorkoutKey, exercise, null);
                             }
+                            addNewExercise(userId, user.username, mWorkoutKey, exercise, exerciseKey);
                         }
                     }
                 // [END_EXCLUDE]
@@ -250,7 +215,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
         if (exerciseKey == null) {
             mExerciseKey = exercise;
-            mUserExercises.add(exercise); // add exercise to list for tracking purposes
+            mUserExerciseKeys.add(exercise); // add exercise to list for tracking purposes
 
             //create new exercise to add to user-exercises
             mExercise = new Exercise(userId, exercise);
@@ -274,7 +239,7 @@ public class NewWorkoutActivity extends BaseActivity {
         }
 
         //Create new workout object and map values. Add exercise via exerciseKey.
-        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true), mExerciseKey);
+        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true));
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();
 
         //Create map object to push multiple updates to multiple nodes
@@ -299,9 +264,10 @@ public class NewWorkoutActivity extends BaseActivity {
         if (exerciseKey == null){
             mExerciseKey = exercise;
             Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
-            mUserExercises.add(exercise);
+            mUserExerciseKeys.add(exercise);
             mExercise = new Exercise(userId, exercise);
             mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
+            mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
         } else {
             Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
             mExerciseKey = exerciseKey;
@@ -320,23 +286,6 @@ public class NewWorkoutActivity extends BaseActivity {
             });
         }
 
-        Log.i(TAG, "mExercise = " + mExercise);
-
-        //Add this exercise to current workout via exercise key
-        mCurrentWorkout.addExercise(mExerciseKey);
-
-        //add new exercises from current workout object to workouts and user-workouts directory
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/workouts/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
-        childUpdates.put("/user-workouts/" + userId + "/" + mWorkoutKey + "/exercises/", mCurrentWorkout.exercises);
-        if (exerciseKey == null) {
-            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
-        }
-        mDatabase.updateChildren(childUpdates);
-        /*mDatabase.child("workouts").child(mWorkoutKey).child("exercises").setValue(mCurrentWorkout.exercises);*/
-
-
-        //locations to update: user-exercises, user-workouts, workouts
     }
 
     private void updateWorkoutExercises(Exercise exercise) {
@@ -346,7 +295,7 @@ public class NewWorkoutActivity extends BaseActivity {
     }
 
     private boolean checkExerciseExists(String exercise) {
-        if (mUserExercises.contains(exercise)){
+        if (mUserExerciseKeys.contains(exercise)){
             Log.i(TAG, "Exercise already exists");
             return true;
         } else {
@@ -367,47 +316,6 @@ public class NewWorkoutActivity extends BaseActivity {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
         String date = df.format(Calendar.getInstance().getTime());
         return date;
-    }
-
-    //get exercise key for existing exercises
-    public void getExerciseKey(final String userId, final String username, final String exercise, final boolean newWorkout) {
-        Log.i(TAG, "getExerciseKey()");
-
-        Query queryRef = mDatabase.child("user-exercises").child(userId).orderByChild("name").equalTo(exercise);
-        queryRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "Exercise exists with the following keys: " + dataSnapshot.getKey());
-                mExerciseKey = dataSnapshot.getKey();
-                Log.i(TAG, "mExerciseKey = " + mExerciseKey);
-                if (newWorkout){
-                    writeNewWorkout(userId, username, exercise, mExerciseKey);
-                } else {
-                    addNewExercise(userId, username, mWorkoutKey, exercise, mExerciseKey);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "onchildchanged called");
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "onchildremoved called");
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "onchildmoved called");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.i(TAG, "onchildcancelled called");
-            }
-        });
-
     }
 
 }

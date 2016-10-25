@@ -26,19 +26,18 @@ public class Workout {
     public int userCount;
     public String clientTimeStamp;
     public Map<String, Boolean> users = new HashMap<>();
-    public Map<String, Boolean> exercises = new HashMap<>();
+
 
     public Workout(){
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
     }
 
-    public Workout(String uid, String creator, String clientTimeStamp, String name, Boolean shared, String exerciseKey){
+    public Workout(String uid, String creator, String clientTimeStamp, String name, Boolean shared){
         this.uid = uid;
         this.creator = creator;
         this.clientTimeStamp = clientTimeStamp;
         this.name = name;
         this.shared = shared;
-        addExercise(exerciseKey);
     }
 
     // [START post_to_map]
@@ -52,30 +51,13 @@ public class Workout {
         result.put("shared", shared);
         result.put("userCount", userCount);
         result.put("users", users);
-        result.put("exercises", exercises);
 
         return result;
     }
     // [END post_to_map]
 
     //adds exercise to workout object via Key
-    @Exclude
-    public Map<String, Boolean> addExercise (String exerciseName){
-        if (exercises == null) {
-            HashMap<String, Boolean> map = new HashMap<>();
-            map.put(exerciseName, true);
-            exercises = map;
-        } else {
-            exercises.put(exerciseName, true);
-            }
-        return exercises;
-    }
 
-    @Exclude
-    public List getExerciseKeys(){
-        List<String> exerciseKeys = new ArrayList<String>(exercises.keySet());
-        return exerciseKeys;
-    }
 
     @Exclude
     public Boolean getShared() {
@@ -102,8 +84,5 @@ public class Workout {
         return name;
     }
 
-    public Map<String, Boolean> getExercises() {
-        return exercises;
-    }
 }
 //[END workout_class]
