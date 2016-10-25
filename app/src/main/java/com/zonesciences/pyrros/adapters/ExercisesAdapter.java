@@ -2,13 +2,20 @@ package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.models.Exercise;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,8 +23,9 @@ import java.util.List;
  */
 public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder> {
 
-    private List<String> mExercises;
-    private Context mContext;
+    public static final String TAG = "ExerciseAdapter";
+
+    private List<String> mExercises = new ArrayList<>();
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -32,7 +40,9 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.View
 
     // Provide suitable constructor
     public ExercisesAdapter(List<String> exercises) {
+
         mExercises = exercises;
+
     }
 
     @Override
@@ -49,7 +59,6 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.View
     public void onBindViewHolder(ExercisesAdapter.ViewHolder holder, int position) {
         holder.exerciseName.setText(mExercises.get(position));
     }
-
 
 
     @Override

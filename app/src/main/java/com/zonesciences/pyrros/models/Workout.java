@@ -60,13 +60,13 @@ public class Workout {
 
     //adds exercise to workout object via Key
     @Exclude
-    public Map<String, Boolean> addExercise (String exerciseKey){
+    public Map<String, Boolean> addExercise (String exerciseName){
         if (exercises == null) {
             HashMap<String, Boolean> map = new HashMap<>();
-            map.put(exerciseKey, true);
+            map.put(exerciseName, true);
             exercises = map;
         } else {
-            exercises.put(exerciseKey, true);
+            exercises.put(exerciseName, true);
             }
         return exercises;
     }
