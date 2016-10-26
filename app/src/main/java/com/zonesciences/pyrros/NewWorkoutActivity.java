@@ -131,10 +131,7 @@ public class NewWorkoutActivity extends BaseActivity {
             mExerciseField.setError(REQUIRED);
             return;
         } else {
-            if (exerciseInCurrentWorkout(exercise)){
-                Toast.makeText(this, "This workout already contains this exercise", Toast.LENGTH_SHORT).show();
-                return;
-            }
+
             mNoExercises.setVisibility(View.INVISIBLE);
         }
 
@@ -307,13 +304,6 @@ public class NewWorkoutActivity extends BaseActivity {
             Log.i(TAG, "Exercise does not exist");
             return false;
         }
-    }
-
-    private boolean exerciseInCurrentWorkout(String exercise) {
-        if(mCurrentExercises.contains(exercise)){
-            return true;
-        }
-        return false;
     }
 
 
