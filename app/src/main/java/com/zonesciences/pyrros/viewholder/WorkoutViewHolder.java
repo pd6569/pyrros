@@ -35,7 +35,6 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         creatorTextView.setText(workout.creator);
         numUsersTextView.setText(String.valueOf(workout.userCount));
         bodyTextView.setText("List of exercises to display");
-
         usersImageView.setOnClickListener(usersClickListener);
     }
 }

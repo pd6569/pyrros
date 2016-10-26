@@ -20,6 +20,7 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.WorkoutsAdapter;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
 
@@ -73,10 +74,11 @@ public abstract class WorkoutsListFragment extends Fragment {
 
         Query workoutsQuery = getQuery(mDatabase);
 
-        mAdapter = new FirebaseRecyclerAdapter<Workout, WorkoutViewHolder>(Workout.class, R.layout.item_workout, WorkoutViewHolder.class, workoutsQuery){
+        mAdapter = new WorkoutsAdapter(Workout.class, R.layout.item_workout, WorkoutViewHolder.class, workoutsQuery, mDatabase, getUid());
+        /*mAdapter = new FirebaseRecyclerAdapter<Workout, WorkoutViewHolder>(Workout.class, R.layout.item_workout, WorkoutViewHolder.class, workoutsQuery){
 
             @Override
-            protected void populateViewHolder(final WorkoutViewHolder viewHolder, final Workout model, final int position) {
+            protected void populateViewHolder(final WorkoutViewHolder viewHolder, final Workout workout, final int position) {
                 final DatabaseReference workoutRef  = getRef(position);
 
                 //Set click listener for the whole workout view
@@ -91,20 +93,20 @@ public abstract class WorkoutsListFragment extends Fragment {
                 });
 
                 //Determine if the current user has subscribed to this workout and set UI accordingly
-                if(model.users.containsKey(getUid())){
+                if(workout.users.containsKey(getUid())){
                     viewHolder.usersImageView.setImageResource(R.drawable.ic_toggle_star_24);
                 } else {
                     viewHolder.usersImageView.setImageResource(R.drawable.ic_toggle_star_outline_24);
                 }
 
                 //Bind Workout to ViewHolder, setting OnClickListener for the users button
-                viewHolder.bindToWorkout(model, new View.OnClickListener() {
+                viewHolder.bindToWorkout(workout, new View.OnClickListener() {
+
                     @Override
                     public void onClick(View view) {
-
                         //Need to write to both places the workout is stored
                         DatabaseReference globalWorkoutRef = mDatabase.child("workouts").child(workoutRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user-workouts").child(model.uid).child(workoutRef.getKey());
+                        DatabaseReference userPostRef = mDatabase.child("user-workouts").child(workout.uid).child(workoutRef.getKey());
 
                         //Run two transactions
                         onUsersClicked(globalWorkoutRef);
@@ -113,7 +115,7 @@ public abstract class WorkoutsListFragment extends Fragment {
                     }
                 });
             }
-        };
+        };*/
 
         mRecyclerView.setAdapter(mAdapter);
     }
