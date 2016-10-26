@@ -131,7 +131,7 @@ public class NewWorkoutActivity extends BaseActivity {
             mExerciseField.setError(REQUIRED);
             return;
         } else {
-
+            mExerciseField.setText("");
             mNoExercises.setVisibility(View.INVISIBLE);
         }
 
