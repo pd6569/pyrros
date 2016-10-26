@@ -75,48 +75,6 @@ public abstract class WorkoutsListFragment extends Fragment {
         Query workoutsQuery = getQuery(mDatabase);
 
         mAdapter = new WorkoutsAdapter(Workout.class, R.layout.item_workout, WorkoutViewHolder.class, workoutsQuery, mDatabase, getUid());
-        /*mAdapter = new FirebaseRecyclerAdapter<Workout, WorkoutViewHolder>(Workout.class, R.layout.item_workout, WorkoutViewHolder.class, workoutsQuery){
-
-            @Override
-            protected void populateViewHolder(final WorkoutViewHolder viewHolder, final Workout workout, final int position) {
-                final DatabaseReference workoutRef  = getRef(position);
-
-                //Set click listener for the whole workout view
-                final String workoutKey = workoutRef.getKey();
-
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //Launch ViewWorkout
-                        Toast.makeText(getActivity(), "Launching Workout...", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                //Determine if the current user has subscribed to this workout and set UI accordingly
-                if(workout.users.containsKey(getUid())){
-                    viewHolder.usersImageView.setImageResource(R.drawable.ic_toggle_star_24);
-                } else {
-                    viewHolder.usersImageView.setImageResource(R.drawable.ic_toggle_star_outline_24);
-                }
-
-                //Bind Workout to ViewHolder, setting OnClickListener for the users button
-                viewHolder.bindToWorkout(workout, new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        //Need to write to both places the workout is stored
-                        DatabaseReference globalWorkoutRef = mDatabase.child("workouts").child(workoutRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user-workouts").child(workout.uid).child(workoutRef.getKey());
-
-                        //Run two transactions
-                        onUsersClicked(globalWorkoutRef);
-                        onUsersClicked(userPostRef);
-
-                    }
-                });
-            }
-        };*/
-
         mRecyclerView.setAdapter(mAdapter);
     }
 

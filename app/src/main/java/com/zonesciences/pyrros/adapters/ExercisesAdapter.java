@@ -152,7 +152,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.v(TAG, "postComments:onCancelled", databaseError.toException());
-                Toast.makeText(mContext, "Failed to load exercises", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Failed to load mExercises", Toast.LENGTH_SHORT).show();
             }
         };
 

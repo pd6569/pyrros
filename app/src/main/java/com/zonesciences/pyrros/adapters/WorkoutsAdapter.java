@@ -5,16 +5,21 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
 
+import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
+
+import java.util.List;
 
 /**
  * Created by Peter on 26/10/2016.
@@ -35,6 +40,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
     protected void populateViewHolder(final WorkoutViewHolder viewHolder, final Workout workout, final int position) {
 
+        //This gets the unique key for the workout associated with the item in the list.
         final DatabaseReference workoutRef  = getRef(position);
 
         //Set click listener for the whole workout view
@@ -45,6 +51,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             public void onClick(View view) {
                 //Launch ViewWorkout
                 Toast.makeText(view.getContext(), "Launching Workout...", Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "Value of workoutRef: " + workoutRef.getKey());
             }
         });
 
@@ -55,8 +62,11 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             viewHolder.usersImageView.setImageResource(R.drawable.ic_toggle_star_outline_24);
         }
 
+        DatabaseReference workoutExercisesReference = mDatabaseReference.child("workout-exercises").child(workoutKey);
+
+
         //Bind Workout to ViewHolder, setting OnClickListener for the users button
-        viewHolder.bindToWorkout(workout, new View.OnClickListener() {
+        viewHolder.bindToWorkout(workout, workoutExercisesReference, new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
