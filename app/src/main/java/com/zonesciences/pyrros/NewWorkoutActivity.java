@@ -239,7 +239,11 @@ public class NewWorkoutActivity extends BaseActivity {
         }
 
         //Create new workout object and map values. Add exercise via exerciseKey.
-        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(), "New Workout", new Boolean(true));
+
+        //Set Default workout title
+        String title = new String("Workout - " + getClientTimeStamp(false));
+
+        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(true), title, new Boolean(true));
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();
 
         //Create map object to push multiple updates to multiple nodes
@@ -313,10 +317,14 @@ public class NewWorkoutActivity extends BaseActivity {
     }
 
 
-    private String getClientTimeStamp(){
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
-        String date = df.format(Calendar.getInstance().getTime());
+    private String getClientTimeStamp(boolean includeTime){
+        SimpleDateFormat df;
+        if (includeTime) {
+            df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+        } else {
+            df = new SimpleDateFormat("dd MMM, yyyy");
+        }
+            String date = df.format(Calendar.getInstance().getTime());
         return date;
     }
-
 }
