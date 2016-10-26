@@ -18,18 +18,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.fragment.DashboardFragment;
 import com.zonesciences.pyrros.fragment.TrainerFragment;
 import com.zonesciences.pyrros.fragment.WorkoutsFragment;
+import com.zonesciences.pyrros.models.User;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends BaseActivity {
 
+    public static final String TAG = "MainActivity";
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
@@ -39,6 +48,9 @@ public class MainActivity extends BaseActivity {
     private ViewPager mViewPager;
 
     private String mUserId;
+    private User mUser;
+
+    private boolean mAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +62,6 @@ public class MainActivity extends BaseActivity {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
 
         if (mFirebaseUser == null) {
             loadLoginView();
@@ -109,9 +120,10 @@ public class MainActivity extends BaseActivity {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return true;
-        } else {
-            return super.onOptionsItemSelected(item);
+        } else if (i == R.id.action_purge_database) {
+            purgeDatabase();
         }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -148,5 +160,30 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    public void purgeDatabase(){
+        mDatabase.child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (user.getAccountType().equals("admin")){
+                    Toast.makeText(getApplicationContext(), "Deleting the database, Motherfucker", Toast.LENGTH_SHORT).show();
+                    Map<String, Object> purgeDatabase = new HashMap<>();
+                    purgeDatabase.put("/timestamps/", null);
+                    purgeDatabase.put("/user-exercises/", null);
+                    purgeDatabase.put("/user-workouts/", null);
+                    purgeDatabase.put("/workout-exercises/", null);
+                    purgeDatabase.put("/workouts/", null);
+                    mDatabase.updateChildren(purgeDatabase);
+                } else {
+                    Toast.makeText(getApplicationContext(), "You are not an admin, motherfucker", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 }

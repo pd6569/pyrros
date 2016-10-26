@@ -271,6 +271,7 @@ public class NewWorkoutActivity extends BaseActivity {
         } else {
             Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
             mExerciseKey = exerciseKey;
+            //grab this exercise from the user-exercises directory
             mDatabase.child("user-exercises").child(userId).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

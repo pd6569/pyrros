@@ -184,7 +184,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     //Write user to database
     private void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email);
+        String accountType;
+        if (email.equals("peterdesouza@gmail.com")){
+            accountType = "admin";
+        } else {
+            accountType = "client";
+        }
+        User user = new User(name, email, accountType);
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/users/" + userId, user);
