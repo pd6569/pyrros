@@ -64,7 +64,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
         DatabaseReference workoutExercisesReference = mDatabaseReference.child("workout-exercises").child(workoutKey);
 
-
+        
         //Bind Workout to ViewHolder, setting OnClickListener for the users button
         viewHolder.bindToWorkout(workout, workoutExercisesReference, new View.OnClickListener() {
 
