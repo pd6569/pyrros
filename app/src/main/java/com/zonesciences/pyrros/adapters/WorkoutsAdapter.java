@@ -1,7 +1,13 @@
 package com.zonesciences.pyrros.adapters;
 
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -25,6 +31,7 @@ import java.util.List;
  * Created by Peter on 26/10/2016.
  */
 public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutViewHolder> {
+
 
     private static final String TAG = "WorkoutsAdapter";
 
@@ -116,4 +123,5 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             }
         });
     }
+
 }
