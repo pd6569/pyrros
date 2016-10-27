@@ -27,6 +27,19 @@ import java.util.List;
 public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutViewHolder> {
 
     private static final String TAG = "WorkoutsAdapter";
+asfdgv[#akwsdjg90i1df
+
+
+    asdf
+
+    asdf
+     asd]
+    F as.fdg
+    = asdf
+
+    asdf
+            asd
+    f
 
     DatabaseReference mDatabaseReference;
     String mUid;
