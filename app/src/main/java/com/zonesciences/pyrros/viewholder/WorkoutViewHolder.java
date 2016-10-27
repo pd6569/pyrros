@@ -48,6 +48,11 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
 
     }
 
+    beoliosadfioasdf;lkajsdf
+    asdflkjsad;fkljasd;float
+    sad;
+    asdfljkasdf;lkjasdf
+
     public void bindToWorkout(Workout workout, final DatabaseReference workoutExercisesReference, View.OnClickListener usersClickListener){
         Log.i(TAG, "bindToWorkout called");
         mExercises = new ArrayList<>();
