@@ -42,6 +42,11 @@ public abstract class WorkoutsListFragment extends Fragment {
     public WorkoutsListFragment() {}
 
     @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_workouts_list, container, false);

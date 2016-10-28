@@ -235,8 +235,6 @@ public class NewWorkoutActivity extends BaseActivity {
             });
         }
 
-        //Create new workout object and map values. Add exercise via exerciseKey.
-
         //Set Default workout title
         String title = new String("Workout - " + getClientTimeStamp(false));
 
@@ -252,14 +250,14 @@ public class NewWorkoutActivity extends BaseActivity {
         if(exerciseKey == null) { // create new exercise if it does not already exist in user-exercises and add it to workout-exercises
             childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, mExercise);
             childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+            childUpdates.put("/user-workout-exercises/" + userId + "/" + mWorkoutKey +"/" + mExerciseKey, mExercise);
         }
         mDatabase.updateChildren(childUpdates);
     }
     // [END write_fan_out]
 
     //Add exercise to existing workout that has just been created
-    private void addNewExercise(String userId, String username, String workoutKey, final String exercise, String exerciseKey) {
-
+    private void addNewExercise(final String userId, String username, String workoutKey, final String exercise, String exerciseKey) {
 
         //Create unique exercise key if the exercise is new, otherwise use key for existing exercise
         if (exerciseKey == null){
@@ -269,6 +267,7 @@ public class NewWorkoutActivity extends BaseActivity {
             mExercise = new Exercise(userId, exercise);
             mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
             mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+            mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
         } else {
             Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
             mExerciseKey = exerciseKey;
@@ -279,6 +278,7 @@ public class NewWorkoutActivity extends BaseActivity {
                     mExercise = dataSnapshot.getValue(Exercise.class);
                     Log.i(TAG, "Adding existing exercise to current workout, setting exercise object to existing exercise values: " + mExercise.getName());
                     mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+                    mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
                 }
 
                 @Override
@@ -293,6 +293,7 @@ public class NewWorkoutActivity extends BaseActivity {
     private void updateWorkoutExercises(Exercise exercise) {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+        childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
         mDatabase.updateChildren(childUpdates);
     }
 

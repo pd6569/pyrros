@@ -1,7 +1,9 @@
 package com.zonesciences.pyrros.adapters;
 
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -27,22 +29,10 @@ import java.util.List;
 public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutViewHolder> {
 
     private static final String TAG = "WorkoutsAdapter";
-asfdgv[#akwsdjg90i1df
-
-
-    asdf
-
-    asdf
-     asd]
-    F as.fdg
-    = asdf
-
-    asdf
-            asd
-    f
 
     DatabaseReference mDatabaseReference;
     String mUid;
+    int populate = 0;
 
     public WorkoutsAdapter(Class<Workout> modelClass, int modelLayout, Class<WorkoutViewHolder> viewHolderClass, Query ref, DatabaseReference databaseReference, String uid) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -55,6 +45,7 @@ asfdgv[#akwsdjg90i1df
 
         //This gets the unique key for the workout associated with the item in the list.
         final DatabaseReference workoutRef  = getRef(position);
+
 
         //Set click listener for the whole workout view
         final String workoutKey = workoutRef.getKey();

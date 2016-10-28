@@ -35,7 +35,6 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
     public LinearLayout exercisesContainerLinearLayout;
 
     public List<Exercise> mExercises;
-    public List<String> mWorkoutsInflated;
 
     public WorkoutViewHolder(View itemView) {
         super(itemView);
@@ -48,11 +47,6 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    beoliosadfioasdf;lkajsdf
-    asdflkjsad;fkljasd;float
-    sad;
-    asdfljkasdf;lkjasdf
-
     public void bindToWorkout(Workout workout, final DatabaseReference workoutExercisesReference, View.OnClickListener usersClickListener){
         Log.i(TAG, "bindToWorkout called");
         mExercises = new ArrayList<>();
@@ -60,40 +54,6 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         titleTextView.setText(workout.name);
         creatorTextView.setText(workout.creator);
         numUsersTextView.setText(String.valueOf(workout.userCount));
-
-        workoutExercisesReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Exercise exercise = dataSnapshot.getValue(Exercise.class);
-                mExercises.add(exercise);
-
-                Log.i(TAG, "mExercises called within eventlistener = " + mExercises.size());
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        Log.i(TAG, "mExercise called within bindWorkout = " + mExercises.size());
-
         usersImageView.setOnClickListener(usersClickListener);
     }
 }
