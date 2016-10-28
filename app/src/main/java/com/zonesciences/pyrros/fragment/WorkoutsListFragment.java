@@ -19,10 +19,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.WorkoutsAdapter;
+import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Peter on 18/10/2016.
@@ -39,11 +46,37 @@ public abstract class WorkoutsListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mManager;
 
+    private Map<String, List<Exercise>> mWorkoutExercisesMap = new HashMap<>();
     public WorkoutsListFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate() called");
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("user-workout-exercises").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "Getting list of exercises for workouts" + dataSnapshot.hasChildren());
+                for (DataSnapshot workout : dataSnapshot.getChildren()) {
+                    String s = workout.getKey();
+                    Log.i(TAG, "Workouts loaded: " + s);
+                    List<Exercise> exercises = new ArrayList<Exercise>();
+                    for (DataSnapshot exerciseKey : workout.getChildren()){
+                        Exercise exercise = exerciseKey.getValue(Exercise.class);
+                        Log.i(TAG, "Exercise added to list: " + exercise.getName());
+                        exercises.add(exercise);
+                    }
+                    mWorkoutExercisesMap.put(s, exercises);
+                    Log.i(TAG, "WorkoutExercisesMap updated: " + mWorkoutExercisesMap.size());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -52,7 +85,7 @@ public abstract class WorkoutsListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_workouts_list, container, false);
 
         // [START create_database_reference]
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         // [END create_database_reference]
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.workouts_list);
