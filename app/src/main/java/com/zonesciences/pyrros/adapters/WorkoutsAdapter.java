@@ -1,9 +1,13 @@
 package com.zonesciences.pyrros.adapters;
 
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -21,7 +25,10 @@ import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Peter on 26/10/2016.
@@ -32,20 +39,54 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
     DatabaseReference mDatabaseReference;
     String mUid;
-    int populate = 0;
+    int mNumExercises;
+    Map<String, List<Exercise>> mWorkoutExercises;
+    List<Exercise> mExercises;
+    List<Integer> mTrackedIds;
 
-    public WorkoutsAdapter(Class<Workout> modelClass, int modelLayout, Class<WorkoutViewHolder> viewHolderClass, Query ref, DatabaseReference databaseReference, String uid) {
+    public WorkoutsAdapter(Class<Workout> modelClass, int modelLayout, Class<WorkoutViewHolder> viewHolderClass, Query ref, DatabaseReference databaseReference, String uid, Map<String, List<Exercise>> workoutExercisesMap) {
         super(modelClass, modelLayout, viewHolderClass, ref);
-
+        Log.i(TAG, "WorkoutsAdapter constructor called");
         mDatabaseReference = databaseReference;
         mUid = uid;
+        mWorkoutExercises = workoutExercisesMap;
+
+    }
+
+    @Override
+    public WorkoutViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+        Log.i(TAG, "onCreateViewHolder() called");
+        ViewGroup view = (ViewGroup) LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
+        WorkoutViewHolder holder = new WorkoutViewHolder(view);
+        return holder;
     }
 
     protected void populateViewHolder(final WorkoutViewHolder viewHolder, final Workout workout, final int position) {
+        Log.i(TAG, "populateViewHolder() called");
 
         //This gets the unique key for the workout associated with the item in the list.
         final DatabaseReference workoutRef  = getRef(position);
 
+        if (!mWorkoutExercises.containsKey(workoutRef.getKey())){ //the stupid listener is set up and will notify adapter that data has changed when a new exercise is added when an exercise is added from the NewWorkoutActivity
+            Log.i(TAG, "No workout key exists");
+        } else {
+            mExercises = mWorkoutExercises.get(workoutRef.getKey());
+            mNumExercises = mExercises.size();
+            Log.i(TAG, "mWorkoutExercises Map contains exercises: " + mNumExercises);
+
+            LinearLayout exercisesContainer = (LinearLayout) viewHolder.itemView.findViewById(R.id.workout_exercises_container);
+            exercisesContainer.removeAllViews();
+
+           /* LinearLayout exerciseContainer = (LinearLayout) view.findViewById(R.id.workout_exercises_container);
+            exerciseContainer.removeAllViews();*/
+
+            for (int i = 0; i < mNumExercises; i++) {
+                View view = LayoutInflater.from(viewHolder.itemView.getContext()).inflate(R.layout.item_workout_exercises, null);
+                TextView exerciseText = (TextView) view.findViewById(R.id.workout_exercise_name);
+                exerciseText.setText(mExercises.get(i).getName());
+                exercisesContainer.addView(view);
+            }
+        }
 
         //Set click listener for the whole workout view
         final String workoutKey = workoutRef.getKey();
@@ -59,6 +100,8 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             }
         });
 
+        //Add set number of text views to the view holder
+
         //Determine if the current user has subscribed to this workout and set UI accordingly
         if(workout.users.containsKey(mUid)){
             viewHolder.usersImageView.setImageResource(R.drawable.ic_toggle_star_24);
@@ -66,9 +109,10 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             viewHolder.usersImageView.setImageResource(R.drawable.ic_toggle_star_outline_24);
         }
 
-        DatabaseReference workoutExercisesReference = mDatabaseReference.child("workout-exercises").child(workoutKey);
+        String workoutExercisesReference = mDatabaseReference.child("workout-exercises").child(workoutKey).getKey();
 
-        
+
+
         //Bind Workout to ViewHolder, setting OnClickListener for the users button
         viewHolder.bindToWorkout(workout, workoutExercisesReference, new View.OnClickListener() {
 
@@ -86,7 +130,13 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
         });
     }
 
+    @Override
+    public void onViewRecycled(WorkoutViewHolder viewHolder){
+        Log.i(TAG, "onViewRecycled called");
+    }
+
     private void onUsersClicked(DatabaseReference workoutRef){
+        Log.i(TAG, "onUsersClicked called");
         workoutRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {

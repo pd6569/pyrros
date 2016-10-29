@@ -20,6 +20,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Peter on 19/10/2016.
@@ -32,9 +33,6 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
 
     public ImageView usersImageView;
     public TextView numUsersTextView;
-    public LinearLayout exercisesContainerLinearLayout;
-
-    public List<Exercise> mExercises;
 
     public WorkoutViewHolder(View itemView) {
         super(itemView);
@@ -43,17 +41,17 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         creatorTextView = (TextView) itemView.findViewById(R.id.workout_creator);
         usersImageView = (ImageView) itemView.findViewById(R.id.workout_users);
         numUsersTextView = (TextView) itemView.findViewById(R.id.workout_num_users);
-        exercisesContainerLinearLayout = (LinearLayout) itemView.findViewById(R.id.linear_layout_exercises_container);
+
 
     }
 
-    public void bindToWorkout(Workout workout, final DatabaseReference workoutExercisesReference, View.OnClickListener usersClickListener){
+    public void bindToWorkout(Workout workout, String workoutExercisesReference,View.OnClickListener usersClickListener){
         Log.i(TAG, "bindToWorkout called");
-        mExercises = new ArrayList<>();
 
         titleTextView.setText(workout.name);
         creatorTextView.setText(workout.creator);
         numUsersTextView.setText(String.valueOf(workout.userCount));
         usersImageView.setOnClickListener(usersClickListener);
     }
+
 }

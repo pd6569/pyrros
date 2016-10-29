@@ -110,6 +110,9 @@ public class NewWorkoutActivity extends BaseActivity {
             }
         });
 
+        //Remove listener from previous activity
+
+
     }
 
     @Override
