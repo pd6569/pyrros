@@ -1,5 +1,6 @@
 package com.zonesciences.pyrros;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -81,7 +82,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
         mExerciseField = (EditText) findViewById(R.id.field_new_exercise);
         mNoExercises = (TextView) findViewById(R.id.textview_no_exercises);
-        mStartWorkout = (Button) findViewById(R.id.button_start_workout);
+
 
         mExercisesRecycler = (RecyclerView) findViewById(R.id.recycler_exercises);
         mExercisesRecycler.setHasFixedSize(true);
@@ -95,6 +96,17 @@ public class NewWorkoutActivity extends BaseActivity {
                 addExercise();
             }
         });
+
+        mStartWorkout = (Button) findViewById(R.id.button_start_workout);
+        mStartWorkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent (view.getContext(), WorkoutActivity.class);
+                startActivity(i);
+            }
+        });
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Get list of current exercises for user on startup of this activity and create working list.
