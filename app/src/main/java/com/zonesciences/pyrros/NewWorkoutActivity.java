@@ -126,6 +126,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
     }
 
+    
     private void addExercise(){
         final String exercise = mExerciseField.getText().toString();
 

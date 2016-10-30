@@ -27,6 +27,7 @@
     <string name="start_new_workout">No exercises added yet, search above or use the drop down list to select an exercise to add to your workout</string>
     <string name="menu_purge">Purge Database</string>
     <string name="menu_add_dummy_items">Dummy Workouts</string>
+    <string name="start_workout">Start Workout</string>
 
     <string-array name="exercise_categories">
         <item>Biceps</item>
