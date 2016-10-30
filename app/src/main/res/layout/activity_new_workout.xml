@@ -27,12 +27,20 @@
 
     <include layout="@layout/content_new_workout"/>
 
+    <Button
+        android:id="@+id/button_start_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="@dimen/floating_buttons_margin"
+        android:text="@string/start_workout"
+        />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_new_workout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_margin="@dimen/floating_buttons_margin"
         android:src="@drawable/ic_add_white_24dp"/>
 
 </android.support.design.widget.CoordinatorLayout>

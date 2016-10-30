@@ -49,12 +49,5 @@
         tools:listitem="@layout/item_exercise">
     </android.support.v7.widget.RecyclerView>
 
-    <Button
-        android:id="@+id/button_start_workout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/recycler_exercises"
-        android:background="@android:color/holo_green_light"
-        android:text="@string/start_workout"/>
 
 </RelativeLayout>
