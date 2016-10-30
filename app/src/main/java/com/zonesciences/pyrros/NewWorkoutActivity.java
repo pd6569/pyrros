@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +50,9 @@ public class NewWorkoutActivity extends BaseActivity {
     private EditText mExerciseField;
     private TextView mNoExercises;
     private FloatingActionButton mSubmitExercise;
+    private Button mStartWorkout;
 
+    private boolean mContainsExercises;
     private String mWorkoutKey;
     private Workout mCurrentWorkout;
     private Exercise mExercise;
@@ -78,6 +81,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
         mExerciseField = (EditText) findViewById(R.id.field_new_exercise);
         mNoExercises = (TextView) findViewById(R.id.textview_no_exercises);
+        mStartWorkout = (Button) findViewById(R.id.button_start_workout);
 
         mExercisesRecycler = (RecyclerView) findViewById(R.id.recycler_exercises);
         mExercisesRecycler.setHasFixedSize(true);
@@ -122,6 +126,14 @@ public class NewWorkoutActivity extends BaseActivity {
         // Adapter sets listener on workout-exercises directory detecting exercises that are added/removed/moved and updates the
         // recycler view as appropriate
         mAdapter = new ExercisesAdapter(this, mExercisesReference, mDatabase, mWorkoutKey);
+        mAdapter.setExercisesListener(new ExercisesAdapter.ExercisesListener() {
+            @Override
+            public void onExercisesEmpty() {
+                Log.i(TAG, "onExercisesEmpty() called");
+                mNoExercises.setVisibility(View.VISIBLE);
+                mStartWorkout.setVisibility(View.INVISIBLE);
+            }
+        });
         mExercisesRecycler.setAdapter(mAdapter);
 
     }
@@ -137,6 +149,7 @@ public class NewWorkoutActivity extends BaseActivity {
         } else {
             mExerciseField.setText("");
             mNoExercises.setVisibility(View.INVISIBLE);
+            mStartWorkout.setVisibility(View.VISIBLE);
         }
 
         // [START single_value_read

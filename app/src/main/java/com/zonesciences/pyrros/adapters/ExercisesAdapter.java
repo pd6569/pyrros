@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,13 +27,14 @@ import java.util.List;
  */
 public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ExerciseViewHolder> {
 
-    public static final String TAG = "ExerciseAdapter";
+    public static final String TAG = "ExercisesAdapter";
 
 
     private Context mContext;
     private DatabaseReference mWorkoutExerciseReference;
     private DatabaseReference mDatabaseRoot;
     private ChildEventListener mChildEventListener;
+    private ExercisesListener mExercisesListener;
 
     private List<String> mExerciseKeys = new ArrayList<>();
     private List<Exercise> mExercises = new ArrayList<>();
@@ -84,6 +86,8 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                 mExerciseKeys.add(dataSnapshot.getKey());
                 mExercises.add(exercise);
                 notifyItemInserted(mExercises.size() - 1);
+
+                Log.i(TAG, "Workout contains: " + mExercises.size() + " exercises");
                 // [END_EXCLUDE]
             }
 
@@ -99,6 +103,9 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
                 // [START_EXCLUDE]
                 int exerciseIndex = mExerciseKeys.indexOf(exerciseKey);
+                if (mExerciseKeys.size() == 0) {
+                }
+
                 if (exerciseIndex > -1) {
                     // Replace with the new data
                     mExercises.set(exerciseIndex, newExercise);
@@ -134,6 +141,12 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                     Log.v(TAG, "onChildRemoved:unknown_child: " + exerciseKey);
                 }
                 //[END_EXCLUDE]
+                Log.i(TAG, "Workout contains: " + mExercises.size() + " exercises");
+
+                if (mExercises.size() == 0){
+                    Log.i(TAG, "Exercises list is empty, fire this information to NewWorkoutActivity");
+                    mExercisesListener.onExercisesEmpty();
+                }
             }
 
             @Override
@@ -183,4 +196,11 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
         return mExercises.size();
     }
 
+    public interface ExercisesListener {
+        public void onExercisesEmpty ();
+    }
+
+    public void setExercisesListener(ExercisesListener listener){
+        this.mExercisesListener = listener;
+    }
 }
