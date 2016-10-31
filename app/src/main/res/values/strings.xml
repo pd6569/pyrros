@@ -28,6 +28,11 @@
     <string name="menu_purge">Purge Database</string>
     <string name="menu_add_dummy_items">Dummy Workouts</string>
     <string name="start_workout">Start Workout</string>
+    <string name="menu_workout_overview">Workout</string>
+    <string name="menu_exercise_history">History</string>
+    <string name="menu_timer">Timer</string>
+    <string name="menu_exercise_stats">Stats</string>
+    <string name="menu_workout_feedback">Feedback</string>
 
     <string-array name="exercise_categories">
         <item>Biceps</item>
