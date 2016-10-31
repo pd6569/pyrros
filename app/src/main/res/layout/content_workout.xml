@@ -14,7 +14,7 @@
     tools:showIn="@layout/activity_workout">
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager_workout"
+        android:id="@+id/viewpager_exercises"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

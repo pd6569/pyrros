@@ -14,12 +14,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.adapters.ExercisesAdapter;
@@ -38,6 +36,9 @@ public class NewWorkoutActivity extends BaseActivity {
     private static final String REQUIRED = "Required";
     private static final String TAG = "NewWorkoutActivity";
 
+    public static final String WORKOUT_EXERCISES = "Workout Exercises";
+    public static final String WORKOUT_ID = "Workout ID";
+
     //need reference to database to read/write data.
     private DatabaseReference mDatabase;
     private DatabaseReference mExercisesReference;
@@ -53,13 +54,13 @@ public class NewWorkoutActivity extends BaseActivity {
     private FloatingActionButton mSubmitExercise;
     private Button mStartWorkout;
 
-    private boolean mContainsExercises;
+
     private String mWorkoutKey;
     private Workout mCurrentWorkout;
     private Exercise mExercise;
 
-    private List<String> mUserExerciseKeys = new ArrayList<String>();
-    private List<String> mCurrentExercises = new ArrayList<String>();
+    private List<String> mUserExerciseKeys = new ArrayList<>();
+    private ArrayList<String> mExerciseKeys = new ArrayList<>();
 
     private String mExerciseKey = new String();
 
@@ -101,8 +102,30 @@ public class NewWorkoutActivity extends BaseActivity {
         mStartWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent (view.getContext(), WorkoutActivity.class);
-                startActivity(i);
+
+                mDatabase.child("workout-exercises").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot exerciseKey : dataSnapshot.getChildren()){
+                            String key = exerciseKey.getKey();
+                            mExerciseKeys.add(key);
+                        }
+
+                        Bundle extras = new Bundle();
+                        Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeys);
+                        extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeys);
+                        extras.putString(WORKOUT_ID, mWorkoutKey);
+                        Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
+                        i.putExtras(extras);
+                        startActivity(i);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         });
 
