@@ -4,6 +4,7 @@ package com.zonesciences.pyrros.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.SetsAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,7 +41,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     EditText mWeightField;
     EditText mRepsField;
 
+    //Recycler view components
     RecyclerView mSetsRecycler;
+    SetsAdapter mSetsAdapter;
+    LinearLayoutManager mLayoutManager;
 
     public static ExerciseFragment newInstance(String exerciseKey) {
         Bundle args = new Bundle();
@@ -81,9 +86,19 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mWeightField = (EditText) view.findViewById(R.id.field_weight);
         mRepsField = (EditText) view.findViewById(R.id.field_reps);
 
-
+        mSetsRecycler = (RecyclerView) view.findViewById(R.id.recycler_sets);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mSetsRecycler.setLayoutManager(mLayoutManager);
+        mSetsRecycler.setHasFixedSize(true);
 
         return view;
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        mSetsAdapter = new SetsAdapter();
+
     }
 
     @Override
