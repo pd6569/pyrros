@@ -47,18 +47,6 @@ public class ExerciseFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
 
-        TextView tv = (TextView) view.findViewById(R.id.fragment_title);
-
-        NumberPicker weightPicker = (NumberPicker) view.findViewById(R.id.numberpicker_weight);
-        NumberPicker repsPicker = (NumberPicker) view.findViewById(R.id.numberpicker_reps);
-
-        weightPicker.setMinValue(0);
-        weightPicker.setMinValue(1000);
-        weightPicker.setWrapSelectorWheel(true);
-
-
-        tv.setText(mExerciseKey);
-
 
         return view;
     }

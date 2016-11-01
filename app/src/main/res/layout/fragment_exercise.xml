@@ -1,28 +1,31 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.zonesciences.pyrros.fragment.ExerciseFragment">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              tools:context="com.zonesciences.pyrros.fragment.ExerciseFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#edecee"
+        android:orientation="vertical"
+        android:padding="15dp"
+        android:layout_margin="2dp">
 
     <TextView
-        android:id="@+id/fragment_title"
+        android:id="@+id/textview_set_number_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24dp"
-        android:layout_margin="5dp"
-        android:text="Exercise Name"/>
-
-    <LinearLayout
-        android:layout_below="@+id/fragment_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:textStyle="bold"
+        android:text="Set 1"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -33,15 +36,38 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16dp"
+                    android:textSize="14dp"
                     android:layout_gravity="center"
                     android:text="@string/weight"/>
 
-                <NumberPicker
-                    android:id="@+id/numberpicker_weight"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/button_decrease_weight"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="-"/>
+
+                    <EditText
+                        android:id="@+id/field_weight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:hint="0000"
+                        android:textColorHint="#00FFFFFF"
+                        android:maxEms="4"/>
+
+                    <Button
+                        android:id="@+id/button_increase_weight"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="+"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -54,15 +80,38 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16dp"
+                    android:textSize="14dp"
                     android:layout_gravity="center"
                     android:text="@string/reps"/>
 
-                <NumberPicker
-                    android:id="@+id/numberpicker_reps"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"/>
+                    android:orientation="horizontal"
+                    android:layout_gravity="center">
+
+                    <Button
+                        android:id="@+id/button_decrease_reps"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="-"/>
+
+                    <EditText
+                        android:id="@+id/field_reps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:hint="0000"
+                        android:textColorHint="#00FFFFFF"
+                        android:maxEms="4"/>
+
+                    <Button
+                        android:id="@+id/button_increase_reps"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="+"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -72,16 +121,23 @@
             android:id="@+id/button_save_set"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save"/>
-
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/exercise_sets"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/item_sets" />
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:text="@string/save_set"/>
 
     </LinearLayout>
 
 
-</RelativeLayout>
+
+
+
+
+        <!--<android.support.v7.widget.RecyclerView
+            android:id="@+id/exercise_sets"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_sets" />-->
+
+</LinearLayout>
+
+

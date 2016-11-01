@@ -34,15 +34,4 @@
 
     <include layout="@layout/content_workout"/>
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/bottom_navigation_workout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:itemBackground="@color/colorAccent"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
-        app:menu="@menu/menu_workout_bottom_navigation"
-        />
-
 </android.support.design.widget.CoordinatorLayout>

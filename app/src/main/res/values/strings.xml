@@ -49,10 +49,9 @@
         <item>Cardio</item>
     </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="weight">weight</string>
-    <string name="reps">reps</string>
+    <string name="weight">Weight</string>
+    <string name="reps">Reps</string>
+    <string name="save_set">Save Set</string>
 
 
 </resources>
