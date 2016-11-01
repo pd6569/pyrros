@@ -1,8 +1,8 @@
 package com.zonesciences.pyrros.fragment;
 
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,12 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.NumberPicker;
-import android.widget.Switch;
-import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,16 +27,14 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     public static final String TAG = "ExerciseFragment";
     public static final String ARG_EXERCISE_KEY = "ExerciseKey";
 
-    String mExerciseKey;
 
-    double mWeight;
-    int mReps;
 
     //Views
     Button mIncreaseWeightButton;
     Button mDecreaseWeightButton;
     Button mIncreaseRepsButton;
     Button mDecreaseRepsButton;
+    Button mAddSet;
 
     EditText mWeightField;
     EditText mRepsField;
@@ -45,6 +43,16 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     RecyclerView mSetsRecycler;
     SetsAdapter mSetsAdapter;
     LinearLayoutManager mLayoutManager;
+
+    //Variables
+
+    String mExerciseKey;
+
+    double mWeight;
+    int mReps;
+    int mSets = 0; // acts as index for lists below
+    List<Double> mWeightList; // stores weights for each set
+    List<Integer> mRepsList; // stores reps for each set
 
     public static ExerciseFragment newInstance(String exerciseKey) {
         Bundle args = new Bundle();
@@ -83,8 +91,13 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mIncreaseRepsButton = (Button) view.findViewById(R.id.button_increase_reps);
         mIncreaseRepsButton.setOnClickListener(this);
 
+        mAddSet = (Button) view.findViewById(R.id.button_add_set);
+        mAddSet.setOnClickListener(this);
+
         mWeightField = (EditText) view.findViewById(R.id.field_weight);
         mRepsField = (EditText) view.findViewById(R.id.field_reps);
+
+
 
         mSetsRecycler = (RecyclerView) view.findViewById(R.id.recycler_sets);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -97,7 +110,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart(){
         super.onStart();
-        mSetsAdapter = new SetsAdapter();
+        mSetsAdapter = new SetsAdapter(getContext());
 
     }
 
@@ -117,17 +130,34 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             case R.id.button_increase_reps:
                 adjustReps(id);
                 break;
-
+            case R.id.button_add_set:
+                addSet();
+                break;
         }
     }
 
-    private void adjustWeight(int id) {
-        String s = mWeightField.getText().toString();
-        if (s.isEmpty()){
-            s = "0.0";
+    private void addSet() {
+        setWeight();
+        setReps();
+        mSets++;
+
+        if (mWeightList == null) {
+            mWeightList = new ArrayList<>();
         }
-        double weight = Double.parseDouble(s);
-        mWeight = Math.round(weight * 100.0) / 100.0;
+
+        if (mRepsList == null) {
+            mRepsList = new ArrayList<>();
+        }
+
+        mWeightList.add(mWeight);
+        mRepsList.add(mReps);
+
+        Log.i(TAG, "Set: " + mSets + " Weight: " + mWeightList.get(mSets-1) + " Reps: " + mRepsList.get(mSets-1));
+    }
+
+    private void adjustWeight(int id) {
+
+        setWeight();
 
         if (id == R.id.button_increase_weight) {
             mWeight += 2.5;
@@ -142,12 +172,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     }
 
     private void adjustReps(int id) {
-
-        String s = mRepsField.getText().toString();
-        if (s.isEmpty()){
-            s = "0";
-        }
-        mReps = Integer.parseInt(s);
+        setReps();
         if (id == R.id.button_increase_reps) {
             mReps++;
         } else {
@@ -161,4 +186,22 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mRepsField.setText(Integer.toString(mReps));
     }
 
+
+
+    private void setWeight() {
+        String s = mWeightField.getText().toString();
+        if (s.isEmpty()){
+            s = "0.0";
+        }
+        double weight = Double.parseDouble(s);
+        mWeight = Math.round(weight * 100.0) / 100.0;
+    }
+
+    private void setReps() {
+        String s = mRepsField.getText().toString();
+        if (s.isEmpty()){
+            s = "0";
+        }
+        mReps = Integer.parseInt(s);
+    }
 }

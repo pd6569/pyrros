@@ -124,7 +124,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/button_save_set"
+                android:id="@+id/button_add_set"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
