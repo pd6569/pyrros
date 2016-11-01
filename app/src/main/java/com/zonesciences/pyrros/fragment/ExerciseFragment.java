@@ -4,6 +4,7 @@ package com.zonesciences.pyrros.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     EditText mWeightField;
     EditText mRepsField;
 
+    RecyclerView mSetsRecycler;
 
     public static ExerciseFragment newInstance(String exerciseKey) {
         Bundle args = new Bundle();
@@ -78,6 +80,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         mWeightField = (EditText) view.findViewById(R.id.field_weight);
         mRepsField = (EditText) view.findViewById(R.id.field_reps);
+
 
 
         return view;
