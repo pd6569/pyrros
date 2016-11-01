@@ -51,8 +51,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     double mWeight;
     int mReps;
     int mSets = 0; // acts as index for lists below
-    List<Double> mWeightList; // stores weights for each set
-    List<Integer> mRepsList; // stores reps for each set
+    List<Double> mWeightList = new ArrayList<>(); // stores weights for each set
+    List<Integer> mRepsList = new ArrayList<>(); // stores reps for each set
 
     public static ExerciseFragment newInstance(String exerciseKey) {
         Bundle args = new Bundle();
@@ -104,14 +104,15 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mSetsRecycler.setLayoutManager(mLayoutManager);
         mSetsRecycler.setHasFixedSize(true);
 
+
         return view;
     }
 
     @Override
     public void onStart(){
         super.onStart();
-        mSetsAdapter = new SetsAdapter(getContext());
-
+        mSetsAdapter = new SetsAdapter(getContext(), mWeightList, mRepsList);
+        mSetsRecycler.setAdapter(mSetsAdapter);
     }
 
     @Override
@@ -151,7 +152,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         mWeightList.add(mWeight);
         mRepsList.add(mReps);
-
+        mSetsAdapter.notifyDataSetChanged();
         Log.i(TAG, "Set: " + mSets + " Weight: " + mWeightList.get(mSets-1) + " Reps: " + mRepsList.get(mSets-1));
     }
 
