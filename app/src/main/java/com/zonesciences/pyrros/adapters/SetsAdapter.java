@@ -60,9 +60,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     @Override
     public void onBindViewHolder(SetsViewHolder holder, int position) {
         Log.i(TAG, "onBindViewHolder called. mSetWeight = " + Double.toString(mWeightList.get(position)) + " mSetReps = " + Integer.toString(mRepsList.get(position)));
-        holder.mSetNumber.setText(Integer.toString(position));
-        holder.mSetWeight.setText(Double.toString(mWeightList.get(position)));
-        holder.mSetReps.setText(Integer.toString(mRepsList.get(position)));
+        holder.mSetNumber.setText(Integer.toString(position + 1));
+        holder.mSetWeight.setText(Double.toString(mWeightList.get(position)) + " kg");
+        holder.mSetReps.setText(Integer.toString(mRepsList.get(position)) + " reps");
     }
 
     @Override

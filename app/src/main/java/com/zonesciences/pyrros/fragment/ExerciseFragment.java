@@ -4,6 +4,7 @@ package com.zonesciences.pyrros.fragment;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
@@ -30,6 +32,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
 
     //Views
+    TextView mSetNumberTitle;
     Button mIncreaseWeightButton;
     Button mDecreaseWeightButton;
     Button mIncreaseRepsButton;
@@ -43,6 +46,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     RecyclerView mSetsRecycler;
     SetsAdapter mSetsAdapter;
     LinearLayoutManager mLayoutManager;
+    DividerItemDecoration mDividerItemDecoration;
 
     //Variables
 
@@ -79,6 +83,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
+
+        mSetNumberTitle = (TextView) view.findViewById(R.id.textview_set_number_title);
+
         mDecreaseWeightButton = (Button) view.findViewById(R.id.button_decrease_weight);
         mDecreaseWeightButton.setOnClickListener(this);
 
@@ -100,9 +107,13 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
 
         mSetsRecycler = (RecyclerView) view.findViewById(R.id.recycler_sets);
+
         mLayoutManager = new LinearLayoutManager(getActivity());
         mSetsRecycler.setLayoutManager(mLayoutManager);
+        mDividerItemDecoration = new DividerItemDecoration(mSetsRecycler.getContext(), mLayoutManager.getOrientation());
+        mSetsRecycler.addItemDecoration(mDividerItemDecoration);
         mSetsRecycler.setHasFixedSize(true);
+
 
 
         return view;
@@ -150,6 +161,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             mRepsList = new ArrayList<>();
         }
 
+        mSetNumberTitle.setText("Set " + Integer.toString(mSets));
         mWeightList.add(mWeight);
         mRepsList.add(mReps);
         mSetsAdapter.notifyDataSetChanged();
