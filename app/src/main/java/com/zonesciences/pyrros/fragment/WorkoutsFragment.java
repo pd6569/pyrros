@@ -17,15 +17,16 @@ public class WorkoutsFragment extends WorkoutsListFragment {
 
     public WorkoutsFragment() {}
 
+
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
         // [START recent_workouts_query]
         // Last 100 workouts, these are automatically the 100 most recent
         // due to sorting by push() keys
-        Query recentWorkoutsQuery = databaseReference.child("workouts")
-                .limitToFirst(100);
+        Query userWorkoutsQuery = databaseReference.child("workouts")
+                .limitToFirst(1000);
         // [END recent_posts_query]
 
-        return recentWorkoutsQuery;
+        return userWorkoutsQuery;
     }
 }

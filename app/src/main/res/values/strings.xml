@@ -26,6 +26,13 @@
     <string name="search_hint">search for exercise...</string>
     <string name="start_new_workout">No exercises added yet, search above or use the drop down list to select an exercise to add to your workout</string>
     <string name="menu_purge">Purge Database</string>
+    <string name="menu_add_dummy_items">Dummy Workouts</string>
+    <string name="start_workout">Start Workout</string>
+    <string name="menu_workout_overview">Workout</string>
+    <string name="menu_exercise_history">History</string>
+    <string name="menu_timer">Timer</string>
+    <string name="menu_exercise_stats">Stats</string>
+    <string name="menu_workout_feedback">Feedback</string>
 
     <string-array name="exercise_categories">
         <item>Biceps</item>
@@ -41,6 +48,10 @@
         <item>Bodyweight</item>
         <item>Cardio</item>
     </string-array>
+
+    <string name="weight">Weight</string>
+    <string name="reps">Reps</string>
+    <string name="save_set">Save Set</string>
 
 
 </resources>

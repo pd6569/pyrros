@@ -31,7 +31,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.fragment.DashboardFragment;
 import com.zonesciences.pyrros.fragment.TrainerFragment;
 import com.zonesciences.pyrros.fragment.WorkoutsFragment;
+import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
+import com.zonesciences.pyrros.models.Workout;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -123,8 +125,11 @@ public class MainActivity extends BaseActivity {
         } else if (i == R.id.action_purge_database) {
             purgeDatabase();
         }
+
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
     class FragmentHomescreenPagerAdapter extends FragmentPagerAdapter {
@@ -172,6 +177,7 @@ public class MainActivity extends BaseActivity {
                     purgeDatabase.put("/user-exercises/", null);
                     purgeDatabase.put("/user-workouts/", null);
                     purgeDatabase.put("/workout-exercises/", null);
+                    purgeDatabase.put("/user-workout-exercise/", null);
                     purgeDatabase.put("/workouts/", null);
                     mDatabase.updateChildren(purgeDatabase);
                 } else {

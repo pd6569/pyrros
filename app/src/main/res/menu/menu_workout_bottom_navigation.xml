@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_workout_overview"
+        android:enabled="true"
+        android:icon="@drawable/ic_assignment_white_24dp"
+        android:title="@string/menu_workout_overview"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_workout_exercise_history"
+        android:enabled="true"
+        android:icon="@drawable/ic_history_white_24dp"
+        android:title="@string/menu_exercise_history"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_workout_exercise_stats"
+        android:enabled="true"
+        android:icon="@drawable/ic_assessment_white_24dp"
+        android:title="@string/menu_exercise_stats"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_workout_feedback"
+        android:enabled="true"
+        android:icon="@drawable/ic_question_answer_white_24dp"
+        android:title="@string/menu_workout_feedback"
+        app:showAsAction="ifRoom" />
+</menu>

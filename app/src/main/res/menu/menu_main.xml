@@ -13,4 +13,5 @@
         android:title="@string/menu_purge"
         android:visible="true"
         app:showAsAction="never" />
+
 </menu>

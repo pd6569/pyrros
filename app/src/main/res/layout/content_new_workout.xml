@@ -49,4 +49,5 @@
         tools:listitem="@layout/item_exercise">
     </android.support.v7.widget.RecyclerView>
 
+
 </RelativeLayout>
