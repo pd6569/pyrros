@@ -57,9 +57,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:hint="0000"
+                        android:hint="00000"
                         android:textColorHint="#00FFFFFF"
-                        android:maxEms="4"/>
+                        android:maxLength="6"/>
 
                     <Button
                         android:id="@+id/button_increase_weight"
@@ -100,10 +100,10 @@
                         android:id="@+id/field_reps"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
+                        android:inputType="number"
                         android:hint="0000"
                         android:textColorHint="#00FFFFFF"
-                        android:maxEms="4"/>
+                        android:maxLength="4"/>
 
                     <Button
                         android:id="@+id/button_increase_reps"
