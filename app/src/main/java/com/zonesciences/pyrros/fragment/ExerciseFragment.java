@@ -39,7 +39,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     EditText mRepsField;
 
 
-    public static ExerciseFragment newInstance(String exerciseKey){
+    public static ExerciseFragment newInstance(String exerciseKey) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         ExerciseFragment fragment = new ExerciseFragment();
@@ -52,7 +52,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
@@ -80,44 +80,67 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mRepsField = (EditText) view.findViewById(R.id.field_reps);
 
 
-
-
         return view;
     }
 
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        switch(id){
+        switch (id) {
             case R.id.button_decrease_weight:
                 adjustWeight(id);
+                break;
             case R.id.button_increase_weight:
                 adjustWeight(id);
+                break;
             case R.id.button_decrease_reps:
                 adjustReps(id);
+                break;
             case R.id.button_increase_reps:
                 adjustReps(id);
+                break;
+
         }
     }
 
     private void adjustWeight(int id) {
-    String s = mWeightField.getText().toString();
-        mWeight = Double.parseDouble(s);
-        Log.i(TAG, "mWeight = " + mWeight);
+        String s = mWeightField.getText().toString();
+        if (s.isEmpty()){
+            s = "0.0";
+        }
+        double weight = Double.parseDouble(s);
+        mWeight = Math.round(weight * 100.0) / 100.0;
+
         if (id == R.id.button_increase_weight) {
             mWeight += 2.5;
-            mWeightField.setText(Double.toString(mWeight));
         } else {
-            if (mWeight >= 2.5){
+            if (mWeight >= 2.5) {
                 mWeight -= 2.5;
-                mWeightField.setText(Double.toString(mWeight));
             } else {
-                Log.i(TAG, "Cannot have negative weight motherucker");
+                Log.i(TAG, "Cannot have negative weight mothefucker");
             }
         }
+        mWeightField.setText(Double.toString(mWeight));
     }
 
     private void adjustReps(int id) {
 
+        String s = mRepsField.getText().toString();
+        if (s.isEmpty()){
+            s = "0";
+        }
+        mReps = Integer.parseInt(s);
+        if (id == R.id.button_increase_reps) {
+            mReps++;
+        } else {
+            if (mReps > 0){
+                mReps--;
+            }
+            else {
+                Log.i(TAG, "Cannot have negative reps, motherfucker");
+            }
+        }
+        mRepsField.setText(Integer.toString(mReps));
     }
+
 }
