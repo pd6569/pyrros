@@ -12,24 +12,27 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkoutActivity extends AppCompatActivity {
+public class WorkoutActivity extends BaseActivity {
     private static String TAG = "WorkoutActivity";
+
     ViewPager mExercisesViewPager;
     WorkoutExercisesAdapter mWorkoutExercisesAdapter;
 
     ArrayList<String> mExercisesList;
     String mWorkoutKey;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
+
 
         Intent i = getIntent();
         mExercisesList = (ArrayList<String>) i.getSerializableExtra(NewWorkoutActivity.WORKOUT_EXERCISES);
@@ -77,4 +80,5 @@ public class WorkoutActivity extends AppCompatActivity {
     public String getWorkoutKey(){
         return this.mWorkoutKey;
     }
+
 }

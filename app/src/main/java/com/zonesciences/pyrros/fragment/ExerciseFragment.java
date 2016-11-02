@@ -56,11 +56,12 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     //Variables
     String mExerciseKey;
     String mWorkoutKey;
+    String mUser;
 
     //Sets reps and weights
     double mWeight;
     int mReps;
-    int mSets = 0; // acts as index for lists below
+    int mSets = 0;
 
     //Firebase
     private DatabaseReference mDatabase;
@@ -88,6 +89,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mWorkoutKey = ((WorkoutActivity)this.getActivity()).getWorkoutKey();
+        mUser = ((WorkoutActivity) this.getActivity()).getUid();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
@@ -195,9 +197,13 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mExercise.addReps(mReps);
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
-        mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).setValue(mExercise);
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
+        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
+        mDatabase.updateChildren(childUpdates);
 
-    }
+        /*mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).setValue(mExercise);*/
+            }
 
     private void adjustWeight(int id) {
 
