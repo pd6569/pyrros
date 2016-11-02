@@ -203,6 +203,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mExercise.addReps(mReps);
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
+        mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).setValue(mExercise);
+
         mSetsAdapter.notifyDataSetChanged();
 
         Log.i(TAG, "Set: " + mSets + " Weight: " + mWeightList.get(mSets-1) + " Reps: " + mRepsList.get(mSets-1));

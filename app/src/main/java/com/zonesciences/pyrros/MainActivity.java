@@ -177,7 +177,7 @@ public class MainActivity extends BaseActivity {
                     purgeDatabase.put("/user-exercises/", null);
                     purgeDatabase.put("/user-workouts/", null);
                     purgeDatabase.put("/workout-exercises/", null);
-                    purgeDatabase.put("/user-workout-exercise/", null);
+                    purgeDatabase.put("/user-workout-exercises/", null);
                     purgeDatabase.put("/workouts/", null);
                     mDatabase.updateChildren(purgeDatabase);
                 } else {
