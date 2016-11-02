@@ -61,8 +61,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     double mWeight;
     int mReps;
     int mSets = 0; // acts as index for lists below
-    List<Double> mWeightList = new ArrayList<>(); // stores weights for each set
-    List<Integer> mRepsList = new ArrayList<>(); // stores reps for each set
 
     //Firebase
     private DatabaseReference mDatabase;
@@ -86,6 +84,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate()");
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mWorkoutKey = ((WorkoutActivity)this.getActivity()).getWorkoutKey();
@@ -107,11 +106,16 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        //adapter created here
+        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.i(TAG, "onCreateView()");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
 
@@ -137,14 +141,14 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
 
 
+        mSetsAdapter.notifyDataSetChanged(); // this ensures that data is reloaded when recreating the view after swiping from other exercises
         mSetsRecycler = (RecyclerView) view.findViewById(R.id.recycler_sets);
-
         mLayoutManager = new LinearLayoutManager(getActivity());
         mSetsRecycler.setLayoutManager(mLayoutManager);
         mDividerItemDecoration = new DividerItemDecoration(mSetsRecycler.getContext(), mLayoutManager.getOrientation());
         mSetsRecycler.addItemDecoration(mDividerItemDecoration);
         mSetsRecycler.setHasFixedSize(true);
-
+        mSetsRecycler.setAdapter(mSetsAdapter);
 
 
         return view;
@@ -153,8 +157,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart(){
         super.onStart();
-        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference);
-        mSetsRecycler.setAdapter(mSetsAdapter);
+        Log.i(TAG, "onStart()");
+
+
     }
 
     @Override
@@ -184,19 +189,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         setReps();
         mSets++;
 
-        if (mWeightList == null) {
-            mWeightList = new ArrayList<>();
-        }
-
-        if (mRepsList == null) {
-            mRepsList = new ArrayList<>();
-        }
-
-
         mSetNumberTitle.setText("Set " + Integer.toString(mSets));
-
-        mWeightList.add(mWeight);
-        mRepsList.add(mReps);
 
         mExercise.addWeight(mWeight);
         mExercise.addReps(mReps);
@@ -204,7 +197,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).setValue(mExercise);
 
-        Log.i(TAG, "Set: " + mSets + " Weight: " + mWeightList.get(mSets-1) + " Reps: " + mRepsList.get(mSets-1));
     }
 
     private void adjustWeight(int id) {
