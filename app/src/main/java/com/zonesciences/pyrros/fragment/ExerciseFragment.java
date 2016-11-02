@@ -66,7 +66,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     //Firebase
     private DatabaseReference mDatabase;
-    private DatabaseReference mExercisesReference;
+    private DatabaseReference mExerciseReference;
 
     //Exercise object
     Exercise mExercise;
@@ -88,14 +88,13 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
+        mWorkoutKey = ((WorkoutActivity)this.getActivity()).getWorkoutKey();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        mWorkoutKey = ((WorkoutActivity)this.getActivity()).getWorkoutKey();
-        Log.i(TAG, "Workout key obtained from parent activity: " + mWorkoutKey);
+        mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
 
         //Create workout object from firebase for this fragment
-        mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
+        mExerciseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mExercise = dataSnapshot.getValue(Exercise.class);
@@ -154,7 +153,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart(){
         super.onStart();
-        mSetsAdapter = new SetsAdapter(getContext(), mWeightList, mRepsList);
+        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference);
         mSetsRecycler.setAdapter(mSetsAdapter);
     }
 
@@ -204,8 +203,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
         mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).setValue(mExercise);
-
-        mSetsAdapter.notifyDataSetChanged();
 
         Log.i(TAG, "Set: " + mSets + " Weight: " + mWeightList.get(mSets-1) + " Reps: " + mRepsList.get(mSets-1));
     }

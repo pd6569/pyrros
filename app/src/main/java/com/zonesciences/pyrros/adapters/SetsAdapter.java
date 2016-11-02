@@ -8,8 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.models.Exercise;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,9 +27,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     private final static String TAG = "SetsAdapter";
 
     Context mContext;
+    DatabaseReference mExerciseReference;
 
-    List<Double> mWeightList;
-    List<Integer> mRepsList;
+    List<Double> mWeightList = new ArrayList<>();
+    List<Long> mRepsList = new ArrayList<>();
 
 
     public static class SetsViewHolder extends RecyclerView.ViewHolder {
@@ -41,11 +48,56 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         }
     }
 
-    public SetsAdapter(Context context, List<Double> weightsList, List<Integer> repsList){
+    public SetsAdapter(final Context context, DatabaseReference exerciseReference){
         Log.i(TAG, "SetsAdapter Constructor called");
         this.mContext = context;
-        this.mWeightList = weightsList;
-        this.mRepsList = repsList;
+        this.mExerciseReference = exerciseReference;
+
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "onChildAdded called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
+                if (dataSnapshot.getKey() == "weight"){
+                    mWeightList = (List)dataSnapshot.getValue();
+                    Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
+                } else if (dataSnapshot.getKey() == "reps"){
+                    mRepsList = (List)dataSnapshot.getValue();
+                    Log.i(TAG, "datasnapshot key = reps. containing values " + dataSnapshot.getValue() + " mRepsList: " + mRepsList);
+                }
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "onChildChanged called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
+                if (dataSnapshot.getKey() == "weight"){
+                    mWeightList = (List) dataSnapshot.getValue();
+                    Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
+                } else if (dataSnapshot.getKey() == "reps"){
+                    mRepsList = (List) dataSnapshot.getValue();
+                    Log.i(TAG, "datasnapshot key = reps. containing values " + dataSnapshot.getValue() + " mRepsList: " + mRepsList);
+                }
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onChildRemoved called at reference: " + mExerciseReference.toString());
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "onChildMoved called at reference: " + mExerciseReference.toString());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.i(TAG, "onChildCancelled called at reference: " + mExerciseReference.toString());
+            }
+        };
+
+        exerciseReference.addChildEventListener(childEventListener);
     }
 
 
@@ -59,15 +111,14 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     @Override
     public void onBindViewHolder(SetsViewHolder holder, int position) {
-        Log.i(TAG, "onBindViewHolder called. mSetWeight = " + Double.toString(mWeightList.get(position)) + " mSetReps = " + Integer.toString(mRepsList.get(position)));
+        Log.i(TAG, "onBindViewHolder called. mSetWeight = " + Double.toString(mWeightList.get(position)) + " mSetReps = " + Long.toString(mRepsList.get(position)));
         holder.mSetNumber.setText(Integer.toString(position + 1));
         holder.mSetWeight.setText(Double.toString(mWeightList.get(position)) + " kg");
-        holder.mSetReps.setText(Integer.toString(mRepsList.get(position)) + " reps");
+        holder.mSetReps.setText(Long.toString(mRepsList.get(position)) + " reps");
     }
 
     @Override
     public int getItemCount() {
-        Log.i(TAG, "getItemCount called, mSets = " + mWeightList.size());
         return mWeightList.size();
     }
 
