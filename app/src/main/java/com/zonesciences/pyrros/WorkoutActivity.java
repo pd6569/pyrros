@@ -73,4 +73,8 @@ public class WorkoutActivity extends AppCompatActivity {
             return mExercisesList.get(position);
         }
     }
+
+    public String getWorkoutKey(){
+        return this.mWorkoutKey;
+    }
 }

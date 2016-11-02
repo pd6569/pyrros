@@ -15,21 +15,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
+import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     public static final String TAG = "ExerciseFragment";
     public static final String ARG_EXERCISE_KEY = "ExerciseKey";
-
-
 
     //Views
     TextView mSetNumberTitle;
@@ -49,14 +54,22 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     DividerItemDecoration mDividerItemDecoration;
 
     //Variables
-
     String mExerciseKey;
+    String mWorkoutKey;
 
+    //Sets reps and weights
     double mWeight;
     int mReps;
     int mSets = 0; // acts as index for lists below
     List<Double> mWeightList = new ArrayList<>(); // stores weights for each set
     List<Integer> mRepsList = new ArrayList<>(); // stores reps for each set
+
+    //Firebase
+    private DatabaseReference mDatabase;
+    private DatabaseReference mExercisesReference;
+
+    //Exercise object
+    Exercise mExercise;
 
     public static ExerciseFragment newInstance(String exerciseKey) {
         Bundle args = new Bundle();
@@ -75,6 +88,25 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        mWorkoutKey = ((WorkoutActivity)this.getActivity()).getWorkoutKey();
+        Log.i(TAG, "Workout key obtained from parent activity: " + mWorkoutKey);
+
+        //Create workout object from firebase for this fragment
+        mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mExercise = dataSnapshot.getValue(Exercise.class);
+                Log.i(TAG, "Fragment loaded for this exercise: " + mExercise.getName());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -161,10 +193,18 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             mRepsList = new ArrayList<>();
         }
 
+
         mSetNumberTitle.setText("Set " + Integer.toString(mSets));
+
         mWeightList.add(mWeight);
         mRepsList.add(mReps);
+
+        mExercise.addWeight(mWeight);
+        mExercise.addReps(mReps);
+        Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
+
         mSetsAdapter.notifyDataSetChanged();
+
         Log.i(TAG, "Set: " + mSets + " Weight: " + mWeightList.get(mSets-1) + " Reps: " + mRepsList.get(mSets-1));
     }
 
