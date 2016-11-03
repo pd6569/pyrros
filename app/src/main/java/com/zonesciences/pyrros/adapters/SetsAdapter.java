@@ -12,17 +12,18 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
 /**
  * Created by Peter on 01/11/2016.
  */
-public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> {
+public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> implements ItemTouchHelperAdapter {
 
     private final static String TAG = "SetsAdapter";
 
@@ -31,7 +32,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     List<Double> mWeightList = new ArrayList<>();
     List<Long> mRepsList = new ArrayList<>();
-
 
     public static class SetsViewHolder extends RecyclerView.ViewHolder {
 
@@ -122,5 +122,31 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         return mWeightList.size();
     }
 
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        // the position of the data is changed every time the view is shifted to a new index,
+        // NOT at the end of the drop event.
+        if (fromPosition < toPosition){
+            for (int i = fromPosition; i < toPosition; i++){
+                Collections.swap(mWeightList, i, i + 1);
+                Collections.swap(mRepsList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--){
+                Collections.swap(mWeightList, i, i - 1);
+                Collections.swap(mRepsList, i, i - 1);
+            }
+        }
+
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        mWeightList.remove(position);
+        mRepsList.remove(position);
+        notifyItemRemoved(position);
+    }
 
 }

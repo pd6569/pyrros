@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.ItemTouchHelper.SimpleItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
@@ -52,6 +54,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     SetsAdapter mSetsAdapter;
     LinearLayoutManager mLayoutManager;
     DividerItemDecoration mDividerItemDecoration;
+
+    //Touch Helper
+    ItemTouchHelper mItemTouchHelper;
+    ItemTouchHelper.Callback mItemTouchCallback;
 
     //Variables
     String mExerciseKey;
@@ -111,6 +117,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         //adapter created here
         mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference);
 
+
     }
 
     @Override
@@ -151,6 +158,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mSetsRecycler.addItemDecoration(mDividerItemDecoration);
         mSetsRecycler.setHasFixedSize(true);
         mSetsRecycler.setAdapter(mSetsAdapter);
+
+        mItemTouchCallback = new SimpleItemTouchHelperCallback(mSetsAdapter);
+        mItemTouchHelper = new ItemTouchHelper(mItemTouchCallback);
+        mItemTouchHelper.attachToRecyclerView(mSetsRecycler);
 
 
         return view;
@@ -202,8 +213,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
         mDatabase.updateChildren(childUpdates);
 
-        /*mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey).setValue(mExercise);*/
-            }
+    }
 
     private void adjustWeight(int id) {
 
@@ -254,4 +264,5 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         }
         mReps = Integer.parseInt(s);
     }
+
 }
