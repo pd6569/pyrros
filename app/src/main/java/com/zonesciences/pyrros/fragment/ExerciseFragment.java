@@ -2,7 +2,6 @@ package com.zonesciences.pyrros.fragment;
 
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,15 +20,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.zonesciences.pyrros.ItemTouchHelper.SimpleItemTouchHelperCallback;
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -57,7 +54,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     //Touch Helper
     ItemTouchHelper mItemTouchHelper;
-    ItemTouchHelper.Callback mItemTouchCallback;
+    ItemTouchHelper.Callback mItemTouchHelperCallback;
 
     //Variables
     String mExerciseKey;
@@ -159,8 +156,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mSetsRecycler.setHasFixedSize(true);
         mSetsRecycler.setAdapter(mSetsAdapter);
 
-        mItemTouchCallback = new SimpleItemTouchHelperCallback(mSetsAdapter);
-        mItemTouchHelper = new ItemTouchHelper(mItemTouchCallback);
+        mItemTouchHelperCallback = new ItemTouchHelperCallback(mSetsAdapter);
+        mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
         mItemTouchHelper.attachToRecyclerView(mSetsRecycler);
 
 
@@ -225,7 +222,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             if (mWeight >= 2.5) {
                 mWeight -= 2.5;
             } else {
-                Log.i(TAG, "Cannot have negative weight mothefucker");
+                Log.i(TAG, "Cannot have negative weight motherfucker");
             }
         }
         mWeightField.setText(Double.toString(mWeight));

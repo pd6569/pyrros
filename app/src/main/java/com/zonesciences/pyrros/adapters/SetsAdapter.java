@@ -18,6 +18,7 @@ import com.zonesciences.pyrros.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -25,6 +26,7 @@ import java.util.List;
  */
 public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> implements ItemTouchHelperAdapter {
 
+    //TODO: Synchronise changes with the active exercise object in ExerciseFragment.
     private final static String TAG = "SetsAdapter";
 
     Context mContext;
@@ -67,17 +69,31 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                 notifyDataSetChanged();
             }
 
+            //TODO: Clean up this method
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Log.i(TAG, "onChildChanged called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
-                if (dataSnapshot.getKey() == "weight"){
-                    mWeightList = (List) dataSnapshot.getValue();
-                    Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
-                } else if (dataSnapshot.getKey() == "reps"){
-                    mRepsList = (List) dataSnapshot.getValue();
-                    Log.i(TAG, "datasnapshot key = reps. containing values " + dataSnapshot.getValue() + " mRepsList: " + mRepsList);
-                }
-                notifyDataSetChanged();
+
+                //Check if the change being made is removal/addition of set. If set is simply being reorder, then do nothing.
+                    if (dataSnapshot.getKey() == "weight") {
+                        Log.i(TAG, "mWeighlist = " + mWeightList.size() + " children count for weight = " + dataSnapshot.getChildrenCount());
+                        if (mWeightList.size() != dataSnapshot.getChildrenCount()) {
+                            mWeightList = (List) dataSnapshot.getValue();
+                            Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
+                            notifyDataSetChanged();
+                        } else {
+                            //do nothing
+                        }
+                    } else if (dataSnapshot.getKey() == "reps") {
+                        if (mRepsList.size() != dataSnapshot.getChildrenCount()) {
+                            mRepsList = (List) dataSnapshot.getValue();
+                            Log.i(TAG, "datasnapshot key = reps. containing values " + dataSnapshot.getValue() + " mRepsList: " + mRepsList);
+                            notifyDataSetChanged();
+                        } else {
+                            // do nothing
+                        }
+                    }
+
             }
 
             @Override
@@ -126,6 +142,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     public boolean onItemMove(int fromPosition, int toPosition) {
         // the position of the data is changed every time the view is shifted to a new index,
         // NOT at the end of the drop event.
+
         if (fromPosition < toPosition){
             for (int i = fromPosition; i < toPosition; i++){
                 Collections.swap(mWeightList, i, i + 1);
@@ -137,6 +154,8 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                 Collections.swap(mRepsList, i, i - 1);
             }
         }
+
+        mExerciseReference.child("reps").setValue(mRepsList);
 
         notifyItemMoved(fromPosition, toPosition);
         return true;
