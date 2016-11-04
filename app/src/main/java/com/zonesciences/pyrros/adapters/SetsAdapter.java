@@ -17,7 +17,9 @@ import com.zonesciences.pyrros.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -31,6 +33,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     Context mContext;
     DatabaseReference mExerciseReference;
+    String mWorkoutKey;
 
     List<Double> mWeightList = new ArrayList<>();
     List<Long> mRepsList = new ArrayList<>();
@@ -52,9 +55,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         }
     }
 
-    public SetsAdapter(final Context context, DatabaseReference exerciseReference){
+    public SetsAdapter(final Context context, DatabaseReference exerciseReference, String workoutKey){
         this.mContext = context;
         this.mExerciseReference = exerciseReference;
+        this.mWorkoutKey = workoutKey;
 
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
@@ -155,8 +159,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             }
         }
 
-        mExerciseReference.child("weight").setValue(mWeightList);
-        mExerciseReference.child("reps").setValue(mRepsList);
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
+        mExerciseReference.getRoot().updateChildren(childUpdates);
 
         notifyItemMoved(fromPosition, toPosition);
         mSetsListener.onSetsChanged();
@@ -170,8 +176,11 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         mWeightList.remove(position);
         mRepsList.remove(position);
 
-        mExerciseReference.child("weight").setValue(mWeightList);
-        mExerciseReference.child("reps").setValue(mRepsList);
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/sets/", mWeightList.size());
+        mExerciseReference.getRoot().updateChildren(childUpdates);
 
         notifyItemRemoved(position);
         mSetsListener.onSetsChanged();

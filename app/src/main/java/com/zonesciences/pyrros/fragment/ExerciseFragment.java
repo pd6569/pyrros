@@ -101,7 +101,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         getExercise();
 
         //adapter created here
-        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference);
+        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference, mWorkoutKey);
         mSetsAdapter.setSetsListener(new SetsAdapter.SetsListener() {
             @Override
             public void onSetsChanged() {
@@ -112,22 +112,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    // Update fragment exercise object with latest firebase data on first load and if changes to set
-    // are made via the adapter (e.g reorder/deleting sets)
-    private void getExercise() {
-        mExerciseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mExercise = dataSnapshot.getValue(Exercise.class);
-                Log.i(TAG, "Fragment loaded for this exercise: " + mExercise.getName());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -272,6 +256,24 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             s = "0";
         }
         mReps = Integer.parseInt(s);
+    }
+
+    // Update fragment exercise object with latest firebase data on first load and if changes to set
+    // are made via the adapter (e.g reorder/deleting sets)
+    private void getExercise() {
+        mExerciseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mExercise = dataSnapshot.getValue(Exercise.class);
+                Log.i(TAG, "Fragment loaded for this exercise: " + mExercise.getName());
+                mSetNumberTitle.setText("Set " + mExercise.getSets());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }
