@@ -102,6 +102,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
         //Set click listener for the whole workout view
         final String workoutKey = workoutRef.getKey();
 
+        //TODO: FIX: this is duplicating exercises every time the workout is clicked
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
