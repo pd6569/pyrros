@@ -101,7 +101,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         getExercise();
 
         //adapter created here
-        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference, mWorkoutKey);
+        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference, mWorkoutKey, mUser);
         mSetsAdapter.setSetsListener(new SetsAdapter.SetsListener() {
             @Override
             public void onSetsChanged() {
