@@ -36,6 +36,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     List<Long> mRepsList = new ArrayList<>();
 
     SetsListener mSetsListener;
+    boolean mMoved;
 
     public static class SetsViewHolder extends RecyclerView.ViewHolder {
 
@@ -45,7 +46,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
         public SetsViewHolder(View itemView) {
             super(itemView);
-            Log.i(TAG, "SetsViewHolder called");
             mSetNumber = (TextView) itemView.findViewById(R.id.textview_set_number);
             mSetWeight = (TextView) itemView.findViewById(R.id.textview_set_weight);
             mSetReps = (TextView) itemView.findViewById(R.id.textview_set_reps);
@@ -53,7 +53,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     }
 
     public SetsAdapter(final Context context, DatabaseReference exerciseReference){
-        Log.i(TAG, "SetsAdapter Constructor called");
         this.mContext = context;
         this.mExerciseReference = exerciseReference;
 
@@ -121,7 +120,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     @Override
     public SetsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.i(TAG, "onCreateViewHolder called");
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.item_sets, parent, false);
         return new SetsViewHolder(view);
@@ -129,7 +127,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     @Override
     public void onBindViewHolder(SetsViewHolder holder, int position) {
-        Log.i(TAG, "onBindViewHolder called. mSetWeight = " + Double.toString(mWeightList.get(position)) + " mSetReps = " + Long.toString(mRepsList.get(position)));
         holder.mSetNumber.setText(Integer.toString(position + 1));
         holder.mSetWeight.setText(Double.toString(mWeightList.get(position)) + " kg");
         holder.mSetReps.setText(Long.toString(mRepsList.get(position)) + " reps");
@@ -145,6 +142,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         // the position of the data is changed every time the view is shifted to a new index,
         // NOT at the end of the drop event.
 
+        mMoved = true;
         if (fromPosition < toPosition){
             for (int i = fromPosition; i < toPosition; i++){
                 Collections.swap(mWeightList, i, i + 1);
@@ -159,6 +157,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
         mExerciseReference.child("weight").setValue(mWeightList);
         mExerciseReference.child("reps").setValue(mRepsList);
+
         notifyItemMoved(fromPosition, toPosition);
         mSetsListener.onSetsChanged();
         return true;
@@ -166,14 +165,24 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     @Override
     public void onItemDismiss(int position) {
+
+        mMoved = false;
         mWeightList.remove(position);
         mRepsList.remove(position);
+
+        mExerciseReference.child("weight").setValue(mWeightList);
+        mExerciseReference.child("reps").setValue(mRepsList);
+
         notifyItemRemoved(position);
+        mSetsListener.onSetsChanged();
     }
 
     @Override
     public void onMoveCompleted() {
-        notifyDataSetChanged();
+        if (mMoved) {
+            notifyDataSetChanged();
+        } else { // do nothing }
+        }
     }
 
     //listener to update fragment which contains exercise object with working sets
@@ -185,8 +194,4 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         this.mSetsListener = listener;
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
-    }
 }
