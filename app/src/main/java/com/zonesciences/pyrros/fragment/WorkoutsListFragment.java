@@ -1,5 +1,6 @@
 package com.zonesciences.pyrros.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,9 +38,9 @@ public abstract class WorkoutsListFragment extends Fragment {
 
     private static final String TAG = "WorkoutsListFragment";
 
-    // [START define_database_reference]
     private DatabaseReference mDatabase;
-    // [END define_database_reference]
+    private Context mContext;
+
 
     private FirebaseRecyclerAdapter<Workout, WorkoutViewHolder> mAdapter;
     private RecyclerView mRecyclerView;
@@ -57,7 +58,7 @@ public abstract class WorkoutsListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate() called");
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
+        mContext = getActivity();
         //Creates hashmap with string workoutKey and value containing list of exercises performed in that workout
         createUserWorkoutsMap();
     }
@@ -110,7 +111,7 @@ public abstract class WorkoutsListFragment extends Fragment {
         mDatabase.child("user-workout-exercises").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "Getting list of exercises for workouts" + dataSnapshot.hasChildren());
+                //gets each workout and associates it with the correct list of exercise objects
                 for (DataSnapshot workout : dataSnapshot.getChildren()) {
                     String s = workout.getKey();
                     Log.i(TAG, "Workouts loaded: " + s);
@@ -144,7 +145,7 @@ public abstract class WorkoutsListFragment extends Fragment {
                 mUserWorkoutsQuery = getQuery(mDatabase);
 
 
-                mAdapter = new WorkoutsAdapter(Workout.class, R.layout.item_workout, WorkoutViewHolder.class, mUserWorkoutsQuery, mDatabase, getUid(), mWorkoutExercisesMap);
+                mAdapter = new WorkoutsAdapter(Workout.class, R.layout.item_workout, WorkoutViewHolder.class, mUserWorkoutsQuery, mDatabase, getUid(), mWorkoutExercisesMap, mContext);
                 mRecyclerView.setAdapter(mAdapter);
 
             }

@@ -22,6 +22,9 @@ import java.util.List;
 public class WorkoutActivity extends BaseActivity {
     private static String TAG = "WorkoutActivity";
 
+    private static final String WORKOUT_EXERCISES = "Workout Exercises";
+    private static final String WORKOUT_ID = "Workout ID";
+
     ViewPager mExercisesViewPager;
     WorkoutExercisesAdapter mWorkoutExercisesAdapter;
 
@@ -35,8 +38,8 @@ public class WorkoutActivity extends BaseActivity {
 
 
         Intent i = getIntent();
-        mExercisesList = (ArrayList<String>) i.getSerializableExtra(NewWorkoutActivity.WORKOUT_EXERCISES);
-        mWorkoutKey = i.getStringExtra(NewWorkoutActivity.WORKOUT_ID);
+        mExercisesList = (ArrayList<String>) i.getSerializableExtra(WORKOUT_EXERCISES);
+        mWorkoutKey = i.getStringExtra(WORKOUT_ID);
 
         Log.i(TAG, "Exercises : " + mExercisesList + " WorkoutKey: " + mWorkoutKey);
 

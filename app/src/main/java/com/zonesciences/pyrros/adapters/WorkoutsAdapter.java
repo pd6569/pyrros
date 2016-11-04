@@ -2,6 +2,8 @@ package com.zonesciences.pyrros.adapters;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,8 +25,10 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.MainActivity;
 import com.zonesciences.pyrros.R;
 
+import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
@@ -42,20 +46,25 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
     private static final String TAG = "WorkoutsAdapter";
 
+    private static final String WORKOUT_EXERCISES = "Workout Exercises";
+    private static final String WORKOUT_ID = "Workout ID";
+
     DatabaseReference mDatabaseReference;
+    Context mContext;
     String mUid;
     int mNumExercises;
-    Map<String, List<Exercise>> mWorkoutExercises;
+    Map<String, List<Exercise>> mWorkoutExercisesMap;
     List<Exercise> mExercises;
     List<Integer> mTrackedIds;
+    ArrayList<String> mExerciseKeys = new ArrayList<>();
 
-    public WorkoutsAdapter(Class<Workout> modelClass, int modelLayout, Class<WorkoutViewHolder> viewHolderClass, Query ref, DatabaseReference databaseReference, String uid, Map<String, List<Exercise>> workoutExercisesMap) {
+    public WorkoutsAdapter(Class<Workout> modelClass, int modelLayout, Class<WorkoutViewHolder> viewHolderClass, Query ref, DatabaseReference databaseReference, String uid, Map<String, List<Exercise>> workoutExercisesMap, Context context) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         Log.i(TAG, "WorkoutsAdapter constructor called");
         mDatabaseReference = databaseReference;
         mUid = uid;
-        mWorkoutExercises = workoutExercisesMap;
-
+        mWorkoutExercisesMap = workoutExercisesMap;
+        mContext = context;
     }
 
     @Override
@@ -72,18 +81,15 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
         //This gets the unique key for the workout associated with the item in the list.
         final DatabaseReference workoutRef  = getRef(position);
 
-        if (!mWorkoutExercises.containsKey(workoutRef.getKey())){ //the stupid listener is set up and will notify adapter that data has changed when a new exercise is added when an exercise is added from the NewWorkoutActivity
+        if (!mWorkoutExercisesMap.containsKey(workoutRef.getKey())){ //the stupid listener is set up and will notify adapter that data has changed when a new exercise is added when an exercise is added from the NewWorkoutActivity
             Log.i(TAG, "No workout key exists");
         } else {
-            mExercises = mWorkoutExercises.get(workoutRef.getKey());
+            mExercises = mWorkoutExercisesMap.get(workoutRef.getKey());
             mNumExercises = mExercises.size();
             Log.i(TAG, "mWorkoutExercises Map contains exercises: " + mNumExercises);
 
             LinearLayout exercisesContainer = (LinearLayout) viewHolder.itemView.findViewById(R.id.workout_exercises_container);
             exercisesContainer.removeAllViews();
-
-           /* LinearLayout exerciseContainer = (LinearLayout) view.findViewById(R.id.workout_exercises_container);
-            exerciseContainer.removeAllViews();*/
 
             for (int i = 0; i < mNumExercises; i++) {
                 View view = LayoutInflater.from(viewHolder.itemView.getContext()).inflate(R.layout.item_workout_exercises, null);
@@ -99,9 +105,23 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Launch ViewWorkout
-                Toast.makeText(view.getContext(), "Launching Workout...", Toast.LENGTH_SHORT).show();
-                Log.i(TAG, "Value of workoutRef: " + workoutRef.getKey());
+                //Launch WorkoutActivity
+
+                List<Exercise> exercisesToLoad = mWorkoutExercisesMap.get(workoutRef.getKey());
+                for (Exercise exercise : exercisesToLoad){
+                    String s = exercise.getName();
+                    mExerciseKeys.add(s);
+                }
+
+                Log.i(TAG, "mExericseKeys: " + mExercises);
+
+                Bundle extras = new Bundle();
+                Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeys);
+                extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeys);
+                extras.putString(WORKOUT_ID, workoutKey);
+                Intent i = new Intent (mContext, WorkoutActivity.class);
+                i.putExtras(extras);
+                mContext.startActivity(i);
             }
         });
 
