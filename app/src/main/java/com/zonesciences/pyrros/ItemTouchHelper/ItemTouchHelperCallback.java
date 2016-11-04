@@ -3,11 +3,14 @@ package com.zonesciences.pyrros.ItemTouchHelper;
 import android.content.ClipData;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 
 /**
  * Created by Peter on 03/11/2016.
  */
 public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
+
+    private static final String TAG = "ItemTouchHelperCallback";
 
     private final ItemTouchHelperAdapter mAdapter;
 
@@ -42,5 +45,17 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+    }
+
+    @Override
+    public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int fromPos, RecyclerView.ViewHolder target, int toPos, int x, int y){
+        Log.i(TAG, "onMoved");
+    }
+
+    @Override
+    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        super.clearView(recyclerView, viewHolder);
+        Log.i(TAG, "clearView");
+        mAdapter.onMoveCompleted();
     }
 }

@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> implements ItemTouchHelperAdapter {
 
-    //TODO: Synchronise changes with the active exercise object in ExerciseFragment.
+    //TODO: set number update after reorder
     private final static String TAG = "SetsAdapter";
 
     Context mContext;
@@ -34,6 +34,8 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     List<Double> mWeightList = new ArrayList<>();
     List<Long> mRepsList = new ArrayList<>();
+
+    SetsListener mSetsListener;
 
     public static class SetsViewHolder extends RecyclerView.ViewHolder {
 
@@ -155,9 +157,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             }
         }
 
+        mExerciseReference.child("weight").setValue(mWeightList);
         mExerciseReference.child("reps").setValue(mRepsList);
-
         notifyItemMoved(fromPosition, toPosition);
+        mSetsListener.onSetsChanged();
         return true;
     }
 
@@ -168,4 +171,22 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         notifyItemRemoved(position);
     }
 
+    @Override
+    public void onMoveCompleted() {
+        notifyDataSetChanged();
+    }
+
+    //listener to update fragment which contains exercise object with working sets
+    public interface SetsListener{
+        public void onSetsChanged();
+    }
+
+    public void setSetsListener (SetsListener listener){
+        this.mSetsListener = listener;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
 }

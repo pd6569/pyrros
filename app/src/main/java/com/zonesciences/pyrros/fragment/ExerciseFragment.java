@@ -98,6 +98,23 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
 
         //Create workout object from firebase for this fragment
+        getExercise();
+
+        //adapter created here
+        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference);
+        mSetsAdapter.setSetsListener(new SetsAdapter.SetsListener() {
+            @Override
+            public void onSetsChanged() {
+                getExercise();
+            }
+        });
+
+
+    }
+
+    // Update fragment exercise object with latest firebase data on first load and if changes to set
+    // are made via the adapter (e.g reorder/deleting sets)
+    private void getExercise() {
         mExerciseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -110,11 +127,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
             }
         });
-
-        //adapter created here
-        mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference);
-
-
     }
 
     @Override
