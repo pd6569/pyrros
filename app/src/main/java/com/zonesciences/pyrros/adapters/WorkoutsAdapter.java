@@ -123,6 +123,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                 Intent i = new Intent (mContext, WorkoutActivity.class);
                 i.putExtras(extras);
                 mContext.startActivity(i);
+                mExerciseKeys.clear();
             }
         });
 
