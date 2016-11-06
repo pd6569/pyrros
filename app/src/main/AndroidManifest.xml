@@ -28,7 +28,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zonesciences.pyrros.MainActivity" />
         </activity>
-        <activity android:name=".WorkoutActivity" >
+        <activity
+            android:name=".WorkoutActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zonesciences.pyrros.MainActivity" />
         </activity>
     </application>
 

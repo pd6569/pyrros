@@ -60,7 +60,7 @@ public abstract class WorkoutsListFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mContext = getActivity();
         //Creates hashmap with string workoutKey and value containing list of exercises performed in that workout
-        createUserWorkoutsMap();
+
     }
 
 
@@ -91,6 +91,11 @@ public abstract class WorkoutsListFragment extends Fragment {
 
     }
 
+    @Override
+    public void onStart(){
+        super.onStart();
+        createUserWorkoutsMap();
+    }
 
 
     @Override
