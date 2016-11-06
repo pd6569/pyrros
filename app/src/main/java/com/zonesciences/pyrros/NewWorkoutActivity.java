@@ -113,6 +113,11 @@ public class NewWorkoutActivity extends BaseActivity {
                             mExerciseKeys.add(key);
                         }
 
+                        Map<String, Object> childUpdates = new HashMap<String, Object>();
+                        childUpdates.put("/workouts/" + mWorkoutKey + "/numExercises/", mNumExercises);
+                        childUpdates.put("/user-workouts/" + getUid() + "/" + mWorkoutKey + "/" + "/numExercises/", mNumExercises);
+                        mDatabase.updateChildren(childUpdates);
+
                         Bundle extras = new Bundle();
                         Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeys);
                         extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeys);
@@ -208,7 +213,7 @@ public class NewWorkoutActivity extends BaseActivity {
                 User user = dataSnapshot.getValue(User.class);
 
                 // [START_EXCLUDE]
-                if (user==null){
+                if (user == null) {
                     // User is null, error out
                     Log.e(TAG, "User " + userId + " is unexpectedly null");
                     Toast.makeText(NewWorkoutActivity.this, "Error: could not fetch user.", Toast.LENGTH_SHORT).show();
@@ -220,33 +225,33 @@ public class NewWorkoutActivity extends BaseActivity {
                     //if exists call method getExerciseKey
                     String exerciseKey;
                     boolean newWorkout;
-                        if (mCurrentWorkout == null) {
-                            newWorkout = true;
-                            if (checkExerciseExists(exercise)){
-                                //Exercise already exists, set exercise key
-                                exerciseKey = exercise;
-                                Log.i(TAG, "Creating brand new workout, with existing exercise");
+                    if (mCurrentWorkout == null) {
+                        newWorkout = true;
+                        if (checkExerciseExists(exercise)) {
+                            //Exercise already exists, set exercise key
+                            exerciseKey = exercise;
+                            Log.i(TAG, "Creating brand new workout, with existing exercise");
 
-                            } else {
-                                // Exercise does not exist, set exercise key null
-                                exerciseKey = null;
-                                Log.i(TAG, "Creating brand new workout, with new exercise");
-                            }
-                            writeNewWorkout(userId, user.username, exercise, exerciseKey);
                         } else {
-                            newWorkout = false;
-                            if (checkExerciseExists(exercise)){
-                                // Exercise already exists, set exercise key
-                                exerciseKey = exercise;
-                                Log.i(TAG, "Adding existing exercise to current workout");
-                            } else {
-                                // Exercise does not exist, set exercise key null
-                                exerciseKey = null;
-                                Log.i(TAG, "Adding new exercise to current workout");
-                            }
-                            addNewExercise(userId, user.username, mWorkoutKey, exercise, exerciseKey);
+                            // Exercise does not exist, set exercise key null
+                            exerciseKey = null;
+                            Log.i(TAG, "Creating brand new workout, with new exercise");
                         }
+                        writeNewWorkout(userId, user.username, exercise, exerciseKey);
+                    } else {
+                        newWorkout = false;
+                        if (checkExerciseExists(exercise)) {
+                            // Exercise already exists, set exercise key
+                            exerciseKey = exercise;
+                            Log.i(TAG, "Adding existing exercise to current workout");
+                        } else {
+                            // Exercise does not exist, set exercise key null
+                            exerciseKey = null;
+                            Log.i(TAG, "Adding new exercise to current workout");
+                        }
+                        addNewExercise(userId, user.username, mWorkoutKey, exercise, exerciseKey);
                     }
+                }
                 // [END_EXCLUDE]
             }
 
