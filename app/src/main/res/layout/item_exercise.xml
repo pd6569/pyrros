@@ -28,7 +28,7 @@
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/exercise_subtitle"
+        android:id="@+id/exercise_order"
         android:layout_width="fill_parent"
         android:layout_height="26dip"
         android:layout_alignParentBottom="true"
@@ -36,7 +36,7 @@
         android:layout_toRightOf="@id/exercise_icon"
         android:ellipsize="marquee"
         android:singleLine="true"
-        android:text="Subtitle"
+        android:text="1"
         android:textSize="12sp" />
 
 

@@ -163,7 +163,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
         // Adapter sets listener on workout-exercises directory detecting exercises that are added/removed/moved and updates the
         // recycler view as appropriate
-        mAdapter = new ExercisesAdapter(this, mExercisesReference, mDatabase, mWorkoutKey);
+        mAdapter = new ExercisesAdapter(this, mExercisesReference, mWorkoutKey, getUid());
         mAdapter.setExercisesListener(new ExercisesAdapter.ExercisesListener() {
             @Override
             public void onExercisesEmpty() {
@@ -384,4 +384,5 @@ public class NewWorkoutActivity extends BaseActivity {
             String date = df.format(Calendar.getInstance().getTime());
         return date;
     }
+
 }

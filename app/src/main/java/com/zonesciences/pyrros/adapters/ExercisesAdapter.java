@@ -16,6 +16,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
+import com.zonesciences.pyrros.NewWorkoutActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
 
@@ -32,9 +33,9 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
     private Context mContext;
     private DatabaseReference mWorkoutExerciseReference;
-    private DatabaseReference mDatabaseRoot;
     private ChildEventListener mChildEventListener;
     private ExercisesListener mExercisesListener;
+    private String mUser;
 
     private List<String> mExerciseKeys = new ArrayList<>();
     private List<Exercise> mExercises = new ArrayList<>();
@@ -47,11 +48,13 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     public class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
         public TextView exerciseName;
+        public TextView exerciseOrder;
 
         public ExerciseViewHolder(View itemView) {
             super(itemView);
 
             exerciseName = (TextView) itemView.findViewById(R.id.exercise_name);
+            exerciseOrder = (TextView) itemView.findViewById(R.id.exercise_order);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -60,6 +63,11 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                     Snackbar snackbar = Snackbar.make(view, "Removing exercise: " + mExercises.get(getAdapterPosition()).getName(), Snackbar.LENGTH_LONG);
                     snackbar.show();
                     mWorkoutExerciseReference.child(mExerciseKeys.get(getAdapterPosition())).removeValue();
+                    mWorkoutExerciseReference.getRoot()
+                            .child("user-workout-exercises")
+                            .child(mUser)
+                            .child(mWorkoutKey)
+                            .child(mExerciseKeys.get(getAdapterPosition())).removeValue();
                 }
             });
         }
@@ -67,11 +75,11 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     }
 
     // Provide suitable constructor
-    public ExercisesAdapter(final Context context, DatabaseReference workoutExercisesRef, DatabaseReference databaseRoot, String workoutKey) {
+    public ExercisesAdapter(final Context context, DatabaseReference workoutExercisesRef, String workoutKey, String user) {
         mContext = context;
         mWorkoutExerciseReference = workoutExercisesRef;
-        mDatabaseRoot = databaseRoot;
         mWorkoutKey = workoutKey;
+        mUser = user;
 
         // Create child event listener
         // [START child_event_listener_recycler]
@@ -191,6 +199,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     public void onBindViewHolder(ExerciseViewHolder holder, int position) {
         Exercise exercise = mExercises.get(position);
         holder.exerciseName.setText(exercise.getName());
+        holder.exerciseOrder.setText("" + position);
     }
 
 
