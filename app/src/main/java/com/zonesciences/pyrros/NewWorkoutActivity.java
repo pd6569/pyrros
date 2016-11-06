@@ -113,10 +113,7 @@ public class NewWorkoutActivity extends BaseActivity {
                             mExerciseKeys.add(key);
                         }
 
-                        Map<String, Object> childUpdates = new HashMap<String, Object>();
-                        childUpdates.put("/workouts/" + mWorkoutKey + "/numExercises/", mNumExercises);
-                        childUpdates.put("/user-workouts/" + getUid() + "/" + mWorkoutKey + "/" + "/numExercises/", mNumExercises);
-                        mDatabase.updateChildren(childUpdates);
+                        updateNumExercises();
 
                         Bundle extras = new Bundle();
                         Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeys);
@@ -162,6 +159,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
     }
 
+
     @Override
     public void onStart(){
         super.onStart();
@@ -185,6 +183,12 @@ public class NewWorkoutActivity extends BaseActivity {
         });
         mExercisesRecycler.setAdapter(mAdapter);
 
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        updateNumExercises();
     }
 
     
@@ -388,6 +392,13 @@ public class NewWorkoutActivity extends BaseActivity {
         }
             String date = df.format(Calendar.getInstance().getTime());
         return date;
+    }
+
+    private void updateNumExercises() {
+        Map<String, Object> childUpdates = new HashMap<String, Object>();
+        childUpdates.put("/workouts/" + mWorkoutKey + "/numExercises/", mNumExercises);
+        childUpdates.put("/user-workouts/" + getUid() + "/" + mWorkoutKey + "/" + "/numExercises/", mNumExercises);
+        mDatabase.updateChildren(childUpdates);
     }
 
 }

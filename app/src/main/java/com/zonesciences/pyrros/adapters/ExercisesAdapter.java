@@ -146,7 +146,8 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                     mExercises.remove(exerciseIndex);
 
                     //Update the RecyclerView
-                    notifyItemRemoved(exerciseIndex);
+                    /*notifyItemRemoved(exerciseIndex);*/
+                    notifyDataSetChanged();
                 } else {
                     Log.v(TAG, "onChildRemoved:unknown_child: " + exerciseKey);
                 }
