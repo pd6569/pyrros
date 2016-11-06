@@ -18,6 +18,7 @@ public class Exercise {
     public List<Double> weight;
     public List<Integer> reps;
     public int sets;
+    public int order;
 
     public Exercise(){
         // Default constructor required for calls to DataSnapshot.getValue(Exercise.class)
@@ -56,6 +57,7 @@ public class Exercise {
         result.put("weight", weight);
         result.put("reps", reps);
         result.put("sets", sets);
+        result.put("order", order);
         return result;
     }
 
@@ -87,6 +89,16 @@ public class Exercise {
     @Exclude
     public int getSets() {
         return sets;
+    }
+
+    @Exclude
+    public int getOrder() {
+        return order;
+    }
+
+    @Exclude
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     @Exclude
