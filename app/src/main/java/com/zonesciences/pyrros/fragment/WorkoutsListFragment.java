@@ -27,6 +27,8 @@ import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +115,6 @@ public abstract class WorkoutsListFragment extends Fragment {
 
     private void createUserWorkoutsMap() {
 
-
         mDatabase.child("user-workout-exercises").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -124,9 +125,11 @@ public abstract class WorkoutsListFragment extends Fragment {
                     List<Exercise> exercises = new ArrayList<Exercise>();
                     for (DataSnapshot exerciseKey : workout.getChildren()){
                         Exercise exercise = exerciseKey.getValue(Exercise.class);
+
                         Log.i(TAG, "Exercise added to list: " + exercise.getName());
                         exercises.add(exercise);
                     }
+
                     mWorkoutExercisesMap.put(s, exercises);
                     Log.i(TAG, "WorkoutExercisesMap updated: " + mWorkoutExercisesMap.size());
                 }
