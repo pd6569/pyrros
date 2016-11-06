@@ -97,7 +97,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
 
-        //Create workout object from firebase for this fragment
         getExercise();
 
         //adapter created here
@@ -164,8 +163,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     public void onStart(){
         super.onStart();
         Log.i(TAG, "onStart()");
-
-
     }
 
     @Override

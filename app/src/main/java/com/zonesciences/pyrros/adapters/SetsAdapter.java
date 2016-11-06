@@ -66,10 +66,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.i(TAG, "onChildAdded called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
-                if (dataSnapshot.getKey() == "weight"){
+                if (dataSnapshot.getKey().equals("weight")){
                     mWeightList = (List)dataSnapshot.getValue();
                     Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
-                } else if (dataSnapshot.getKey() == "reps"){
+                } else if (dataSnapshot.getKey().equals("reps")){
                     mRepsList = (List)dataSnapshot.getValue();
                     Log.i(TAG, "datasnapshot key = reps. containing values " + dataSnapshot.getValue() + " mRepsList: " + mRepsList);
                 }
@@ -100,7 +100,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                             // do nothing
                         }
                     }
-
             }
 
             @Override

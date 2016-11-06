@@ -118,6 +118,7 @@ public class NewWorkoutActivity extends BaseActivity {
                         Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
                         i.putExtras(extras);
                         startActivity(i);
+                        finish();
                     }
 
                     @Override
