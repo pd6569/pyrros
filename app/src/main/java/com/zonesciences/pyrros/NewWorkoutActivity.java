@@ -396,8 +396,13 @@ public class NewWorkoutActivity extends BaseActivity {
 
     private void updateNumExercises() {
         Map<String, Object> childUpdates = new HashMap<String, Object>();
-        childUpdates.put("/workouts/" + mWorkoutKey + "/numExercises/", mNumExercises);
-        childUpdates.put("/user-workouts/" + getUid() + "/" + mWorkoutKey + "/" + "/numExercises/", mNumExercises);
+        if (mNumExercises > 0) {
+            childUpdates.put("/workouts/" + mWorkoutKey + "/numExercises/", mNumExercises);
+            childUpdates.put("/user-workouts/" + getUid() + "/" + mWorkoutKey + "/" + "/numExercises/", mNumExercises);
+        } else {
+            childUpdates.put("/workouts/" + mWorkoutKey, null);
+            childUpdates.put("/user-workouts/" + getUid() + "/" + mWorkoutKey, null);
+        }
         mDatabase.updateChildren(childUpdates);
     }
 
