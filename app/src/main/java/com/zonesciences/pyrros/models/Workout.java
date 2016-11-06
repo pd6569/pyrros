@@ -27,6 +27,7 @@ public class Workout {
     public String clientTimeStamp;
     public Map<String, Boolean> users = new HashMap<>();
     public List<Exercise> exercises;
+    public int numExercises;
 
     public Workout(){
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
@@ -51,6 +52,7 @@ public class Workout {
         result.put("shared", shared);
         result.put("userCount", userCount);
         result.put("users", users);
+        result.put("numExercises", numExercises);
 
         return result;
     }
@@ -97,6 +99,11 @@ public class Workout {
     @Exclude
     public void addExercise (Exercise exercise){
         exercises.add(exercise);
+    }
+
+    @Exclude
+    public int getNumExercises() {
+        return numExercises;
     }
 }
 //[END workout_class]
