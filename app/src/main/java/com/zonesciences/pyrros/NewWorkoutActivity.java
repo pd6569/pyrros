@@ -58,6 +58,8 @@ public class NewWorkoutActivity extends BaseActivity {
     private String mWorkoutKey;
     private Workout mCurrentWorkout;
     private Exercise mExercise;
+    private int mOrder;
+    private int mNumExercises = 0;
 
     private List<String> mUserExerciseKeys = new ArrayList<>();
     private ArrayList<String> mExerciseKeys = new ArrayList<>();
@@ -169,6 +171,12 @@ public class NewWorkoutActivity extends BaseActivity {
                 mNoExercises.setVisibility(View.VISIBLE);
                 mStartWorkout.setVisibility(View.INVISIBLE);
             }
+
+            @Override
+            public void onExerciseRemoved() {
+                mNumExercises--;
+                Log.i(TAG, "onExerciseRemoved() Number of exercises" + mNumExercises);
+            }
         });
         mExercisesRecycler.setAdapter(mAdapter);
 
@@ -257,6 +265,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
     // [START write_fan_out]
     private void writeNewWorkout(String userId, String username, String exercise, String exerciseKey) {
+        mNumExercises++;
+        Log.i(TAG, "Number of exercises: " + mNumExercises);
 
         Map<String, Object> exerciseValues;
 
@@ -311,6 +321,9 @@ public class NewWorkoutActivity extends BaseActivity {
 
     //Add exercise to existing workout that has just been created
     private void addNewExercise(final String userId, String username, String workoutKey, final String exercise, String exerciseKey) {
+
+        mNumExercises++;
+        Log.i(TAG, "Number of exercises: " + mNumExercises);
 
         //Create unique exercise key if the exercise is new, otherwise use key for existing exercise
         if (exerciseKey == null){

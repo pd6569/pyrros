@@ -39,6 +39,8 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     private List<String> mExerciseKeys = new ArrayList<>();
     private List<Exercise> mExercises = new ArrayList<>();
 
+    private int mOrder;
+
     private String mWorkoutKey;
 
 
@@ -147,6 +149,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                     Log.i(TAG, "Exercises list is empty, fire this information to NewWorkoutActivity");
                     mExercisesListener.onExercisesEmpty();
                 }
+                mExercisesListener.onExerciseRemoved();
             }
 
             @Override
@@ -198,6 +201,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
     public interface ExercisesListener {
         public void onExercisesEmpty ();
+        public void onExerciseRemoved ();
     }
 
     public void setExercisesListener(ExercisesListener listener){
