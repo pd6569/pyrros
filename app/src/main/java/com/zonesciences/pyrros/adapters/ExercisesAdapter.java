@@ -217,4 +217,8 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     public void setExercisesListener(ExercisesListener listener){
         this.mExercisesListener = listener;
     }
+
+    public List<String> getExerciseKeys(){
+        return mExerciseKeys;
+    }
 }

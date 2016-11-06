@@ -19,6 +19,8 @@ import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: Rotating screen to landscape crashes app - likely just fix to portrait orientation for this app
+
 public class WorkoutActivity extends BaseActivity {
     private static String TAG = "WorkoutActivity";
 

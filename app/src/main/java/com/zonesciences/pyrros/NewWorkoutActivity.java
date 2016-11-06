@@ -25,6 +25,7 @@ import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -104,32 +105,26 @@ public class NewWorkoutActivity extends BaseActivity {
         mStartWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ArrayList<String> exerciseKeys = (ArrayList) mAdapter.getExerciseKeys();
+                Log.i(TAG, "exerise keys ordered by adapter: " + exerciseKeys);
 
-                mDatabase.child("workout-exercises").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot exerciseKey : dataSnapshot.getChildren()){
-                            String key = exerciseKey.getKey();
-                            mExerciseKeys.add(key);
-                        }
+                Map<String, Object> childUpdates = new HashMap<String, Object>();
+                for (int i = 0; i < exerciseKeys.size(); i++){
+                    childUpdates.put("/workout-exercises/" + mWorkoutKey + "/"  + exerciseKeys.get(i) + "/order/", i + 1);
+                    childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + exerciseKeys.get(i) + "/order/", i + 1);
+                }
+                mDatabase.updateChildren(childUpdates);
 
-                        updateNumExercises();
+                updateNumExercises();
 
-                        Bundle extras = new Bundle();
-                        Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeys);
-                        extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeys);
-                        extras.putString(WORKOUT_ID, mWorkoutKey);
-                        Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
-                        i.putExtras(extras);
-                        startActivity(i);
-                        finish();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                Bundle extras = new Bundle();
+                Log.i(TAG, "Exercises to pass to new activity " + exerciseKeys);
+                extras.putSerializable(WORKOUT_EXERCISES, exerciseKeys);
+                extras.putString(WORKOUT_ID, mWorkoutKey);
+                Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
+                i.putExtras(extras);
+                startActivity(i);
+                finish();
 
             }
         });
