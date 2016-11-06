@@ -67,7 +67,17 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.i(TAG, "onChildAdded called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
                 if (dataSnapshot.getKey().equals("weight")){
-                    mWeightList = (List)dataSnapshot.getValue();
+                    List list = (List) dataSnapshot.getValue();
+                    List<Double> weightList= new ArrayList<>();
+                    for (Object weight : list){
+                        Log.i(TAG, "This weight is of class: " + weight.getClass());
+                        if(weight instanceof Long){
+                            long l = (long) weight;
+                            weight = (double) l;
+                        }
+                        weightList.add((double) weight);
+                    }
+                    mWeightList = weightList;
                     Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
                 } else if (dataSnapshot.getKey().equals("reps")){
                     mRepsList = (List)dataSnapshot.getValue();
@@ -132,6 +142,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     @Override
     public void onBindViewHolder(SetsViewHolder holder, int position) {
+
         holder.mSetNumber.setText(Integer.toString(position + 1));
         holder.mSetWeight.setText(Double.toString(mWeightList.get(position)) + " kg");
         holder.mSetReps.setText(Long.toString(mRepsList.get(position)) + " reps");
