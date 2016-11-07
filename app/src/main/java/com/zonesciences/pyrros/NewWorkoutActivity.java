@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -148,6 +150,13 @@ public class NewWorkoutActivity extends BaseActivity {
 
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu){
+        getMenuInflater().inflate(R.menu.menu_new_workout, menu);
+        return true;
+    }
+
 
     @Override
     public void onStart(){

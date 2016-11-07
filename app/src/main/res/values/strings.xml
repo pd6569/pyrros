@@ -53,6 +53,7 @@
     <string name="reps">Reps</string>
     <string name="save_set">Add Set</string>
     <string name="no_sets_recorded">No sets recorded</string>
+    <string name="action_start">Start</string>
 
 
 </resources>
