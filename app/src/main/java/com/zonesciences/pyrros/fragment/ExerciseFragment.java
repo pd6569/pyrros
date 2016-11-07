@@ -64,7 +64,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     //Sets reps and weights
     double mWeight;
     int mReps;
-    int mSets = 0;
+    int mCurrentSet;
 
     //Firebase
     private DatabaseReference mDatabase;
@@ -190,9 +190,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     private void addSet() {
         setWeight();
         setReps();
-        mSets++;
+        mCurrentSet++;
 
-        mSetNumberTitle.setText("Set " + Integer.toString(mSets));
+        mSetNumberTitle.setText("Set " + Integer.toString(mCurrentSet));
 
         mExercise.addWeight(mWeight);
         mExercise.addReps(mReps);
@@ -263,7 +263,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mExercise = dataSnapshot.getValue(Exercise.class);
                 Log.i(TAG, "Fragment loaded for this exercise: " + mExercise.getName());
-                mSetNumberTitle.setText("Set " + mExercise.getSets());
+                mCurrentSet = mExercise.getSets() + 1;
+                mSetNumberTitle.setText("Set " + mCurrentSet);
             }
 
             @Override

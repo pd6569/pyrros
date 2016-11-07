@@ -67,6 +67,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.i(TAG, "onChildAdded called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
                 if (dataSnapshot.getKey().equals("weight")){
+
+                    //convert list stored on firebase to list of doubles
+                    //firebase automatically converts doubles to longs when it can, e.g. 10.0 stored as 10
                     List list = (List) dataSnapshot.getValue();
                     List<Double> weightList= new ArrayList<>();
                     for (Object weight : list){
