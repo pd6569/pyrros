@@ -4,6 +4,7 @@ package com.zonesciences.pyrros.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -99,9 +100,30 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             exercisesContainer.removeAllViews();
 
             for (int i = 0; i < mNumExercises; i++) {
+
+                Exercise currentExercise = mExercises.get(i);
                 View view = LayoutInflater.from(viewHolder.itemView.getContext()).inflate(R.layout.item_workout_exercises, null);
                 TextView exerciseText = (TextView) view.findViewById(R.id.workout_exercise_name);
-                exerciseText.setText(mExercises.get(i).getName());
+                LinearLayout setsContainer = (LinearLayout) view.findViewById(R.id.workout_sets_container);
+                exerciseText.setText(currentExercise.getName());
+
+
+                for (int j = 0; j < currentExercise.getSets(); j++){
+
+                    Log.i(TAG, "GETTING SETS FOR: currentExercise = " + currentExercise.getName());
+                    View setsView = LayoutInflater.from(viewHolder.itemView.getContext()).inflate(R.layout.item_sets, null);
+                    TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
+                    TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
+                    TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
+
+                    setNumber.setText(Integer.toString(j + 1));
+                    setWeight.setText("" + currentExercise.getWeight().get(j) + " kgs");
+                    setReps.setText("" + currentExercise.getReps().get(j) + " reps");
+
+                    setsContainer.addView(setsView);
+
+                }
+
                 exercisesContainer.addView(view);
             }
         }
@@ -109,7 +131,6 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
         //Set click listener for the whole workout view
         final String workoutKey = workoutRef.getKey();
 
-        //TODO: FIX: this is duplicating exercises every time the workout is clicked
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -129,7 +129,6 @@ public abstract class WorkoutsListFragment extends Fragment {
                         Log.i(TAG, "Exercise added to list: " + exercise.getName());
                         exercises.add(exercise);
                     }
-
                     mWorkoutExercisesMap.put(s, exercises);
                     Log.i(TAG, "WorkoutExercisesMap updated: " + mWorkoutExercisesMap.size());
                 }

@@ -12,4 +12,12 @@
         android:textSize="18dp"
         />
 
+    <!--set will by dynamically generated and inserted here using layout item_sets-->
+    <LinearLayout
+        android:id="@+id/workout_sets_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    </LinearLayout>
+
 </LinearLayout>
