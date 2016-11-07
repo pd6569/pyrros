@@ -310,36 +310,40 @@ public class NewWorkoutActivity extends BaseActivity {
     //Add exercise to existing workout that has just been created
     private void addNewExercise(final String userId, String username, String workoutKey, final String exercise, String exerciseKey) {
 
-        mNumExercises++;
-        Log.i(TAG, "Number of exercises: " + mNumExercises);
-
-        //Create unique exercise key if the exercise is new, otherwise use key for existing exercise
-        if (exerciseKey == null){
-            mExerciseKey = exercise;
-            Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
-            mUserExerciseKeys.add(exercise);
-            mExercise = new Exercise(userId, exercise);
-            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
-            mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
-            mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+        if(mAdapter.getExerciseKeys().contains(exercise)) {
+            Log.i(TAG, "You have already added this exercise to the workout, dickhead");
         } else {
-            Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
-            mExerciseKey = exerciseKey;
-            //grab this exercise from the user-exercises directory
-            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    mExercise = dataSnapshot.getValue(Exercise.class);
-                    Log.i(TAG, "Adding existing exercise to current workout, setting exercise object to existing exercise values: " + mExercise.getName());
-                    mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
-                    mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
-                }
+            mNumExercises++;
+            Log.i(TAG, "Number of exercises: " + mNumExercises);
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            //Create unique exercise key if the exercise is new, otherwise use key for existing exercise
+            if (exerciseKey == null) {
+                mExerciseKey = exercise;
+                Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
+                mUserExerciseKeys.add(exercise);
+                mExercise = new Exercise(userId, exercise);
+                mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
+                mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+                mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+            } else {
+                Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
+                mExerciseKey = exerciseKey;
+                //grab this exercise from the user-exercises directory
+                mDatabase.child("user-exercises").child(userId).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        mExercise = dataSnapshot.getValue(Exercise.class);
+                        Log.i(TAG, "Adding existing exercise to current workout, setting exercise object to existing exercise values: " + mExercise.getName());
+                        mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+                        mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+                    }
 
-                }
-            });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.i(TAG, "onCancelled: " + databaseError);
+                    }
+                });
+            }
         }
 
     }

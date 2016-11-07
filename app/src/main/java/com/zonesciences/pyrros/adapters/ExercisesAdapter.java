@@ -48,13 +48,11 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     public class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
         public TextView exerciseName;
-        public TextView exerciseOrder;
 
         public ExerciseViewHolder(View itemView) {
             super(itemView);
 
             exerciseName = (TextView) itemView.findViewById(R.id.exercise_name);
-            exerciseOrder = (TextView) itemView.findViewById(R.id.exercise_order);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -200,7 +198,6 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     public void onBindViewHolder(ExerciseViewHolder holder, int position) {
         Exercise exercise = mExercises.get(position);
         holder.exerciseName.setText(exercise.getName());
-        holder.exerciseOrder.setText("" + position);
     }
 
 
