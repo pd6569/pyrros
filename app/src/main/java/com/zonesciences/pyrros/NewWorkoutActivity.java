@@ -298,7 +298,7 @@ public class NewWorkoutActivity extends BaseActivity {
         }
 
         //Set Default workout title
-        String title = new String("Workout - " + getClientTimeStamp(false));
+        String title = new String("" + getClientTimeStamp(false));
 
         mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(true), title, new Boolean(true));
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();
@@ -378,7 +378,7 @@ public class NewWorkoutActivity extends BaseActivity {
         if (includeTime) {
             df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
         } else {
-            df = new SimpleDateFormat("dd MMM, yyyy");
+            df = new SimpleDateFormat("EEE, dd MMM");
         }
             String date = df.format(Calendar.getInstance().getTime());
         return date;
