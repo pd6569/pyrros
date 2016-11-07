@@ -67,6 +67,7 @@ public class WorkoutActivity extends BaseActivity {
             @Override
             public void onTabSelected(@IdRes int tabId) {
                 if (tabId == R.id.tab_history){
+                    FragmentManager fm = getSupportFragmentManager();
 
                 }
             }

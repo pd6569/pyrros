@@ -9,9 +9,7 @@ import android.view.ViewGroup;
 
 import com.zonesciences.pyrros.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class ExerciseHistoryFragment extends Fragment {
 
 
