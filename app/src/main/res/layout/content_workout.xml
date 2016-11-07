@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/workout_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -14,6 +13,12 @@
     tools:context="com.zonesciences.pyrros.WorkoutActivity"
     tools:showIn="@layout/activity_workout">
 
+    <FrameLayout
+        android:id="@+id/workout_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </FrameLayout>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_exercises"
         android:layout_width="match_parent"
@@ -22,3 +27,6 @@
         tools:context=".activity_workout"/>
 
 </RelativeLayout>
+
+
+
