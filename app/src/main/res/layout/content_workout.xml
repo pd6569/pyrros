@@ -17,8 +17,7 @@
         android:id="@+id/viewpager_exercises"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="45dp"
         tools:context=".activity_workout"/>
-
-
 
 </RelativeLayout>

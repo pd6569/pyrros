@@ -30,7 +30,8 @@
         </activity>
         <activity
             android:name=".WorkoutActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zonesciences.pyrros.MainActivity" />

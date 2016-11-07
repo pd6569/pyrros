@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs >
+    <tab
+        id="@+id/tab_workout"
+        icon="@drawable/ic_assignment_black_24dp"
+        title="Workout" />
+    <tab
+        id="@+id/tab_history"
+        icon="@drawable/ic_history_black_24dp"
+        title="History" />
+    <tab
+        id="@+id/tab_stats"
+        icon="@drawable/ic_assessment_black_24dp"
+        title="Stats" />
+    <tab
+        id="@+id/tab_feedback"
+        icon="@drawable/ic_question_answer_black_24dp"
+        title="Feedback" />
+</tabs>
