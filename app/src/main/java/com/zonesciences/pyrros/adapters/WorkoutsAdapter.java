@@ -116,9 +116,13 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                     TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
                     TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
 
-                    setNumber.setText(Integer.toString(j + 1));
+                    setNumber.setVisibility(View.GONE);
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
                     setWeight.setText("" + currentExercise.getWeight().get(j) + " kgs");
+                    setWeight.setLayoutParams(params);
                     setReps.setText("" + currentExercise.getReps().get(j) + " reps");
+                    setReps.setLayoutParams(params);
 
                     setsContainer.addView(setsView);
 
