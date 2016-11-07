@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,7 +56,8 @@ public class NewWorkoutActivity extends BaseActivity {
     private EditText mExerciseField;
     private TextView mNoExercises;
     private FloatingActionButton mSubmitExercise;
-    private Button mStartWorkout;
+
+    private MenuItem mStartWorkoutAction;
 
 
     private String mWorkoutKey;
@@ -103,30 +105,6 @@ public class NewWorkoutActivity extends BaseActivity {
             }
         });
 
-        mStartWorkout = (Button) findViewById(R.id.button_start_workout);
-        mStartWorkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //Gets ordered arraylist from adapter and writes order as property of exercise
-                updateOrder();
-
-                //write number of exercises to workout
-                updateNumExercises();
-
-                Bundle extras = new Bundle();
-                Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeysList);
-                extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeysList);
-                extras.putString(WORKOUT_ID, mWorkoutKey);
-                Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
-                i.putExtras(extras);
-                startActivity(i);
-                finish();
-
-            }
-        });
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Get list of current exercises for user on startup of this activity and create working list.
@@ -152,8 +130,9 @@ public class NewWorkoutActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(final Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_new_workout, menu);
+        mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
         return true;
     }
 
@@ -170,7 +149,8 @@ public class NewWorkoutActivity extends BaseActivity {
             public void onExercisesEmpty() {
                 Log.i(TAG, "onExercisesEmpty() called");
                 mNoExercises.setVisibility(View.VISIBLE);
-                mStartWorkout.setVisibility(View.INVISIBLE);
+                mStartWorkoutAction.setVisible(false);
+
             }
 
             @Override
@@ -201,7 +181,7 @@ public class NewWorkoutActivity extends BaseActivity {
         } else {
             mExerciseField.setText("");
             mNoExercises.setVisibility(View.INVISIBLE);
-            mStartWorkout.setVisibility(View.VISIBLE);
+            mStartWorkoutAction.setVisible(true);
         }
 
         // [START single_value_read
@@ -417,5 +397,34 @@ public class NewWorkoutActivity extends BaseActivity {
             childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/order/", i + 1);
         }
         mDatabase.updateChildren(childUpdates);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_start_workout:
+                //Gets ordered arraylist from adapter and writes order as property of exercise
+                updateOrder();
+
+                //write number of exercises to workout
+                updateNumExercises();
+
+                Bundle extras = new Bundle();
+                Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeysList);
+                extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeysList);
+                extras.putString(WORKOUT_ID, mWorkoutKey);
+                Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
+                i.putExtras(extras);
+                startActivity(i);
+                finish();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }
