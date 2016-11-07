@@ -2,6 +2,7 @@ package com.zonesciences.pyrros;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +15,8 @@ import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 
 import java.util.ArrayList;
@@ -49,6 +52,7 @@ public class WorkoutActivity extends BaseActivity {
         mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(getSupportFragmentManager());
         mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
 
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_workout);
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -57,6 +61,16 @@ public class WorkoutActivity extends BaseActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs_workout);
         tabLayout.setupWithViewPager(mExercisesViewPager, false);
+
+        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                if (tabId == R.id.tab_history){
+
+                }
+            }
+        });
     }
 
     class WorkoutExercisesAdapter extends FragmentPagerAdapter {
