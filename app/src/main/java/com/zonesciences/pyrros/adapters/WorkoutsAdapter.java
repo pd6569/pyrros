@@ -107,6 +107,10 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                 LinearLayout setsContainer = (LinearLayout) view.findViewById(R.id.workout_sets_container);
                 exerciseText.setText(currentExercise.getName());
 
+                if (currentExercise.getSets() == 0){
+                    TextView noSets = (TextView) view.findViewById(R.id.workout_no_sets);
+                    noSets.setVisibility(View.VISIBLE);
+                }
 
                 for (int j = 0; j < currentExercise.getSets(); j++){
 

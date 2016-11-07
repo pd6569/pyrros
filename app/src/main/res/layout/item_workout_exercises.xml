@@ -20,6 +20,14 @@
         android:background="@color/colorAccent">
     </View>
 
+    <TextView
+        android:id="@+id/workout_no_sets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_sets_recorded"
+        android:visibility="gone"
+        />
+
     <!--set will by dynamically generated and inserted here using layout item_sets-->
     <LinearLayout
         android:id="@+id/workout_sets_container"

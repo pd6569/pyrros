@@ -13,17 +13,10 @@
     tools:context="com.zonesciences.pyrros.NewWorkoutActivity"
     tools:showIn="@layout/activity_new_workout">
 
-    <android.support.v7.widget.SearchView
-        android:id="@+id/searchview_new_workout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </android.support.v7.widget.SearchView>
-
     <EditText
         android:id="@+id/field_new_exercise"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/searchview_new_workout"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
