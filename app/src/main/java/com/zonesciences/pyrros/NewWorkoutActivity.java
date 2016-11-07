@@ -2,7 +2,9 @@ package com.zonesciences.pyrros;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,6 +56,7 @@ public class NewWorkoutActivity extends BaseActivity {
     private ExercisesAdapter mAdapter;
     private LinearLayoutManager mLayoutManager;
 
+    private CoordinatorLayout mCoordinatorLayout;
     private EditText mExerciseField;
     private TextView mNoExercises;
     private FloatingActionButton mSubmitExercise;
@@ -87,6 +91,8 @@ public class NewWorkoutActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("New Workout");
+
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout_new_workout);
 
         mExerciseField = (EditText) findViewById(R.id.field_new_exercise);
         mNoExercises = (TextView) findViewById(R.id.textview_no_exercises);
@@ -284,6 +290,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
                 }
             });
+
+
         }
 
         //Set Default workout title
@@ -304,6 +312,9 @@ public class NewWorkoutActivity extends BaseActivity {
             childUpdates.put("/user-workout-exercises/" + userId + "/" + mWorkoutKey +"/" + mExerciseKey, mExercise);
         }
         mDatabase.updateChildren(childUpdates);
+
+        Snackbar snackbar = Snackbar.make(mCoordinatorLayout, "Added exercise: " + mExerciseKey, Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
     // [END write_fan_out]
 
@@ -312,6 +323,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
         if(mAdapter.getExerciseKeys().contains(exercise)) {
             Log.i(TAG, "You have already added this exercise to the workout, dickhead");
+            Snackbar snackbar = Snackbar.make(mCoordinatorLayout, "Already added this one, dickhead", Snackbar.LENGTH_LONG);
+            snackbar.show();
         } else {
             mNumExercises++;
             Log.i(TAG, "Number of exercises: " + mNumExercises);
@@ -344,6 +357,9 @@ public class NewWorkoutActivity extends BaseActivity {
                     }
                 });
             }
+
+            Snackbar snackbar = Snackbar.make(mCoordinatorLayout, "Added exercise: " + mExerciseKey, Snackbar.LENGTH_LONG);
+            snackbar.show();
         }
 
     }

@@ -14,8 +14,9 @@
             android:id="@+id/exercise_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:text="Bench Press"
+            android:textStyle="bold"
             android:textSize="22dp" />
 
     </RelativeLayout>

@@ -1,16 +1,20 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -49,7 +53,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
         public TextView exerciseName;
 
-        public ExerciseViewHolder(View itemView) {
+        public ExerciseViewHolder(final View itemView) {
             super(itemView);
 
             exerciseName = (TextView) itemView.findViewById(R.id.exercise_name);
@@ -57,7 +61,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.i(TAG, "onClick");
+
                     Snackbar snackbar = Snackbar.make(view, "Removing exercise: " + mExercises.get(getAdapterPosition()).getName(), Snackbar.LENGTH_LONG);
                     snackbar.show();
                     mWorkoutExerciseReference.child(mExerciseKeys.get(getAdapterPosition())).removeValue();
@@ -97,6 +101,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
 
                 Log.i(TAG, "Workout contains: " + mExercises.size() + " exercises");
                 // [END_EXCLUDE]
+
             }
 
             @Override
@@ -156,6 +161,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                     Log.i(TAG, "Exercises list is empty, fire this information to NewWorkoutActivity");
                     mExercisesListener.onExercisesEmpty();
                 }
+
                 mExercisesListener.onExerciseRemoved();
             }
 
