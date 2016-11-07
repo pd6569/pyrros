@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Created by Peter on 18/10/2016.
  */
-public class Exercise {
+public class Exercise implements Comparable<Exercise>{
 
     public String uid;
     public String name;
@@ -117,5 +117,14 @@ public class Exercise {
         }
         reps.add(newReps);
         sets = reps.size();
+    }
+
+    @Exclude
+    @Override
+    public int compareTo(Exercise exercise) {
+        int compareOrder =((Exercise) exercise).getOrder();
+
+        //Ascending order
+        return this.order - compareOrder;
     }
 }

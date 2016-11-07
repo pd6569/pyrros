@@ -63,7 +63,7 @@ public class NewWorkoutActivity extends BaseActivity {
     private int mNumExercises = 0;
 
     private List<String> mUserExerciseKeys = new ArrayList<>();
-    private ArrayList<String> mExerciseKeys = new ArrayList<>();
+    private ArrayList<String> mExerciseKeysList = new ArrayList<>();
 
     private String mExerciseKey = new String();
 
@@ -105,21 +105,16 @@ public class NewWorkoutActivity extends BaseActivity {
         mStartWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<String> exerciseKeys = (ArrayList) mAdapter.getExerciseKeys();
-                Log.i(TAG, "exerise keys ordered by adapter: " + exerciseKeys);
 
-                Map<String, Object> childUpdates = new HashMap<String, Object>();
-                for (int i = 0; i < exerciseKeys.size(); i++){
-                    childUpdates.put("/workout-exercises/" + mWorkoutKey + "/"  + exerciseKeys.get(i) + "/order/", i + 1);
-                    childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + exerciseKeys.get(i) + "/order/", i + 1);
-                }
-                mDatabase.updateChildren(childUpdates);
+                //Gets ordered arraylist from adapter and writes order as property of exercise
+                updateOrder();
 
+                //write number of exercises to workout
                 updateNumExercises();
 
                 Bundle extras = new Bundle();
-                Log.i(TAG, "Exercises to pass to new activity " + exerciseKeys);
-                extras.putSerializable(WORKOUT_EXERCISES, exerciseKeys);
+                Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeysList);
+                extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeysList);
                 extras.putString(WORKOUT_ID, mWorkoutKey);
                 Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
                 i.putExtras(extras);
@@ -154,7 +149,6 @@ public class NewWorkoutActivity extends BaseActivity {
 
     }
 
-
     @Override
     public void onStart(){
         super.onStart();
@@ -183,6 +177,7 @@ public class NewWorkoutActivity extends BaseActivity {
     @Override
     public void onPause(){
         super.onPause();
+        updateOrder();
         updateNumExercises();
     }
 
@@ -401,4 +396,17 @@ public class NewWorkoutActivity extends BaseActivity {
         mDatabase.updateChildren(childUpdates);
     }
 
+    private void updateOrder() {
+        //Get ordered arraylist from adapter
+        ArrayList<String> exerciseKeys = (ArrayList) mAdapter.getExerciseKeys();
+        Log.i(TAG, "exerise keys ordered by adapter: " + exerciseKeys);
+
+        //write the exercise order as an exercise property
+        Map<String, Object> childUpdates = new HashMap<String, Object>();
+        for (int i = 0; i < exerciseKeys.size(); i++){
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/"  + exerciseKeys.get(i) + "/order/", i + 1);
+            childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + exerciseKeys.get(i) + "/order/", i + 1);
+        }
+        mDatabase.updateChildren(childUpdates);
+    }
 }

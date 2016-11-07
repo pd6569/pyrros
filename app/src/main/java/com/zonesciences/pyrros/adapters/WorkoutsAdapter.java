@@ -34,6 +34,7 @@ import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,12 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             Log.i(TAG, "No workout key exists");
         } else {
             mExercises = mWorkoutExercisesMap.get(workoutRef.getKey());
+
+            Log.i(TAG, "mExercises before sort: " + mExercises);
+            Collections.sort(mExercises);
+            for (Exercise e : mExercises){
+                Log.i(TAG, "Name of exercise: " + e.getName() + " Order: " + e.getOrder());
+            }
             mNumExercises = mExercises.size();
             Log.i(TAG, "mWorkoutExercises Map contains exercises: " + mNumExercises);
 
