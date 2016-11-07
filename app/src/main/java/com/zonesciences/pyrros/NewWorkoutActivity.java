@@ -398,14 +398,14 @@ public class NewWorkoutActivity extends BaseActivity {
 
     private void updateOrder() {
         //Get ordered arraylist from adapter
-        ArrayList<String> exerciseKeys = (ArrayList) mAdapter.getExerciseKeys();
-        Log.i(TAG, "exerise keys ordered by adapter: " + exerciseKeys);
+        mExerciseKeysList = (ArrayList) mAdapter.getExerciseKeys();
+        Log.i(TAG, "exerise keys ordered by adapter: " + mExerciseKeysList);
 
         //write the exercise order as an exercise property
         Map<String, Object> childUpdates = new HashMap<String, Object>();
-        for (int i = 0; i < exerciseKeys.size(); i++){
-            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/"  + exerciseKeys.get(i) + "/order/", i + 1);
-            childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + exerciseKeys.get(i) + "/order/", i + 1);
+        for (int i = 0; i < mExerciseKeysList.size(); i++){
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/"  + mExerciseKeysList.get(i) + "/order/", i + 1);
+            childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/order/", i + 1);
         }
         mDatabase.updateChildren(childUpdates);
     }
