@@ -58,11 +58,15 @@ public class ExerciseHistoryFragment extends Fragment {
         mUserId = bundle.getString(ARG_USER_ID);
 
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
-        Query query = mUserWorkoutExercisesRef.orderByChild(mExerciseKey);
+        //Firebase deep path query
+        Query query = mUserWorkoutExercisesRef.orderByChild(mExerciseKey+"/name").equalTo(mExerciseKey);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "Trying to find all occurences of exercise " + mExerciseKey + " DataSnapshot children count: " + dataSnapshot.getChildrenCount() + " Value: " + dataSnapshot.getValue());
+
+                Log.i(TAG, "Datasnapshot instances: " + dataSnapshot.getChildrenCount() + " VALUE : " + dataSnapshot.getValue());
+
+                /*Log.i(TAG, "Trying to find all occurences of exercise " + mExerciseKey + " DataSnapshot children count: " + dataSnapshot.getChildrenCount() + " Value: " + dataSnapshot.getValue());
                 for(DataSnapshot workout : dataSnapshot.getChildren()){
                     for (DataSnapshot exercise : workout.getChildren()){
                         Log.i(TAG, "Exercise: " + exercise.getKey() + " in workout: " + workout.getKey());
@@ -73,7 +77,7 @@ public class ExerciseHistoryFragment extends Fragment {
                         }
                     }
                 }
-                Log.i(TAG, mExerciseKey + " has been performed " + mExercises.size() + " times. " + mExercises);
+                Log.i(TAG, mExerciseKey + " has been performed " + mExercises.size() + " times. " + mExercises);*/
             }
 
             @Override
