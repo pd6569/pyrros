@@ -29,11 +29,12 @@ public class ExerciseHistory {
     List<Exercise> mExercises = new ArrayList<>();
     List<String> mExerciseDates = new ArrayList<>();
 
-    public ExerciseHistory(DatabaseReference userWorkoutExercisesRef, String userId, String exerciseKey){
-        mUserWorkoutExercisesRef = userWorkoutExercisesRef;
+    public ExerciseHistory(String userId, String exerciseKey){
         mExerciseKey = exerciseKey;
         mUserId = userId;
+    }
 
+    public void getHistory(){
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
         //Firebase deep path query returns all workouts containing mExerciseKey
         Query query = mUserWorkoutExercisesRef.orderByChild(mExerciseKey+"/name").equalTo(mExerciseKey);
@@ -64,8 +65,6 @@ public class ExerciseHistory {
 
             }
         });
-
-
     }
 
     private void getWorkoutDates(final String workoutKey) {
