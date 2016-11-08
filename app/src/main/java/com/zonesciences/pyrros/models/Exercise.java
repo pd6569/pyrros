@@ -1,5 +1,8 @@
 package com.zonesciences.pyrros.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 
 import java.util.ArrayList;
@@ -10,7 +13,7 @@ import java.util.Map;
 /**
  * Created by Peter on 18/10/2016.
  */
-public class Exercise implements Comparable<Exercise>{
+public class Exercise implements Comparable<Exercise>, Parcelable {
 
     public String uid;
     public String name;
@@ -127,4 +130,66 @@ public class Exercise implements Comparable<Exercise>{
         //Ascending order
         return this.order - compareOrder;
     }
+
+    protected Exercise(Parcel in) {
+        uid = in.readString();
+        name = in.readString();
+        muscleGroup = in.readString();
+        if (in.readByte() == 0x01) {
+            weight = new ArrayList<Double>();
+            in.readList(weight, Double.class.getClassLoader());
+        } else {
+            weight = null;
+        }
+        if (in.readByte() == 0x01) {
+            reps = new ArrayList<Integer>();
+            in.readList(reps, Integer.class.getClassLoader());
+        } else {
+            reps = null;
+        }
+        sets = in.readInt();
+        order = in.readInt();
+    }
+
+    @Exclude
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Exclude
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uid);
+        dest.writeString(name);
+        dest.writeString(muscleGroup);
+        if (weight == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(weight);
+        }
+        if (reps == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(reps);
+        }
+        dest.writeInt(sets);
+        dest.writeInt(order);
+    }
+
+    @Exclude
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Exercise> CREATOR = new Parcelable.Creator<Exercise>() {
+        @Override
+        public Exercise createFromParcel(Parcel in) {
+            return new Exercise(in);
+        }
+
+        @Override
+        public Exercise[] newArray(int size) {
+            return new Exercise[size];
+        }
+    };
 }

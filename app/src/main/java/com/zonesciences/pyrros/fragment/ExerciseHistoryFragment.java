@@ -14,14 +14,19 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.models.Exercise;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class ExerciseHistoryFragment extends Fragment {
 
+    private static final String TAG = "ExerciseHistoryFragment";
+
     private static final String ARG_EXERCISE_KEY = "ExerciseKey";
     private static final String ARG_USER_ID = "UserId";
-    private static final String TAG = "ExerciseHistoryFragment";
+    private static final String ARG_EXERCISE_HISTORY_DATES = "ExerciseHistoryDates";
+    private static final String ARG_EXERCISE_HISTORY = "ExerciseHistory";
+
 
     DatabaseReference mUserWorkoutExercisesRef;
 
@@ -31,10 +36,12 @@ public class ExerciseHistoryFragment extends Fragment {
     List<Exercise> mExercises;
     List<String> mExerciseDates;
 
-    public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId) {
+    public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
+        args.putStringArrayList(ARG_EXERCISE_HISTORY_DATES, (ArrayList<String>) exerciseDates);
+
         ExerciseHistoryFragment fragment = new ExerciseHistoryFragment();
         fragment.setArguments(args);
         return fragment;
@@ -67,3 +74,4 @@ public class ExerciseHistoryFragment extends Fragment {
     }
 
 }
+

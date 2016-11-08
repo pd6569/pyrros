@@ -132,7 +132,7 @@ public class WorkoutActivity extends BaseActivity implements ExerciseFragment.On
 
             mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
             if (mExerciseHistoryFragment == null){
-                mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId);
+                mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
             }
             fragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId);
         } else if (fragmentTag == "STATS"){
