@@ -25,6 +25,10 @@ import java.util.ArrayList;
 
 //TODO: Rotating screen to landscape crashes app - likely just fix to portrait orientation for this app
 
+// The viewpager forms the main basis of this activity and is separate to the fragment container
+// The fragment container switches in and out the exercise history, stats, and feedback fragments
+// and the visibility of the viewpager is toggled on/off.
+
 public class WorkoutActivity extends BaseActivity {
     private static String TAG = "WorkoutActivity";
 
@@ -39,6 +43,7 @@ public class WorkoutActivity extends BaseActivity {
 
     ArrayList<String> mExercisesList;
     String mWorkoutKey;
+    String mExerciseKey;
 
     FragmentManager mFragmentManager;
 
@@ -58,6 +63,7 @@ public class WorkoutActivity extends BaseActivity {
         Intent i = getIntent();
         mExercisesList = (ArrayList<String>) i.getSerializableExtra(WORKOUT_EXERCISES);
         mWorkoutKey = i.getStringExtra(WORKOUT_ID);
+        mExerciseKey = mExercisesList.get(0);
 
         Log.i(TAG, "Exercises : " + mExercisesList + " WorkoutKey: " + mWorkoutKey);
 
@@ -115,10 +121,12 @@ public class WorkoutActivity extends BaseActivity {
         mFragmentTag = fragmentTag;
         Fragment fragment;
         if (fragmentTag == "EXERCISE_HISTORY"){
+            Log.i(TAG, "Current exercise item: " + mExercisesList.get(mExercisesViewPager.getCurrentItem()));
+            mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
             if (mExerciseHistoryFragment == null){
-                mExerciseHistoryFragment = new ExerciseHistoryFragment();
+                mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey);
             }
-            fragment = mExerciseHistoryFragment;
+            fragment = mExerciseHistoryFragment.newInstance(mExerciseKey);
         } else if (fragmentTag == "STATS"){
             if (mStatsFragment == null) {
                 mStatsFragment = new StatsFragment();
@@ -133,6 +141,7 @@ public class WorkoutActivity extends BaseActivity {
             fragment = new Fragment();
         }
 
+        // only add to back stack if a any fragment has previously been added, otherwise just replace fragment.
         FragmentTransaction ft;
         ft = mFragmentManager.beginTransaction();
         if (mFragmentManager.getBackStackEntryCount() > 0) {
@@ -142,6 +151,20 @@ public class WorkoutActivity extends BaseActivity {
         }
         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
 
+    }
+
+    public void returnToWorkout(){
+
+        mExercisesViewPager.setVisibility(View.VISIBLE);
+        mTabLayout.setVisibility(View.VISIBLE);
+
+        // backstack will be 1 if any bottom nav frag has been previously selected. If it is 0, then the
+        // workout tab will be displayed, therefore do nothing.
+        if (mFragmentManager.getBackStackEntryCount() > 0) {
+            Log.i(TAG, "Attempt to remove fragment: " + mFragmentManager.findFragmentByTag(mFragmentTag));
+            FragmentTransaction ft = mFragmentManager.beginTransaction();
+            ft.remove(mFragmentManager.findFragmentByTag(mFragmentTag)).commit();
+        }
     }
 
     class WorkoutExercisesAdapter extends FragmentPagerAdapter {
@@ -177,17 +200,6 @@ public class WorkoutActivity extends BaseActivity {
         // DO NOTHING
     }
 
-    public void returnToWorkout(){
-
-        mExercisesViewPager.setVisibility(View.VISIBLE);
-        mTabLayout.setVisibility(View.VISIBLE);
-
-        if (mFragmentManager.getBackStackEntryCount() > 0) {
-            Log.i(TAG, "Attempt to remove fragment: " + mFragmentManager.findFragmentByTag(mFragmentTag));
-            FragmentTransaction ft = mFragmentManager.beginTransaction();
-            ft.remove(mFragmentManager.findFragmentByTag(mFragmentTag)).commit();
-        }
-    }
 
 
 
