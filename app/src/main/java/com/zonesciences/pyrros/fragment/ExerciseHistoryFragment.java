@@ -52,10 +52,6 @@ public class ExerciseHistoryFragment extends Fragment {
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mUserId = bundle.getString(ARG_USER_ID);
 
-        ExerciseHistory exerciseHistory = new ExerciseHistory(mUserId, mExerciseKey);
-        exerciseHistory.getHistory();
-        this.mExercises = exerciseHistory.getExercises();
-        this.mExerciseDates = exerciseHistory.getExerciseDates();
     }
 
     @Override

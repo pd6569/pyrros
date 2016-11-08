@@ -8,11 +8,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Peter on 08/11/2016.
@@ -28,6 +31,9 @@ public class ExerciseHistory {
 
     List<Exercise> mExercises = new ArrayList<>();
     List<String> mExerciseDates = new ArrayList<>();
+    List<String> mWorkoutKeys = new ArrayList<>();
+
+    OnLoadCompleteListener mListener;
 
     public ExerciseHistory(String userId, String exerciseKey){
         mExerciseKey = exerciseKey;
@@ -41,11 +47,9 @@ public class ExerciseHistory {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String workoutKey;
-
                 Log.i(TAG, "Datasnapshot instances: " + dataSnapshot.getChildrenCount() + " VALUE : " + dataSnapshot.getValue());
                 for (DataSnapshot workout : dataSnapshot.getChildren()){
-                    getWorkoutDates(workout.getKey());
+                    mWorkoutKeys.add(workout.getKey());
                     Log.i(TAG, "Workout key: " + workout.getKey());
                     for (DataSnapshot exercise : workout.getChildren()){
 
@@ -57,6 +61,31 @@ public class ExerciseHistory {
                     }
 
                 }
+                getWorkoutDates(mWorkoutKeys);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getWorkoutDates(final List<String> workoutKeys) {
+
+        mUserWorkoutExercisesRef.getRoot().child("user-workouts").child(mUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot workout : dataSnapshot.getChildren()){
+                    if (mWorkoutKeys.contains(workout.getKey())){
+                        Workout w = workout.getValue(Workout.class);
+                        mExerciseDates.add(w.getClientTimeStamp());
+                        Log.i(TAG, "Added date to exercise dates list: " + w.getClientTimeStamp());
+                    }
+                }
+                Log.i(TAG, "Finished loading exercise history");
+
+                mListener.onLoadComplete();
 
             }
 
@@ -67,20 +96,12 @@ public class ExerciseHistory {
         });
     }
 
-    private void getWorkoutDates(final String workoutKey) {
-        mUserWorkoutExercisesRef.getRoot().child("user-workouts").child(mUserId).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot workout) {
-                Workout w = workout.getValue(Workout.class);
-                Log.i(TAG, "Workout key: " + workout.getKey() + " was created on: " + w.getClientTimeStamp());
-                mExerciseDates.add(w.getClientTimeStamp());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+    public Map <String, Exercise> createExerciseHistoryMap(List<String> dates, List<Exercise> exercises){
+        Map<String, Exercise> map = new HashMap<>();
+        for (int i = 0; i < exercises.size(); i++){
+            map.put(dates.get(i), exercises.get(i));
+        }
+        return map;
     }
 
     public List<Exercise> getExercises() {
@@ -89,5 +110,13 @@ public class ExerciseHistory {
 
     public List<String> getExerciseDates() {
         return mExerciseDates;
+    }
+
+    public interface OnLoadCompleteListener{
+        public void onLoadComplete();
+    }
+
+    public void setOnLoadCompleteListener(OnLoadCompleteListener listener){
+        this.mListener = listener;
     }
 }

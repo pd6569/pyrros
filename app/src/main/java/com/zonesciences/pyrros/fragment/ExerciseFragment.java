@@ -1,7 +1,10 @@
 package com.zonesciences.pyrros.fragment;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,9 +27,11 @@ import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
+import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -34,6 +39,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     public static final String TAG = "ExerciseFragment";
     public static final String ARG_EXERCISE_KEY = "ExerciseKey";
+    public static final String ARG_WORKOUT_KEY = "WorkoutKey";
+    public static final String ARG_USER_ID = "UserId";
 
     //Views
     TextView mSetNumberTitle;
@@ -73,9 +80,20 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     //Exercise object
     Exercise mExercise;
 
-    public static ExerciseFragment newInstance(String exerciseKey) {
+    //Exercise history data
+    ExerciseHistory exerciseHistory;
+    List<String> mExerciseHistoryDates;
+    List<Exercise> mExerciseHistory;
+    Map<String, Exercise> mExerciseHistoryMap;
+
+    //Listeners
+    OnExerciseHistoryReadyListener mExerciseHistoryReadyListener;
+
+    public static ExerciseFragment newInstance(String exerciseKey, String workoutKey, String userId) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
+        args.putString(ARG_WORKOUT_KEY, workoutKey);
+        args.putString(ARG_USER_ID, userId);
         ExerciseFragment fragment = new ExerciseFragment();
         fragment.setArguments(args);
         return fragment;
@@ -91,8 +109,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         Log.i(TAG, "onCreate()");
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
-        mWorkoutKey = ((WorkoutActivity)this.getActivity()).getWorkoutKey();
-        mUser = ((WorkoutActivity) this.getActivity()).getUid();
+        mWorkoutKey = bundle.getString(ARG_WORKOUT_KEY);
+        mUser = bundle.getString(ARG_USER_ID);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
@@ -108,6 +126,19 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        exerciseHistory = new ExerciseHistory(mUser, mExerciseKey);
+        exerciseHistory.getHistory();
+        exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete() {
+                Log.i(TAG, "Callback from exercise history loader received. Notified of completion. Can now create ExerciseHistoryMap");
+                mExerciseHistory = exerciseHistory.getExercises();
+                mExerciseHistoryDates = exerciseHistory.getExerciseDates();
+
+                //Data for exercise history is now ready, pass it to activity
+                mExerciseHistoryReadyListener.setExerciseHistory(mExerciseHistoryDates, mExerciseHistory);
+            }
+        });
 
     }
 
@@ -164,6 +195,19 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         super.onStart();
         Log.i(TAG, "onStart()");
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mExerciseHistoryReadyListener = (OnExerciseHistoryReadyListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnExerciseHistoryReadyListener");
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -274,4 +318,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    public interface OnExerciseHistoryReadyListener {
+        public void setExerciseHistory(List<String> exerciseDates, List<Exercise> exercises);
+    }
 }

@@ -20,8 +20,10 @@ import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
 import com.zonesciences.pyrros.fragment.StatsFragment;
+import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
+import java.util.List;
 
 //TODO: Rotating screen to landscape crashes app - likely just fix to portrait orientation for this app
 
@@ -29,7 +31,7 @@ import java.util.ArrayList;
 // The fragment container switches in and out the exercise history, stats, and feedback fragments
 // and the visibility of the viewpager is toggled on/off.
 
-public class WorkoutActivity extends BaseActivity {
+public class WorkoutActivity extends BaseActivity implements ExerciseFragment.OnExerciseHistoryReadyListener {
     private static String TAG = "WorkoutActivity";
 
     private static final String WORKOUT_EXERCISES = "Workout Exercises";
@@ -52,6 +54,10 @@ public class WorkoutActivity extends BaseActivity {
     ExerciseHistoryFragment mExerciseHistoryFragment;
     StatsFragment mStatsFragment;
     FeedbackFragment mFeedbackFragment;
+
+    //Exercise History
+    List<String> mExerciseHistoryDates;
+    List<Exercise> mExerciseHistory;
 
     String mFragmentTag;
 
@@ -123,6 +129,7 @@ public class WorkoutActivity extends BaseActivity {
         Fragment fragment;
         if (fragmentTag == "EXERCISE_HISTORY"){
             Log.i(TAG, "Current exercise item: " + mExercisesList.get(mExercisesViewPager.getCurrentItem()));
+
             mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
             if (mExerciseHistoryFragment == null){
                 mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId);
@@ -168,6 +175,20 @@ public class WorkoutActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onBackPressed(){
+        Log.i(TAG, "Back button pressed, and I'm not gonna do shit about it, you stay right where you are motherfucker");
+        // DO NOTHING
+    }
+
+    @Override
+    public void setExerciseHistory(List<String> exerciseDates, List<Exercise> exercises) {
+        this.mExerciseHistoryDates = exerciseDates;
+        this.mExerciseHistory = exercises;
+        Log.i(TAG, "mExerciseHistoryDates received from ExerciseFragment: " + mExerciseHistoryDates + " and mExerciseHistory exercise: + " + mExerciseHistory);
+    }
+
+
     class WorkoutExercisesAdapter extends FragmentPagerAdapter {
 
         public WorkoutExercisesAdapter(FragmentManager fm) {
@@ -177,7 +198,7 @@ public class WorkoutActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return ExerciseFragment.newInstance(mExercisesList.get(position));
+            return ExerciseFragment.newInstance(mExercisesList.get(position), mWorkoutKey, mUserId);
         }
 
         @Override
@@ -195,11 +216,7 @@ public class WorkoutActivity extends BaseActivity {
         return this.mWorkoutKey;
     }
 
-    @Override
-    public void onBackPressed(){
-        Log.i(TAG, "Back button pressed, and I'm not gonna do shit about it, you stay right where you are motherfucker");
-        // DO NOTHING
-    }
+
 
 
 
