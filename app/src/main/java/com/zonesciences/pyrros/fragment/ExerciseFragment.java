@@ -86,9 +86,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     List<Exercise> mExerciseHistory;
     Map<String, Exercise> mExerciseHistoryMap;
 
-    //Listeners
-    OnExerciseHistoryReadyListener mExerciseHistoryReadyListener;
-
     public static ExerciseFragment newInstance(String exerciseKey, String workoutKey, String userId) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
@@ -131,12 +128,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete() {
-                Log.i(TAG, "Callback from exercise history loader received. Notified of completion. Can now create ExerciseHistoryMap");
+                Log.i(TAG, "Callback from exercise history loader received. Notified of completion. Can now update variables");
                 mExerciseHistory = exerciseHistory.getExercises();
                 mExerciseHistoryDates = exerciseHistory.getExerciseDates();
-
-                //Data for exercise history is now ready, pass it to activity
-                mExerciseHistoryReadyListener.setExerciseHistory(mExerciseHistoryDates, mExerciseHistory);
             }
         });
 
@@ -199,13 +193,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        try {
-            mExerciseHistoryReadyListener = (OnExerciseHistoryReadyListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnExerciseHistoryReadyListener");
-        }
     }
 
 
@@ -318,7 +305,11 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    public interface OnExerciseHistoryReadyListener {
-        public void setExerciseHistory(List<String> exerciseDates, List<Exercise> exercises);
+    public List<String> getExerciseHistoryDates() {
+        return mExerciseHistoryDates;
+    }
+
+    public List<Exercise> getExerciseHistory() {
+        return mExerciseHistory;
     }
 }

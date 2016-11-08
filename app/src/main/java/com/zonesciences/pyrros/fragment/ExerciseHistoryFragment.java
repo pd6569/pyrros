@@ -14,6 +14,7 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.models.Exercise;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ExerciseHistoryFragment extends Fragment {
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
         args.putStringArrayList(ARG_EXERCISE_HISTORY_DATES, (ArrayList<String>) exerciseDates);
-
+        args.putSerializable(ARG_EXERCISE_HISTORY, (Serializable) exercises);
         ExerciseHistoryFragment fragment = new ExerciseHistoryFragment();
         fragment.setArguments(args);
         return fragment;
@@ -58,6 +59,10 @@ public class ExerciseHistoryFragment extends Fragment {
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mUserId = bundle.getString(ARG_USER_ID);
+        mExerciseDates = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY_DATES);
+        mExercises = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY);
+
+        Log.i(TAG, "Exercise history obtained. Number of times performed " + mExerciseKey + " = " + mExercises.size());
 
     }
 

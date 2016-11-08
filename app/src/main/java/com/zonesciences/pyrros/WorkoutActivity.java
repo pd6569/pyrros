@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
@@ -23,7 +24,9 @@ import com.zonesciences.pyrros.fragment.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //TODO: Rotating screen to landscape crashes app - likely just fix to portrait orientation for this app
 
@@ -31,7 +34,7 @@ import java.util.List;
 // The fragment container switches in and out the exercise history, stats, and feedback fragments
 // and the visibility of the viewpager is toggled on/off.
 
-public class WorkoutActivity extends BaseActivity implements ExerciseFragment.OnExerciseHistoryReadyListener {
+public class WorkoutActivity extends BaseActivity {
     private static String TAG = "WorkoutActivity";
 
     private static final String WORKOUT_EXERCISES = "Workout Exercises";
@@ -49,6 +52,9 @@ public class WorkoutActivity extends BaseActivity implements ExerciseFragment.On
     String mUserId;
 
     FragmentManager mFragmentManager;
+
+    //Track exercise fragments
+    Map<Integer, ExerciseFragment> mExerciseReferenceMap = new HashMap<>();
 
     // Fragments
     ExerciseHistoryFragment mExerciseHistoryFragment;
@@ -130,11 +136,16 @@ public class WorkoutActivity extends BaseActivity implements ExerciseFragment.On
         if (fragmentTag == "EXERCISE_HISTORY"){
             Log.i(TAG, "Current exercise item: " + mExercisesList.get(mExercisesViewPager.getCurrentItem()));
 
+            int index = mExercisesViewPager.getCurrentItem();
+            ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+            mExerciseHistoryDates = currentFragment.getExerciseHistoryDates();
+            mExerciseHistory = currentFragment.getExerciseHistory();
+
             mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
             if (mExerciseHistoryFragment == null){
                 mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
             }
-            fragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId);
+            fragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
         } else if (fragmentTag == "STATS"){
             if (mStatsFragment == null) {
                 mStatsFragment = new StatsFragment();
@@ -181,14 +192,6 @@ public class WorkoutActivity extends BaseActivity implements ExerciseFragment.On
         // DO NOTHING
     }
 
-    @Override
-    public void setExerciseHistory(List<String> exerciseDates, List<Exercise> exercises) {
-        this.mExerciseHistoryDates = exerciseDates;
-        this.mExerciseHistory = exercises;
-        Log.i(TAG, "mExerciseHistoryDates received from ExerciseFragment: " + mExerciseHistoryDates + " and mExerciseHistory exercise: + " + mExerciseHistory);
-    }
-
-
     class WorkoutExercisesAdapter extends FragmentPagerAdapter {
 
         public WorkoutExercisesAdapter(FragmentManager fm) {
@@ -198,7 +201,9 @@ public class WorkoutActivity extends BaseActivity implements ExerciseFragment.On
 
         @Override
         public Fragment getItem(int position) {
-            return ExerciseFragment.newInstance(mExercisesList.get(position), mWorkoutKey, mUserId);
+            ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(mExercisesList.get(position), mWorkoutKey, mUserId);
+            mExerciseReferenceMap.put(position, exerciseFragment);
+            return exerciseFragment;
         }
 
         @Override
@@ -210,15 +215,15 @@ public class WorkoutActivity extends BaseActivity implements ExerciseFragment.On
         public CharSequence getPageTitle(int position){
             return mExercisesList.get(position);
         }
+
+        public ExerciseFragment getFragment(int key){
+            return mExerciseReferenceMap.get(key);
+        }
     }
 
     public String getWorkoutKey(){
         return this.mWorkoutKey;
     }
-
-
-
-
 
 
 }
