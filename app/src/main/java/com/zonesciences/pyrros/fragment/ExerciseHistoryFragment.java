@@ -19,9 +19,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Workout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ExerciseHistoryFragment extends Fragment {
@@ -36,6 +39,7 @@ public class ExerciseHistoryFragment extends Fragment {
     String mUserId;
 
     List<Exercise> mExercises = new ArrayList<>();
+    List<String> mExerciseDates = new ArrayList<>();
 
     public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId) {
         Bundle args = new Bundle();
@@ -58,26 +62,28 @@ public class ExerciseHistoryFragment extends Fragment {
         mUserId = bundle.getString(ARG_USER_ID);
 
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
-        //Firebase deep path query
+        //Firebase deep path query returns all workouts containing mExerciseKey
         Query query = mUserWorkoutExercisesRef.orderByChild(mExerciseKey+"/name").equalTo(mExerciseKey);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                String workoutKey;
 
                 Log.i(TAG, "Datasnapshot instances: " + dataSnapshot.getChildrenCount() + " VALUE : " + dataSnapshot.getValue());
-
-                /*Log.i(TAG, "Trying to find all occurences of exercise " + mExerciseKey + " DataSnapshot children count: " + dataSnapshot.getChildrenCount() + " Value: " + dataSnapshot.getValue());
-                for(DataSnapshot workout : dataSnapshot.getChildren()){
+                for (DataSnapshot workout : dataSnapshot.getChildren()){
+                    getExerciseDate(workout.getKey());
+                    Log.i(TAG, "Workout key: " + workout.getKey());
                     for (DataSnapshot exercise : workout.getChildren()){
-                        Log.i(TAG, "Exercise: " + exercise.getKey() + " in workout: " + workout.getKey());
-                        Exercise e = exercise.getValue(Exercise.class);
-                        if (e.getName().equals(mExerciseKey)){
-                            Log.i(TAG, "New exercise object created and added to list: " + e.getName());
+
+                        if (exercise.getKey().equals(mExerciseKey)){
+                            Exercise e = exercise.getValue(Exercise.class);
                             mExercises.add(e);
+                            Log.i(TAG, "Created exercises object for exercise and and it to list: " + e.getName());
                         }
                     }
+
                 }
-                Log.i(TAG, mExerciseKey + " has been performed " + mExercises.size() + " times. " + mExercises);*/
+
             }
 
             @Override
@@ -87,6 +93,22 @@ public class ExerciseHistoryFragment extends Fragment {
         });
 
 
+    }
+
+    private void getExerciseDate(final String workoutKey) {
+        mUserWorkoutExercisesRef.getRoot().child("user-workouts").child(mUserId).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot workout) {
+                Workout w = workout.getValue(Workout.class);
+                Log.i(TAG, "Workout key: " + workout.getKey() + " was created on: " + w.getClientTimeStamp());
+                mExerciseDates.add(w.getClientTimeStamp());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
