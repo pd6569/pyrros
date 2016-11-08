@@ -47,7 +47,6 @@ public class WorkoutActivity extends BaseActivity {
     StatsFragment mStatsFragment;
     FeedbackFragment mFeedbackFragment;
 
-    String mActiveFragmentTag;
     String mFragmentTag;
 
     @Override
@@ -82,7 +81,6 @@ public class WorkoutActivity extends BaseActivity {
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
-                FragmentTransaction ft = null;
 
                 switch (tabId) {
                     case R.id.tab_history:
@@ -102,16 +100,7 @@ public class WorkoutActivity extends BaseActivity {
                         break;
 
                     case R.id.tab_workout:
-
-                        mExercisesViewPager.setVisibility(View.VISIBLE);
-                        mTabLayout.setVisibility(View.VISIBLE);
-
-                        if (mFragmentManager.getBackStackEntryCount() > 0) {
-                            Log.i(TAG, "Attempt to remove fragment: " + mFragmentManager.findFragmentByTag(mActiveFragmentTag));
-                            ft = mFragmentManager.beginTransaction();
-                            ft.remove(mFragmentManager.findFragmentByTag(mFragmentTag)).commit();
-                        }
-
+                        returnToWorkout();
                         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
                         break;
                 }
@@ -184,11 +173,22 @@ public class WorkoutActivity extends BaseActivity {
 
     @Override
     public void onBackPressed(){
-        super.onBackPressed();
-        Log.i(TAG, "Back pressed");
-        if (mFragmentManager.getBackStackEntryCount() == 0){
-            mExercisesViewPager.setVisibility(View.VISIBLE);
+        Log.i(TAG, "Back button pressed, and I'm not gonna do shit about it, you stay right where you are motherfucker");
+        // DO NOTHING
+    }
+
+    public void returnToWorkout(){
+
+        mExercisesViewPager.setVisibility(View.VISIBLE);
+        mTabLayout.setVisibility(View.VISIBLE);
+
+        if (mFragmentManager.getBackStackEntryCount() > 0) {
+            Log.i(TAG, "Attempt to remove fragment: " + mFragmentManager.findFragmentByTag(mFragmentTag));
+            FragmentTransaction ft = mFragmentManager.beginTransaction();
+            ft.remove(mFragmentManager.findFragmentByTag(mFragmentTag)).commit();
         }
     }
+
+
 
 }
