@@ -44,6 +44,7 @@ public class WorkoutActivity extends BaseActivity {
     ArrayList<String> mExercisesList;
     String mWorkoutKey;
     String mExerciseKey;
+    String mUserId;
 
     FragmentManager mFragmentManager;
 
@@ -63,7 +64,7 @@ public class WorkoutActivity extends BaseActivity {
         Intent i = getIntent();
         mExercisesList = (ArrayList<String>) i.getSerializableExtra(WORKOUT_EXERCISES);
         mWorkoutKey = i.getStringExtra(WORKOUT_ID);
-        mExerciseKey = mExercisesList.get(0);
+        mUserId = getUid();
 
         Log.i(TAG, "Exercises : " + mExercisesList + " WorkoutKey: " + mWorkoutKey);
 
@@ -124,9 +125,9 @@ public class WorkoutActivity extends BaseActivity {
             Log.i(TAG, "Current exercise item: " + mExercisesList.get(mExercisesViewPager.getCurrentItem()));
             mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
             if (mExerciseHistoryFragment == null){
-                mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey);
+                mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId);
             }
-            fragment = mExerciseHistoryFragment.newInstance(mExerciseKey);
+            fragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId);
         } else if (fragmentTag == "STATS"){
             if (mStatsFragment == null) {
                 mStatsFragment = new StatsFragment();
