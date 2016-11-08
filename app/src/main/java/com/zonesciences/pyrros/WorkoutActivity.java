@@ -48,7 +48,7 @@ public class WorkoutActivity extends BaseActivity {
     FeedbackFragment mFeedbackFragment;
 
     String mActiveFragmentTag;
-
+    String mFragmentTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,51 +83,22 @@ public class WorkoutActivity extends BaseActivity {
             @Override
             public void onTabSelected(@IdRes int tabId) {
                 FragmentTransaction ft = null;
+
                 switch (tabId) {
                     case R.id.tab_history:
-                        mExercisesViewPager.setVisibility(View.GONE);
-                        mTabLayout.setVisibility(View.GONE);
+                        mFragmentTag = "EXERCISE_HISTORY";
+                        changeFragment(mFragmentTag);
 
-                        if (mExerciseHistoryFragment == null) {
-                            Log.i(TAG, "New exercise history fragment created");
-                            mExerciseHistoryFragment = new ExerciseHistoryFragment();
-
-                        }
-                        ft = mFragmentManager.beginTransaction();
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mExerciseHistoryFragment, "EXERCISE_HISTORY").addToBackStack(null).commit();
-                        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
-                        mActiveFragmentTag = "EXERCISE_HISTORY";
                         break;
 
                     case R.id.tab_stats:
-                        mExercisesViewPager.setVisibility(View.GONE);
-                        mTabLayout.setVisibility(View.GONE);
-
-                        if (mStatsFragment == null){
-                            Log.i(TAG, "New stats fragment created");
-                            mStatsFragment = new StatsFragment();
-                        }
-
-                        ft = mFragmentManager.beginTransaction();
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mStatsFragment, "STATS").addToBackStack(null).commit();
-                        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
-                        mActiveFragmentTag = "STATS";
+                        mFragmentTag = "STATS";
+                        changeFragment(mFragmentTag);
                         break;
 
                     case R.id.tab_feedback:
-                        mExercisesViewPager.setVisibility(View.GONE);
-                        mTabLayout.setVisibility(View.GONE);
-
-                        if (mFeedbackFragment == null){
-                            Log.i(TAG, "New feedback fragment created");
-                            mFeedbackFragment = new FeedbackFragment();
-                        }
-
-                        ft = mFragmentManager.beginTransaction();
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFeedbackFragment, "FEEDBACK").addToBackStack(null).commit();
-                        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
-                        mActiveFragmentTag = "FEEDBACK";
-
+                        mFragmentTag = "FEEDBACK";
+                        changeFragment(mFragmentTag);
                         break;
 
                     case R.id.tab_workout:
@@ -138,16 +109,50 @@ public class WorkoutActivity extends BaseActivity {
                         if (mFragmentManager.getBackStackEntryCount() > 0) {
                             Log.i(TAG, "Attempt to remove fragment: " + mFragmentManager.findFragmentByTag(mActiveFragmentTag));
                             ft = mFragmentManager.beginTransaction();
-                            ft.remove(mFragmentManager.findFragmentByTag(mActiveFragmentTag)).commit();
+                            ft.remove(mFragmentManager.findFragmentByTag(mFragmentTag)).commit();
                         }
-
-
 
                         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
                         break;
                 }
             }
         });
+    }
+
+    private void changeFragment(String fragmentTag) {
+        mExercisesViewPager.setVisibility(View.GONE);
+        mTabLayout.setVisibility(View.GONE);
+
+        mFragmentTag = fragmentTag;
+        Fragment fragment;
+        if (fragmentTag == "EXERCISE_HISTORY"){
+            if (mExerciseHistoryFragment == null){
+                mExerciseHistoryFragment = new ExerciseHistoryFragment();
+            }
+            fragment = mExerciseHistoryFragment;
+        } else if (fragmentTag == "STATS"){
+            if (mStatsFragment == null) {
+                mStatsFragment = new StatsFragment();
+            }
+            fragment = mStatsFragment;
+        } else if (fragmentTag == "FEEDBACK"){
+            if(mFeedbackFragment == null){
+                mFeedbackFragment = new FeedbackFragment();
+            }
+            fragment = mFeedbackFragment;
+        } else {
+            fragment = new Fragment();
+        }
+
+        FragmentTransaction ft;
+        ft = mFragmentManager.beginTransaction();
+        if (mFragmentManager.getBackStackEntryCount() > 0) {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, fragment, mFragmentTag).commit();
+        } else {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, fragment, mFragmentTag).addToBackStack(null).commit();
+        }
+        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
+
     }
 
     class WorkoutExercisesAdapter extends FragmentPagerAdapter {
