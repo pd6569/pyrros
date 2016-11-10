@@ -335,9 +335,16 @@ public class NewWorkoutActivity extends BaseActivity {
                 Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
                 mUserExerciseKeys.add(exercise);
                 mExercise = new Exercise(userId, exercise);
-                mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
+                /*mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
                 mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
-                mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+                mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());*/
+                Map <String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("user-exercises/" + userId + "/" + mExerciseKey, mExercise);
+                childUpdates.put("workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+                childUpdates.put("user-workout-exercises/" + userId + "/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+                mDatabase.updateChildren(childUpdates);
+
+
             } else {
                 Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
                 mExerciseKey = exerciseKey;
@@ -347,8 +354,14 @@ public class NewWorkoutActivity extends BaseActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         mExercise = dataSnapshot.getValue(Exercise.class);
                         Log.i(TAG, "Adding existing exercise to current workout, setting exercise object to existing exercise values: " + mExercise.getName());
-                        mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
-                        mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+
+                        /*mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
+                        mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());*/
+
+                        Map <String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put("workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+                        childUpdates.put("user-workout-exercises/" + userId + "/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+                        mDatabase.updateChildren(childUpdates);
                     }
 
                     @Override
