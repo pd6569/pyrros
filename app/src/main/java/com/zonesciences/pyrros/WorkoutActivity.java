@@ -138,14 +138,24 @@ public class WorkoutActivity extends BaseActivity {
 
             int index = mExercisesViewPager.getCurrentItem();
             ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+
+            //If the history tab is clicked before the fragment has obtained exercise history,
+            // then this will cause a null pointer exception in ExerciseHistoryFragment
+
             mExerciseHistoryDates = currentFragment.getExerciseHistoryDates();
             mExerciseHistory = currentFragment.getExerciseHistory();
 
-            mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
-            if (mExerciseHistoryFragment == null){
-                mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+            if (mExerciseHistory == null){
+                Log.i(TAG, "History tab clicked, but mExerciseHistory is null, there do not allow fragment to load");
+                return;
+            } else {
+
+                mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
+                if (mExerciseHistoryFragment == null) {
+                    mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+                }
+                fragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
             }
-            fragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
         } else if (fragmentTag == "STATS"){
             if (mStatsFragment == null) {
                 mStatsFragment = new StatsFragment();

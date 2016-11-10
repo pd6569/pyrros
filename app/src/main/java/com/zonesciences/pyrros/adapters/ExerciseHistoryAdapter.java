@@ -49,10 +49,13 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
         setsContainer.removeAllViews();
 
         Exercise currentExercise = mExercises.get(position);
+        Log.i(TAG, "New exercise object created for view: " + currentExercise.getName());
 
         for (int i = 0; i < mExercises.get(position).getSets(); i++){
 
             View setsView = LayoutInflater.from(mContext).inflate(R.layout.item_sets, null);
+            TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
+            setNumber.setVisibility(View.GONE);
             TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
             TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
 
