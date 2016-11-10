@@ -13,10 +13,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
+import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
@@ -60,6 +60,9 @@ public class WorkoutActivity extends BaseActivity {
     ExerciseHistoryFragment mExerciseHistoryFragment;
     StatsFragment mStatsFragment;
     FeedbackFragment mFeedbackFragment;
+
+    //Fragment temporary reference
+    Fragment mFragment;
 
     //Exercise History
     List<String> mExerciseHistoryDates;
@@ -132,53 +135,82 @@ public class WorkoutActivity extends BaseActivity {
         mTabLayout.setVisibility(View.GONE);
 
         mFragmentTag = fragmentTag;
-        Fragment fragment;
-        if (fragmentTag == "EXERCISE_HISTORY"){
+
+        if (fragmentTag == "EXERCISE_HISTORY") {
             Log.i(TAG, "Current exercise item: " + mExercisesList.get(mExercisesViewPager.getCurrentItem()));
 
+
             int index = mExercisesViewPager.getCurrentItem();
-            ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+            mExerciseKey = mExercisesList.get(index);
+
+            final ExerciseHistory exerciseHistory = new ExerciseHistory(getUid(), mExerciseKey);
+            exerciseHistory.getHistory();
+            showProgressDialog();
+            exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
+                @Override
+                public void onLoadComplete() {
+                    Log.i(TAG, "Callback from exercise history loader received. Notified of completion.");
+
+                    mExerciseHistoryDates = exerciseHistory.getExerciseDates();
+                    mExerciseHistory = exerciseHistory.getExercises();
+
+                    if (mExerciseHistoryFragment == null) {
+                        mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+                    }
+                    mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+
+                    FragmentTransaction ft;
+                    ft = mFragmentManager.beginTransaction();
+                    if (mFragmentManager.getBackStackEntryCount() > 0) {
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
+                    } else {
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
+                    }
+                    Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
+
+                    hideProgressDialog();
+                }
+            });
+        }
 
             //If the history tab is clicked before the fragment has obtained exercise history,
             // then this will cause a null pointer exception in ExerciseHistoryFragment
 
-            mExerciseHistoryDates = currentFragment.getExerciseHistoryDates();
-            mExerciseHistory = currentFragment.getExerciseHistory();
+            // show progress dialog
 
-            if (mExerciseHistory == null){
-                Log.i(TAG, "History tab clicked, but mExerciseHistory is null, there do not allow fragment to load");
-                return;
-            } else {
+            // Tell fragment that history button has been clicked, and to call back when history is ready
 
-                mExerciseKey = mExercisesList.get(mExercisesViewPager.getCurrentItem());
-                if (mExerciseHistoryFragment == null) {
-                    mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+
+
+            // When the history is ready then set variables for the history and load the exercise history fragment
+
+            //remove loading dialog
+
+        else {
+            if (fragmentTag == "STATS") {
+                if (mStatsFragment == null) {
+                    mStatsFragment = new StatsFragment();
                 }
-                fragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+                mFragment = mStatsFragment;
+            } else if (fragmentTag == "FEEDBACK") {
+                if (mFeedbackFragment == null) {
+                    mFeedbackFragment = new FeedbackFragment();
+                }
+                mFragment = mFeedbackFragment;
+            } else {
+                mFragment = new Fragment();
             }
-        } else if (fragmentTag == "STATS"){
-            if (mStatsFragment == null) {
-                mStatsFragment = new StatsFragment();
-            }
-            fragment = mStatsFragment;
-        } else if (fragmentTag == "FEEDBACK"){
-            if(mFeedbackFragment == null){
-                mFeedbackFragment = new FeedbackFragment();
-            }
-            fragment = mFeedbackFragment;
-        } else {
-            fragment = new Fragment();
-        }
 
-        // only add to back stack if a any fragment has previously been added, otherwise just replace fragment.
-        FragmentTransaction ft;
-        ft = mFragmentManager.beginTransaction();
-        if (mFragmentManager.getBackStackEntryCount() > 0) {
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, fragment, mFragmentTag).commit();
-        } else {
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, fragment, mFragmentTag).addToBackStack(null).commit();
+            // only add to back stack if a any fragment has previously been added, otherwise just replace fragment.
+            FragmentTransaction ft;
+            ft = mFragmentManager.beginTransaction();
+            if (mFragmentManager.getBackStackEntryCount() > 0) {
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
+            } else {
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
+            }
+            Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
         }
-        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
 
     }
 

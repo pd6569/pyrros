@@ -123,17 +123,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        exerciseHistory = new ExerciseHistory(mUser, mExerciseKey);
-        exerciseHistory.getHistory();
-        exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete() {
-                Log.i(TAG, "Callback from exercise history loader received. Notified of completion.");
-                mExerciseHistory = exerciseHistory.getExercises();
-                mExerciseHistoryDates = exerciseHistory.getExerciseDates();
-            }
-        });
-
     }
 
 
@@ -306,10 +295,13 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     }
 
     public List<String> getExerciseHistoryDates() {
+
         return mExerciseHistoryDates;
     }
 
     public List<Exercise> getExerciseHistory() {
+
         return mExerciseHistory;
     }
+
 }
