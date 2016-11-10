@@ -13,6 +13,7 @@
         android:maxLines="1"
         android:textStyle="bold"/>
 
+    <!--Dynamically populated with views via WorkoutsAdapter-->
     <LinearLayout
         android:id="@+id/workout_exercises_container"
         android:layout_width="match_parent"

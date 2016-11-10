@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +35,13 @@ public class ExerciseHistoryFragment extends Fragment {
     String mExerciseKey;
     String mUserId;
 
+    //Data
     List<Exercise> mExercises;
     List<String> mExerciseDates;
+
+    //RecyclerView
+    RecyclerView mExerciseHistoryRecycler;
+
 
     public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises) {
         Bundle args = new Bundle();
