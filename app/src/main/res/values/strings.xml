@@ -56,6 +56,7 @@
     <string name="action_start">Start</string>
 
     <string name="exercise_history_no_sets_recorded">No sets recorded</string>
-
+    <string name="menu_oldest_first">Oldest first</string>
+    <string name="menu_newest_first">Newest first</string>
 
 </resources>

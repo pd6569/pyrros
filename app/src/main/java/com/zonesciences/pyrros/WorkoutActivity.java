@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 
 import com.roughike.bottombar.BottomBar;
@@ -24,6 +25,7 @@ import com.zonesciences.pyrros.fragment.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,6 +136,12 @@ public class WorkoutActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_workout, menu);
+        return true;
+    }
+
     private void changeFragment(String fragmentTag) {
         mExercisesViewPager.setVisibility(View.GONE);
         mTabLayout.setVisibility(View.GONE);
@@ -161,6 +169,10 @@ public class WorkoutActivity extends BaseActivity {
                         hideProgressDialog();
                         mExerciseHistoryDates = exerciseHistory.getExerciseDates();
                         mExerciseHistory = exerciseHistory.getExercises();
+
+                        //puts newest exercises first by default
+                        Collections.reverse(mExerciseHistoryDates);
+                        Collections.reverse(mExerciseHistory);
 
                         //store data to hashmap
                         mExerciseHistoryDatesMap.put(index, mExerciseHistoryDates);

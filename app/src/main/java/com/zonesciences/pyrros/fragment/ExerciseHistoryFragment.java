@@ -1,17 +1,23 @@
 package com.zonesciences.pyrros.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.zonesciences.pyrros.LoginActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.ExerciseHistoryAdapter;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
@@ -19,6 +25,7 @@ import com.zonesciences.pyrros.models.Exercise;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -45,6 +52,9 @@ public class ExerciseHistoryFragment extends Fragment {
     RecyclerView mExerciseHistoryRecycler;
     ExerciseHistoryAdapter mAdapter;
     LinearLayoutManager mLinearLayoutManager;
+
+    //Sort order
+    boolean newestFirst = true;
 
     public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises) {
         Bundle args = new Bundle();
@@ -75,6 +85,7 @@ public class ExerciseHistoryFragment extends Fragment {
 
         Log.i(TAG, "Exercise history obtained. " + mExercises.size());
 
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -94,6 +105,38 @@ public class ExerciseHistoryFragment extends Fragment {
 
         return rootView;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_exercise_history, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int i = item.getItemId();
+
+        switch(i){
+            case R.id.action_reverse_order:
+                newestFirst = !newestFirst;
+                Log.i(TAG, "Reverse the order");
+                Collections.reverse(mExerciseDates);
+                Collections.reverse(mExercises);
+                mAdapter.notifyDataSetChanged();
+
+                if (newestFirst) {
+                    item.setTitle(R.string.menu_oldest_first);
+                } else {
+                    item.setTitle(R.string.menu_newest_first);
+                }
+
+
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }
 
