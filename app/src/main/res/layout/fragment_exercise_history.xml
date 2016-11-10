@@ -1,21 +1,21 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+              android:orientation="vertical"
              tools:context="com.zonesciences.pyrros.fragment.ExerciseHistoryFragment">
     <TextView
         android:id="@+id/textview_exercise_history"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="EXERCISE HISTORY FRAGMENT"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_exercise_history"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:scrollbars="vertical"
         tools:listitem="@layout/item_exercise_history" />
 
-</RelativeLayout>
+</LinearLayout>

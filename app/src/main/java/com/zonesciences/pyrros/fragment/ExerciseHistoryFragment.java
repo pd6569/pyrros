@@ -71,7 +71,7 @@ public class ExerciseHistoryFragment extends Fragment {
         mExerciseDates = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY_DATES);
         mExercises = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY);
 
-        mAdapter = new ExerciseHistoryAdapter(mExerciseDates, mExercises);
+        mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseDates, mExercises);
 
         Log.i(TAG, "Exercise history obtained. Number of times performed " + mExerciseKey + " = " + mExercises.size());
 
