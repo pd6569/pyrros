@@ -146,6 +146,7 @@ public class WorkoutActivity extends BaseActivity {
             final int index = mExercisesViewPager.getCurrentItem();
             mExerciseKey = mExercisesList.get(index);
 
+            //check if the history has already been viewed, if not load from firebase and store in hashmaps
             if (!mExerciseHistoryMap.containsKey(index)) {
                 Log.i(TAG, "This exercise has not been viewed. Load from firebase and update map");
                 final ExerciseHistory exerciseHistory = new ExerciseHistory(getUid(), mExerciseKey);
@@ -161,23 +162,11 @@ public class WorkoutActivity extends BaseActivity {
                         mExerciseHistoryDates = exerciseHistory.getExerciseDates();
                         mExerciseHistory = exerciseHistory.getExercises();
 
+                        //store data to hashmap
                         mExerciseHistoryDatesMap.put(index, mExerciseHistoryDates);
                         mExerciseHistoryMap.put(index, mExerciseHistory);
 
-                        if (mExerciseHistoryFragment == null) {
-                            mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
-                        }
-                        mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
-
-                        FragmentTransaction ft;
-                        ft = mFragmentManager.beginTransaction();
-                        if (mFragmentManager.getBackStackEntryCount() > 0) {
-                            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
-                        } else {
-                            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
-                        }
-                        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
-
+                        loadExerciseHistoryFragment();
                     }
                 });
             }
@@ -187,20 +176,7 @@ public class WorkoutActivity extends BaseActivity {
                 mExerciseHistory = mExerciseHistoryMap.get(index);
                 mExerciseHistoryDates = mExerciseHistoryDatesMap.get(index);
 
-                if (mExerciseHistoryFragment == null) {
-                    mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
-                }
-                mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
-
-                FragmentTransaction ft;
-                ft = mFragmentManager.beginTransaction();
-                if (mFragmentManager.getBackStackEntryCount() > 0) {
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
-                } else {
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
-                }
-                Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
-
+                loadExerciseHistoryFragment();
             }
         }
 
@@ -283,6 +259,25 @@ public class WorkoutActivity extends BaseActivity {
 
     public String getWorkoutKey(){
         return this.mWorkoutKey;
+    }
+
+    public void loadExerciseHistoryFragment(){
+
+        if (mExerciseHistoryFragment == null) {
+            mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+        }
+        mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+
+        FragmentTransaction ft;
+        ft = mFragmentManager.beginTransaction();
+        if (mFragmentManager.getBackStackEntryCount() > 0) {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
+        } else {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
+        }
+
+        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
+
     }
 
 
