@@ -169,7 +169,8 @@ public class WorkoutActivity extends BaseActivity {
                         hideProgressDialog();
                         mExerciseHistoryDates = exerciseHistory.getExerciseDates();
                         mExerciseHistory = exerciseHistory.getExercises();
-
+                        mExerciseHistoryDates.remove(mExerciseHistory.size()-1);
+                        mExerciseHistory.remove(mExerciseHistory.size()-1);
                         //puts newest exercises first by default
                         Collections.reverse(mExerciseHistoryDates);
                         Collections.reverse(mExerciseHistory);
