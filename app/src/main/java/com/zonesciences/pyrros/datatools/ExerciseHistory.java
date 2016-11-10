@@ -43,17 +43,20 @@ public class ExerciseHistory {
     public void getHistory(){
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
         //Firebase deep path query returns all workouts containing mExerciseKey
-        Query query = mUserWorkoutExercisesRef.orderByChild(mExerciseKey+"/name").equalTo(mExerciseKey);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        mUserWorkoutExercisesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.i(TAG, "Datasnapshot instances: " + dataSnapshot.getChildrenCount() + " VALUE : " + dataSnapshot.getValue());
                 for (DataSnapshot workout : dataSnapshot.getChildren()){
-                    mWorkoutKeys.add(workout.getKey());
-                    Log.i(TAG, "Workout key: " + workout.getKey());
+
                     for (DataSnapshot exercise : workout.getChildren()){
 
                         if (exercise.getKey().equals(mExerciseKey)){
+
+                            mWorkoutKeys.add(workout.getKey());
+                            Log.i(TAG, "Workout key: " + workout.getKey());
+
                             Exercise e = exercise.getValue(Exercise.class);
                             mExercises.add(e);
                             Log.i(TAG, "Created exercises object for exercise and and it to list: " + e.getName());
