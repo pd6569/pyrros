@@ -68,6 +68,10 @@ public class WorkoutActivity extends BaseActivity {
     List<String> mExerciseHistoryDates;
     List<Exercise> mExerciseHistory;
 
+    //Maps for storing exercise history for each exercise in the workout once initially loaded from firebase
+    Map<Integer, List<String>> mExerciseHistoryDatesMap = new HashMap<>();
+    Map<Integer, List<Exercise>> mExerciseHistoryMap = new HashMap<>();
+
     String mFragmentTag;
 
     @Override
@@ -139,52 +143,66 @@ public class WorkoutActivity extends BaseActivity {
         if (fragmentTag == "EXERCISE_HISTORY") {
             Log.i(TAG, "Current exercise item: " + mExercisesList.get(mExercisesViewPager.getCurrentItem()));
 
-
-            int index = mExercisesViewPager.getCurrentItem();
+            final int index = mExercisesViewPager.getCurrentItem();
             mExerciseKey = mExercisesList.get(index);
 
-            final ExerciseHistory exerciseHistory = new ExerciseHistory(getUid(), mExerciseKey);
-            exerciseHistory.getHistory();
-            showProgressDialog();
-            exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
-                @Override
-                public void onLoadComplete() {
-                    Log.i(TAG, "Callback from exercise history loader received. Notified of completion.");
+            if (!mExerciseHistoryMap.containsKey(index)) {
+                Log.i(TAG, "This exercise has not been viewed. Load from firebase and update map");
+                final ExerciseHistory exerciseHistory = new ExerciseHistory(getUid(), mExerciseKey);
 
-                    mExerciseHistoryDates = exerciseHistory.getExerciseDates();
-                    mExerciseHistory = exerciseHistory.getExercises();
+                //start loading exercise history
+                showProgressDialog();
+                exerciseHistory.getHistory();
+                exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
+                    @Override
+                    public void onLoadComplete() {
+                        Log.i(TAG, "Callback from exercise history loader received. Notified of completion.");
+                        hideProgressDialog();
+                        mExerciseHistoryDates = exerciseHistory.getExerciseDates();
+                        mExerciseHistory = exerciseHistory.getExercises();
 
-                    if (mExerciseHistoryFragment == null) {
-                        mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+                        mExerciseHistoryDatesMap.put(index, mExerciseHistoryDates);
+                        mExerciseHistoryMap.put(index, mExerciseHistory);
+
+                        if (mExerciseHistoryFragment == null) {
+                            mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+                        }
+                        mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+
+                        FragmentTransaction ft;
+                        ft = mFragmentManager.beginTransaction();
+                        if (mFragmentManager.getBackStackEntryCount() > 0) {
+                            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
+                        } else {
+                            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
+                        }
+                        Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
+
                     }
-                    mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+                });
+            }
 
-                    FragmentTransaction ft;
-                    ft = mFragmentManager.beginTransaction();
-                    if (mFragmentManager.getBackStackEntryCount() > 0) {
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
-                    } else {
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
-                    }
-                    Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
+            else {
+                Log.i(TAG, "This exercise has already been viewed. Load history from map, not firebase ");
+                mExerciseHistory = mExerciseHistoryMap.get(index);
+                mExerciseHistoryDates = mExerciseHistoryDatesMap.get(index);
 
-                    hideProgressDialog();
+                if (mExerciseHistoryFragment == null) {
+                    mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
                 }
-            });
+                mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+
+                FragmentTransaction ft;
+                ft = mFragmentManager.beginTransaction();
+                if (mFragmentManager.getBackStackEntryCount() > 0) {
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).commit();
+                } else {
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).replace(R.id.workout_fragment_container, mFragment, mFragmentTag).addToBackStack(null).commit();
+                }
+                Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
+
+            }
         }
-
-            //If the history tab is clicked before the fragment has obtained exercise history,
-            // then this will cause a null pointer exception in ExerciseHistoryFragment
-
-            // show progress dialog
-
-            // Tell fragment that history button has been clicked, and to call back when history is ready
-
-
-
-            // When the history is ready then set variables for the history and load the exercise history fragment
-
-            //remove loading dialog
 
         else {
             if (fragmentTag == "STATS") {
