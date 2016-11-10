@@ -45,15 +45,22 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
         Log.i(TAG, "onBindViewHolder()");
         holder.mExerciseDate.setText(mWorkoutDates.get(position));
 
+
+
         LinearLayout setsContainer = (LinearLayout) holder.itemView.findViewById(R.id.exercise_history_sets_container);
         setsContainer.removeAllViews();
 
         Exercise currentExercise = mExercises.get(position);
         Log.i(TAG, "New exercise object created for view: " + currentExercise.getName());
+        int numSets = mExercises.get(position).getSets();
 
-        for (int i = 0; i < mExercises.get(position).getSets(); i++){
+        if (numSets == 0) {
+            holder.mNoSetsCreated.setVisibility(View.VISIBLE);
+        }
 
+        for (int i = 0; i < numSets; i++) {
             View setsView = LayoutInflater.from(mContext).inflate(R.layout.item_sets, null);
+
             TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
             setNumber.setVisibility(View.GONE);
             TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
@@ -64,10 +71,10 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
             setWeight.setLayoutParams(params);
             setReps.setText("" + currentExercise.getReps().get(i) + " reps");
             setReps.setLayoutParams(params);
-
             setsContainer.addView(setsView);
-
         }
+
+
 
     }
 
@@ -78,10 +85,12 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView mExerciseDate;
+        TextView mNoSetsCreated;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mExerciseDate = (TextView) itemView.findViewById(R.id.exercise_history_title_date);
+            mNoSetsCreated = (TextView) itemView.findViewById(R.id.exercise_history_no_sets);
         }
     }
 }
