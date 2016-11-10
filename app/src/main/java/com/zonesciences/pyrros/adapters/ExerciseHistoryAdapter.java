@@ -4,10 +4,23 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zonesciences.pyrros.models.Exercise;
+
+import java.util.List;
+
 /**
  * Created by Peter on 10/11/2016.
  */
 public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistoryAdapter.ViewHolder> {
+
+    //Execise data
+    List<String> mWorkoutDates;
+    List<Exercise> mExercises;
+
+    public ExerciseHistoryAdapter(List<String> workoutDate, List<Exercise> exercises){
+        this.mWorkoutDates = workoutDate;
+        this.mExercises = exercises;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

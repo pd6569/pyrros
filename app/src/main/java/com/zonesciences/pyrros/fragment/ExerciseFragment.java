@@ -128,7 +128,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete() {
-                Log.i(TAG, "Callback from exercise history loader received. Notified of completion. Can now update variables");
+                Log.i(TAG, "Callback from exercise history loader received. Notified of completion.");
                 mExerciseHistory = exerciseHistory.getExercises();
                 mExerciseHistoryDates = exerciseHistory.getExerciseDates();
             }

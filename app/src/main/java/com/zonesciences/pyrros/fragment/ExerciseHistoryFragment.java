@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.ExerciseHistoryAdapter;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.models.Exercise;
 
@@ -41,7 +43,8 @@ public class ExerciseHistoryFragment extends Fragment {
 
     //RecyclerView
     RecyclerView mExerciseHistoryRecycler;
-
+    ExerciseHistoryAdapter mAdapter;
+    LinearLayoutManager mLinearLayoutManager;
 
     public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises) {
         Bundle args = new Bundle();
@@ -68,6 +71,8 @@ public class ExerciseHistoryFragment extends Fragment {
         mExerciseDates = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY_DATES);
         mExercises = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY);
 
+        mAdapter = new ExerciseHistoryAdapter(mExerciseDates, mExercises);
+
         Log.i(TAG, "Exercise history obtained. Number of times performed " + mExerciseKey + " = " + mExercises.size());
 
     }
@@ -80,6 +85,12 @@ public class ExerciseHistoryFragment extends Fragment {
 
         TextView tv = (TextView) rootView.findViewById(R.id.textview_exercise_history);
         tv.setText("Exercise history for: " + mExerciseKey);
+
+        mExerciseHistoryRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_exercise_history);
+        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mExerciseHistoryRecycler.setLayoutManager(mLinearLayoutManager);
+        mExerciseHistoryRecycler.setHasFixedSize(true);
+        mExerciseHistoryRecycler.setAdapter(mAdapter);
 
         return rootView;
     }
