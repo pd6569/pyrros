@@ -2,9 +2,11 @@ package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
@@ -16,6 +18,8 @@ import java.util.List;
  * Created by Peter on 10/11/2016.
  */
 public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistoryAdapter.ViewHolder> {
+
+    private static final String TAG = "ExerciseHistoryAdapter" ;
 
     Context mContext;
 
@@ -38,7 +42,30 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Log.i(TAG, "onBindViewHolder()");
         holder.mExerciseDate.setText(mWorkoutDates.get(position));
+
+        LinearLayout setsContainer = (LinearLayout) holder.itemView.findViewById(R.id.exercise_history_sets_container);
+        setsContainer.removeAllViews();
+
+        Exercise currentExercise = mExercises.get(position);
+
+        for (int i = 0; i < mExercises.get(position).getSets(); i++){
+
+            View setsView = LayoutInflater.from(mContext).inflate(R.layout.item_sets, null);
+            TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
+            TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
+            setWeight.setText("" + currentExercise.getWeight().get(i) + " kgs");
+            setWeight.setLayoutParams(params);
+            setReps.setText("" + currentExercise.getReps().get(i) + " reps");
+            setReps.setLayoutParams(params);
+
+            setsContainer.addView(setsView);
+
+        }
+
     }
 
     @Override
