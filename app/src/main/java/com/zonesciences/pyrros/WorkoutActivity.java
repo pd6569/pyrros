@@ -202,7 +202,7 @@ public class WorkoutActivity extends BaseActivity {
         @Override
         public Fragment getItem(int position) {
             ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(mExercisesList.get(position), mWorkoutKey, mUserId);
-            mExerciseReferenceMap.put(position, exerciseFragment);
+            mExerciseReferenceMap.put(position, exerciseFragment); // map exercise fragments so that variables can be obtained when switching fragments.
             return exerciseFragment;
         }
 
