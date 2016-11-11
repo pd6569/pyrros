@@ -11,7 +11,10 @@ import android.view.MenuItem;
 
 import com.zonesciences.pyrros.fragment.SettingsFragment;
 
+
 public class SettingsActivity extends BaseActivity {
+
+    public static final String PREF_UNIT = "pref_unit";
 
     Toolbar mToolbar;
 

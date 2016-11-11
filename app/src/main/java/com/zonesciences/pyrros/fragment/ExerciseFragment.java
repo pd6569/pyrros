@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.SettingsActivity;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
@@ -130,13 +131,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUnitSystem = sharedPref.getString("pref_unit", null);
 
-        if (mUnitSystem.equals("metric")){
-            mUnits = " kgs";
-            mConversionMultiple = 1.0;
-        } else {
-            mUnits = " lbs";
-            mConversionMultiple = 0.453592;
-        }
+        setUnitSystem();
 
         //adapter created here
         mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference, mWorkoutKey, mUser);
@@ -148,6 +143,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         });
 
         mSetsAdapter.notifyDataSetChanged();
+
     }
 
 
@@ -206,6 +202,18 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     public void onStart(){
         super.onStart();
         Log.i(TAG, "onStart()");
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.i(TAG, "onPause()");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.i(TAG, "onResume()");
     }
 
     @Override
@@ -325,6 +333,16 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
             }
         });
+    }
+
+    public void setUnitSystem(){
+        if (mUnitSystem.equals("metric")){
+            mUnits = " kgs";
+            mConversionMultiple = 1.0;
+        } else {
+            mUnits = " lbs";
+            mConversionMultiple = 0.453592;
+        }
     }
 
     public List<String> getExerciseHistoryDates() {

@@ -3,6 +3,8 @@ package com.zonesciences.pyrros;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -45,7 +47,7 @@ import java.util.Map;
 // The fragment container switches in and out the exercise history, stats, and feedback fragments
 // and the visibility of the viewpager is toggled on/off.
 
-public class WorkoutActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class WorkoutActivity extends BaseActivity {
 
     private static String TAG = "WorkoutActivity";
 
@@ -148,6 +150,8 @@ public class WorkoutActivity extends BaseActivity implements SharedPreferences.O
                 }
             }
         });
+
+
     }
 
     @Override
@@ -323,23 +327,6 @@ public class WorkoutActivity extends BaseActivity implements SharedPreferences.O
 
         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
 
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-            case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-        }
-                return super.onOptionsItemSelected(item);
-
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        Log.i(TAG, "Preferences have just changed");
     }
 
 }
