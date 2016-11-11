@@ -66,5 +66,6 @@
     <string name="pref_unit_system">Unit System</string>
     <string name="pref_choose_units">Choose Unit System</string>
     <string name="pref_unit_default">metric</string>
+    <string name="summar_unit_preferences">Sets units for your workouts</string>
 
 </resources>

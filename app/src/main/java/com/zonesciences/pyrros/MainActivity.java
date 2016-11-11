@@ -126,7 +126,6 @@ public class MainActivity extends BaseActivity {
             purgeDatabase();
         } else if ( i == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));
-            finish();
             return true;
         }
 
