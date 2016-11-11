@@ -158,7 +158,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mSetNumberTitle = (TextView) view.findViewById(R.id.textview_set_number_title);
 
         mWeightTextView = (TextView) view.findViewById(R.id.textview_weight);
-        mWeightTextView.setText("Weight" + mUnits);
+        mWeightTextView.setText("Weight (" + mUnits + ")");
 
         mDecreaseWeightButton = (Button) view.findViewById(R.id.button_decrease_weight);
         mDecreaseWeightButton.setOnClickListener(this);
@@ -337,10 +337,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     public void setUnitSystem(){
         if (mUnitSystem.equals("metric")){
-            mUnits = " kgs";
+            mUnits = "kgs";
             mConversionMultiple = 1.0;
         } else {
-            mUnits = " lbs";
+            mUnits = "lbs";
             mConversionMultiple = 0.453592;
         }
     }
