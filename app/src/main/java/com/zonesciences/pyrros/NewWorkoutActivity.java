@@ -42,6 +42,7 @@ import java.util.Map;
 public class NewWorkoutActivity extends BaseActivity {
     private static final String REQUIRED = "Required";
     private static final String TAG = "NewWorkoutActivity";
+    private static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
 
     public static final String WORKOUT_EXERCISES = "Workout Exercises";
     public static final String WORKOUT_ID = "Workout ID";
@@ -443,14 +444,32 @@ public class NewWorkoutActivity extends BaseActivity {
                 //write number of exercises to workout
                 updateNumExercises();
 
-                Bundle extras = new Bundle();
-                Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeysList);
-                extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeysList);
-                extras.putString(WORKOUT_ID, mWorkoutKey);
-                Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
-                i.putExtras(extras);
-                startActivity(i);
-                finish();
+                final ArrayList<Exercise> exercisesToLoad = new ArrayList<>();
+                mDatabase.child("user-workout-exercises").child(getUid()).child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot exerciseSnapshot : dataSnapshot.getChildren()){
+                            Exercise exercise = exerciseSnapshot.getValue(Exercise.class);
+                            exercisesToLoad.add(exercise);
+                        }
+
+                        Bundle extras = new Bundle();
+                        Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeysList);
+                        extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeysList);
+                        extras.putString(WORKOUT_ID, mWorkoutKey);
+                        extras.putSerializable(WORKOUT_EXERCISE_OBJECTS, exercisesToLoad);
+                        Intent i = new Intent (NewWorkoutActivity.this, WorkoutActivity.class);
+                        i.putExtras(extras);
+                        startActivity(i);
+                        finish();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
                 return true;
 
             default:

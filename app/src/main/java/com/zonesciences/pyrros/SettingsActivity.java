@@ -1,6 +1,8 @@
 package com.zonesciences.pyrros;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.Preference;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,5 +38,6 @@ public class SettingsActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 }

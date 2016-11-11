@@ -3,7 +3,9 @@ package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntegerRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +36,7 @@ import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +53,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
     private static final String WORKOUT_EXERCISES = "Workout Exercises";
     private static final String WORKOUT_ID = "Workout ID";
+    private static final String WORKOUT_EXERCISES_OBJECTS = "WorkoutExerciseObjects";
 
     DatabaseReference mDatabaseReference;
     Context mContext;
@@ -57,8 +61,9 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
     int mNumExercises;
     Map<String, List<Exercise>> mWorkoutExercisesMap;
     List<Exercise> mExercises;
-    List<Integer> mTrackedIds;
     ArrayList<String> mExerciseKeys = new ArrayList<>();
+    String mUnit;
+    double mConversionMultiple;
 
     public WorkoutsAdapter(Class<Workout> modelClass, int modelLayout, Class<WorkoutViewHolder> viewHolderClass, Query ref, DatabaseReference databaseReference, String uid, Map<String, List<Exercise>> workoutExercisesMap, Context context) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -67,6 +72,13 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
         mUid = uid;
         mWorkoutExercisesMap = workoutExercisesMap;
         mContext = context;
+        if (PreferenceManager.getDefaultSharedPreferences(mContext).getString("pref_unit", null).equals("metric")){
+            mUnit = " kgs";
+            mConversionMultiple = 1.0;
+        } else {
+            mUnit = " lbs";
+            mConversionMultiple = 2.20462;
+        }
     }
 
     @Override
@@ -123,7 +135,8 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                     setNumber.setVisibility(View.GONE);
 
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
-                    setWeight.setText("" + currentExercise.getWeight().get(j) + " kgs");
+                    double weight = currentExercise.getWeight().get(j) * mConversionMultiple;
+                    setWeight.setText("" + weight + mUnit);
                     setWeight.setLayoutParams(params);
                     setReps.setText("" + currentExercise.getReps().get(j) + " reps");
                     setReps.setLayoutParams(params);
@@ -144,7 +157,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             public void onClick(View view) {
                 //Launch WorkoutActivity
 
-                List<Exercise> exercisesToLoad = mWorkoutExercisesMap.get(workoutRef.getKey());
+                ArrayList<Exercise> exercisesToLoad = (ArrayList) mWorkoutExercisesMap.get(workoutRef.getKey());
                 for (Exercise exercise : exercisesToLoad){
                     String s = exercise.getName();
                     mExerciseKeys.add(s);
@@ -156,6 +169,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                 Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeys);
                 extras.putSerializable(WORKOUT_EXERCISES, mExerciseKeys);
                 extras.putString(WORKOUT_ID, workoutKey);
+                extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, exercisesToLoad);
                 Intent i = new Intent (mContext, WorkoutActivity.class);
                 i.putExtras(extras);
                 mContext.startActivity(i);

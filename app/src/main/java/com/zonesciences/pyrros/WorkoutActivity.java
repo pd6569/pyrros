@@ -41,9 +41,11 @@ import java.util.Map;
 // and the visibility of the viewpager is toggled on/off.
 
 public class WorkoutActivity extends BaseActivity {
+
     private static String TAG = "WorkoutActivity";
 
     private static final String WORKOUT_EXERCISES = "Workout Exercises";
+    private static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
     private static final String WORKOUT_ID = "Workout ID";
 
     ViewPager mExercisesViewPager;
@@ -53,6 +55,8 @@ public class WorkoutActivity extends BaseActivity {
     TabLayout mTabLayout;
 
     ArrayList<String> mExercisesList;
+    ArrayList<Exercise> mExerciseObjects;
+
     String mWorkoutKey;
     String mExerciseKey;
     String mUserId;
@@ -88,6 +92,7 @@ public class WorkoutActivity extends BaseActivity {
 
         Intent i = getIntent();
         mExercisesList = (ArrayList<String>) i.getSerializableExtra(WORKOUT_EXERCISES);
+        mExerciseObjects = (ArrayList<Exercise>) i.getSerializableExtra(WORKOUT_EXERCISE_OBJECTS);
         mWorkoutKey = i.getStringExtra(WORKOUT_ID);
         mUserId = getUid();
 
@@ -271,7 +276,7 @@ public class WorkoutActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(mExercisesList.get(position), mWorkoutKey, mUserId);
+            ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(mExercisesList.get(position), mExerciseObjects.get(position), mWorkoutKey, mUserId);
             mExerciseReferenceMap.put(position, exerciseFragment); // map exercise fragments so that variables can be obtained when switching fragments.
             return exerciseFragment;
         }

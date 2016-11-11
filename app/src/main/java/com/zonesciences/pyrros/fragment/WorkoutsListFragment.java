@@ -1,7 +1,9 @@
 package com.zonesciences.pyrros.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +24,7 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.MainActivity;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.SettingsActivity;
 import com.zonesciences.pyrros.adapters.WorkoutsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
@@ -55,6 +58,8 @@ public abstract class WorkoutsListFragment extends Fragment {
     private Map<String, List<Exercise>> mWorkoutExercisesMap = new HashMap<>();
     private Query mUserWorkoutsQuery;
 
+    private String mUnits;
+
     public WorkoutsListFragment() {}
 
 
@@ -65,8 +70,9 @@ public abstract class WorkoutsListFragment extends Fragment {
         Log.i(TAG, "onCreate() called");
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mContext = getActivity();
-
-
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mUnits = sharedPref.getString("pref_unit", null);
+        Log.i(TAG, "Units for this app: " + mUnits);
     }
 
 
@@ -125,6 +131,7 @@ public abstract class WorkoutsListFragment extends Fragment {
                     List<Exercise> exercises = new ArrayList<Exercise>();
                     for (DataSnapshot exerciseKey : workout.getChildren()){
                         Exercise exercise = exerciseKey.getValue(Exercise.class);
+                        Log.i(TAG, "Obtained exercise: " + exercise.getName() + " Sets: " + exercise.getSets());
                         exercises.add(exercise);
                     }
                     mWorkoutExercisesMap.put(s, exercises);

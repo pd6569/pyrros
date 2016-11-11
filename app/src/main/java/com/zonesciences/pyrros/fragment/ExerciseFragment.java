@@ -30,6 +30,7 @@ import com.zonesciences.pyrros.adapters.SetsAdapter;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.models.Exercise;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     public static final String ARG_EXERCISE_KEY = "ExerciseKey";
     public static final String ARG_WORKOUT_KEY = "WorkoutKey";
     public static final String ARG_USER_ID = "UserId";
+    private static final String ARG_EXERCISE_OBJECT = "ExerciseObject";
 
     //Views
     TextView mSetNumberTitle;
@@ -86,11 +88,12 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     List<Exercise> mExerciseHistory;
     Map<String, Exercise> mExerciseHistoryMap;
 
-    public static ExerciseFragment newInstance(String exerciseKey, String workoutKey, String userId) {
+    public static ExerciseFragment newInstance(String exerciseKey, Exercise exercise, String workoutKey, String userId) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_WORKOUT_KEY, workoutKey);
         args.putString(ARG_USER_ID, userId);
+        args.putParcelable(ARG_EXERCISE_OBJECT, exercise);
         ExerciseFragment fragment = new ExerciseFragment();
         fragment.setArguments(args);
         return fragment;
@@ -107,12 +110,14 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mWorkoutKey = bundle.getString(ARG_WORKOUT_KEY);
+        mExercise = bundle.getParcelable(ARG_EXERCISE_OBJECT);
         mUser = bundle.getString(ARG_USER_ID);
+        mCurrentSet = mExercise.getSets() + 1;
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
 
-        getExercise();
+        /*getExercise();*/
 
         //adapter created here
         mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference, mWorkoutKey, mUser);
@@ -123,6 +128,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        mSetsAdapter.notifyDataSetChanged();
     }
 
 
@@ -154,6 +160,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mWeightField = (EditText) view.findViewById(R.id.field_weight);
         mRepsField = (EditText) view.findViewById(R.id.field_reps);
 
+        mSetNumberTitle.setText("Set " + mCurrentSet);
 
 
         mSetsAdapter.notifyDataSetChanged(); // this ensures that data is reloaded when recreating the view after swiping from other exercises
@@ -278,6 +285,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     // Update fragment exercise object with latest firebase data on first load and if changes to set
     // are made via the adapter (e.g reorder/deleting sets)
     private void getExercise() {
+        Log.i(TAG, "getExercise called()");
         mExerciseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
