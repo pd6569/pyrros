@@ -24,8 +24,12 @@ import com.zonesciences.pyrros.fragment.FeedbackFragment;
 import com.zonesciences.pyrros.fragment.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,6 +175,23 @@ public class WorkoutActivity extends BaseActivity {
                         mExerciseHistory = exerciseHistory.getExercises();
                         mExerciseHistoryDates.remove(mExerciseHistory.size()-1);
                         mExerciseHistory.remove(mExerciseHistory.size()-1);
+
+                        List<String> dateformat = new ArrayList<String>();
+                        for (int i = 0; i < mExerciseHistoryDates.size(); i++){
+                            String oldDate = mExerciseHistoryDates.get(i);
+                            String newDate;
+                            DateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+                            DateFormat targeFormat = new SimpleDateFormat("EEE, dd MMM");
+                            try {
+                                Date date = originalFormat.parse(oldDate);
+                                DateFormat newDF = new SimpleDateFormat("EEE, dd MMM");
+
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                         //puts newest exercises first by default
                         Collections.reverse(mExerciseHistoryDates);
                         Collections.reverse(mExerciseHistory);

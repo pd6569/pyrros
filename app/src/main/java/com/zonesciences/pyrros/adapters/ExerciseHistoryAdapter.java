@@ -74,8 +74,6 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
             setsContainer.addView(setsView);
         }
 
-
-
     }
 
     @Override

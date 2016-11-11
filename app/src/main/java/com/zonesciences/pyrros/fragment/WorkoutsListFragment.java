@@ -20,12 +20,14 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.MainActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.WorkoutsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,6 +41,8 @@ import java.util.Map;
 public abstract class WorkoutsListFragment extends Fragment {
 
     private static final String TAG = "WorkoutsListFragment";
+
+    private static final String STATE_EXERCISE_MAP = "WorkoutListExerciseMap";
 
     private DatabaseReference mDatabase;
     private Context mContext;
@@ -87,15 +91,12 @@ public abstract class WorkoutsListFragment extends Fragment {
     @Override
     public void onActivityCreated (Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-
-        Log.i(TAG, "onActivityCreated() called");
-
-
     }
 
     @Override
     public void onStart(){
         super.onStart();
+
         //Creates hashmap with string workoutKey and value containing list of exercises performed in that workout
         createUserWorkoutsMap();
     }
@@ -121,16 +122,12 @@ public abstract class WorkoutsListFragment extends Fragment {
                 //gets each workout and associates it with the correct list of exercise objects
                 for (DataSnapshot workout : dataSnapshot.getChildren()) {
                     String s = workout.getKey();
-                    Log.i(TAG, "Workouts loaded: " + s);
                     List<Exercise> exercises = new ArrayList<Exercise>();
                     for (DataSnapshot exerciseKey : workout.getChildren()){
                         Exercise exercise = exerciseKey.getValue(Exercise.class);
-
-                        Log.i(TAG, "Exercise added to list: " + exercise.getName());
                         exercises.add(exercise);
                     }
                     mWorkoutExercisesMap.put(s, exercises);
-                    Log.i(TAG, "WorkoutExercisesMap updated: " + mWorkoutExercisesMap.size());
                 }
 
 
@@ -164,7 +161,6 @@ public abstract class WorkoutsListFragment extends Fragment {
             }
         });
     }
-
 
     //Method to generate query. Override in subclass with specific query required.
     public abstract Query getQuery(DatabaseReference database);

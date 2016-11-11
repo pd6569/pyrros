@@ -124,6 +124,10 @@ public class MainActivity extends BaseActivity {
             return true;
         } else if (i == R.id.action_purge_database) {
             purgeDatabase();
+        } else if ( i == R.id.action_settings){
+            startActivity(new Intent(this, SettingsActivity.class));
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
