@@ -1,6 +1,8 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +42,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     List<Double> mWeightList = new ArrayList<>();
     List<Long> mRepsList = new ArrayList<>();
 
+    String mUnit;
+    double mConversionMultiple;
+
+
     SetsListener mSetsListener;
     boolean mMoved;
 
@@ -61,6 +68,14 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         this.mExerciseReference = exerciseReference;
         this.mWorkoutKey = workoutKey;
         this.mUser = user;
+        if (PreferenceManager.getDefaultSharedPreferences(mContext).getString("pref_unit", null).equals("metric")){
+            mUnit = " kgs";
+            mConversionMultiple = 1.0;
+        } else {
+            mUnit = " lbs";
+            mConversionMultiple = 2.20462;
+        }
+
 
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
@@ -147,7 +162,11 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     public void onBindViewHolder(SetsViewHolder holder, int position) {
 
         holder.mSetNumber.setText(Integer.toString(position + 1));
-        holder.mSetWeight.setText(Double.toString(mWeightList.get(position)) + " kg");
+
+        double weight = mWeightList.get(position) * mConversionMultiple;
+        /*String s = String.format("%1.2f", weight);*/
+        String s = Utils.formatWeight(weight);
+        holder.mSetWeight.setText(s + mUnit);
         holder.mSetReps.setText(Long.toString(mRepsList.get(position)) + " reps");
     }
 

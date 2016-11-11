@@ -3,7 +3,9 @@ package com.zonesciences.pyrros.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -46,6 +48,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     //Views
     TextView mSetNumberTitle;
+    TextView mWeightTextView;
     Button mIncreaseWeightButton;
     Button mDecreaseWeightButton;
     Button mIncreaseRepsButton;
@@ -88,6 +91,11 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     List<Exercise> mExerciseHistory;
     Map<String, Exercise> mExerciseHistoryMap;
 
+    //Units and conversion
+    String mUnitSystem;
+    String mUnits;
+    double mConversionMultiple;
+
     public static ExerciseFragment newInstance(String exerciseKey, Exercise exercise, String workoutKey, String userId) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
@@ -119,6 +127,17 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         /*getExercise();*/
 
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mUnitSystem = sharedPref.getString("pref_unit", null);
+
+        if (mUnitSystem.equals("metric")){
+            mUnits = " kgs";
+            mConversionMultiple = 1.0;
+        } else {
+            mUnits = " lbs";
+            mConversionMultiple = 0.453592;
+        }
+
         //adapter created here
         mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference, mWorkoutKey, mUser);
         mSetsAdapter.setSetsListener(new SetsAdapter.SetsListener() {
@@ -141,6 +160,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
 
         mSetNumberTitle = (TextView) view.findViewById(R.id.textview_set_number_title);
+
+        mWeightTextView = (TextView) view.findViewById(R.id.textview_weight);
+        mWeightTextView.setText("Weight" + mUnits);
 
         mDecreaseWeightButton = (Button) view.findViewById(R.id.button_decrease_weight);
         mDecreaseWeightButton.setOnClickListener(this);
@@ -219,9 +241,11 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         setReps();
         mCurrentSet++;
 
+        double convertedWeight = mWeight * mConversionMultiple;
+
         mSetNumberTitle.setText("Set " + Integer.toString(mCurrentSet));
 
-        mExercise.addWeight(mWeight);
+        mExercise.addWeight(convertedWeight);
         mExercise.addReps(mReps);
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
@@ -271,6 +295,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             s = "0.0";
         }
         double weight = Double.parseDouble(s);
+
         mWeight = Math.round(weight * 100.0) / 100.0;
     }
 

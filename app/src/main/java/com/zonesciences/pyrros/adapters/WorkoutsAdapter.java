@@ -62,6 +62,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
     Map<String, List<Exercise>> mWorkoutExercisesMap;
     List<Exercise> mExercises;
     ArrayList<String> mExerciseKeys = new ArrayList<>();
+
     String mUnit;
     double mConversionMultiple;
 
