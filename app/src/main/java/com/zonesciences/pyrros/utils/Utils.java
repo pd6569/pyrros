@@ -2,6 +2,10 @@ package com.zonesciences.pyrros.utils;
 
 import android.util.Log;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Peter on 11/11/2016.
  */
@@ -23,5 +27,24 @@ public class Utils {
             }
         }
         return s;
+    }
+
+    public static String formatDate(String date) {
+        String oldDate = date;
+        String oldDateFormat = "yyyy-MM-dd, HH:mm:ss";
+
+        String newDate = new String();
+        String newDateFormat = "EEE, dd MMM";
+
+        SimpleDateFormat sdf = new SimpleDateFormat(oldDateFormat);
+
+        try {
+            Date d = sdf.parse(oldDate);
+            sdf.applyPattern(newDateFormat);
+            newDate = sdf.format(d);
+        } catch (ParseException e) {
+            Log.i(TAG, "Failed to parse date: " + e);
+        }
+        return newDate;
     }
 }

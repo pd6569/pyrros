@@ -57,7 +57,10 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Log.i(TAG, "onBindViewHolder()");
-        holder.mExerciseDate.setText(mWorkoutDates.get(position));
+
+        String workoutDate = Utils.formatDate(mWorkoutDates.get(position));
+
+        holder.mExerciseDate.setText(workoutDate);
 
 
 
