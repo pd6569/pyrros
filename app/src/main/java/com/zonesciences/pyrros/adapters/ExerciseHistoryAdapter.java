@@ -1,6 +1,7 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.List;
 
@@ -20,6 +22,10 @@ import java.util.List;
 public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistoryAdapter.ViewHolder> {
 
     private static final String TAG = "ExerciseHistoryAdapter" ;
+
+    private String mUnit;
+    private double mConversionMultiple;
+
 
     Context mContext;
 
@@ -31,6 +37,14 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
         this.mContext = context;
         this.mWorkoutDates = workoutDate;
         this.mExercises = exercises;
+
+        if (PreferenceManager.getDefaultSharedPreferences(mContext).getString("pref_unit", null).equals("metric")){
+            mUnit = " kgs";
+            mConversionMultiple = 1.0;
+        } else {
+            mUnit = " lbs";
+            mConversionMultiple = 2.20462;
+        }
     }
 
     @Override
@@ -67,7 +81,11 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
             TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
-            setWeight.setText("" + currentExercise.getWeight().get(i) + " kgs");
+
+            double weight = currentExercise.getWeight().get(i) * mConversionMultiple;
+            String s = Utils.formatWeight(weight);
+
+            setWeight.setText(s + mUnit);
             setWeight.setLayoutParams(params);
             setReps.setText("" + currentExercise.getReps().get(i) + " reps");
             setReps.setLayoutParams(params);

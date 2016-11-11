@@ -34,6 +34,7 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
 
 import java.lang.reflect.Array;
@@ -137,7 +138,8 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
                     double weight = currentExercise.getWeight().get(j) * mConversionMultiple;
-                    setWeight.setText("" + weight + mUnit);
+                    String s = Utils.formatWeight(weight);
+                    setWeight.setText(s + mUnit);
                     setWeight.setLayoutParams(params);
                     setReps.setText("" + currentExercise.getReps().get(j) + " reps");
                     setReps.setLayoutParams(params);
