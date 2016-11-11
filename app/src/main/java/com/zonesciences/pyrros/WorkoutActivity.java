@@ -1,6 +1,7 @@
 package com.zonesciences.pyrros;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
@@ -13,8 +14,12 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
@@ -40,7 +45,7 @@ import java.util.Map;
 // The fragment container switches in and out the exercise history, stats, and feedback fragments
 // and the visibility of the viewpager is toggled on/off.
 
-public class WorkoutActivity extends BaseActivity {
+public class WorkoutActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static String TAG = "WorkoutActivity";
 
@@ -267,6 +272,7 @@ public class WorkoutActivity extends BaseActivity {
         // DO NOTHING
     }
 
+
     class WorkoutExercisesAdapter extends FragmentPagerAdapter {
 
         public WorkoutExercisesAdapter(FragmentManager fm) {
@@ -319,5 +325,21 @@ public class WorkoutActivity extends BaseActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+        }
+                return super.onOptionsItemSelected(item);
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        Log.i(TAG, "Preferences have just changed");
+    }
 
 }
