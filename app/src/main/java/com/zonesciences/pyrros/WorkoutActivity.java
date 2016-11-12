@@ -164,12 +164,13 @@ public class WorkoutActivity extends BaseActivity {
         final int index = mExercisesViewPager.getCurrentItem();
         mExerciseKey = mExercisesList.get(index);
 
+        final DataTools dataTools = new DataTools(getUid(), mExerciseKey);
+
         if (fragmentTag == "EXERCISE_HISTORY") {
 
             //check if the history has already been viewed, if not load from firebase and store in hashmaps
             if (!mExerciseHistoryDatesMap.containsKey(index)) {
                 Log.i(TAG, "Exercise History fragment called. Dates map not created yet");
-                final DataTools dataTools = new DataTools(getUid(), mExerciseKey);
 
                 //start loading exercise history
                 showProgressDialog();
@@ -217,7 +218,6 @@ public class WorkoutActivity extends BaseActivity {
 
             if (!mAllExercisesMap.containsKey(index)) {
                 Log.i(TAG, "Stats fragment called, all exercises map does not exist yet");
-                final DataTools dataTools = new DataTools(getUid(), mExerciseKey);
 
                 //start generating exercise stats
                 showProgressDialog();

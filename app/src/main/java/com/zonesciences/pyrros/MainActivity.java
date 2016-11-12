@@ -79,6 +79,11 @@ public class MainActivity extends BaseActivity {
 
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+            //Set locations to keep in sync
+            mDatabase.child("user-exercises").child(mUserId).keepSynced(true);
+            mDatabase.child("user-workout-exercises").child(mUserId).keepSynced(true);
+            mDatabase.child("user-workouts").child(mUserId).keepSynced(true);
+
             //Give the TabLayout for region selection the ViewPager
             TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs_homescreen);
             tabLayout.setupWithViewPager(mViewPager, false);

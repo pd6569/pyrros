@@ -69,7 +69,10 @@ public class StatsFragment extends Fragment {
         title.setText("Showing stats for " + mExerciseKey);
 
         TextView totalSets = (TextView) rootView.findViewById(R.id.stats_total_sets);
-        totalSets.setText("Total for this exercise: " + mDataTools.totalSets());
+        totalSets.setText("Total number of sets: " + mDataTools.totalSets());
+
+        TextView totalReps = (TextView) rootView.findViewById(R.id.stats_total_reps);
+        totalReps.setText("Total reps performed: " + mDataTools.totalReps());
 
         return rootView;
     }

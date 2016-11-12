@@ -147,4 +147,22 @@ public class DataTools {
         }
         return totalSets;
     }
+
+    public int totalReps(){
+        int totalReps = 0;
+        for(Exercise exercise : mExercises){
+            try {
+            List<Integer> repsList = exercise.getReps();
+            Log.i(TAG, "repsList = " + repsList.size());
+
+            for (int rep : repsList) {
+                totalReps = totalReps + rep;
+            }
+
+            } catch (NullPointerException exception) {
+                Log.i(TAG, "No reps recorded for this exercise: " + exception);
+            }
+        }
+        return totalReps;
+    }
 }
