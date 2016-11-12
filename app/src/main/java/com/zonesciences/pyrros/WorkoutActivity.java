@@ -179,32 +179,21 @@ public class WorkoutActivity extends BaseActivity {
 
                 //start loading exercise history
                 showProgressDialog();
-                exerciseHistory.getHistory();
-                exerciseHistory.setOnLoadCompleteListener(new ExerciseHistory.OnLoadCompleteListener() {
+                exerciseHistory.loadExercises();
+                exerciseHistory.setOnDataLoadCompleteListener(new ExerciseHistory.OnDataLoadCompleteListener() {
                     @Override
-                    public void onLoadComplete() {
-                        Log.i(TAG, "Callback from exercise history loader received. Notified of completion.");
+                    public void onExercisesLoadComplete() {
+                        exerciseHistory.loadWorkoutDates(exerciseHistory.getWorkoutKeys());
+                    }
+
+                    @Override
+                    public void onWorkoutDatesLoadComplete() {
+                        Log.i(TAG, "Callback from loadWorkoutDates received");
                         hideProgressDialog();
                         mExerciseHistoryDates = exerciseHistory.getExerciseDates();
                         mExerciseHistory = exerciseHistory.getExercises();
-                        mExerciseHistoryDates.remove(mExerciseHistory.size()-1);
-                        mExerciseHistory.remove(mExerciseHistory.size()-1);
-
-                        List<String> dateformat = new ArrayList<String>();
-                        for (int i = 0; i < mExerciseHistoryDates.size(); i++){
-                            String oldDate = mExerciseHistoryDates.get(i);
-                            String newDate;
-                            DateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
-                            DateFormat targeFormat = new SimpleDateFormat("EEE, dd MMM");
-                            try {
-                                Date date = originalFormat.parse(oldDate);
-                                DateFormat newDF = new SimpleDateFormat("EEE, dd MMM");
-
-
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        mExerciseHistoryDates.remove(mExerciseHistory.size() - 1);
+                        mExerciseHistory.remove(mExerciseHistory.size() - 1);
 
                         //puts newest exercises first by default
                         Collections.reverse(mExerciseHistoryDates);
@@ -215,7 +204,9 @@ public class WorkoutActivity extends BaseActivity {
                         mExerciseHistoryMap.put(index, mExerciseHistory);
 
                         loadExerciseHistoryFragment();
+
                     }
+
                 });
             }
 

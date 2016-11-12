@@ -42,8 +42,6 @@ public class DataTools {
         mUserId = userId;
 
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
-
-        getExercises();
     }
 
     //Constructor with exercises list passed in.
@@ -54,7 +52,7 @@ public class DataTools {
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
     }
 
-    public void getExercises() {
+    public void loadExercises() {
 
         mUserWorkoutExercisesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -70,11 +68,13 @@ public class DataTools {
 
                             Exercise e = exercise.getValue(Exercise.class);
                             mExercises.add(e);
-                            Log.i(TAG, "Created exercises object for exercise and and it to list: " + e.getName());
+                            Log.i(TAG, "Created exercises object for exercise and and it to list: " + e.getName() + "mExercises size: " + mExercises.size());
                         }
                     }
 
                 }
+
+                Log.i(TAG, "Exercises loaded. Number of exercises : " + mExercises.size());
 
                 mListener.onExercisesLoadComplete();
 
@@ -88,7 +88,7 @@ public class DataTools {
 
     }
 
-    private void getWorkoutDates(final List<String> workoutKeys) {
+    public void loadWorkoutDates(final List<String> workoutKeys) {
 
         mUserWorkoutExercisesRef.getRoot().child("user-workouts").child(mUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -100,7 +100,7 @@ public class DataTools {
                         Log.i(TAG, "Added date to exercise dates list: " + w.getClientTimeStamp());
                     }
                 }
-                Log.i(TAG, "Finished loading exercise history");
+                Log.i(TAG, "Finished loading workout dates");
 
                 mListener.onWorkoutDatesLoadComplete();
 
@@ -113,8 +113,6 @@ public class DataTools {
         });
     }
 
-
-
     public interface OnDataLoadCompleteListener{
         public void onExercisesLoadComplete();
         public void onWorkoutDatesLoadComplete();
@@ -122,5 +120,15 @@ public class DataTools {
 
     public void setOnDataLoadCompleteListener(OnDataLoadCompleteListener listener){
         this.mListener = listener;
+    }
+
+    public List<Exercise> getExercises() {
+        return mExercises;
+    }
+
+    public List<String> getExerciseDates() { return mExerciseDates; }
+
+    public ArrayList<String> getWorkoutKeys() {
+        return mWorkoutKeys;
     }
 }
