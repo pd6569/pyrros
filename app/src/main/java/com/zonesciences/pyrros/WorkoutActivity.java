@@ -24,7 +24,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
+import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.datatools.ExerciseHistory;
+import com.zonesciences.pyrros.datatools.ExerciseStats;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
@@ -83,7 +85,7 @@ public class WorkoutActivity extends BaseActivity {
 
     //Exercise History
     List<String> mExerciseHistoryDates;
-    List<Exercise> mExerciseHistory;
+    List<Exercise> mExerciseHistory; //all exercises for specific exercise
 
     //Maps for storing exercise history for each exercise in the workout once initially loaded from firebase
     Map<Integer, List<String>> mExerciseHistoryDatesMap = new HashMap<>();
@@ -166,14 +168,13 @@ public class WorkoutActivity extends BaseActivity {
 
         mFragmentTag = fragmentTag;
 
-        if (fragmentTag == "EXERCISE_HISTORY") {
-            Log.i(TAG, "Current exercise item: " + mExercisesList.get(mExercisesViewPager.getCurrentItem()));
+        final int index = mExercisesViewPager.getCurrentItem();
+        mExerciseKey = mExercisesList.get(index);
 
-            final int index = mExercisesViewPager.getCurrentItem();
-            mExerciseKey = mExercisesList.get(index);
+        if (fragmentTag == "EXERCISE_HISTORY") {
 
             //check if the history has already been viewed, if not load from firebase and store in hashmaps
-            if (!mExerciseHistoryMap.containsKey(index)) {
+            if (!mExerciseHistoryMap.containsKey(index) && !mExerciseHistoryDatesMap.containsKey(index)) {
                 Log.i(TAG, "This exercise has not been viewed. Load from firebase and update map");
                 final ExerciseHistory exerciseHistory = new ExerciseHistory(getUid(), mExerciseKey);
 
@@ -221,10 +222,40 @@ public class WorkoutActivity extends BaseActivity {
 
         else {
             if (fragmentTag == "STATS") {
-                if (mStatsFragment == null) {
-                    mStatsFragment = new StatsFragment();
+
+                if (!mExerciseHistoryMap.containsKey(index)){
+                    Log.i(TAG, "Stats fragment called, exercise history map does not exist yet");
+                    final ExerciseStats exerciseStats = new ExerciseStats(getUid(), mExerciseKey);
+
+                    //start generating exercise stats
+                    showProgressDialog();
+                    exerciseStats.loadExercises();
+                    exerciseStats.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
+                        @Override
+                        public void onExercisesLoadComplete() {
+                            mExerciseHistory = exerciseStats.getExercises();
+
+                            //store data to hashmap
+                            mExerciseHistoryMap.put(index, mExerciseHistory);
+
+                            loadStatsFragment();
+
+                        }
+
+                        @Override
+                        public void onWorkoutDatesLoadComplete() {
+
+                        }
+                    });
+
+                } else {
+                    Log.i(TAG, "Exercise history map already generated. Load stats fragment");
+                    mExerciseHistory = mExerciseHistoryMap.get(index);
+
+                    loadStatsFragment();
+
                 }
-                mFragment = mStatsFragment;
+
             } else if (fragmentTag == "FEEDBACK") {
                 if (mFeedbackFragment == null) {
                     mFeedbackFragment = new FeedbackFragment();
@@ -302,11 +333,16 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     public void loadExerciseHistoryFragment(){
-
-        if (mExerciseHistoryFragment == null) {
-            mExerciseHistoryFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
-        }
         mFragment = mExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+        setFragment();
+    }
+
+    public void loadStatsFragment(){
+        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, (ArrayList<Exercise>)mExerciseHistory);
+        setFragment();
+    }
+
+    private void setFragment() {
 
         FragmentTransaction ft;
         ft = mFragmentManager.beginTransaction();
@@ -317,7 +353,6 @@ public class WorkoutActivity extends BaseActivity {
         }
 
         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
-
     }
 
 }

@@ -113,6 +113,15 @@ public class DataTools {
         });
     }
 
+    public int totalSets(){
+        int totalSets = 0;
+        for(Exercise exercise : mExercises){
+            int sets = exercise.getSets();
+            totalSets = totalSets + sets;
+        }
+        return totalSets;
+    }
+
     public interface OnDataLoadCompleteListener{
         public void onExercisesLoadComplete();
         public void onWorkoutDatesLoadComplete();
@@ -122,11 +131,11 @@ public class DataTools {
         this.mListener = listener;
     }
 
-    public List<Exercise> getExercises() {
+    public ArrayList<Exercise> getExercises() {
         return mExercises;
     }
 
-    public List<String> getExerciseDates() { return mExerciseDates; }
+    public ArrayList<String> getExerciseDates() { return mExerciseDates; }
 
     public ArrayList<String> getWorkoutKeys() {
         return mWorkoutKeys;

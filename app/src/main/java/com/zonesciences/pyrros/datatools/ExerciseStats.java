@@ -13,45 +13,14 @@ import java.util.ArrayList;
 /**
  * Created by Peter on 12/11/2016.
  */
-public class ExerciseStats {
+public class ExerciseStats extends DataTools {
 
-    private static final String TAG = "ExerciseStats.class";
 
-    DatabaseReference mUserWorkoutExercisesRef;
-
-    String mExerciseKey;
-    String mUserId;
-    ArrayList<Exercise> mExercises;
-    int mSets;
-    int mReps;
-
-    public ExerciseStats (String userId, String exerciseKey){
-        mExerciseKey = exerciseKey;
-        mUserId = userId;
-
-        mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
-        mUserWorkoutExercisesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+    public ExerciseStats(String userId, String exerciseKey) {
+        super(userId, exerciseKey);
     }
 
-    public ExerciseStats (String userId, String exerciseKey, ArrayList<Exercise> exercises){
-        mExerciseKey = exerciseKey;
-        mUserId = userId;
-        mExercises = exercises;
-        mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
+    public ExerciseStats(String userId, String exerciseKey, ArrayList<Exercise> exercises) {
+        super(userId, exerciseKey, exercises);
     }
-
-    public int getSets(){
-        return 0;
-    }
-
 }
