@@ -74,6 +74,9 @@ public class StatsFragment extends Fragment {
         TextView totalReps = (TextView) rootView.findViewById(R.id.stats_total_reps);
         totalReps.setText("Total reps performed: " + mDataTools.totalReps());
 
+        TextView totalVolume = (TextView) rootView.findViewById(R.id.stats_total_volume);
+        totalVolume.setText("Total volume: " + mDataTools.totalVolume());
+
         return rootView;
     }
 

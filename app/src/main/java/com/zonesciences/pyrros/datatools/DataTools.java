@@ -9,6 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,13 +167,28 @@ public class DataTools {
         return totalReps;
     }
 
-    public int totalWeight(){
-        int totalWeight = 0;
+    public String totalVolume(){
+
+        double totalVolume = 0;
+
         for (Exercise exercise: mExercises){
 
-        }
+            if (exercise.getSets() == 0) {
+                Log.i(TAG, "No sets recorded for this exercise");
+            } else {
+                List<Double> weightsList = exercise.getWeight();
+                List<Integer> repsList = exercise.getReps();
 
-        return 0;
+                for (int i = 0; i < weightsList.size(); i++){
+                    double weight = weightsList.get(i);
+                    int reps = repsList.get(i);
+                    double setVolume = weight * reps;
+                    Log.i(TAG, "Volume for this set = " + setVolume);
+                    totalVolume = totalVolume + setVolume;
+                }
+            }
+        }
+        return Utils.formatWeight(totalVolume);
     }
 
 
