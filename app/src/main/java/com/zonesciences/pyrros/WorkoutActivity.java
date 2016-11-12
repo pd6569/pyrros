@@ -33,6 +33,7 @@ import com.zonesciences.pyrros.fragment.FeedbackFragment;
 import com.zonesciences.pyrros.fragment.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -85,11 +86,17 @@ public class WorkoutActivity extends BaseActivity {
 
     //Exercise History
     List<String> mExerciseHistoryDates;
-    List<Exercise> mExerciseHistory; //all exercises for specific exercise
+    List<Exercise> mExerciseHistory; //exercise history for specific exercise
 
-    //Maps for storing exercise history for each exercise in the workout once initially loaded from firebase
+    //Exercise Stats
+    List<Exercise> mAllExercises;
+
+    //Maps for storing exercise history for each exercise in the workout after initial loaded from firebase
     Map<Integer, List<String>> mExerciseHistoryDatesMap = new HashMap<>();
     Map<Integer, List<Exercise>> mExerciseHistoryMap = new HashMap<>();
+
+    //Map for storing all exercises for passing to exercise stats
+    Map<Integer, List<Exercise>> mAllExercisesMap = new HashMap<>();
 
     String mFragmentTag;
 
@@ -222,8 +229,8 @@ public class WorkoutActivity extends BaseActivity {
 
         else if (fragmentTag == "STATS") {
 
-            if (!mExerciseHistoryMap.containsKey(index)) {
-                Log.i(TAG, "Stats fragment called, exercise history map does not exist yet");
+            if (!mAllExercisesMap.containsKey(index)) {
+                Log.i(TAG, "Stats fragment called, all exercises map does not exist yet");
                 final ExerciseStats exerciseStats = new ExerciseStats(getUid(), mExerciseKey);
 
                 //start generating exercise stats
@@ -232,9 +239,10 @@ public class WorkoutActivity extends BaseActivity {
                 exerciseStats.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
                     @Override
                     public void onExercisesLoadComplete() {
-                        mExerciseHistory = exerciseStats.getExercises();
+                        hideProgressDialog();
+                        mAllExercises = exerciseStats.getExercises();
                         //store data to hashmap
-                        mExerciseHistoryMap.put(index, mExerciseHistory);
+                        mAllExercisesMap.put(index, mAllExercises);
                         loadStatsFragment();
                     }
 
@@ -246,7 +254,9 @@ public class WorkoutActivity extends BaseActivity {
 
             } else {
                 Log.i(TAG, "Exercise history map already generated. Load stats fragment");
-                mExerciseHistory = mExerciseHistoryMap.get(index);
+
+                mAllExercises = mAllExercisesMap.get(index);
+
                 loadStatsFragment();
             }
 
@@ -324,7 +334,7 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     public void loadStatsFragment(){
-        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, (ArrayList<Exercise>) mExerciseHistory);
+        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, (ArrayList<Exercise>)mAllExercises);
         setFragment();
     }
 

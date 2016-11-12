@@ -355,4 +355,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         return mExerciseHistory;
     }
 
+    public Exercise getCurrentExercise(){
+        return mExercise;
+    }
 }
