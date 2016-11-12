@@ -1,7 +1,6 @@
 package com.zonesciences.pyrros.fragment;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,12 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
-import com.zonesciences.pyrros.LoginActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.ExerciseHistoryAdapter;
-import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.io.Serializable;

@@ -9,13 +9,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.datatools.ExerciseStats;
+import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,8 +32,7 @@ public class StatsFragment extends Fragment {
     //Data
     ArrayList<Exercise> mExercises = new ArrayList<>();
 
-    //ExerciseStats
-    ExerciseStats mExerciseStats;
+    DataTools mDataTools;
 
     public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises) {
         Bundle args = new Bundle();
@@ -60,7 +57,7 @@ public class StatsFragment extends Fragment {
         mUserId = bundle.getString(ARG_USER_ID);
         mExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
 
-        mExerciseStats = new ExerciseStats(mExerciseKey, mUserId, mExercises);
+        mDataTools = new DataTools(mExerciseKey, mUserId, mExercises);
     }
 
     @Override
@@ -72,7 +69,7 @@ public class StatsFragment extends Fragment {
         title.setText("Showing stats for " + mExerciseKey);
 
         TextView totalSets = (TextView) rootView.findViewById(R.id.stats_total_sets);
-        totalSets.setText("Total for this exercise: " + mExerciseStats.totalSets());
+        totalSets.setText("Total for this exercise: " + mDataTools.totalSets());
 
         return rootView;
     }

@@ -1,12 +1,10 @@
 package com.zonesciences.pyrros.fragment;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,13 +25,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.SettingsActivity;
-import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
-import com.zonesciences.pyrros.datatools.ExerciseHistory;
 import com.zonesciences.pyrros.models.Exercise;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +81,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     Exercise mExercise;
 
     //Exercise history data
-    ExerciseHistory exerciseHistory;
     List<String> mExerciseHistoryDates;
     List<Exercise> mExerciseHistory;
     Map<String, Exercise> mExerciseHistoryMap;

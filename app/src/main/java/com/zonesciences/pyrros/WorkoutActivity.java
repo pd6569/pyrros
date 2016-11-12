@@ -1,10 +1,7 @@
 package com.zonesciences.pyrros;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -16,30 +13,19 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.datatools.DataTools;
-import com.zonesciences.pyrros.datatools.ExerciseHistory;
-import com.zonesciences.pyrros.datatools.ExerciseStats;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
 import com.zonesciences.pyrros.fragment.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
-import java.lang.reflect.Array;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -183,23 +169,23 @@ public class WorkoutActivity extends BaseActivity {
             //check if the history has already been viewed, if not load from firebase and store in hashmaps
             if (!mExerciseHistoryDatesMap.containsKey(index)) {
                 Log.i(TAG, "Exercise History fragment called. Dates map not created yet");
-                final ExerciseHistory exerciseHistory = new ExerciseHistory(getUid(), mExerciseKey);
+                final DataTools dataTools = new DataTools(getUid(), mExerciseKey);
 
                 //start loading exercise history
                 showProgressDialog();
-                exerciseHistory.loadExercises();
-                exerciseHistory.setOnDataLoadCompleteListener(new ExerciseHistory.OnDataLoadCompleteListener() {
+                dataTools.loadExercises();
+                dataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
                     @Override
                     public void onExercisesLoadComplete() {
-                        exerciseHistory.loadWorkoutDates(exerciseHistory.getWorkoutKeys());
+                        dataTools.loadWorkoutDates(dataTools.getWorkoutKeys());
                     }
 
                     @Override
                     public void onWorkoutDatesLoadComplete() {
                         Log.i(TAG, "Callback from loadWorkoutDates received");
                         hideProgressDialog();
-                        mExerciseHistoryDates = exerciseHistory.getExerciseDates();
-                        mExerciseHistory = exerciseHistory.getExercises();
+                        mExerciseHistoryDates = dataTools.getExerciseDates();
+                        mExerciseHistory = dataTools.getExercises();
                         mExerciseHistoryDates.remove(mExerciseHistory.size() - 1);
                         mExerciseHistory.remove(mExerciseHistory.size() - 1);
 
@@ -231,16 +217,16 @@ public class WorkoutActivity extends BaseActivity {
 
             if (!mAllExercisesMap.containsKey(index)) {
                 Log.i(TAG, "Stats fragment called, all exercises map does not exist yet");
-                final ExerciseStats exerciseStats = new ExerciseStats(getUid(), mExerciseKey);
+                final DataTools dataTools = new DataTools(getUid(), mExerciseKey);
 
                 //start generating exercise stats
                 showProgressDialog();
-                exerciseStats.loadExercises();
-                exerciseStats.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
+                dataTools.loadExercises();
+                dataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
                     @Override
                     public void onExercisesLoadComplete() {
                         hideProgressDialog();
-                        mAllExercises = exerciseStats.getExercises();
+                        mAllExercises = dataTools.getExercises();
                         //store data to hashmap
                         mAllExercisesMap.put(index, mAllExercises);
                         loadStatsFragment();
