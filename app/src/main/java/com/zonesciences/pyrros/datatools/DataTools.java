@@ -150,19 +150,30 @@ public class DataTools {
 
     public int totalReps(){
         int totalReps = 0;
-        for(Exercise exercise : mExercises){
-            try {
-            List<Integer> repsList = exercise.getReps();
-            Log.i(TAG, "repsList = " + repsList.size());
+        for(Exercise exercise : mExercises) {
+            if (exercise.getSets() == 0) {
+                Log.i(TAG, "No sets recorded for this exercise");
+            } else {
+                List<Integer> repsList = exercise.getReps();
+                Log.i(TAG, "repsList = " + repsList.size());
 
-            for (int rep : repsList) {
-                totalReps = totalReps + rep;
-            }
-
-            } catch (NullPointerException exception) {
-                Log.i(TAG, "No reps recorded for this exercise: " + exception);
+                for (int rep : repsList) {
+                    totalReps = totalReps + rep;
+                }
             }
         }
+
         return totalReps;
     }
+
+    public int totalWeight(){
+        int totalWeight = 0;
+        for (Exercise exercise: mExercises){
+
+        }
+
+        return 0;
+    }
+
+
 }
