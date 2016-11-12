@@ -6,53 +6,64 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by Peter on 08/11/2016.
+ * Created by Peter on 12/11/2016.
  */
-public class ExerciseHistory {
+public class DataTools {
 
-    private static final String TAG = "ExerciseHistory.class";
+    private static final String TAG = "DataTools.class";
 
     DatabaseReference mUserWorkoutExercisesRef;
 
     String mExerciseKey;
     String mUserId;
 
-    List<Exercise> mExercises = new ArrayList<>();
-    List<String> mExerciseDates = new ArrayList<>();
-    List<String> mWorkoutKeys = new ArrayList<>();
+    ArrayList<Exercise> mExercises = new ArrayList<>();
+    ArrayList<String> mExerciseDates = new ArrayList<>();
+    ArrayList<String> mWorkoutKeys = new ArrayList<>();
 
-    OnLoadCompleteListener mListener;
+    int mSets;
+    int mReps;
 
-    public ExerciseHistory(String userId, String exerciseKey){
+    //Load complete listener
+    OnDataLoadCompleteListener mListener;
+
+
+    //Constructor without exercises list passed in - generates exercises from firebase call.
+    public DataTools (String userId, String exerciseKey){
         mExerciseKey = exerciseKey;
         mUserId = userId;
-    }
 
-    public void getHistory(){
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
 
-        //Get exercises
+        getExercises();
+    }
+
+    //Constructor with exercises list passed in.
+    public DataTools (String userId, String exerciseKey, ArrayList<Exercise> exercises){
+        mExerciseKey = exerciseKey;
+        mUserId = userId;
+        mExercises = exercises;
+        mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
+    }
+
+    public void getExercises() {
+
         mUserWorkoutExercisesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "Datasnapshot instances: " + dataSnapshot.getChildrenCount() + " VALUE : " + dataSnapshot.getValue());
-                for (DataSnapshot workout : dataSnapshot.getChildren()){
+                for (DataSnapshot workout : dataSnapshot.getChildren()) {
 
-                    for (DataSnapshot exercise : workout.getChildren()){
+                    for (DataSnapshot exercise : workout.getChildren()) {
 
-                        if (exercise.getKey().equals(mExerciseKey)){
+                        if (exercise.getKey().equals(mExerciseKey)) {
 
                             mWorkoutKeys.add(workout.getKey());
                             Log.i(TAG, "Workout key: " + workout.getKey());
@@ -64,7 +75,9 @@ public class ExerciseHistory {
                     }
 
                 }
-                getWorkoutDates(mWorkoutKeys);
+
+                mListener.onExercisesLoadComplete();
+
             }
 
             @Override
@@ -72,6 +85,7 @@ public class ExerciseHistory {
 
             }
         });
+
     }
 
     private void getWorkoutDates(final List<String> workoutKeys) {
@@ -79,8 +93,8 @@ public class ExerciseHistory {
         mUserWorkoutExercisesRef.getRoot().child("user-workouts").child(mUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot workout : dataSnapshot.getChildren()){
-                    if (mWorkoutKeys.contains(workout.getKey())){
+                for (DataSnapshot workout : dataSnapshot.getChildren()) {
+                    if (mWorkoutKeys.contains(workout.getKey())) {
                         Workout w = workout.getValue(Workout.class);
                         mExerciseDates.add(w.getClientTimeStamp());
                         Log.i(TAG, "Added date to exercise dates list: " + w.getClientTimeStamp());
@@ -88,7 +102,7 @@ public class ExerciseHistory {
                 }
                 Log.i(TAG, "Finished loading exercise history");
 
-                mListener.onLoadComplete();
+                mListener.onWorkoutDatesLoadComplete();
 
             }
 
@@ -99,27 +113,14 @@ public class ExerciseHistory {
         });
     }
 
-    public Map <String, Exercise> createExerciseHistoryMap(List<String> dates, List<Exercise> exercises){
-        Map<String, Exercise> map = new HashMap<>();
-        for (int i = 0; i < exercises.size(); i++){
-            map.put(dates.get(i), exercises.get(i));
-        }
-        return map;
+
+
+    public interface OnDataLoadCompleteListener{
+        public void onExercisesLoadComplete();
+        public void onWorkoutDatesLoadComplete();
     }
 
-    public List<Exercise> getExercises() {
-        return mExercises;
-    }
-
-    public List<String> getExerciseDates() {
-        return mExerciseDates;
-    }
-
-    public interface OnLoadCompleteListener{
-        public void onLoadComplete();
-    }
-
-    public void setOnLoadCompleteListener(OnLoadCompleteListener listener){
+    public void setOnDataLoadCompleteListener(OnDataLoadCompleteListener listener){
         this.mListener = listener;
     }
 }
