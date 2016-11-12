@@ -2,8 +2,10 @@ package com.zonesciences.pyrros;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -74,6 +76,8 @@ public class MainActivity extends BaseActivity {
 
             mPagerAdapter = new FragmentHomescreenPagerAdapter(getSupportFragmentManager());
             mViewPager.setAdapter(mPagerAdapter);
+
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
             //Give the TabLayout for region selection the ViewPager
             TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs_homescreen);
