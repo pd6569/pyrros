@@ -84,6 +84,8 @@ public class ExerciseHistoryFragment extends Fragment {
         mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseDates, mExercises);
 
         Log.i(TAG, "Exercise history obtained. " + mExercises.size());
+        Log.i(TAG, "Exercise dates obtained. " + mExerciseDates.size());
+
 
         setHasOptionsMenu(true);
     }

@@ -40,7 +40,6 @@ public class DataTools {
     public DataTools (String userId, String exerciseKey){
         mExerciseKey = exerciseKey;
         mUserId = userId;
-
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
     }
 
