@@ -32,7 +32,6 @@ public class DataTools {
     int mSets;
     int mReps;
 
-    //Load complete listener
     OnDataLoadCompleteListener mListener;
 
 
@@ -51,6 +50,8 @@ public class DataTools {
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
     }
 
+    // Methods for loading data from Firebase
+
     public void loadExercises() {
 
         mUserWorkoutExercisesRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -66,6 +67,7 @@ public class DataTools {
                             Log.i(TAG, "Workout key: " + workout.getKey());
 
                             Exercise e = exercise.getValue(Exercise.class);
+
                             mExercises.add(e);
                             Log.i(TAG, "Created exercises object for exercise and and it to list: " + e.getName() + "mExercises size: " + mExercises.size());
                         }
@@ -112,15 +114,8 @@ public class DataTools {
         });
     }
 
-    public int totalSets(){
-        int totalSets = 0;
-        for(Exercise exercise : mExercises){
-            int sets = exercise.getSets();
-            totalSets = totalSets + sets;
-        }
-        return totalSets;
-    }
 
+    // Listener for load completion
     public interface OnDataLoadCompleteListener{
         public void onExercisesLoadComplete();
         public void onWorkoutDatesLoadComplete();
@@ -130,6 +125,8 @@ public class DataTools {
         this.mListener = listener;
     }
 
+    // Getters
+
     public ArrayList<Exercise> getExercises() {
         return mExercises;
     }
@@ -138,5 +135,16 @@ public class DataTools {
 
     public ArrayList<String> getWorkoutKeys() {
         return mWorkoutKeys;
+    }
+
+    // Methods for calculations
+
+    public int totalSets(){
+        int totalSets = 0;
+        for(Exercise exercise : mExercises){
+            int sets = exercise.getSets();
+            totalSets = totalSets + sets;
+        }
+        return totalSets;
     }
 }

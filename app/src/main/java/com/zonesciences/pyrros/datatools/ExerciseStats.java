@@ -23,4 +23,6 @@ public class ExerciseStats extends DataTools {
     public ExerciseStats(String userId, String exerciseKey, ArrayList<Exercise> exercises) {
         super(userId, exerciseKey, exercises);
     }
+
+
 }

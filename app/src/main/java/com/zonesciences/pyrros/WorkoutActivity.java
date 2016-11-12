@@ -254,12 +254,14 @@ public class WorkoutActivity extends BaseActivity {
 
             } else {
                 Log.i(TAG, "Exercise history map already generated. Load stats fragment");
+
+                // Get active exercise and replace it in the list to pass up to date exercise list
+                // to stats fragment.
                 ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
                 Exercise currentExercise = currentFragment.getCurrentExercise();
                 mAllExercises = mAllExercisesMap.get(index);
                 int currentExerciseIndex = mAllExercises.size() - 1;
                 mAllExercises.set(currentExerciseIndex, currentExercise);
-
 
                 loadStatsFragment();
             }
