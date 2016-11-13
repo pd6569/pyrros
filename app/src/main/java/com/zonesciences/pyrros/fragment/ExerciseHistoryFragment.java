@@ -77,6 +77,8 @@ public class ExerciseHistoryFragment extends Fragment {
         mExerciseDates = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY_DATES);
         mExercises = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY);
 
+        //TODO: METHODS TO SORT DATA INTO REVERSE ORDER
+
         mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseDates, mExercises);
 
         Log.i(TAG, "Exercise history obtained. " + mExercises.size());
@@ -116,7 +118,7 @@ public class ExerciseHistoryFragment extends Fragment {
 
         switch(i){
             case R.id.action_reverse_order:
-                newestFirst = !newestFirst;
+                /*newestFirst = !newestFirst;
                 Log.i(TAG, "Reverse the order");
                 Collections.reverse(mExerciseDates);
                 Collections.reverse(mExercises);
@@ -126,7 +128,7 @@ public class ExerciseHistoryFragment extends Fragment {
                     item.setTitle(R.string.menu_oldest_first);
                 } else {
                     item.setTitle(R.string.menu_newest_first);
-                }
+                }*/
 
 
                 break;

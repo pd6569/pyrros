@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
+import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.HashMap;
@@ -80,15 +81,20 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     //Exercise object
     Exercise mExercise;
 
-    //Exercise history data
-    List<String> mExerciseHistoryDates;
-    List<Exercise> mExerciseHistory;
+    //Exercise history and stats
+    List<String> mStatsExerciseWorkoutKeys;
+    List<String> mStatsExerciseDates;
+    List<Exercise> mStatsExercises;
     Map<String, Exercise> mExerciseHistoryMap;
+    boolean mStatsDataLoaded;
 
     //Units and conversion
     String mUnitSystem;
     String mUnits;
     double mConversionMultiple;
+
+    //DataTools
+    DataTools mDataTools;
 
     public static ExerciseFragment newInstance(String exerciseKey, Exercise exercise, String workoutKey, String userId) {
         Bundle args = new Bundle();
@@ -115,6 +121,31 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mExercise = bundle.getParcelable(ARG_EXERCISE_OBJECT);
         mUser = bundle.getString(ARG_USER_ID);
         mCurrentSet = mExercise.getSets() + 1;
+
+        //Load data for exercise history and for statistics
+        mDataTools = new DataTools(mUser, mExerciseKey);
+        mDataTools.loadExercises(); //loads exercises AND workout keys
+        mDataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
+            @Override
+            public void onExercisesLoadComplete() {
+                Log.i(TAG, "Exercises and workout keys loaded");
+                mStatsExercises = mDataTools.getExercises();
+                mStatsExerciseWorkoutKeys = mDataTools.getWorkoutKeys();
+                mDataTools.loadWorkoutDates(mStatsExerciseWorkoutKeys);
+            }
+
+            @Override
+            public void onWorkoutDatesLoadComplete() {
+                Log.i(TAG, "Workout dates loaded");
+                mStatsExerciseDates = mDataTools.getExerciseDates();
+                mStatsDataLoaded = true;
+
+            }
+            @Override
+            public void onWorkoutKeysLoadComplete() {
+
+            }
+        });
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
@@ -338,17 +369,26 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public List<String> getExerciseHistoryDates() {
 
-        return mExerciseHistoryDates;
-    }
-
-    public List<Exercise> getExerciseHistory() {
-
-        return mExerciseHistory;
-    }
+    // Getters
 
     public Exercise getCurrentExercise(){
         return mExercise;
+    }
+
+    public List<String> getStatsExerciseWorkoutKeys() {
+        return mStatsExerciseWorkoutKeys;
+    }
+
+    public List<String> getStatsExerciseDates() {
+        return mStatsExerciseDates;
+    }
+
+    public List<Exercise> getStatsExercises() {
+        return mStatsExercises;
+    }
+
+    public boolean isStatsDataLoaded() {
+        return mStatsDataLoaded;
     }
 }

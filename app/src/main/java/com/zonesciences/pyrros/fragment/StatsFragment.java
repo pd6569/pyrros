@@ -27,6 +27,8 @@ public class StatsFragment extends Fragment {
     private static final String ARG_EXERCISE_KEY = "ExerciseKey";
     private static final String ARG_USER_ID = "UserId";
     private static final String ARG_EXERCISES = "Exercises";
+    private static final String ARG_WORKOUT_KEYS = "WorkoutKeys";
+    private static final String ARG_WORKOUT_DATES = "WorkoutDates";
 
     String mExerciseKey;
     String mUserId;
@@ -40,14 +42,20 @@ public class StatsFragment extends Fragment {
 
     //Data
     ArrayList<Exercise> mExercises = new ArrayList<>();
+    ArrayList<String> mWorkoutKeys;
+    ArrayList<String> mWorkoutDates;
+
 
     DataTools mDataTools;
 
-    public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises) {
+    public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
         args.putSerializable(ARG_EXERCISES, (Serializable) exercises);
+        args.putSerializable(ARG_WORKOUT_KEYS, workoutKeys);
+        args.putSerializable(ARG_WORKOUT_DATES, workoutDates);
+
         StatsFragment fragment = new StatsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -65,8 +73,10 @@ public class StatsFragment extends Fragment {
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mUserId = bundle.getString(ARG_USER_ID);
         mExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
+        mWorkoutKeys = (ArrayList) bundle.getSerializable(ARG_WORKOUT_KEYS);
+        mWorkoutDates = (ArrayList) bundle.getSerializable(ARG_WORKOUT_DATES);
 
-        mDataTools = new DataTools(mExerciseKey, mUserId, mExercises);
+        mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
 
     }
 
@@ -84,7 +94,7 @@ public class StatsFragment extends Fragment {
         mTotalReps = (TextView) rootView.findViewById(R.id.stats_total_reps);
         mTotalReps.setText("Total reps performed: " + mDataTools.totalReps());
 
-        mTotalVolume = (TextView) rootView.findViewById(R.id.stats_total_reps);
+        mTotalVolume = (TextView) rootView.findViewById(R.id.stats_total_volume);
         mTotalVolume.setText("Total volume: " + Utils.formatWeight(mDataTools.totalVolume()));
 
         return rootView;

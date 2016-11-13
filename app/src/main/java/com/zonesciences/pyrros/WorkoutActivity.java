@@ -168,7 +168,24 @@ public class WorkoutActivity extends BaseActivity {
 
         if (fragmentTag == "EXERCISE_HISTORY") {
 
-            //check if the history has already been viewed, if not load from firebase and store in hashmaps
+            ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+
+            if (currentFragment.isStatsDataLoaded()){
+                Log.i(TAG, "Stats data loaded for this exercise, create exercise history fragment and pass in data lists");
+
+                ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
+                ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+
+                mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises);
+                setFragment();
+
+            } else {
+                //TODO: show loading dialog and ask fragment to callback when data has loaded, proceed to load history fragment
+                Log.i(TAG, "Stats data has not finished loading, cannot load fragment");
+            }
+
+
+            /*//check if the history has already been viewed, if not load from firebase and store in hashmaps
             if (!mExerciseHistoryDatesMap.containsKey(index)) {
                 Log.i(TAG, "Exercise History fragment called. Dates map not created yet");
 
@@ -202,6 +219,11 @@ public class WorkoutActivity extends BaseActivity {
 
                     }
 
+                    @Override
+                    public void onWorkoutKeysLoadComplete() {
+
+                    }
+
                 });
             }
 
@@ -211,12 +233,35 @@ public class WorkoutActivity extends BaseActivity {
                 mExerciseHistoryDates = mExerciseHistoryDatesMap.get(index);
 
                 loadExerciseHistoryFragment();
-            }
+            }*/
         }
 
         else if (fragmentTag == "STATS") {
 
-            if (!mAllExercisesMap.containsKey(index)) {
+            Log.i(TAG, "Stats fragment called");
+
+            ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+            if (currentFragment.isStatsDataLoaded()){
+                Log.i(TAG, "Stats data loaded for this exercise, create stats fragment and pass in data lists");
+
+                // Get current exercise with up to dates sets/reps info and add it to list to pass for stats analysis
+                ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
+                Exercise currentExercise = currentFragment.getCurrentExercise();
+                ArrayList<Exercise> allExercises = exercises;
+                int currentExerciseIndex = allExercises.size() - 1;
+                allExercises.set(currentExerciseIndex, currentExercise);
+
+                ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
+                ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+
+                mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, allExercises, workoutKeys, workoutDates);
+                setFragment();
+            } else {
+                //TODO: show loading dialog and ask fragment to callback when data has loaded, proceed to load stats fragment
+                Log.i(TAG, "Stats data has not finished loading, cannot load fragment");
+            }
+
+            /*if (!mAllExercisesMap.containsKey(index)) {
                 Log.i(TAG, "Stats fragment called, all exercises map does not exist yet");
 
                 //start generating exercise stats
@@ -229,11 +274,16 @@ public class WorkoutActivity extends BaseActivity {
                         mAllExercises = dataTools.getExercises();
                         //store data to hashmap
                         mAllExercisesMap.put(index, mAllExercises);
-                        loadStatsFragment();
+                        dataTools.loadWorkoutDates(dataTools.getWorkoutKeys());
                     }
 
                     @Override
                     public void onWorkoutDatesLoadComplete() {
+                        loadStatsFragment();
+                    }
+
+                    @Override
+                    public void onWorkoutKeysLoadComplete() {
 
                     }
                 });
@@ -250,7 +300,7 @@ public class WorkoutActivity extends BaseActivity {
                 mAllExercises.set(currentExerciseIndex, currentExercise);
 
                 loadStatsFragment();
-            }
+            }*/
 
         } else if (fragmentTag == "FEEDBACK") {
                 if (mFeedbackFragment == null) {
@@ -321,13 +371,13 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     public void loadExerciseHistoryFragment(){
-        mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
-        setFragment();
+        /*mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, mExerciseHistoryDates, mExerciseHistory);
+        setFragment();*/
     }
 
     public void loadStatsFragment(){
-        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, (ArrayList<Exercise>)mAllExercises);
-        setFragment();
+        /*mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, (ArrayList<Exercise>)mAllExercises);
+        setFragment();*/
     }
 
     private void setFragment() {
