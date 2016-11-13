@@ -8,11 +8,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Peter on 12/11/2016.
@@ -32,6 +35,11 @@ public class DataTools {
 
     int mSets;
     int mReps;
+
+    Map<Exercise, List<Double>> mWeightsMap = new HashMap<>();
+    Map<Exercise, List<Integer>> mRepsMap = new HashMap<>();
+    Map<Exercise, List<Double>> mVolumeMap = new HashMap<>();
+    Map<String, String> mDatesMap = new HashMap<>();
 
     OnDataLoadCompleteListener mListener;
 
@@ -53,11 +61,13 @@ public class DataTools {
 
     // Methods for loading data from Firebase
 
+    //Load exercises and workout keys
     public void loadExercises() {
-
+        Log.i(TAG, "loadExercises()");
         mUserWorkoutExercisesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onDataChange");
                 for (DataSnapshot workout : dataSnapshot.getChildren()) {
 
                     for (DataSnapshot exercise : workout.getChildren()) {
@@ -138,6 +148,24 @@ public class DataTools {
         return mWorkoutKeys;
     }
 
+    // Maps
+    public void createWeightsRepsMaps(){
+
+        for (Exercise exercise: mExercises){
+
+            if (exercise.getSets() == 0) {
+                Log.i(TAG, "No sets recorded for this exercise");
+            } else {
+                List<Double> weightsList = (ArrayList) exercise.getWeight();
+                List<Integer> repsList = (ArrayList) exercise.getReps();
+
+                mWeightsMap.put(exercise, weightsList);
+                mRepsMap.put(exercise, repsList);
+            }
+        }
+
+    }
+
     // Methods for calculations
 
     public int totalSets(){
@@ -167,7 +195,7 @@ public class DataTools {
         return totalReps;
     }
 
-    public String totalVolume(){
+    public double totalVolume(){
 
         double totalVolume = 0;
 
@@ -178,17 +206,53 @@ public class DataTools {
             } else {
                 List<Double> weightsList = exercise.getWeight();
                 List<Integer> repsList = exercise.getReps();
-
+                List<Double> volumeList = new ArrayList<>();
                 for (int i = 0; i < weightsList.size(); i++){
                     double weight = weightsList.get(i);
                     int reps = repsList.get(i);
                     double setVolume = weight * reps;
+                    volumeList.add(setVolume);
                     Log.i(TAG, "Volume for this set = " + setVolume);
                     totalVolume = totalVolume + setVolume;
                 }
+                mVolumeMap.put(exercise, volumeList);
             }
         }
-        return Utils.formatWeight(totalVolume);
+        return totalVolume;
+    }
+
+    public Record oneRepMax(){
+
+        Double oneRepMax = 0.0;
+        Exercise recordExercise = new Exercise();
+        String workoutId = new String();
+        String date = new String();
+
+        for (Exercise exercise : mExercises){
+
+            List<Double> weightsList = exercise.getWeight();
+            List<Integer> repsList = exercise.getReps();
+
+            if (exercise.getSets() == 0) {
+                Log.i(TAG, "No sets recorded for this exercise");
+            } else {
+                for (int i = 0; i < weightsList.size(); i++){
+                    int rep = repsList.get(i);
+                    if (rep == 1){
+                        double weight = weightsList.get(i);
+                        if (weight > oneRepMax){
+                            oneRepMax = weight;
+                            recordExercise = exercise;
+                            int index = mExercises.indexOf(recordExercise);
+                            date = null;
+                            workoutId = mWorkoutKeys.get(index);
+                        }
+                    }
+                }
+            }
+        }
+
+        return new Record(recordExercise, oneRepMax, 1, workoutId, date);
     }
 
 

@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,6 +30,13 @@ public class StatsFragment extends Fragment {
 
     String mExerciseKey;
     String mUserId;
+
+    //View
+    TextView mTitle;
+    TextView mTotalSets;
+    TextView mTotalReps;
+    TextView mTotalVolume;
+    TextView mOneRepMax;
 
     //Data
     ArrayList<Exercise> mExercises = new ArrayList<>();
@@ -58,6 +67,7 @@ public class StatsFragment extends Fragment {
         mExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
 
         mDataTools = new DataTools(mExerciseKey, mUserId, mExercises);
+
     }
 
     @Override
@@ -65,17 +75,17 @@ public class StatsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.fragment_stats, container, false);
 
-        TextView title = (TextView) rootView.findViewById(R.id.stats_title);
-        title.setText("Showing stats for " + mExerciseKey);
+        mTitle = (TextView) rootView.findViewById(R.id.stats_title);
+        mTitle.setText("Showing stats for " + mExerciseKey);
 
-        TextView totalSets = (TextView) rootView.findViewById(R.id.stats_total_sets);
-        totalSets.setText("Total number of sets: " + mDataTools.totalSets());
+        mTotalSets = (TextView) rootView.findViewById(R.id.stats_total_sets);
+        mTotalSets.setText("Total number of sets: " + mDataTools.totalSets());
 
-        TextView totalReps = (TextView) rootView.findViewById(R.id.stats_total_reps);
-        totalReps.setText("Total reps performed: " + mDataTools.totalReps());
+        mTotalReps = (TextView) rootView.findViewById(R.id.stats_total_reps);
+        mTotalReps.setText("Total reps performed: " + mDataTools.totalReps());
 
-        TextView totalVolume = (TextView) rootView.findViewById(R.id.stats_total_volume);
-        totalVolume.setText("Total volume: " + mDataTools.totalVolume());
+        mTotalVolume = (TextView) rootView.findViewById(R.id.stats_total_reps);
+        mTotalVolume.setText("Total volume: " + Utils.formatWeight(mDataTools.totalVolume()));
 
         return rootView;
     }
