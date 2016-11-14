@@ -180,6 +180,8 @@ public class WorkoutActivity extends BaseActivity {
             } else {
                 //TODO: encapsulate this. check it works properly
                 Log.i(TAG, "Stats data has not finished loading, cannot load fragment");
+                // show progress dialog and set a listener on the current fragment to notify when data is ready and then load fragment
+
                 showProgressDialog();
                 currentFragment.setOnStatsDataLoadedListener(new ExerciseFragment.OnStatsDataLoaded() {
                     @Override
@@ -195,56 +197,6 @@ public class WorkoutActivity extends BaseActivity {
                 });
             }
 
-
-            /*//check if the history has already been viewed, if not load from firebase and store in hashmaps
-            if (!mExerciseHistoryDatesMap.containsKey(index)) {
-                Log.i(TAG, "Exercise History fragment called. Dates map not created yet");
-
-                //start loading exercise history
-                showProgressDialog();
-                dataTools.loadExercises();
-                dataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
-                    @Override
-                    public void onExercisesLoadComplete() {
-                        dataTools.loadWorkoutDates(dataTools.getWorkoutKeys());
-                    }
-
-                    @Override
-                    public void onWorkoutDatesLoadComplete() {
-                        Log.i(TAG, "Callback from loadWorkoutDates received");
-                        hideProgressDialog();
-                        mExerciseHistoryDates = dataTools.getExerciseDates();
-                        mExerciseHistory = dataTools.getExercises();
-                        mExerciseHistoryDates.remove(mExerciseHistory.size() - 1);
-                        mExerciseHistory.remove(mExerciseHistory.size() - 1);
-
-                        //puts newest exercises first by default
-                        Collections.reverse(mExerciseHistoryDates);
-                        Collections.reverse(mExerciseHistory);
-
-                        //store data to hashmap
-                        mExerciseHistoryDatesMap.put(index, mExerciseHistoryDates);
-                        mExerciseHistoryMap.put(index, mExerciseHistory);
-
-                        loadExerciseHistoryFragment();
-
-                    }
-
-                    @Override
-                    public void onWorkoutKeysLoadComplete() {
-
-                    }
-
-                });
-            }
-
-            else {
-                Log.i(TAG, "This exercise has already been viewed. Load history from map, not firebase ");
-                mExerciseHistory = mExerciseHistoryMap.get(index);
-                mExerciseHistoryDates = mExerciseHistoryDatesMap.get(index);
-
-                loadExerciseHistoryFragment();
-            }*/
         }
 
         else if (fragmentTag == "STATS") {
@@ -270,7 +222,9 @@ public class WorkoutActivity extends BaseActivity {
                 setFragment();
             } else {
                 //TODO: encapsulate this. check it works properly
-                Log.i(TAG, "Stats data has not finished loading, cannot load fragment");
+                Log.i(TAG, "Stats data has not finished loading, cannot load fragment yet");
+
+                // show progress dialog and set a listener on the current fragment to notify when data is ready and then load fragment
                 showProgressDialog();
                 currentFragment.setOnStatsDataLoadedListener(new ExerciseFragment.OnStatsDataLoaded() {
                     @Override
@@ -293,47 +247,6 @@ public class WorkoutActivity extends BaseActivity {
                 });
 
             }
-
-            /*if (!mAllExercisesMap.containsKey(index)) {
-                Log.i(TAG, "Stats fragment called, all exercises map does not exist yet");
-
-                //start generating exercise stats
-                showProgressDialog();
-                dataTools.loadExercises();
-                dataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
-                    @Override
-                    public void onExercisesLoadComplete() {
-                        hideProgressDialog();
-                        mAllExercises = dataTools.getExercises();
-                        //store data to hashmap
-                        mAllExercisesMap.put(index, mAllExercises);
-                        dataTools.loadWorkoutDates(dataTools.getWorkoutKeys());
-                    }
-
-                    @Override
-                    public void onWorkoutDatesLoadComplete() {
-                        loadStatsFragment();
-                    }
-
-                    @Override
-                    public void onWorkoutKeysLoadComplete() {
-
-                    }
-                });
-
-            } else {
-                Log.i(TAG, "Exercise history map already generated. Load stats fragment");
-
-                // Get active exercise and replace it in the list to pass up to date exercise list
-                // to stats fragment.
-                ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
-                Exercise currentExercise = currentFragment.getCurrentExercise();
-                mAllExercises = mAllExercisesMap.get(index);
-                int currentExerciseIndex = mAllExercises.size() - 1;
-                mAllExercises.set(currentExerciseIndex, currentExercise);
-
-                loadStatsFragment();
-            }*/
 
         } else if (fragmentTag == "FEEDBACK") {
                 if (mFeedbackFragment == null) {

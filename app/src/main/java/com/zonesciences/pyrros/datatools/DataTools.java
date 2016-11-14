@@ -255,39 +255,5 @@ public class DataTools {
         return totalVolume;
     }
 
-    public Record oneRepMax(){
-
-        Double oneRepMax = 0.0;
-        Exercise recordExercise = new Exercise();
-        String workoutId = new String();
-        String date = new String();
-
-        for (Exercise exercise : mExercises){
-
-            List<Double> weightsList = exercise.getWeight();
-            List<Integer> repsList = exercise.getReps();
-
-            if (exercise.getSets() == 0) {
-                Log.i(TAG, "No sets recorded for this exercise");
-            } else {
-                for (int i = 0; i < weightsList.size(); i++){
-                    int rep = repsList.get(i);
-                    if (rep == 1){
-                        double weight = weightsList.get(i);
-                        if (weight > oneRepMax){
-                            oneRepMax = weight;
-                            recordExercise = exercise;
-                            int index = mExercises.indexOf(recordExercise);
-                            date = null;
-                            workoutId = mWorkoutKeys.get(index);
-                        }
-                    }
-                }
-            }
-        }
-
-        return new Record(recordExercise, oneRepMax, 1, workoutId, date);
-    }
-
 
 }

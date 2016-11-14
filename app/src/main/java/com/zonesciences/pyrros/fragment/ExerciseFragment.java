@@ -143,6 +143,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
                 mStatsExerciseDates = mDataTools.getExerciseDates();
                 mStatsDataLoaded = true;
 
+                // only need to notify workout activity that data is loaded, if exercise fragments
+                // methods are being called before this data is loaded. In this case the listener
+                // will be set by the activity and will not be null.
+
                 if (mStatsDataLoadedListener != null) {
                     mStatsDataLoadedListener.statsDataLoaded();
                 }
@@ -284,8 +288,11 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         mSetNumberTitle.setText("Set " + Integer.toString(mCurrentSet));
 
+
+
         mExercise.addWeight(convertedWeight);
         mExercise.addReps(mReps);
+
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
         Map<String, Object> childUpdates = new HashMap<>();
@@ -294,6 +301,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mDatabase.updateChildren(childUpdates);
 
     }
+
+
 
     private void adjustWeight(int id) {
 
@@ -375,7 +384,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             mConversionMultiple = 0.453592;
         }
     }
-
 
     // Getters
 
