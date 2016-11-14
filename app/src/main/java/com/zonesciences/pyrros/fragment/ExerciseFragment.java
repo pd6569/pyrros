@@ -96,6 +96,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     //DataTools
     DataTools mDataTools;
 
+    //Listener
+    OnStatsDataLoaded mStatsDataLoadedListener;
+
     public static ExerciseFragment newInstance(String exerciseKey, Exercise exercise, String workoutKey, String userId) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
@@ -139,6 +142,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
                 Log.i(TAG, "Workout dates loaded");
                 mStatsExerciseDates = mDataTools.getExerciseDates();
                 mStatsDataLoaded = true;
+
+                if (mStatsDataLoadedListener != null) {
+                    mStatsDataLoadedListener.statsDataLoaded();
+                }
 
             }
             @Override
@@ -390,5 +397,15 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     public boolean isStatsDataLoaded() {
         return mStatsDataLoaded;
+    }
+
+    // Listener
+
+    public interface OnStatsDataLoaded {
+        void statsDataLoaded();
+    }
+
+    public void setOnStatsDataLoadedListener (OnStatsDataLoaded listener){
+        this.mStatsDataLoadedListener = listener;
     }
 }

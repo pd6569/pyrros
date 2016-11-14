@@ -164,11 +164,9 @@ public class WorkoutActivity extends BaseActivity {
         final int index = mExercisesViewPager.getCurrentItem();
         mExerciseKey = mExercisesList.get(index);
 
-        final DataTools dataTools = new DataTools(getUid(), mExerciseKey);
-
         if (fragmentTag == "EXERCISE_HISTORY") {
 
-            ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+            final ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
 
             if (currentFragment.isStatsDataLoaded()){
                 Log.i(TAG, "Stats data loaded for this exercise, create exercise history fragment and pass in data lists");
@@ -180,8 +178,21 @@ public class WorkoutActivity extends BaseActivity {
                 setFragment();
 
             } else {
-                //TODO: show loading dialog and ask fragment to callback when data has loaded, proceed to load history fragment
+                //TODO: encapsulate this. check it works properly
                 Log.i(TAG, "Stats data has not finished loading, cannot load fragment");
+                showProgressDialog();
+                currentFragment.setOnStatsDataLoadedListener(new ExerciseFragment.OnStatsDataLoaded() {
+                    @Override
+                    public void statsDataLoaded() {
+                        Log.i(TAG, "Callback now received from fragment, load complete, load stats");
+                        ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
+                        ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+
+                        mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises);
+                        setFragment();
+                        hideProgressDialog();
+                    }
+                });
             }
 
 
@@ -240,7 +251,8 @@ public class WorkoutActivity extends BaseActivity {
 
             Log.i(TAG, "Stats fragment called");
 
-            ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+            final ExerciseFragment currentFragment = mWorkoutExercisesAdapter.getFragment(index);
+
             if (currentFragment.isStatsDataLoaded()){
                 Log.i(TAG, "Stats data loaded for this exercise, create stats fragment and pass in data lists");
 
@@ -257,8 +269,29 @@ public class WorkoutActivity extends BaseActivity {
                 mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, allExercises, workoutKeys, workoutDates);
                 setFragment();
             } else {
-                //TODO: show loading dialog and ask fragment to callback when data has loaded, proceed to load stats fragment
+                //TODO: encapsulate this. check it works properly
                 Log.i(TAG, "Stats data has not finished loading, cannot load fragment");
+                showProgressDialog();
+                currentFragment.setOnStatsDataLoadedListener(new ExerciseFragment.OnStatsDataLoaded() {
+                    @Override
+                    public void statsDataLoaded() {
+                        Log.i(TAG, "Callback now received from fragment, load complete, load stats");
+                        // Get current exercise with up to dates sets/reps info and add it to list to pass for stats analysis
+                        ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
+                        Exercise currentExercise = currentFragment.getCurrentExercise();
+                        ArrayList<Exercise> allExercises = exercises;
+                        int currentExerciseIndex = allExercises.size() - 1;
+                        allExercises.set(currentExerciseIndex, currentExercise);
+
+                        ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
+                        ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+
+                        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, allExercises, workoutKeys, workoutDates);
+                        setFragment();
+                        hideProgressDialog();
+                    }
+                });
+
             }
 
             /*if (!mAllExercisesMap.containsKey(index)) {
@@ -314,7 +347,6 @@ public class WorkoutActivity extends BaseActivity {
         }
 
     }
-
 
     public void returnToWorkout(){
 

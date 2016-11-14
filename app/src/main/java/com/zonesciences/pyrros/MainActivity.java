@@ -71,13 +71,14 @@ public class MainActivity extends BaseActivity {
             loadLoginView();
         } else{
             mUserId = mFirebaseUser.getUid();
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
             mViewPager = (ViewPager) findViewById(R.id.viewpager_homescreen);
 
             mPagerAdapter = new FragmentHomescreenPagerAdapter(getSupportFragmentManager());
             mViewPager.setAdapter(mPagerAdapter);
 
-            PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
 
             //Set locations to keep in sync
             mDatabase.child("user-exercises").child(mUserId).keepSynced(true);
