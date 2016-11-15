@@ -32,6 +32,7 @@ public class DataTools {
     ArrayList<Exercise> mExercises = new ArrayList<>();
     ArrayList<String> mExerciseDates = new ArrayList<>();
     ArrayList<String> mWorkoutKeys = new ArrayList<>();
+    Record mExerciseRecord;
 
     int mSets;
     int mReps;
@@ -158,12 +159,30 @@ public class DataTools {
         });
     }
 
+    public void loadRecord(){
+
+        mUserWorkoutExercisesRef.getRoot().child("user-records").child(mUserId).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "Get record: " + dataSnapshot.getValue());
+                mExerciseRecord = dataSnapshot.getValue(Record.class);
+                mListener.onExerciseRecordLoadComplete();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     // Listener for load completion
     public interface OnDataLoadCompleteListener{
         public void onExercisesLoadComplete();
         public void onWorkoutDatesLoadComplete();
         public void onWorkoutKeysLoadComplete();
+        public void onExerciseRecordLoadComplete();
     }
 
     public void setOnDataLoadCompleteListener(OnDataLoadCompleteListener listener){
@@ -180,6 +199,14 @@ public class DataTools {
 
     public ArrayList<String> getWorkoutKeys() {
         return mWorkoutKeys;
+    }
+
+    public Record getExerciseRecord() { return mExerciseRecord; }
+
+    // Setters
+
+    public void setExerciseRecord(Record exerciseRecord) {
+        mExerciseRecord = exerciseRecord;
     }
 
     // Maps
@@ -255,5 +282,30 @@ public class DataTools {
         return totalVolume;
     }
 
+    public boolean isRecord(double weight, String reps){
+        boolean recordSet = false;
+        Map<String, Double> records = mExerciseRecord.getRecords();
+        if (records == null){
+            Log.i(TAG, "sets map not yet created");
+        } else {
+            if (records.containsKey(reps)) {
+                double oldWeight = records.get(reps);
+                Log.i(TAG, "This number of reps has been recorded before, and the weight lifted was: " + records.get(reps));
+                if(weight > oldWeight){
+                    Log.i(TAG, "New " + reps + " rep-max set");
+                    records.remove(reps);
+                    records.put(reps, weight);
+                    recordSet = true;
+                } else {
+                    Log.i(TAG, "No record set");
+                }
+            } else {
+                Log.i(TAG, "This number of reps has never been done before, add to record. New " + reps + " rep-max set");
+                mExerciseRecord.addSet(reps, weight);
+                recordSet = true;
+            }
+        }
+        return recordSet;
+    }
 
 }

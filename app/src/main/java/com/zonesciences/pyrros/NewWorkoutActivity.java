@@ -28,6 +28,8 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.adapters.ExercisesAdapter;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Record;
+import com.zonesciences.pyrros.models.Stats;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
 
@@ -75,6 +77,9 @@ public class NewWorkoutActivity extends BaseActivity {
     private ArrayList<String> mExerciseKeysList = new ArrayList<>();
 
     private String mExerciseKey = new String();
+
+    public Stats mStats;
+    public Record mRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -274,6 +279,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
             //create new exercise to add to user-exercises
             mExercise = new Exercise(userId, exercise);
+            mRecord = new Record(mExerciseKey, userId);
+
         } else {
             mExerciseKey = exerciseKey;
 
@@ -311,6 +318,8 @@ public class NewWorkoutActivity extends BaseActivity {
             childUpdates.put("/user-exercises/" + userId + "/" + mExerciseKey, mExercise);
             childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
             childUpdates.put("/user-workout-exercises/" + userId + "/" + mWorkoutKey +"/" + mExerciseKey, mExercise);
+            childUpdates.put("/user-records/" + userId + "/" + mExerciseKey, mRecord);
+            childUpdates.put("/records/" + mExerciseKey + "/" + userId, mRecord);
         }
         mDatabase.updateChildren(childUpdates);
 
@@ -336,13 +345,14 @@ public class NewWorkoutActivity extends BaseActivity {
                 Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
                 mUserExerciseKeys.add(exercise);
                 mExercise = new Exercise(userId, exercise);
-                /*mDatabase.child("user-exercises").child(userId).child(mExerciseKey).setValue(mExercise);
-                mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
-                mDatabase.child("user-workout-exercises/").child(userId).child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());*/
+                mRecord = new Record(mExerciseKey, userId);
+
                 Map <String, Object> childUpdates = new HashMap<>();
                 childUpdates.put("user-exercises/" + userId + "/" + mExerciseKey, mExercise);
                 childUpdates.put("workout-exercises/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
                 childUpdates.put("user-workout-exercises/" + userId + "/" + mWorkoutKey + "/" + mExerciseKey, mExercise);
+                childUpdates.put("user-records/" + userId + "/" + mExerciseKey, mRecord);
+                childUpdates.put("/records/" + mExerciseKey + "/" + userId, mRecord);
                 mDatabase.updateChildren(childUpdates);
 
 

@@ -5,7 +5,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
               android:background="#ffffff"
-              android:weightSum="3"
+              android:weightSum="3.5"
             android:padding="5dp">
     <TextView
         android:id="@+id/textview_set_number"
@@ -26,6 +26,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        />
+
+    <ImageView
+        android:id="@+id/imageview_new_record"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
         />
 
 </LinearLayout>

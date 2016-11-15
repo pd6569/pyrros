@@ -4,6 +4,7 @@ package com.zonesciences.pyrros.fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -28,6 +29,7 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
 import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Record;
 
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +90,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     Map<String, Exercise> mExerciseHistoryMap;
     boolean mStatsDataLoaded;
 
+    //Exercise records
+    Record mRecord;
+
     //Units and conversion
     String mUnitSystem;
     String mUnits;
@@ -128,6 +133,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         //Load data for exercise history and for statistics
         mDataTools = new DataTools(mUser, mExerciseKey);
         mDataTools.loadExercises(); //loads exercises AND workout keys
+        mDataTools.loadRecord();
         mDataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
             @Override
             public void onExercisesLoadComplete() {
@@ -156,7 +162,21 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             public void onWorkoutKeysLoadComplete() {
 
             }
+
+            @Override
+            public void onExerciseRecordLoadComplete() {
+                Log.i(TAG, "Exercise record loaded");
+                mRecord = mDataTools.getExerciseRecord();
+                if (mRecord == null){
+                    Log.i(TAG, "mRecord is null");
+                    mRecord = new Record(mExerciseKey, mUser);
+                    mDataTools.setExerciseRecord(mRecord);
+                }
+            }
         });
+
+        //Load records for exercise
+
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mExerciseReference = mDatabase.child("workout-exercises").child(mWorkoutKey).child(mExerciseKey);
@@ -288,16 +308,21 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         mSetNumberTitle.setText("Set " + Integer.toString(mCurrentSet));
 
-
-
         mExercise.addWeight(convertedWeight);
         mExercise.addReps(mReps);
+
+
 
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
         childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
+        if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps) + " rep-max")){
+            Log.i(TAG, "Record set, write to database");
+            childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mDataTools.getExerciseRecord());
+            childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mDataTools.getExerciseRecord());
+        }
         mDatabase.updateChildren(childUpdates);
 
     }
