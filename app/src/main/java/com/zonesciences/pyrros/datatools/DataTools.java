@@ -296,7 +296,6 @@ public class DataTools {
                 if(weight > oldWeight){
                     Log.i(TAG, "New " + reps + " rep-max set");
 
-
                     //update record
                     mExerciseRecord.getRecords().get(key).add(weight);
 

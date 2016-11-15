@@ -212,7 +212,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     public void onItemDismiss(int position) {
 
         mMoved = false;
-
+        removeFromRecords(mWeightList.get(position), mRepsList.get(position));
         mWeightList.remove(position);
         mRepsList.remove(position);
 
@@ -230,6 +230,46 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         mSetsListener.onSetsChanged();
     }
 
+    private void removeFromRecords(final Double weight, final Long reps) {
+        mExerciseReference.getRoot().child("user-records").child(mUser).child(mExerciseReference.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Record record = dataSnapshot.getValue(Record.class);
+                String key = Long.toString(reps) + " rep-max";
+                Log.i(TAG, "Record to check before removing " + key + " for exercise: " + record.exerciseKey);
+                if (record.getRecords().containsKey(key) && record.getRecords().get(key).contains(weight) ){
+                    int index = record.getRecords().get(key).indexOf(weight);
+                    Log.i(TAG, "Set being removed matches record, stored at index " + index);
+                    Log.i(TAG, "Record being removed was set in workout " + record.getWorkoutKey().get(key).get(index));
+                    if (record.getWorkoutKey().get(key).get(index).equals(mWorkoutKey)){
+
+                        Log.i(TAG, "frequency of weight in this workout = " + Collections.frequency(mWeightList, weight));
+                        if (Collections.frequency(mWeightList, weight) == 0) {
+                            Log.i(TAG, "Set being removed matches record AND it was set in this workout");
+
+                            record.getRecords().get(key).remove(weight);
+                            record.getDate().get(key).remove(index);
+                            record.getWorkoutKey().get(key).remove(index);
+
+                            Map<String, Object> childUpdates = new HashMap<>();
+                            childUpdates.put("/user-records/" + mUser + "/" + mExerciseReference.getKey(), record);
+                            childUpdates.put("/records/" + mExerciseReference.getKey() + "/" + mUser, record);
+                            mExerciseReference.getRoot().updateChildren(childUpdates);
+                            mSetsListener.onRecordChanged();
+                        }
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     @Override
     public void onMoveCompleted() {
         if (mMoved) {
@@ -241,6 +281,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     //listener to update fragment which contains exercise object with working sets
     public interface SetsListener{
         public void onSetsChanged();
+        public void onRecordChanged();
     }
 
     public void setSetsListener (SetsListener listener){

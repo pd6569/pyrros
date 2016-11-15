@@ -195,6 +195,33 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             public void onSetsChanged() {
                 getExercise();
             }
+
+            @Override
+            public void onRecordChanged(){
+                Log.i(TAG, "Callback received from sets adapter, record has been changed, so update record variable with latest data");
+                mDataTools.loadRecord();
+                mDataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
+                    @Override
+                    public void onExercisesLoadComplete() {
+
+                    }
+
+                    @Override
+                    public void onWorkoutDatesLoadComplete() {
+
+                    }
+
+                    @Override
+                    public void onWorkoutKeysLoadComplete() {
+
+                    }
+
+                    @Override
+                    public void onExerciseRecordLoadComplete() {
+                        mRecord = mDataTools.getExerciseRecord();
+                    }
+                });
+            }
         });
 
         mSetsAdapter.notifyDataSetChanged();
@@ -314,8 +341,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         boolean record = false;
        if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps), mWorkoutKey)){
            record = true;
-
         }
+
+        mRecord = mDataTools.getExerciseRecord();
 
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
@@ -324,8 +352,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
         if (record){
             Log.i(TAG, "Record set, write to database");
-            childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mDataTools.getExerciseRecord());
-            childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mDataTools.getExerciseRecord());
+            childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mRecord);
+            childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mRecord);
         }
         mDatabase.updateChildren(childUpdates);
 
