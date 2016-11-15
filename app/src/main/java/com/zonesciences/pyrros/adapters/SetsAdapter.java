@@ -212,7 +212,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     public void onItemDismiss(int position) {
 
         mMoved = false;
-        removeFromRecords(mWeightList.get(position), mRepsList.get(position));
+
+        removeFromRecords(mWeightList.get(position), mRepsList.get(position)); // check if the set thats being dismissed is a record
+
         mWeightList.remove(position);
         mRepsList.remove(position);
 
@@ -230,22 +232,27 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         mSetsListener.onSetsChanged();
     }
 
+    //if the set is a record, remove it from records
     private void removeFromRecords(final Double weight, final Long reps) {
         mExerciseReference.getRoot().child("user-records").child(mUser).child(mExerciseReference.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Record record = dataSnapshot.getValue(Record.class);
                 String key = Long.toString(reps) + " rep-max";
-                Log.i(TAG, "Record to check before removing " + key + " for exercise: " + record.exerciseKey);
+
+                //is an identical set found in the records
                 if (record.getRecords().containsKey(key) && record.getRecords().get(key).contains(weight) ){
+
                     int index = record.getRecords().get(key).indexOf(weight);
-                    Log.i(TAG, "Set being removed matches record, stored at index " + index);
-                    Log.i(TAG, "Record being removed was set in workout " + record.getWorkoutKey().get(key).get(index));
+
+                    // get the workout in which this record was set, and check that it is the current workout.
+                    // if it isn't then the record was set in another workout and it cannot be removed from the record list!
                     if (record.getWorkoutKey().get(key).get(index).equals(mWorkoutKey)){
 
-                        Log.i(TAG, "frequency of weight in this workout = " + Collections.frequency(mWeightList, weight));
+                        // the record may be set in this workout, and it may have been done multiple times
+                        // do not want to remove the record if user removes one of the sets that equals the records.
+                        // Only remove from the records if it is the ONLY set in the workout matching the record.
                         if (Collections.frequency(mWeightList, weight) == 0) {
-                            Log.i(TAG, "Set being removed matches record AND it was set in this workout");
 
                             record.getRecords().get(key).remove(weight);
                             record.getDate().get(key).remove(index);

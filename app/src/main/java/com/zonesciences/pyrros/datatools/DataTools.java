@@ -282,6 +282,8 @@ public class DataTools {
         return totalVolume;
     }
 
+
+    //checks if weight lifted is a record, if so, updates the database with the new record
     public boolean isRecord(double weight, String reps, String workoutKey){
         boolean recordSet = false;
         String key = reps + " rep-max";
