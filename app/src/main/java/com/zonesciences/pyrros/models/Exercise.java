@@ -104,6 +104,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         this.order = order;
     }
 
+
     @Exclude
     public void addWeight(Double newWeight){
         if(weight == null){

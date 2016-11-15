@@ -14,11 +14,11 @@ public class Record {
     //key for maps is the rep-max record, e.g. "1 rep-max"
 
     public String exerciseKey;
-    public Map<String, String> workoutKey = new HashMap<>();
+    public Map<String, List<String>> workoutKey = new HashMap<>();
     public String userId;
-    public Map<String, Double> records = new HashMap<>();
-    public Map<String, String> date = new HashMap<>();
-    public Map<String, Boolean> verified = new HashMap<>();
+    public Map<String, List<Double>> records = new HashMap<>();
+    public Map<String, List<String>> date = new HashMap<>();
+    public Map<String, List<Boolean>> verified = new HashMap<>();
 
     public Record(){
         // Default constructor required for calls to DataSnapshot.getValue(Record.class)
@@ -29,7 +29,7 @@ public class Record {
         this.userId = userId;
     }
 
-    public Record (String exerciseKey, Map<String, String> workoutKey, String userId, Map <String, Double> records, Map<String, String> date, Map<String, Boolean> verified){
+    public Record (String exerciseKey, Map<String, List<String>> workoutKey, String userId, Map<String, List<Double>> records, Map<String, List<String>> date, Map<String, List<Boolean>> verified){
         this.exerciseKey = exerciseKey;
         this.workoutKey = workoutKey;
         this.userId = userId;
@@ -44,7 +44,7 @@ public class Record {
     }
 
     @Exclude
-    public Map<String, String> getWorkoutKey() {
+    public Map<String, List<String>> getWorkoutKey() {
         return workoutKey;
     }
 
@@ -54,17 +54,17 @@ public class Record {
     }
 
     @Exclude
-    public Map<String, Double> getRecords() {
+    public Map<String, List<Double>> getRecords() {
         return records;
     }
 
     @Exclude
-    public Map<String, String> getDate() {
+    public Map<String, List<String>> getDate() {
         return date;
     }
 
     @Exclude
-    public Map<String, Boolean> isVerified() {
+    public Map<String, List<Boolean>> getVerified() {
         return verified;
     }
 

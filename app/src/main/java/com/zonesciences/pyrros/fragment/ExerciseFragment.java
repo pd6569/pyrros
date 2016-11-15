@@ -311,14 +311,18 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mExercise.addWeight(convertedWeight);
         mExercise.addReps(mReps);
 
+        boolean record = false;
+       if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps), mWorkoutKey)){
+           record = true;
 
+        }
 
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
         childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
-        if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps), mWorkoutKey)){
+        if (record){
             Log.i(TAG, "Record set, write to database");
             childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mDataTools.getExerciseRecord());
             childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mDataTools.getExerciseRecord());

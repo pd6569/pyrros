@@ -14,8 +14,10 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
@@ -210,6 +212,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     public void onItemDismiss(int position) {
 
         mMoved = false;
+
         mWeightList.remove(position);
         mRepsList.remove(position);
 
@@ -244,4 +247,27 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         this.mSetsListener = listener;
     }
 
+    /*private void removeRecord(final double weight, final long reps){
+        mExerciseReference.getRoot().child("user-records").child(mUser).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Record record = dataSnapshot.getValue(Record.class);
+                String key = Long.toString(reps) + " rep-max";
+                Log.i(TAG, "Record to check before removing " + key + " for exercise: " + record.exerciseKey);
+                if (record.getRecords().containsKey(key) && record.getRecords().get(key) == weight){
+                    Log.i(TAG, "The record being removed was set in this workout");
+                    record.getRecords().remove(key);
+
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, record);
+                    mExerciseReference.getRoot().updateChildren(childUpdates);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }*/
 }

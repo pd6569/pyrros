@@ -285,27 +285,26 @@ public class DataTools {
     public boolean isRecord(double weight, String reps, String workoutKey){
         boolean recordSet = false;
         String key = reps + " rep-max";
-        Map<String, Double> records = mExerciseRecord.getRecords();
+        Map<String, List<Double>> records = mExerciseRecord.getRecords();
         if (records == null){
             Log.i(TAG, "sets map not yet created");
         } else {
             if (records.containsKey(key)) {
-                double oldWeight = records.get(key);
-                Log.i(TAG, "This number of reps has been recorded before, and the weight lifted was: " + records.get(reps));
+                int index = records.get(key).size() - 1;
+                double oldWeight = records.get(key).get(index);
+                Log.i(TAG, "This number of reps has been recorded before, and the weight lifted was: " + records.get(key).get(index));
                 if(weight > oldWeight){
                     Log.i(TAG, "New " + reps + " rep-max set");
 
-                    //replace record
-                    mExerciseRecord.getRecords().remove(key);
-                    mExerciseRecord.getRecords().put(key, weight);
+
+                    //update record
+                    mExerciseRecord.getRecords().get(key).add(weight);
 
                     //update record date
-                    mExerciseRecord.getDate().remove(key);
-                    mExerciseRecord.getDate().put(key, Utils.getClientTimeStamp(true));
+                    mExerciseRecord.getDate().get(key).add(Utils.getClientTimeStamp(true));
 
                     //update workout key
-                    mExerciseRecord.getWorkoutKey().remove(key);
-                    mExerciseRecord.getWorkoutKey().put(key, workoutKey);
+                    mExerciseRecord.getWorkoutKey().get(key).add(workoutKey);
 
                     recordSet = true;
                 } else {
@@ -313,9 +312,19 @@ public class DataTools {
                 }
             } else {
                 Log.i(TAG, "This number of reps has never been done before, add to record. New " + reps + " rep-max set");
-                records.put(key, weight);
-                mExerciseRecord.getDate().put(key, Utils.getClientTimeStamp(true));
-                mExerciseRecord.getWorkoutKey().put(key, workoutKey);
+                List<Double> weightList = new ArrayList<>();
+                weightList.add(weight);
+
+                List<String> dateList = new ArrayList<>();
+                dateList.add(Utils.getClientTimeStamp(true));
+
+                List<String> workoutKeyList = new ArrayList<>();
+                workoutKeyList.add(workoutKey);
+
+                mExerciseRecord.getRecords().put(key, weightList);
+                mExerciseRecord.getDate().put(key, dateList);
+                mExerciseRecord.getWorkoutKey().put(key, workoutKeyList);
+
                 recordSet = true;
             }
         }
