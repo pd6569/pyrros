@@ -11,12 +11,14 @@ import java.util.Map;
  */
 public class Record {
 
+    //key for maps is the rep-max record, e.g. "1 rep-max"
+
     public String exerciseKey;
-    public List<String> workoutKey;
+    public Map<String, String> workoutKey = new HashMap<>();
     public String userId;
     public Map<String, Double> records = new HashMap<>();
-    public List<String> date;
-    public List<Boolean> verified;
+    public Map<String, String> date = new HashMap<>();
+    public Map<String, Boolean> verified = new HashMap<>();
 
     public Record(){
         // Default constructor required for calls to DataSnapshot.getValue(Record.class)
@@ -27,7 +29,7 @@ public class Record {
         this.userId = userId;
     }
 
-    public Record (String exerciseKey, List<String> workoutKey, String userId, Map <String, Double> records, List<String> date, List<Boolean> verified){
+    public Record (String exerciseKey, Map<String, String> workoutKey, String userId, Map <String, Double> records, Map<String, String> date, Map<String, Boolean> verified){
         this.exerciseKey = exerciseKey;
         this.workoutKey = workoutKey;
         this.userId = userId;
@@ -42,7 +44,7 @@ public class Record {
     }
 
     @Exclude
-    public List<String> getWorkoutKey() {
+    public Map<String, String> getWorkoutKey() {
         return workoutKey;
     }
 
@@ -57,20 +59,13 @@ public class Record {
     }
 
     @Exclude
-    public List<String> getDate() {
+    public Map<String, String> getDate() {
         return date;
     }
 
     @Exclude
-    public List<Boolean> isVerified() {
+    public Map<String, Boolean> isVerified() {
         return verified;
     }
 
-    @Exclude
-    public void addSet(String reps, double weight){
-        if (records == null){
-            records = new HashMap<>();
-        }
-        records.put(reps, weight);
-    }
 }

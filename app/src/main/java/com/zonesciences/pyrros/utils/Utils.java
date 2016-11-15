@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -46,5 +47,16 @@ public class Utils {
             Log.i(TAG, "Failed to parse date: " + e);
         }
         return newDate;
+    }
+
+    public static String getClientTimeStamp(boolean includeTime){
+        SimpleDateFormat df;
+        if (includeTime) {
+            df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+        } else {
+            df = new SimpleDateFormat("EEE, dd MMM");
+        }
+        String date = df.format(Calendar.getInstance().getTime());
+        return date;
     }
 }

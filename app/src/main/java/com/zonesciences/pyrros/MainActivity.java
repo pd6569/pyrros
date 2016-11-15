@@ -192,6 +192,8 @@ public class MainActivity extends BaseActivity {
                     purgeDatabase.put("/workout-exercises/", null);
                     purgeDatabase.put("/user-workout-exercises/", null);
                     purgeDatabase.put("/workouts/", null);
+                    purgeDatabase.put("/user-records/", null);
+                    purgeDatabase.put("/records/", null);
                     mDatabase.updateChildren(purgeDatabase);
                 } else {
                     Toast.makeText(getApplicationContext(), "You are not an admin, motherfucker", Toast.LENGTH_SHORT).show();

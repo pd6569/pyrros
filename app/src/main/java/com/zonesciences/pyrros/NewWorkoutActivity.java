@@ -32,6 +32,7 @@ import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.models.Stats;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -303,9 +304,9 @@ public class NewWorkoutActivity extends BaseActivity {
         }
 
         //Set Default workout title
-        String title = new String("" + getClientTimeStamp(false));
+        String title = new String("" + Utils.getClientTimeStamp(false));
 
-        mCurrentWorkout = new Workout(userId, username, getClientTimeStamp(true), title, new Boolean(true));
+        mCurrentWorkout = new Workout(userId, username, Utils.getClientTimeStamp(true), title, new Boolean(true));
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();
 
         //Create map object to push multiple updates to multiple nodes
@@ -405,17 +406,6 @@ public class NewWorkoutActivity extends BaseActivity {
         }
     }
 
-
-    private String getClientTimeStamp(boolean includeTime){
-        SimpleDateFormat df;
-        if (includeTime) {
-            df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
-        } else {
-            df = new SimpleDateFormat("EEE, dd MMM");
-        }
-            String date = df.format(Calendar.getInstance().getTime());
-        return date;
-    }
 
     private void updateNumExercises() {
         Map<String, Object> childUpdates = new HashMap<String, Object>();

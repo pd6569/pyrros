@@ -282,26 +282,40 @@ public class DataTools {
         return totalVolume;
     }
 
-    public boolean isRecord(double weight, String reps){
+    public boolean isRecord(double weight, String reps, String workoutKey){
         boolean recordSet = false;
+        String key = reps + " rep-max";
         Map<String, Double> records = mExerciseRecord.getRecords();
         if (records == null){
             Log.i(TAG, "sets map not yet created");
         } else {
-            if (records.containsKey(reps)) {
-                double oldWeight = records.get(reps);
+            if (records.containsKey(key)) {
+                double oldWeight = records.get(key);
                 Log.i(TAG, "This number of reps has been recorded before, and the weight lifted was: " + records.get(reps));
                 if(weight > oldWeight){
                     Log.i(TAG, "New " + reps + " rep-max set");
-                    records.remove(reps);
-                    records.put(reps, weight);
+
+                    //replace record
+                    mExerciseRecord.getRecords().remove(key);
+                    mExerciseRecord.getRecords().put(key, weight);
+
+                    //update record date
+                    mExerciseRecord.getDate().remove(key);
+                    mExerciseRecord.getDate().put(key, Utils.getClientTimeStamp(true));
+
+                    //update workout key
+                    mExerciseRecord.getWorkoutKey().remove(key);
+                    mExerciseRecord.getWorkoutKey().put(key, workoutKey);
+
                     recordSet = true;
                 } else {
                     Log.i(TAG, "No record set");
                 }
             } else {
                 Log.i(TAG, "This number of reps has never been done before, add to record. New " + reps + " rep-max set");
-                mExerciseRecord.addSet(reps, weight);
+                records.put(key, weight);
+                mExerciseRecord.getDate().put(key, Utils.getClientTimeStamp(true));
+                mExerciseRecord.getWorkoutKey().put(key, workoutKey);
                 recordSet = true;
             }
         }
