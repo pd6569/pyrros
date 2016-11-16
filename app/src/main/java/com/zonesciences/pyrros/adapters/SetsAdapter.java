@@ -82,7 +82,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "onChildAdded called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
+
                 if (dataSnapshot.getKey().equals("weight")){
 
                     //convert list stored on firebase to list of doubles
@@ -90,7 +90,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                     List list = (List) dataSnapshot.getValue();
                     List<Double> weightList= new ArrayList<>();
                     for (Object weight : list){
-                        Log.i(TAG, "This weight is of class: " + weight.getClass());
+
                         if(weight instanceof Long){
                             long l = (long) weight;
                             weight = (double) l;
@@ -98,10 +98,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                         weightList.add((double) weight);
                     }
                     mWeightList = weightList;
-                    Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
+
                 } else if (dataSnapshot.getKey().equals("reps")){
                     mRepsList = (List)dataSnapshot.getValue();
-                    Log.i(TAG, "datasnapshot key = reps. containing values " + dataSnapshot.getValue() + " mRepsList: " + mRepsList);
+
                 }
                 notifyDataSetChanged();
             }
@@ -109,14 +109,13 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             //TODO: Clean up this method
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "onChildChanged called key: " + dataSnapshot.getKey() + " Value: " + dataSnapshot.getValue());
 
                 //Check if the change being made is removal/addition of set. If set is simply being reorder, then do nothing.
                     if (dataSnapshot.getKey() == "weight") {
-                        Log.i(TAG, "mWeighlist = " + mWeightList.size() + " children count for weight = " + dataSnapshot.getChildrenCount());
+
                         if (mWeightList.size() != dataSnapshot.getChildrenCount()) {
                             mWeightList = (List) dataSnapshot.getValue();
-                            Log.i(TAG, "datasnapshot key = weight. containing values " + dataSnapshot.getValue() + " mWeightList: " + mWeightList);
+
                             notifyDataSetChanged();
                         } else {
                             //do nothing
@@ -124,7 +123,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                     } else if (dataSnapshot.getKey() == "reps") {
                         if (mRepsList.size() != dataSnapshot.getChildrenCount()) {
                             mRepsList = (List) dataSnapshot.getValue();
-                            Log.i(TAG, "datasnapshot key = reps. containing values " + dataSnapshot.getValue() + " mRepsList: " + mRepsList);
+
                             notifyDataSetChanged();
                         } else {
                             // do nothing
@@ -134,18 +133,18 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "onChildRemoved called at reference: " + mExerciseReference.toString());
+
 
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "onChildMoved called at reference: " + mExerciseReference.toString());
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.i(TAG, "onChildCancelled called at reference: " + mExerciseReference.toString());
+
             }
         };
 
@@ -234,6 +233,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     //if the set is a record, remove it from records
     private void removeFromRecords(final Double weight, final Long reps) {
+        Log.i(TAG, "removeFromRecords called");
         mExerciseReference.getRoot().child("user-records").child(mUser).child(mExerciseReference.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -252,7 +252,8 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                         // the record may be set in this workout, and it may have been done multiple times
                         // do not want to remove the record if user removes one of the sets that equals the records.
                         // Only remove from the records if it is the ONLY set in the workout matching the record.
-                        if (Collections.frequency(mWeightList, weight) == 0) {
+
+                        if (getMatchingSets(weight, reps) == 0) {
 
                             record.getRecords().get(key).remove(weight);
                             record.getDate().get(key).remove(index);
@@ -277,6 +278,23 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         });
     }
 
+    private int getMatchingSets(Double weight, Long reps) {
+        int matches = 0;
+        Log.i(TAG, "Checking if any matches for set with weight = " + weight + " and reps = " + reps + " mWeightList size = " + mWeightList.size());
+        for (int i = 0; i < mWeightList.size(); i++){
+            Log.i(TAG, "weight = " + weight);
+            Log.i(TAG, "mWeightList.get(" + i + ")" + mWeightList.get(i));
+            if (mWeightList.get(i).equals(weight)){
+                Log.i(TAG, "Found matching weight in set");
+                if (mRepsList.get(i).equals(reps)){
+                    Log.i(TAG, "This set contains the same number of weight and reps, therefore equals the record");
+                    matches++;
+                }
+            }
+        }
+        return matches;
+    }
+
     @Override
     public void onMoveCompleted() {
         if (mMoved) {
@@ -295,27 +313,4 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         this.mSetsListener = listener;
     }
 
-    /*private void removeRecord(final double weight, final long reps){
-        mExerciseReference.getRoot().child("user-records").child(mUser).child(mExerciseKey).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Record record = dataSnapshot.getValue(Record.class);
-                String key = Long.toString(reps) + " rep-max";
-                Log.i(TAG, "Record to check before removing " + key + " for exercise: " + record.exerciseKey);
-                if (record.getRecords().containsKey(key) && record.getRecords().get(key) == weight){
-                    Log.i(TAG, "The record being removed was set in this workout");
-                    record.getRecords().remove(key);
-
-                    Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, record);
-                    mExerciseReference.getRoot().updateChildren(childUpdates);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }*/
 }
