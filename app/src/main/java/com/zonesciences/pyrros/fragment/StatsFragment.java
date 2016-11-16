@@ -42,6 +42,12 @@ public class StatsFragment extends Fragment {
     TextView mTotalReps;
     TextView mTotalVolume;
     TextView mHeaviestWeightLifted;
+    TextView mOneRepMax;
+    TextView mThreeRepMax;
+    TextView mFiveRepMax;
+    TextView mTenRepMax;
+    TextView mNumSessions;
+    TextView mSetsPerSession;
 
     //Data
     ArrayList<Exercise> mExercises = new ArrayList<>();
@@ -129,6 +135,12 @@ public class StatsFragment extends Fragment {
 
         mHeaviestWeightLifted = (TextView) rootView.findViewById(R.id.stats_heaviest_weight_lifted);
         mHeaviestWeightLifted.setText(Utils.formatWeight((Double) mHeaviestWeightMap.get("weight") * mConversionMultiple) + mUnit + " x " + reps + "\n" + Utils.formatDate(date));
+
+        mNumSessions = (TextView) rootView.findViewById(R.id.stats_number_of_sessions);
+        mNumSessions.setText("" + mDataTools.getExercises().size());
+
+        mSetsPerSession = (TextView) rootView.findViewById(R.id.stats_sets_per_session);
+        mSetsPerSession.setText("" + mDataTools.totalSets()/mDataTools.getExercises().size());
 
         return rootView;
     }
