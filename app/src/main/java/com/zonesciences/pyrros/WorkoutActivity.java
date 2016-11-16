@@ -214,26 +214,9 @@ public class WorkoutActivity extends BaseActivity {
                 // Get the currentExercise with up to date number of sets - this may be an old workout that is being viewed, or the latest workout
                 // Replace this specific exercise in the exercise list with the up to date information
 
+                loadStatsFragment(currentFragment);
 
-                Exercise currentExercise = currentFragment.getCurrentExercise();
 
-                ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
-
-                for (int i = 0; i < exercises.size(); i++){
-                    Exercise e = exercises.get(i);
-                    if (e.getExerciseId().equals(currentExercise.getExerciseId())){
-                        Log.i(TAG, "Found matching exercise in list with id: " + e.getExerciseId() + " At index: " + i + " Weights lifted: " + e.getWeight());
-                        exercises.set(i, currentExercise);
-                        Log.i(TAG, "Replaced with current Exercise parameters: " + exercises.get(i).getWeight());
-                        break;
-                    }
-                }
-
-                ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
-                ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
-
-                mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, exercises, workoutKeys, workoutDates);
-                setFragment();
             } else {
 
                 Log.i(TAG, "Stats data has not finished loading, cannot load fragment yet");
@@ -246,18 +229,7 @@ public class WorkoutActivity extends BaseActivity {
                     @Override
                     public void statsDataLoaded() {
                         Log.i(TAG, "Callback now received from fragment, load complete, load stats");
-                        // Get current exercise with up to dates sets/reps info and add it to list to pass for stats analysis
-                        ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
-                        Exercise currentExercise = currentFragment.getCurrentExercise();
-                        ArrayList<Exercise> allExercises = exercises;
-                        int currentExerciseIndex = allExercises.size() - 1;
-                        allExercises.set(currentExerciseIndex, currentExercise);
-
-                        ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
-                        ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
-
-                        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, allExercises, workoutKeys, workoutDates);
-                        setFragment();
+                        loadStatsFragment(currentFragment);
                         hideProgressDialog();
                     }
                 });
@@ -337,6 +309,28 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     public void loadStatsFragment(ExerciseFragment fragment){
+
+        ExerciseFragment currentFragment = fragment;
+
+        Exercise currentExercise = currentFragment.getCurrentExercise();
+
+        ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
+
+        for (int i = 0; i < exercises.size(); i++){
+            Exercise e = exercises.get(i);
+            if (e.getExerciseId().equals(currentExercise.getExerciseId())){
+                Log.i(TAG, "Found matching exercise in list with id: " + e.getExerciseId() + " At index: " + i + " Weights lifted: " + e.getWeight());
+                exercises.set(i, currentExercise);
+                Log.i(TAG, "Replaced with current Exercise parameters: " + exercises.get(i).getWeight());
+                break;
+            }
+        }
+
+        ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
+        ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+
+        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, exercises, workoutKeys, workoutDates);
+        setFragment();
 
     }
 
