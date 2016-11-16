@@ -25,6 +25,7 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,7 +48,6 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     private int mOrder;
 
     private String mWorkoutKey;
-
 
     public class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
@@ -97,6 +97,7 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
                 // Update RecyclerView
                 mExerciseKeys.add(dataSnapshot.getKey());
                 mExercises.add(exercise);
+
                 notifyItemInserted(mExercises.size() - 1);
 
                 Log.i(TAG, "Workout contains: " + mExercises.size() + " exercises");

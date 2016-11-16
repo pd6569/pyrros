@@ -85,9 +85,13 @@ public class NewWorkoutActivity extends BaseActivity {
     public Stats mStats;
     public Record mRecord;
 
+    private boolean mStartWorkout = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate()");
+
         setContentView(R.layout.activity_new_workout);
 
         //Initialise Database
@@ -143,20 +147,6 @@ public class NewWorkoutActivity extends BaseActivity {
         //Remove listener from previous activity
 
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.menu_new_workout, menu);
-        mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
-        return true;
-    }
-
-
-    @Override
-    public void onStart(){
-        super.onStart();
-
         // Adapter sets listener on workout-exercises directory detecting exercises that are added/removed/moved and updates the
         // recycler view as appropriate
         mAdapter = new ExercisesAdapter(this, mExercisesReference, mWorkoutKey, getUid());
@@ -180,11 +170,37 @@ public class NewWorkoutActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_new_workout, menu);
+        mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
+        return true;
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        Log.i(TAG, "onStart()");
+
+
+    }
+
+    @Override
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause()");
-        updateOrder();
-        updateNumExercises();
+        // prevents double write when workout started
+        if (mStartWorkout == false) {
+            updateOrder();
+            updateNumExercises();
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.i(TAG, "onResume()");
+
     }
 
     
@@ -412,6 +428,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
 
     private void updateNumExercises() {
+
         Map<String, Object> childUpdates = new HashMap<String, Object>();
         if (mNumExercises > 0) {
             childUpdates.put("/workouts/" + mWorkoutKey + "/numExercises/", mNumExercises);
@@ -421,6 +438,7 @@ public class NewWorkoutActivity extends BaseActivity {
             childUpdates.put("/user-workouts/" + getUid() + "/" + mWorkoutKey, null);
         }
         mDatabase.updateChildren(childUpdates);
+
     }
 
     private void updateOrder() {
@@ -431,35 +449,32 @@ public class NewWorkoutActivity extends BaseActivity {
         List<Exercise> exercisesToLoad = mAdapter.getExercises();
 
 
-        //write the exercise order as an exercise property
+        //write the exercise order as an exercise property and assign unique ID
         Map<String, Object> childUpdates = new HashMap<String, Object>();
-        for (int i = 0; i < mExerciseKeysList.size(); i++){
+        for (int i = 0; i < mExerciseKeysList.size(); i++) {
             String uuid = (UUID.randomUUID()).toString();
-            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/"  + mExerciseKeysList.get(i) + "/order/", i + 1);
+
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/order/", i + 1);
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/exerciseId/", uuid);
 
             childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/order/", i + 1);
+            childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/exerciseId/", uuid);
         }
         mDatabase.updateChildren(childUpdates);
         Log.i(TAG, "Finished updating order");
+
     }
 
-
-    //TODO: Something is fucking up when passing exercise to workout activity rearranging and rewriting names and orders
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_start_workout:
-                //Gets ordered arraylist from adapter and writes order as property of exercise
-                updateOrder();
+                //Gets ordered arraylist from adapter and writes order as property of exercise and assigns UUID
 
+                mStartWorkout = true;
+                updateOrder();
                 //write number of exercises to workout
                 updateNumExercises();
-
-                /*List<Exercise> exercisesToLoad = mAdapter.getExercises();*/
-
-
-
-
 
                 final ArrayList<Exercise> exercisesToLoad = new ArrayList<>();
                 mDatabase.child("user-workout-exercises").child(getUid()).child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -474,6 +489,7 @@ public class NewWorkoutActivity extends BaseActivity {
                             Log.i(TAG, "exercise " + e.getName() + " order " + e.getOrder());
                         }
 
+                        //List is in the firebase order, need to order by the established workout order
                         Collections.sort(exercisesToLoad);
 
                         Bundle extras = new Bundle();

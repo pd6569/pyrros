@@ -22,6 +22,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     public List<Integer> reps;
     public int sets;
     public int order;
+    public String exerciseId;
 
     public Exercise(){
         // Default constructor required for calls to DataSnapshot.getValue(Exercise.class)
@@ -61,6 +62,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         result.put("reps", reps);
         result.put("sets", sets);
         result.put("order", order);
+        result.put("exerciseId", exerciseId);
         return result;
     }
 
@@ -104,6 +106,10 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         this.order = order;
     }
 
+    @Exclude
+    public String getExerciseId() {
+        return exerciseId;
+    }
 
     @Exclude
     public void addWeight(Double newWeight){
@@ -150,6 +156,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         }
         sets = in.readInt();
         order = in.readInt();
+        exerciseId = in.readString();
     }
 
     @Exclude
@@ -178,6 +185,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         }
         dest.writeInt(sets);
         dest.writeInt(order);
+        dest.writeString(exerciseId);
     }
 
     @Exclude
