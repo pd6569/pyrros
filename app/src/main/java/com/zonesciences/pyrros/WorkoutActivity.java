@@ -99,6 +99,9 @@ public class WorkoutActivity extends BaseActivity {
         mUserId = getUid();
 
         Log.i(TAG, "Exercises : " + mExercisesList + " WorkoutKey: " + mWorkoutKey);
+        for (Exercise e : mExerciseObjects){
+            Log.i(TAG, "exercise " + e.getName() + " order " + e.getOrder());
+        }
 
         mExercisesViewPager = (ViewPager) findViewById(R.id.viewpager_exercises);
 
@@ -208,6 +211,7 @@ public class WorkoutActivity extends BaseActivity {
             if (currentFragment.isStatsDataLoaded()){
                 Log.i(TAG, "Stats data loaded for this exercise, create stats fragment and pass in data lists");
 
+                //TODO: THIS IS FUCKING UP STATS - it is replacing the active exercise as the last exercise
                 // Get current exercise with up to dates sets/reps info and add it to list to pass for stats analysis
                 ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
                 Exercise currentExercise = currentFragment.getCurrentExercise();
@@ -221,8 +225,10 @@ public class WorkoutActivity extends BaseActivity {
                 mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, allExercises, workoutKeys, workoutDates);
                 setFragment();
             } else {
-                //TODO: encapsulate this. check it works properly
+
                 Log.i(TAG, "Stats data has not finished loading, cannot load fragment yet");
+
+                //TODO: THIS IS FUCKING UP STATS - it is replacing the active exercise as the last exercise
 
                 // show progress dialog and set a listener on the current fragment to notify when data is ready and then load fragment
                 showProgressDialog();

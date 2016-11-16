@@ -38,9 +38,12 @@ import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 
 public class NewWorkoutActivity extends BaseActivity {
     private static final String REQUIRED = "Required";
@@ -179,6 +182,7 @@ public class NewWorkoutActivity extends BaseActivity {
     @Override
     public void onPause(){
         super.onPause();
+        Log.i(TAG, "onPause()");
         updateOrder();
         updateNumExercises();
     }
@@ -422,18 +426,25 @@ public class NewWorkoutActivity extends BaseActivity {
     private void updateOrder() {
         //Get ordered arraylist from adapter
         mExerciseKeysList = (ArrayList) mAdapter.getExerciseKeys();
-        Log.i(TAG, "exerise keys ordered by adapter: " + mExerciseKeysList);
+        Log.i(TAG, "exercise keys ordered by adapter: " + mExerciseKeysList);
+
+        List<Exercise> exercisesToLoad = mAdapter.getExercises();
+
 
         //write the exercise order as an exercise property
         Map<String, Object> childUpdates = new HashMap<String, Object>();
         for (int i = 0; i < mExerciseKeysList.size(); i++){
+            String uuid = (UUID.randomUUID()).toString();
             childUpdates.put("/workout-exercises/" + mWorkoutKey + "/"  + mExerciseKeysList.get(i) + "/order/", i + 1);
+
             childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/order/", i + 1);
         }
         mDatabase.updateChildren(childUpdates);
+        Log.i(TAG, "Finished updating order");
     }
 
 
+    //TODO: Something is fucking up when passing exercise to workout activity rearranging and rewriting names and orders
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -444,6 +455,12 @@ public class NewWorkoutActivity extends BaseActivity {
                 //write number of exercises to workout
                 updateNumExercises();
 
+                /*List<Exercise> exercisesToLoad = mAdapter.getExercises();*/
+
+
+
+
+
                 final ArrayList<Exercise> exercisesToLoad = new ArrayList<>();
                 mDatabase.child("user-workout-exercises").child(getUid()).child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -452,6 +469,12 @@ public class NewWorkoutActivity extends BaseActivity {
                             Exercise exercise = exerciseSnapshot.getValue(Exercise.class);
                             exercisesToLoad.add(exercise);
                         }
+                        Log.i(TAG, "Finished loading exercises to pass to workout activity");
+                        for (Exercise e : exercisesToLoad){
+                            Log.i(TAG, "exercise " + e.getName() + " order " + e.getOrder());
+                        }
+
+                        Collections.sort(exercisesToLoad);
 
                         Bundle extras = new Bundle();
                         Log.i(TAG, "Exercises to pass to new activity " + mExerciseKeysList);
@@ -466,7 +489,6 @@ public class NewWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
                     }
                 });
 
@@ -479,4 +501,6 @@ public class NewWorkoutActivity extends BaseActivity {
 
         }
     }
+
+
 }

@@ -127,6 +127,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mWorkoutKey = bundle.getString(ARG_WORKOUT_KEY);
         mExercise = bundle.getParcelable(ARG_EXERCISE_OBJECT);
+
+        Log.i(TAG, "mExercise obtained. Exercise name: " + mExercise.getName() + "mExercise order: " + mExercise.getOrder());
+
         mUser = bundle.getString(ARG_USER_ID);
         mCurrentSet = mExercise.getSets() + 1;
 
@@ -340,16 +343,15 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         boolean record = false;
        if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps), mWorkoutKey)){
+           mRecord = mDataTools.getExerciseRecord();
            record = true;
         }
-
-        mRecord = mDataTools.getExerciseRecord();
 
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
-        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise.toMap());
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
+        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
         if (record){
             Log.i(TAG, "Record set, write to database");
             childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mRecord);

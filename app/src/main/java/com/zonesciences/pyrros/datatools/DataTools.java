@@ -13,6 +13,7 @@ import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -298,6 +299,7 @@ public class DataTools {
                 if(weight > oldWeight){
                     Log.i(TAG, "New " + reps + " rep-max set");
 
+                   /* removePreviousRecordFromSameWorkout(key, workoutKey);*/
                     //update record
                     mExerciseRecord.getRecords().get(key).add(weight);
 
@@ -330,6 +332,75 @@ public class DataTools {
             }
         }
         return recordSet;
+    }
+
+   /* private void removePreviousRecordFromSameWorkout(String key, String workoutKey) {
+        List<String> workoutKeys = mExerciseRecord.getWorkoutKey().get(key);
+        List<Double> records = mExerciseRecord.getRecords().get(key);
+        List<String> workoutDate = mExerciseRecord.getDate().get(key);
+
+        if (workoutKeys.contains(workoutKey)){
+            Log.i(TAG, "A record for this rep range has already been recorded in this workout.");
+            ArrayList<Integer> indexList = new ArrayList<>();
+            for (int i = 0; i < workoutKeys.size(); i++) {
+                if (workoutKey.equals(workoutKeys.get(i))) {
+                    indexList.add(i);
+                }
+                Log.i(TAG, "indexList = " + indexList);
+            }
+            Collections.sort(indexList, Collections.<Integer>reverseOrder());
+            for (int j : indexList){
+                workoutKeys.remove(j);
+                records.remove(j);
+                workoutDate.remove(j);
+            }
+
+            mExerciseRecord.getWorkoutKey().remove(key);
+            mExerciseRecord.getDate().remove(key);
+            mExerciseRecord.getRecords().remove(key);
+
+            mExerciseRecord.getWorkoutKey().put(key, workoutKeys);
+            mExerciseRecord.getRecords().put(key, records);
+            mExerciseRecord.getDate().put(key, workoutDate);
+
+        }
+    }*/
+
+    public double heaviestWeightLifted(){
+        double heaviestWeight = 0;
+        int numReps = 0;
+        int index = 0;
+        String workoutKey;
+        String workoutDate;
+
+        Log.i(TAG, "mExercises size: " + mExercises.size());
+        for (int j = 0; j < mExercises.size(); j++){
+            Log.i(TAG, "Exercise" + mExercises.get(j).getWeight());
+            Exercise e = mExercises.get(j);
+            List<Double> weightList = e.getWeight();
+            List<Integer> repsList = e.getReps();
+            if (weightList != null) {
+                for (int i = 0; i < weightList.size(); i++){
+                    double highestVol = 0;
+                    if (weightList.get(i) >= heaviestWeight){
+                        heaviestWeight = weightList.get(i);
+                        double volume = heaviestWeight * repsList.get(i);
+                        if (volume > highestVol){
+                            numReps = repsList.get(i);
+                        }
+                        index = j;
+                    }
+                }
+            }
+        }
+
+        workoutKey = mWorkoutKeys.get(index);
+        workoutDate = mExerciseDates.get(index);
+
+
+        Log.i(TAG, "Heaviest weight : " + heaviestWeight + " lifted for " + numReps + " reps" + " Exercise index: " + index + " on: " + workoutDate + " workoutKey: " + workoutKey);
+
+        return heaviestWeight;
     }
 
 }

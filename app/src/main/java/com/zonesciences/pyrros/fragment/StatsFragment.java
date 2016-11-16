@@ -38,7 +38,7 @@ public class StatsFragment extends Fragment {
     TextView mTotalSets;
     TextView mTotalReps;
     TextView mTotalVolume;
-    TextView mOneRepMax;
+    TextView mHeaviestWeightLifted;
 
     //Data
     ArrayList<Exercise> mExercises = new ArrayList<>();
@@ -52,7 +52,7 @@ public class StatsFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
-        args.putSerializable(ARG_EXERCISES, (Serializable) exercises);
+        args.putSerializable(ARG_EXERCISES, exercises);
         args.putSerializable(ARG_WORKOUT_KEYS, workoutKeys);
         args.putSerializable(ARG_WORKOUT_DATES, workoutDates);
 
@@ -73,8 +73,18 @@ public class StatsFragment extends Fragment {
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mUserId = bundle.getString(ARG_USER_ID);
         mExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
+
+        for (Exercise e : mExercises){
+            Log.i(TAG, "Exercise " + e.getWeight());
+        }
+
         mWorkoutKeys = (ArrayList) bundle.getSerializable(ARG_WORKOUT_KEYS);
         mWorkoutDates = (ArrayList) bundle.getSerializable(ARG_WORKOUT_DATES);
+
+        for (String key : mWorkoutKeys){
+            Log.i(TAG, "Exercise " + key);
+        }
+
 
         mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
 
@@ -96,6 +106,9 @@ public class StatsFragment extends Fragment {
 
         mTotalVolume = (TextView) rootView.findViewById(R.id.stats_total_volume);
         mTotalVolume.setText("Total volume: " + Utils.formatWeight(mDataTools.totalVolume()));
+
+        /*mHeaviestWeightLifted = (TextView) rootView.findViewById(R.id.stats_heaviest_weight_lifted);
+        mHeaviestWeightLifted.setText("Heaviest weight lifted " + Utils.formatWeight(mDataTools.heaviestWeightLifted()));*/
 
         return rootView;
     }

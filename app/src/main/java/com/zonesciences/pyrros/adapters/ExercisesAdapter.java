@@ -224,4 +224,8 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
     public List<String> getExerciseKeys(){
         return mExerciseKeys;
     }
+
+    public List<Exercise> getExercises(){
+        return mExercises;
+    }
 }
