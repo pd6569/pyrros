@@ -211,18 +211,28 @@ public class WorkoutActivity extends BaseActivity {
             if (currentFragment.isStatsDataLoaded()){
                 Log.i(TAG, "Stats data loaded for this exercise, create stats fragment and pass in data lists");
 
-                //TODO: THIS IS FUCKING UP STATS - it is replacing the active exercise as the last exercise
-                // Get current exercise with up to dates sets/reps info and add it to list to pass for stats analysis
-                ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
+                // Get the currentExercise with up to date number of sets - this may be an old workout that is being viewed, or the latest workout
+                // Replace this specific exercise in the exercise list with the up to date information
+
+
                 Exercise currentExercise = currentFragment.getCurrentExercise();
-                ArrayList<Exercise> allExercises = exercises;
-                int currentExerciseIndex = allExercises.size() - 1;
-                allExercises.set(currentExerciseIndex, currentExercise);
+
+                ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
+
+                for (int i = 0; i < exercises.size(); i++){
+                    Exercise e = exercises.get(i);
+                    if (e.getExerciseId().equals(currentExercise.getExerciseId())){
+                        Log.i(TAG, "Found matching exercise in list with id: " + e.getExerciseId() + " At index: " + i + " Weights lifted: " + e.getWeight());
+                        exercises.set(i, currentExercise);
+                        Log.i(TAG, "Replaced with current Exercise parameters: " + exercises.get(i).getWeight());
+                        break;
+                    }
+                }
 
                 ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
                 ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
 
-                mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, allExercises, workoutKeys, workoutDates);
+                mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, exercises, workoutKeys, workoutDates);
                 setFragment();
             } else {
 
@@ -326,9 +336,8 @@ public class WorkoutActivity extends BaseActivity {
         setFragment();*/
     }
 
-    public void loadStatsFragment(){
-        /*mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, (ArrayList<Exercise>)mAllExercises);
-        setFragment();*/
+    public void loadStatsFragment(ExerciseFragment fragment){
+
     }
 
     private void setFragment() {

@@ -107,8 +107,8 @@ public class StatsFragment extends Fragment {
         mTotalVolume = (TextView) rootView.findViewById(R.id.stats_total_volume);
         mTotalVolume.setText("Total volume: " + Utils.formatWeight(mDataTools.totalVolume()));
 
-        /*mHeaviestWeightLifted = (TextView) rootView.findViewById(R.id.stats_heaviest_weight_lifted);
-        mHeaviestWeightLifted.setText("Heaviest weight lifted " + Utils.formatWeight(mDataTools.heaviestWeightLifted()));*/
+        mHeaviestWeightLifted = (TextView) rootView.findViewById(R.id.stats_heaviest_weight_lifted);
+        mHeaviestWeightLifted.setText("Heaviest weight lifted " + Utils.formatWeight(mDataTools.heaviestWeightLifted()));
 
         return rootView;
     }
