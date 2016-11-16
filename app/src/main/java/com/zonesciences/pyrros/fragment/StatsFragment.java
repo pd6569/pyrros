@@ -2,6 +2,7 @@ package com.zonesciences.pyrros.fragment;
 
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import com.zonesciences.pyrros.utils.Utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,9 +47,13 @@ public class StatsFragment extends Fragment {
     ArrayList<Exercise> mExercises = new ArrayList<>();
     ArrayList<String> mWorkoutKeys;
     ArrayList<String> mWorkoutDates;
-
+    Map<String, Object> mHeaviestWeightMap = new HashMap<>();
 
     DataTools mDataTools;
+
+    //Units
+    String mUnit;
+    Double mConversionMultiple;
 
     public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates) {
         Bundle args = new Bundle();
@@ -88,6 +95,16 @@ public class StatsFragment extends Fragment {
 
         mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
 
+        mHeaviestWeightMap = mDataTools.heaviestWeightLifted();
+
+        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("pref_unit", null).equals("metric")){
+            mUnit = " kgs";
+            mConversionMultiple = 1.0;
+        } else {
+            mUnit = " lbs";
+            mConversionMultiple = 2.20462;
+        }
+
     }
 
     @Override
@@ -96,19 +113,22 @@ public class StatsFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_stats, container, false);
 
         mTitle = (TextView) rootView.findViewById(R.id.stats_title);
-        mTitle.setText("Showing stats for " + mExerciseKey);
+        mTitle.setText("Stats for: " + mExerciseKey);
 
         mTotalSets = (TextView) rootView.findViewById(R.id.stats_total_sets);
-        mTotalSets.setText("Total number of sets: " + mDataTools.totalSets());
+        mTotalSets.setText("" + mDataTools.totalSets());
 
         mTotalReps = (TextView) rootView.findViewById(R.id.stats_total_reps);
-        mTotalReps.setText("Total reps performed: " + mDataTools.totalReps());
+        mTotalReps.setText("" + mDataTools.totalReps());
 
         mTotalVolume = (TextView) rootView.findViewById(R.id.stats_total_volume);
-        mTotalVolume.setText("Total volume: " + Utils.formatWeight(mDataTools.totalVolume()));
+        mTotalVolume.setText(Utils.formatWeight(mDataTools.totalVolume() * mConversionMultiple) + mUnit);
+
+        int reps = (Integer) mHeaviestWeightMap.get("reps");
+        String date = (String) mHeaviestWeightMap.get("date");
 
         mHeaviestWeightLifted = (TextView) rootView.findViewById(R.id.stats_heaviest_weight_lifted);
-        mHeaviestWeightLifted.setText("Heaviest weight lifted " + Utils.formatWeight(mDataTools.heaviestWeightLifted()));
+        mHeaviestWeightLifted.setText(Utils.formatWeight((Double) mHeaviestWeightMap.get("weight") * mConversionMultiple) + mUnit + " x " + reps + "\n" + Utils.formatDate(date));
 
         return rootView;
     }

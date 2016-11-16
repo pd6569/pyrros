@@ -366,7 +366,8 @@ public class DataTools {
         }
     }*/
 
-    public double heaviestWeightLifted(){
+    public Map<String, Object> heaviestWeightLifted(){
+        Map<String, Object> heaviestWeightMap = new HashMap<>();
         double heaviestWeight = 0;
         int numReps = 0;
         int index = 0;
@@ -397,10 +398,14 @@ public class DataTools {
         workoutKey = mWorkoutKeys.get(index);
         workoutDate = mExerciseDates.get(index);
 
+        heaviestWeightMap.put("weight", heaviestWeight);
+        heaviestWeightMap.put("reps", numReps);
+        heaviestWeightMap.put("date", workoutDate);
+        heaviestWeightMap.put("workoutKey", workoutKey);
 
         Log.i(TAG, "Heaviest weight : " + heaviestWeight + " lifted for " + numReps + " reps" + " Exercise index: " + index + " on: " + workoutDate + " workoutKey: " + workoutKey);
 
-        return heaviestWeight;
+        return heaviestWeightMap;
     }
 
 }
