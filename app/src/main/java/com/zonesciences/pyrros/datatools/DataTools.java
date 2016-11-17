@@ -408,4 +408,17 @@ public class DataTools {
         return heaviestWeightMap;
     }
 
+    public double estimatedMax(double weightLifted, int reps, int repMax) {
+        double oneRepMaxEstimate = (weightLifted / (1.0278 - (0.0278 * reps)));
+        double estimatedMax;
+        int repMaxRequired = repMax - 1;
+
+        double[] estimatedReps = new double[]{1, 0.95, 0.90, 0.88, 0.86, 0.83, 0.80, 0.78, 0.76, 0.75, 0.72, 0.70};
+
+        estimatedMax = oneRepMaxEstimate * estimatedReps[repMaxRequired];
+
+        return estimatedMax;
+
+    }
+
 }

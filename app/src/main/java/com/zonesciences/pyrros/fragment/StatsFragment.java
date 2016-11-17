@@ -4,6 +4,7 @@ package com.zonesciences.pyrros.fragment;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,8 @@ public class StatsFragment extends Fragment {
     String mUserId;
 
     //View
+    ViewPager mStatsViewPager;
+
     TextView mTitle;
     TextView mTotalSets;
     TextView mTotalReps;
@@ -62,6 +65,10 @@ public class StatsFragment extends Fragment {
     //Units
     String mUnit;
     Double mConversionMultiple;
+
+    //Heaviest weight for rep-max estimate
+    double mHeaviestWeight;
+    int mHeaviestWeightReps;
 
     public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates) {
         Bundle args = new Bundle();
@@ -106,6 +113,8 @@ public class StatsFragment extends Fragment {
 
 
         mHeaviestWeightMap = mDataTools.heaviestWeightLifted();
+        mHeaviestWeight = (Double) mHeaviestWeightMap.get("weight");
+        mHeaviestWeightReps = (Integer) mHeaviestWeightMap.get("reps");
 
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("pref_unit", null).equals("metric")){
             mUnit = " kgs";
@@ -137,10 +146,9 @@ public class StatsFragment extends Fragment {
         mTotalVolume.setText(Utils.formatWeight(mDataTools.totalVolume() * mConversionMultiple) + mUnit);
 
         int reps = (Integer) mHeaviestWeightMap.get("reps");
-        String date = (String) mHeaviestWeightMap.get("date");
 
         mHeaviestWeightLifted = (TextView) rootView.findViewById(R.id.stats_heaviest_weight_lifted);
-        mHeaviestWeightLifted.setText(Utils.formatWeight((Double) mHeaviestWeightMap.get("weight") * mConversionMultiple) + mUnit + " x " + reps + "\n" + Utils.formatDate(date));
+        mHeaviestWeightLifted.setText(Utils.formatWeight((Double) mHeaviestWeightMap.get("weight") * mConversionMultiple) + mUnit + " x " + reps);
 
         mNumSessions = (TextView) rootView.findViewById(R.id.stats_number_of_sessions);
         mNumSessions.setText("" + mDataTools.getExercises().size());
@@ -202,7 +210,8 @@ public class StatsFragment extends Fragment {
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 1 rep-max created. Error: " + e.toString());
-            mOneRepMax.setText("No data");
+            double estimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1));
+            mOneRepMax.setText("Estimated: " + Utils.formatWeight(estimatedOneRep) + mUnit);
         };
 
 
@@ -212,7 +221,8 @@ public class StatsFragment extends Fragment {
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 3 rep-max created. Error: " + e.toString());
-            mThreeRepMax.setText("No data");
+            double estimatedThreeRep = Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 3));
+            mThreeRepMax.setText("Estimated: " + Utils.formatWeight(estimatedThreeRep) + mUnit);;
         };
 
         try{
@@ -221,7 +231,8 @@ public class StatsFragment extends Fragment {
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 5 rep-max created. Error: " + e.toString());
-            mFiveRepMax.setText("No data");
+            double estimatedFiveRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 5));
+            mFiveRepMax.setText("Estimated: " + Utils.formatWeight(estimatedFiveRep) + mUnit);
         };
 
         try{
@@ -230,7 +241,8 @@ public class StatsFragment extends Fragment {
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 10 rep-max created. Error: " + e.toString());
-            mTenRepMax.setText("No data");
+            double estimatedTenRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 10));
+            mTenRepMax.setText("Estimated: " + Utils.formatWeight(estimatedTenRep) + mUnit);
         };
 
     }
