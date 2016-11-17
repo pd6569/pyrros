@@ -462,6 +462,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         return mStatsExercises;
     }
 
+    public Record getRecord() {
+        return mRecord;
+    }
+
     public boolean isStatsDataLoaded() {
         return mStatsDataLoaded;
     }

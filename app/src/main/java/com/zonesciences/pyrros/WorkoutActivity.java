@@ -23,6 +23,7 @@ import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
 import com.zonesciences.pyrros.fragment.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Record;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -211,17 +212,12 @@ public class WorkoutActivity extends BaseActivity {
             if (currentFragment.isStatsDataLoaded()){
                 Log.i(TAG, "Stats data loaded for this exercise, create stats fragment and pass in data lists");
 
-                // Get the currentExercise with up to date number of sets - this may be an old workout that is being viewed, or the latest workout
-                // Replace this specific exercise in the exercise list with the up to date information
-
                 loadStatsFragment(currentFragment);
 
 
             } else {
 
                 Log.i(TAG, "Stats data has not finished loading, cannot load fragment yet");
-
-                //TODO: THIS IS FUCKING UP STATS - it is replacing the active exercise as the last exercise
 
                 // show progress dialog and set a listener on the current fragment to notify when data is ready and then load fragment
                 showProgressDialog();
@@ -312,8 +308,11 @@ public class WorkoutActivity extends BaseActivity {
 
         ExerciseFragment currentFragment = fragment;
 
-        Exercise currentExercise = currentFragment.getCurrentExercise();
 
+        // Get the currentExercise with up to date number of sets - this may be an old workout that is being viewed, or the latest workout
+        // Replace this specific exercise in the exercise list with the up to date information
+
+        Exercise currentExercise = currentFragment.getCurrentExercise();
         ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
 
         for (int i = 0; i < exercises.size(); i++){
@@ -328,6 +327,7 @@ public class WorkoutActivity extends BaseActivity {
 
         ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
         ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+        Record exerciseRecord = currentFragment.getRecord();
 
         mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, exercises, workoutKeys, workoutDates);
         setFragment();

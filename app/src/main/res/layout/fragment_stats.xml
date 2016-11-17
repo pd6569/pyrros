@@ -167,7 +167,8 @@
                 <TextView
                     android:id="@+id/stats_one_rep_max"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"/>
 
             </LinearLayout>
 
@@ -195,7 +196,8 @@
                 <TextView
                     android:id="@+id/stats_three_rep_max"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"/>
 
             </LinearLayout>
 
@@ -223,7 +225,8 @@
                 <TextView
                     android:id="@+id/stats_five_rep_max"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"/>
 
             </LinearLayout>
 
@@ -251,7 +254,8 @@
                 <TextView
                     android:id="@+id/stats_ten_rep_max"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"/>
 
             </LinearLayout>
 

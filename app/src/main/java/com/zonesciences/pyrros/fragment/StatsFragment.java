@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.io.Serializable;
@@ -56,6 +57,7 @@ public class StatsFragment extends Fragment {
     Map<String, Object> mHeaviestWeightMap = new HashMap<>();
 
     DataTools mDataTools;
+    Record mRecord;
 
     //Units
     String mUnit;
@@ -81,6 +83,7 @@ public class StatsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate");
         Bundle bundle = getArguments();
 
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
@@ -101,6 +104,7 @@ public class StatsFragment extends Fragment {
 
         mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
 
+
         mHeaviestWeightMap = mDataTools.heaviestWeightLifted();
 
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("pref_unit", null).equals("metric")){
@@ -116,7 +120,9 @@ public class StatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView");
         View rootView =  inflater.inflate(R.layout.fragment_stats, container, false);
+
 
         mTitle = (TextView) rootView.findViewById(R.id.stats_title);
         mTitle.setText("Stats for: " + mExerciseKey);
@@ -142,7 +148,115 @@ public class StatsFragment extends Fragment {
         mSetsPerSession = (TextView) rootView.findViewById(R.id.stats_sets_per_session);
         mSetsPerSession.setText("" + mDataTools.totalSets()/mDataTools.getExercises().size());
 
+        mOneRepMax = (TextView) rootView.findViewById(R.id.stats_one_rep_max);
+        mThreeRepMax = (TextView) rootView.findViewById(R.id.stats_three_rep_max);
+        mFiveRepMax = (TextView) rootView.findViewById(R.id.stats_five_rep_max);
+        mTenRepMax = (TextView) rootView.findViewById(R.id.stats_ten_rep_max);
+
+        if (mRecord == null) {
+            Log.i(TAG, "mRecord has not been initialised yet, load from datatools");
+            mDataTools.loadRecord();
+            mDataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
+                @Override
+                public void onExercisesLoadComplete() {
+
+                }
+
+                @Override
+                public void onWorkoutDatesLoadComplete() {
+
+                }
+
+                @Override
+                public void onWorkoutKeysLoadComplete() {
+
+                }
+
+                @Override
+                public void onExerciseRecordLoadComplete() {
+                    Log.i(TAG, "Exercise record loaded");
+                    mRecord = mDataTools.getExerciseRecord();
+
+                    setRepMaxStats();
+
+                }
+            });
+        } else {
+            setRepMaxStats();
+        }
+
         return rootView;
+    }
+
+    private void setRepMaxStats() {
+
+        String oneRepMax;
+        String threeRepMax;
+        String fiveRepMax;
+        String tenRepMax;
+
+
+        try{
+            oneRepMax = Utils.formatWeight(mRecord.getRecords().get("1 rep-max").get(mRecord.getRecords().get("1 rep-max").size() - 1));
+            mOneRepMax.setText(oneRepMax + mUnit);
+
+        } catch (Exception e) {
+            Log.i(TAG, "No data for 1 rep-max created. Error: " + e.toString());
+            mOneRepMax.setText("No data");
+        };
+
+
+        try{
+            threeRepMax = Utils.formatWeight(mRecord.getRecords().get("3 rep-max").get(mRecord.getRecords().get("3 rep-max").size() - 1));
+            mThreeRepMax.setText(threeRepMax + mUnit);
+
+        } catch (Exception e) {
+            Log.i(TAG, "No data for 3 rep-max created. Error: " + e.toString());
+            mThreeRepMax.setText("No data");
+        };
+
+        try{
+            fiveRepMax = Utils.formatWeight(mRecord.getRecords().get("5 rep-max").get(mRecord.getRecords().get("5 rep-max").size() - 1));
+            mFiveRepMax.setText(fiveRepMax + mUnit);
+
+        } catch (Exception e) {
+            Log.i(TAG, "No data for 5 rep-max created. Error: " + e.toString());
+            mFiveRepMax.setText("No data");
+        };
+
+        try{
+            tenRepMax = Utils.formatWeight(mRecord.getRecords().get("10 rep-max").get(mRecord.getRecords().get("10 rep-max").size() - 1));
+            mTenRepMax.setText(tenRepMax + mUnit);
+
+        } catch (Exception e) {
+            Log.i(TAG, "No data for 10 rep-max created. Error: " + e.toString());
+            mTenRepMax.setText("No data");
+        };
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+        Log.i(TAG, "onActivityCreated");
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        Log.i(TAG, "onStart");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.i(TAG, "onResume");
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.i(TAG, "onPause");
     }
 
 }
