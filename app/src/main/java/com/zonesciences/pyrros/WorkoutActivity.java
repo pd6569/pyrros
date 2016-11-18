@@ -17,16 +17,14 @@ import android.view.View;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
-import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
-import com.zonesciences.pyrros.fragment.StatsFragment;
+import com.zonesciences.pyrros.fragment.stats.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Record;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

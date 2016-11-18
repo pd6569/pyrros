@@ -1,4 +1,4 @@
-package com.zonesciences.pyrros.fragment;
+package com.zonesciences.pyrros.fragment.stats;
 
 
 import android.os.Bundle;
