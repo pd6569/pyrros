@@ -1,10 +1,15 @@
 package com.zonesciences.pyrros.fragment;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +25,7 @@ import com.zonesciences.pyrros.utils.Utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,40 +41,19 @@ public class StatsFragment extends Fragment {
     private static final String ARG_WORKOUT_KEYS = "WorkoutKeys";
     private static final String ARG_WORKOUT_DATES = "WorkoutDates";
 
+    private ViewPager mViewPager;
+    private FragmentPagerAdapter mPagerAdapter;
+
+    private Toolbar mToolbar;
+    TabLayout mTabLayout;
+
+    //Data for stats
     String mExerciseKey;
     String mUserId;
+    List<Exercise> mExercises;
+    List<String> mWorkoutKeys;
+    List<String> mWorkoutDates;
 
-    //View
-    ViewPager mStatsViewPager;
-
-    TextView mTitle;
-    TextView mTotalSets;
-    TextView mTotalReps;
-    TextView mTotalVolume;
-    TextView mHeaviestWeightLifted;
-    TextView mOneRepMax;
-    TextView mThreeRepMax;
-    TextView mFiveRepMax;
-    TextView mTenRepMax;
-    TextView mNumSessions;
-    TextView mSetsPerSession;
-
-    //Data
-    ArrayList<Exercise> mExercises = new ArrayList<>();
-    ArrayList<String> mWorkoutKeys;
-    ArrayList<String> mWorkoutDates;
-    Map<String, Object> mHeaviestWeightMap = new HashMap<>();
-
-    DataTools mDataTools;
-    Record mRecord;
-
-    //Units
-    String mUnit;
-    Double mConversionMultiple;
-
-    //Heaviest weight for rep-max estimate
-    double mHeaviestWeight;
-    int mHeaviestWeightReps;
 
     public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates) {
         Bundle args = new Bundle();
@@ -91,38 +76,13 @@ public class StatsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
-        Bundle bundle = getArguments();
 
+        Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mUserId = bundle.getString(ARG_USER_ID);
         mExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
-
-        for (Exercise e : mExercises){
-            Log.i(TAG, "Exercise " + e.getWeight());
-        }
-
         mWorkoutKeys = (ArrayList) bundle.getSerializable(ARG_WORKOUT_KEYS);
         mWorkoutDates = (ArrayList) bundle.getSerializable(ARG_WORKOUT_DATES);
-
-        for (String key : mWorkoutKeys){
-            Log.i(TAG, "Exercise " + key);
-        }
-
-
-        mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
-
-
-        mHeaviestWeightMap = mDataTools.heaviestWeightLifted();
-        mHeaviestWeight = (Double) mHeaviestWeightMap.get("weight");
-        mHeaviestWeightReps = (Integer) mHeaviestWeightMap.get("reps");
-
-        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("pref_unit", null).equals("metric")){
-            mUnit = " kgs";
-            mConversionMultiple = 1.0;
-        } else {
-            mUnit = " lbs";
-            mConversionMultiple = 2.20462;
-        }
 
     }
 
@@ -132,120 +92,20 @@ public class StatsFragment extends Fragment {
         Log.i(TAG, "onCreateView");
         View rootView =  inflater.inflate(R.layout.fragment_stats, container, false);
 
+        mViewPager = (ViewPager) rootView.findViewById(R.id.viewpager_stats);
 
-        mTitle = (TextView) rootView.findViewById(R.id.stats_title);
-        mTitle.setText("Stats for: " + mExerciseKey);
+        mPagerAdapter = new FragmentStatsPagerAdapter(getChildFragmentManager());
+        mViewPager.setAdapter(mPagerAdapter);
 
-        mTotalSets = (TextView) rootView.findViewById(R.id.stats_total_sets);
-        mTotalSets.setText("" + mDataTools.totalSets());
+        mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_stats);
 
-        mTotalReps = (TextView) rootView.findViewById(R.id.stats_total_reps);
-        mTotalReps.setText("" + mDataTools.totalReps());
-
-        mTotalVolume = (TextView) rootView.findViewById(R.id.stats_total_volume);
-        mTotalVolume.setText(Utils.formatWeight(mDataTools.totalVolume() * mConversionMultiple) + mUnit);
-
-        int reps = (Integer) mHeaviestWeightMap.get("reps");
-
-        mHeaviestWeightLifted = (TextView) rootView.findViewById(R.id.stats_heaviest_weight_lifted);
-        mHeaviestWeightLifted.setText(Utils.formatWeight((Double) mHeaviestWeightMap.get("weight") * mConversionMultiple) + mUnit + " x " + reps);
-
-        mNumSessions = (TextView) rootView.findViewById(R.id.stats_number_of_sessions);
-        mNumSessions.setText("" + mDataTools.getExercises().size());
-
-        mSetsPerSession = (TextView) rootView.findViewById(R.id.stats_sets_per_session);
-        mSetsPerSession.setText("" + mDataTools.totalSets()/mDataTools.getExercises().size());
-
-        mOneRepMax = (TextView) rootView.findViewById(R.id.stats_one_rep_max);
-        mThreeRepMax = (TextView) rootView.findViewById(R.id.stats_three_rep_max);
-        mFiveRepMax = (TextView) rootView.findViewById(R.id.stats_five_rep_max);
-        mTenRepMax = (TextView) rootView.findViewById(R.id.stats_ten_rep_max);
-
-        if (mRecord == null) {
-            Log.i(TAG, "mRecord has not been initialised yet, load from datatools");
-            mDataTools.loadRecord();
-            mDataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
-                @Override
-                public void onExercisesLoadComplete() {
-
-                }
-
-                @Override
-                public void onWorkoutDatesLoadComplete() {
-
-                }
-
-                @Override
-                public void onWorkoutKeysLoadComplete() {
-
-                }
-
-                @Override
-                public void onExerciseRecordLoadComplete() {
-                    Log.i(TAG, "Exercise record loaded");
-                    mRecord = mDataTools.getExerciseRecord();
-
-                    setRepMaxStats();
-
-                }
-            });
-        } else {
-            setRepMaxStats();
-        }
+        mTabLayout = (TabLayout) rootView.findViewById(R.id.sliding_tabs_stats);
+        mTabLayout.setupWithViewPager(mViewPager, false);
 
         return rootView;
     }
 
-    private void setRepMaxStats() {
 
-        String oneRepMax;
-        String threeRepMax;
-        String fiveRepMax;
-        String tenRepMax;
-
-
-        try{
-            oneRepMax = Utils.formatWeight(mRecord.getRecords().get("1 rep-max").get(mRecord.getRecords().get("1 rep-max").size() - 1));
-            mOneRepMax.setText(oneRepMax + mUnit);
-
-        } catch (Exception e) {
-            Log.i(TAG, "No data for 1 rep-max created. Error: " + e.toString());
-            double estimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1));
-            mOneRepMax.setText("Estimated: " + Utils.formatWeight(estimatedOneRep) + mUnit);
-        };
-
-
-        try{
-            threeRepMax = Utils.formatWeight(mRecord.getRecords().get("3 rep-max").get(mRecord.getRecords().get("3 rep-max").size() - 1));
-            mThreeRepMax.setText(threeRepMax + mUnit);
-
-        } catch (Exception e) {
-            Log.i(TAG, "No data for 3 rep-max created. Error: " + e.toString());
-            double estimatedThreeRep = Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 3));
-            mThreeRepMax.setText("Estimated: " + Utils.formatWeight(estimatedThreeRep) + mUnit);;
-        };
-
-        try{
-            fiveRepMax = Utils.formatWeight(mRecord.getRecords().get("5 rep-max").get(mRecord.getRecords().get("5 rep-max").size() - 1));
-            mFiveRepMax.setText(fiveRepMax + mUnit);
-
-        } catch (Exception e) {
-            Log.i(TAG, "No data for 5 rep-max created. Error: " + e.toString());
-            double estimatedFiveRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 5));
-            mFiveRepMax.setText("Estimated: " + Utils.formatWeight(estimatedFiveRep) + mUnit);
-        };
-
-        try{
-            tenRepMax = Utils.formatWeight(mRecord.getRecords().get("10 rep-max").get(mRecord.getRecords().get("10 rep-max").size() - 1));
-            mTenRepMax.setText(tenRepMax + mUnit);
-
-        } catch (Exception e) {
-            Log.i(TAG, "No data for 10 rep-max created. Error: " + e.toString());
-            double estimatedTenRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 10));
-            mTenRepMax.setText("Estimated: " + Utils.formatWeight(estimatedTenRep) + mUnit);
-        };
-
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
@@ -271,4 +131,41 @@ public class StatsFragment extends Fragment {
         Log.i(TAG, "onPause");
     }
 
+    private class FragmentStatsPagerAdapter extends FragmentPagerAdapter {
+
+        StatsOverviewFragment mStatsOverviewFragment = StatsOverviewFragment.newInstance(mExerciseKey, mUserId, (ArrayList) mExercises, (ArrayList) mWorkoutKeys, (ArrayList) mWorkoutDates);
+        StatsRepMaxFragment mStatsRepMaxFragment = new StatsRepMaxFragment();
+        StatsGraphFragment mStatsGraphFragment = new StatsGraphFragment();
+
+        private final Fragment[] mFragments = new Fragment[] {
+                mStatsOverviewFragment,
+                new StatsRepMaxFragment(),
+                new StatsGraphFragment()
+        };
+
+        String tabTitles[] = new String[]{
+                "Overview",
+                "Rep-max",
+                "Graph"
+        };
+
+        public FragmentStatsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragments[position];
+        }
+
+        @Override
+        public int getCount() {
+            return mFragments.length;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position){
+            return tabTitles[position];
+        }
+    }
 }
