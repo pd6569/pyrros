@@ -44,7 +44,6 @@ public class StatsFragment extends Fragment {
     private ViewPager mViewPager;
     private FragmentPagerAdapter mPagerAdapter;
 
-    private Toolbar mToolbar;
     TabLayout mTabLayout;
 
     //Data for stats
@@ -96,8 +95,6 @@ public class StatsFragment extends Fragment {
 
         mPagerAdapter = new FragmentStatsPagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
-
-        mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_stats);
 
         mTabLayout = (TabLayout) rootView.findViewById(R.id.sliding_tabs_stats);
         mTabLayout.setupWithViewPager(mViewPager, false);
