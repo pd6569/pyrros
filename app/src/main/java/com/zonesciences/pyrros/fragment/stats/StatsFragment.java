@@ -120,17 +120,21 @@ public class StatsFragment extends Fragment {
         StatsOverviewFragment mStatsOverviewFragment = StatsOverviewFragment.newInstance(mExerciseKey, mUserId, (ArrayList) mExercises, (ArrayList) mWorkoutKeys, (ArrayList) mWorkoutDates);
         StatsRepMaxFragment mStatsRepMaxFragment = new StatsRepMaxFragment();
         StatsGraphFragment mStatsGraphFragment = new StatsGraphFragment();
+        StatsCompareFragment mStatsCompareFragment = new StatsCompareFragment();
+
 
         private final Fragment[] mFragments = new Fragment[] {
                 mStatsOverviewFragment,
-                new StatsRepMaxFragment(),
-                new StatsGraphFragment()
+                mStatsRepMaxFragment,
+                mStatsGraphFragment,
+                mStatsCompareFragment
         };
 
         String tabTitles[] = new String[]{
                 "Overview",
                 "Rep-max",
-                "Graph"
+                "Graph",
+                "Compare"
         };
 
         public FragmentStatsPagerAdapter(FragmentManager fm) {

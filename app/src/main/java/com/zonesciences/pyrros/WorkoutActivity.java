@@ -46,7 +46,7 @@ public class WorkoutActivity extends BaseActivity {
     ViewPager mExercisesViewPager;
     WorkoutExercisesAdapter mWorkoutExercisesAdapter;
 
-    Toolbar mToolbar;
+    public Toolbar mToolbar;
     TabLayout mTabLayout;
 
     ArrayList<String> mExercisesList;
@@ -180,7 +180,7 @@ public class WorkoutActivity extends BaseActivity {
                 setFragment();
 
             } else {
-                //TODO: encapsulate this. check it works properly
+
                 Log.i(TAG, "Stats data has not finished loading, cannot load fragment");
                 // show progress dialog and set a listener on the current fragment to notify when data is ready and then load fragment
 

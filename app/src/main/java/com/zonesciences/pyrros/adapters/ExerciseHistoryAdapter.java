@@ -62,8 +62,6 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
 
         holder.mExerciseDate.setText(workoutDate);
 
-
-
         LinearLayout setsContainer = (LinearLayout) holder.itemView.findViewById(R.id.exercise_history_sets_container);
         setsContainer.removeAllViews();
 

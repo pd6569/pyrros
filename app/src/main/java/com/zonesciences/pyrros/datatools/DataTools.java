@@ -374,7 +374,6 @@ public class DataTools {
         String workoutKey;
         String workoutDate;
 
-        Log.i(TAG, "mExercises size: " + mExercises.size());
         for (int j = 0; j < mExercises.size(); j++){
             Log.i(TAG, "Exercise" + mExercises.get(j).getWeight());
             Exercise e = mExercises.get(j);
@@ -406,6 +405,47 @@ public class DataTools {
         Log.i(TAG, "Heaviest weight : " + heaviestWeight + " lifted for " + numReps + " reps" + " Exercise index: " + index + " on: " + workoutDate + " workoutKey: " + workoutKey);
 
         return heaviestWeightMap;
+    }
+
+    public Map<String, Object> mostReps(){
+        Map<String, Object> mostRepsMap = new HashMap<>();
+        double weight = 0;
+        int mostReps = 0;
+        int index = 0;
+        String workoutKey;
+        String workoutDate;
+
+        for (int j = 0; j < mExercises.size(); j++){
+
+            Exercise e = mExercises.get(j);
+            List<Double> weightList = e.getWeight();
+            List<Integer> repsList = e.getReps();
+            if (weightList != null) {
+                for (int i = 0; i < repsList.size(); i++){
+                    double highestVol = 0;
+                    if (repsList.get(i) >= mostReps){
+                        mostReps = repsList.get(i);
+                        double volume = weightList.get(i) * mostReps;
+                        if (volume > highestVol){
+                            weight = weightList.get(i);
+                        }
+                        index = j;
+                    }
+                }
+            }
+        }
+
+        workoutKey = mWorkoutKeys.get(index);
+        workoutDate = mExerciseDates.get(index);
+
+        mostRepsMap.put("weight", weight);
+        mostRepsMap.put("reps", mostReps);
+        mostRepsMap.put("date", workoutDate);
+        mostRepsMap.put("workoutKey", workoutKey);
+
+        Log.i(TAG, "Weight : " + weight + " lifted for " + mostReps + " reps" + " Exercise index: " + index + " on: " + workoutDate + " workoutKey: " + workoutKey);
+
+        return mostRepsMap;
     }
 
     public double estimatedMax(double weightLifted, int reps, int repMax) {
