@@ -448,6 +448,47 @@ public class DataTools {
         return mostRepsMap;
     }
 
+    public Map<String, Object> mostVolume(){
+        Map<String, Object> mostVolumeMap = new HashMap<>();
+        double mostVol = 0.0;
+        double weight = 0.0;
+        int reps = 0;
+        int index = 0;
+        String workoutKey;
+        String workoutDate;
+
+        for (int i = 0; i < mExercises.size(); i++){
+            Exercise e = mExercises.get(i);
+            List<Double> weightList = e.getWeight();
+            List<Integer> repsList = e.getReps();
+            if (weightList != null) {
+                for (int j = 0; j < weightList.size(); j++) {
+                    double volume = weightList.get(j) * repsList.get(j);
+                    if (volume > mostVol) {
+                        mostVol = volume;
+                        weight = weightList.get(j);
+                        reps = repsList.get(j);
+                        index = i;
+                    }
+                }
+            }
+
+        }
+
+        workoutKey = mWorkoutKeys.get(index);
+        workoutDate = mExerciseDates.get(index);
+
+        mostVolumeMap.put("volume", mostVol);
+        mostVolumeMap.put("weight", weight);
+        mostVolumeMap.put("reps", reps);
+        mostVolumeMap.put("date", workoutDate);
+        mostVolumeMap.put("workoutKey", workoutKey);
+
+        Log.i(TAG, "Maximum volume in single set: " + mostVol + " set on: " + workoutDate + " workoutKey: " +workoutKey);
+
+        return mostVolumeMap;
+    }
+
     public double estimatedMax(double weightLifted, int reps, int repMax) {
         double oneRepMaxEstimate = (weightLifted / (1.0278 - (0.0278 * reps)));
         double estimatedMax;
