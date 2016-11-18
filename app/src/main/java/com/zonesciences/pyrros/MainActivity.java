@@ -84,6 +84,8 @@ public class MainActivity extends BaseActivity {
             mDatabase.child("user-exercises").child(mUserId).keepSynced(true);
             mDatabase.child("user-workout-exercises").child(mUserId).keepSynced(true);
             mDatabase.child("user-workouts").child(mUserId).keepSynced(true);
+            mDatabase.child("user-records").child(mUserId).keepSynced(true);
+
 
             //Give the TabLayout for region selection the ViewPager
             TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs_homescreen);
