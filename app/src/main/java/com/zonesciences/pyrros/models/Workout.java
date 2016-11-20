@@ -105,5 +105,10 @@ public class Workout {
     public int getNumExercises() {
         return numExercises;
     }
+
+    @Exclude
+    public int getUserCount() {
+        return userCount;
+    }
 }
 //[END workout_class]

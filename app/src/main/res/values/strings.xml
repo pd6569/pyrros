@@ -67,5 +67,11 @@
     <string name="pref_unit_default">metric</string>
     <string name="summar_unit_preferences">Sets units for your workouts</string>
     <string name="menu_edit_workout">Edit Workout</string>
+    <string name="edit_workout_creator">Creator</string>
+    <string name="edit_workout_date">Date</string>
+    <string name="edit_workout_name">Name</string>
+    <string name="edit_workout_num_exercises">Exercise Count</string>
+    <string name="edit_workout_shared">Shared</string>
+    <string name="edit_workout_user_count">User Count</string>
 
 </resources>

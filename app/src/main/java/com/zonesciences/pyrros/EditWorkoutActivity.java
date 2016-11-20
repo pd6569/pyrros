@@ -65,13 +65,15 @@ public class EditWorkoutActivity extends BaseActivity {
 
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs_edit_workout);
         mTabLayout.setupWithViewPager(mViewPager, false);
+
+
     }
 
     class EditWorkoutAdapter extends FragmentPagerAdapter {
 
         Fragment [] mFragments = new Fragment[]{
                 new WorkoutOrderFragment(),
-                new WorkoutPropertiesFragment()
+                WorkoutPropertiesFragment.newInstance(mUserId, mWorkoutKey)
         };
 
         String [] mTitles = new String[] {
