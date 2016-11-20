@@ -13,8 +13,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
@@ -347,6 +349,19 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int i = item.getItemId();
+        if (i == R.id.action_edit_workout) {
+            Intent intent = new Intent(getApplicationContext(), EditWorkoutActivity.class);
+            intent.putExtra(WORKOUT_EXERCISE_OBJECTS, mExerciseObjects);
+            intent.putExtra(WORKOUT_ID, mWorkoutKey);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
 
 }
