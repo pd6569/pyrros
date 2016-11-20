@@ -38,6 +38,8 @@
         </activity>
         <activity android:name=".SettingsActivity">
         </activity>
+        <activity android:name=".EditWorkoutActivity">
+        </activity>
     </application>
 
 </manifest>

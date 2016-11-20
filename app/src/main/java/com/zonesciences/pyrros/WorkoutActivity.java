@@ -347,4 +347,6 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
     }
 
+
+
 }
