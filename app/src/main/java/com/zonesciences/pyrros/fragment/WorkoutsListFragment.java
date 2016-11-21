@@ -1,9 +1,7 @@
 package com.zonesciences.pyrros.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -38,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class WorkoutsFragment extends Fragment {
+public class WorkoutsListFragment extends Fragment {
 
     private static final String TAG = "WorkoutsListFragment";
 
@@ -57,17 +55,13 @@ public class WorkoutsFragment extends Fragment {
 
     private String mUnits;
 
-    public WorkoutsFragment() {}
+    public WorkoutsListFragment() {}
 
-    //Listeners
-    HomeScreenPagerAdapter.WorkoutsFragmentListener mListener;
-
-    public static WorkoutsFragment newInstance(HomeScreenPagerAdapter.WorkoutsFragmentListener listener) {
+    public static WorkoutsListFragment newInstance() {
 
         Bundle args = new Bundle();
-        WorkoutsFragment fragment = new WorkoutsFragment();
+        WorkoutsListFragment fragment = new WorkoutsListFragment();
         fragment.setArguments(args);
-        fragment.setWorkoutsFragmentListener(listener);
         return fragment;
     }
 
@@ -189,15 +183,10 @@ public class WorkoutsFragment extends Fragment {
 
         switch(i){
             case R.id.action_calendar_view:
-                mListener.onSwitchWorkoutsView();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void setWorkoutsFragmentListener (HomeScreenPagerAdapter.WorkoutsFragmentListener listener){
-        this.mListener = listener;
     }
 
 }

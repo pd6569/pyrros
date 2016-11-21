@@ -1,26 +1,15 @@
 package com.zonesciences.pyrros;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,14 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.adapters.HomeScreenPagerAdapter;
-import com.zonesciences.pyrros.fragment.DashboardFragment;
-import com.zonesciences.pyrros.fragment.ExerciseFragment;
-import com.zonesciences.pyrros.fragment.TrainerFragment;
-import com.zonesciences.pyrros.fragment.WorkoutsCalendarFragment;
-import com.zonesciences.pyrros.fragment.WorkoutsFragment;
-import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
-import com.zonesciences.pyrros.models.Workout;
 
 import java.util.HashMap;
 import java.util.Map;
