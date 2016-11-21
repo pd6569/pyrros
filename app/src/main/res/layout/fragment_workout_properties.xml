@@ -9,14 +9,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
-            android:text="@string/edit_workout_date"/>
+            android:text="@string/edit_workout_date"
+            android:textStyle="bold"
+            android:textSize="24dp"/>
 
         <TextView
             android:id="@+id/date_textview"
@@ -24,22 +29,28 @@
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
+            android:textSize="24dp"
             />
 
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
-            android:text="@string/edit_workout_creator"/>
+            android:text="@string/edit_workout_creator"
+            android:textStyle="bold"
+            android:textSize="24dp"/>
 
         <TextView
             android:id="@+id/creator_textview"
@@ -47,6 +58,7 @@
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
+            android:textSize="24dp"
             />
 
     </LinearLayout>
@@ -55,14 +67,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
-            android:text="@string/edit_workout_name"/>
+            android:text="@string/edit_workout_name"
+            android:textStyle="bold"
+            android:textSize="24dp"/>
 
         <TextView
             android:id="@+id/name_textview"
@@ -70,6 +86,7 @@
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
+            android:textSize="24dp"
             />
 
     </LinearLayout>
@@ -78,14 +95,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
-            android:text="@string/edit_workout_num_exercises"/>
+            android:text="@string/edit_workout_num_exercises"
+            android:textStyle="bold"
+            android:textSize="24dp"/>
 
         <TextView
             android:id="@+id/num_exercises_textview"
@@ -93,6 +114,7 @@
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
+            android:textSize="24dp"
             />
 
     </LinearLayout>
@@ -101,14 +123,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
-            android:text="@string/edit_workout_shared"/>
+            android:text="@string/edit_workout_shared"
+            android:textStyle="bold"
+            android:textSize="24dp"/>
 
         <TextView
             android:id="@+id/shared_textview"
@@ -116,6 +142,7 @@
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
+            android:textSize="24dp"
             />
 
     </LinearLayout>
@@ -124,14 +151,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
-            android:text="@string/edit_workout_user_count"/>
+            android:text="@string/edit_workout_user_count"
+            android:textStyle="bold"
+            android:textSize="24dp"/>
 
         <TextView
             android:id="@+id/user_count_textview"
@@ -139,6 +170,7 @@
             android:layout_height="wrap_content"
             android:width="0dp"
             android:layout_weight="1"
+            android:textSize="24dp"
             />
 
     </LinearLayout>
