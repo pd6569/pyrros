@@ -17,20 +17,28 @@ import com.zonesciences.pyrros.R;
 import java.util.Calendar;
 
 
-public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+public class DatePickerFragment extends DialogFragment  {
+
+    int mYear;
+    int mMonth;
+    int mDay;
+
+    DatePickerDialog.OnDateSetListener mOnDateSetListener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
 
-        return new DatePickerDialog(getActivity(), this ,year, month, day);
+        return new DatePickerDialog(getActivity(), mOnDateSetListener , mYear, mMonth, mDay);
     }
 
-    @Override
-    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-
+    public void setDate(int year, int month, int day){
+        mYear = year;
+        mMonth = month;
+        mDay = day;
     }
+
+    public void setOnDateSetListener(DatePickerDialog.OnDateSetListener dateSetListener){
+        this.mOnDateSetListener = dateSetListener;
+    }
+
 }

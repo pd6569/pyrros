@@ -54,6 +54,19 @@ public class Utils {
         return newDate;
     }
 
+    public static Calendar convertToCalendarObj (String dateToConvert) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        try {
+            Date date = sdf.parse(dateToConvert);
+            cal.setTime(date);
+        } catch (ParseException e) {
+            Log.i(TAG, "Failed to parse date: " + e);
+        }
+
+        return cal;
+    }
+
     public static String getClientTimeStamp(boolean includeTime){
         SimpleDateFormat df;
         if (includeTime) {

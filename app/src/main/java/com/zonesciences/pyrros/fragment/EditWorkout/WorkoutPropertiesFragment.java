@@ -1,14 +1,17 @@
 package com.zonesciences.pyrros.fragment.EditWorkout;
 
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -22,7 +25,13 @@ import com.zonesciences.pyrros.fragment.DatePickerFragment;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class WorkoutPropertiesFragment extends Fragment {
+
+    private static final String TAG = "WorkoutPropertiesFragment";
 
     private static final String ARG_USER_ID = "UserId";
     private static final String ARG_WORKOUT_KEY = "WorkoutKey";
@@ -106,7 +115,19 @@ public class WorkoutPropertiesFragment extends Fragment {
         mDateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment fragment = new DatePickerFragment();
+                DatePickerFragment fragment = new DatePickerFragment();
+                fragment.setDate(Utils.convertToCalendarObj(mDate).get(Calendar.YEAR), Utils.convertToCalendarObj(mDate).get(Calendar.MONTH), Utils.convertToCalendarObj(mDate).get(Calendar.DAY_OF_MONTH));
+                fragment.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(year, month, day);
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+                        mDate = sdf.format(cal.getTime());
+                        Log.i(TAG, "New date: " + mDate);
+                        mDateText.setText(Utils.formatDate(mDate, 1));
+                    }
+                });
                 fragment.show(getChildFragmentManager(), "datePicker");
             }
         });
