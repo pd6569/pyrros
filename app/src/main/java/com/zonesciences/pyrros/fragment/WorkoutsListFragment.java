@@ -90,7 +90,6 @@ public abstract class WorkoutsListFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.workouts_list);
         mRecyclerView.setHasFixedSize(true);
-
         return rootView;
     }
 
