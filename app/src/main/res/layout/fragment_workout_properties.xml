@@ -33,7 +33,7 @@
                     android:layout_weight="1"
                     android:text="@string/edit_workout_date"
                     android:textStyle="bold"
-                    android:textSize="20dp"/>
+                    android:textSize="18dp"/>
 
                 <TextView
                     android:id="@+id/date_textview"
@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:width="0dp"
                     android:layout_weight="1"
-                    android:textSize="20dp"
+                    android:textSize="18dp"
                     />
 
             </LinearLayout>
@@ -61,7 +61,7 @@
                     android:layout_weight="1"
                     android:text="@string/edit_workout_creator"
                     android:textStyle="bold"
-                    android:textSize="20dp"/>
+                    android:textSize="18dp"/>
 
                 <TextView
                     android:id="@+id/creator_textview"
@@ -69,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:width="0dp"
                     android:layout_weight="1"
-                    android:textSize="20dp"
+                    android:textSize="18dp"
                     />
 
             </LinearLayout>
@@ -89,7 +89,7 @@
                     android:layout_weight="1"
                     android:text="@string/edit_workout_name"
                     android:textStyle="bold"
-                    android:textSize="20dp"/>
+                    android:textSize="18dp"/>
 
                 <TextView
                     android:id="@+id/name_textview"
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:width="0dp"
                     android:layout_weight="1"
-                    android:textSize="20dp"
+                    android:textSize="18dp"
                     />
 
             </LinearLayout>
@@ -117,7 +117,7 @@
                     android:layout_weight="1"
                     android:text="@string/edit_workout_num_exercises"
                     android:textStyle="bold"
-                    android:textSize="20dp"/>
+                    android:textSize="18dp"/>
 
                 <TextView
                     android:id="@+id/num_exercises_textview"
@@ -125,7 +125,7 @@
                     android:layout_height="wrap_content"
                     android:width="0dp"
                     android:layout_weight="1"
-                    android:textSize="20dp"
+                    android:textSize="18dp"
                     />
 
             </LinearLayout>
@@ -145,7 +145,7 @@
                     android:text="@string/edit_workout_shared"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:textSize="20dp"/>
+                    android:textSize="18dp"/>
 
                 <Switch
                     android:id="@+id/shared_switch"
@@ -172,7 +172,7 @@
                     android:layout_weight="1"
                     android:text="@string/edit_workout_user_count"
                     android:textStyle="bold"
-                    android:textSize="20dp"/>
+                    android:textSize="18dp"/>
 
                 <TextView
                     android:id="@+id/user_count_textview"
@@ -180,7 +180,7 @@
                     android:layout_height="wrap_content"
                     android:width="0dp"
                     android:layout_weight="1"
-                    android:textSize="20dp"
+                    android:textSize="18dp"
                     />
 
             </LinearLayout>

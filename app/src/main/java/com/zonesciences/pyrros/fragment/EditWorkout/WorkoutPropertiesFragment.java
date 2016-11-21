@@ -20,6 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.fragment.DatePickerFragment;
 import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 
 public class WorkoutPropertiesFragment extends Fragment {
 
@@ -101,7 +102,7 @@ public class WorkoutPropertiesFragment extends Fragment {
         mDate = mWorkout.getClientTimeStamp();
 
         mDateText = (TextView) view.findViewById(R.id.date_textview);
-        mDateText.setText(mDate);
+        mDateText.setText(Utils.formatDate(mDate, 1));
         mDateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

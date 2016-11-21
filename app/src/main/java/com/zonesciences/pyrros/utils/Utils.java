@@ -30,12 +30,17 @@ public class Utils {
         return s;
     }
 
-    public static String formatDate(String date) {
+    public static String formatDate(String date, int format) {
         String oldDate = date;
         String oldDateFormat = "yyyy-MM-dd, HH:mm:ss";
-
         String newDate = new String();
-        String newDateFormat = "EEE, dd MMM";
+        String newDateFormat = new String();
+
+        if (format == 0) {
+            newDateFormat = "EEE, dd MMM";
+        } else if (format == 1){
+            newDateFormat = "EEE dd MMM, yyyy";
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat(oldDateFormat);
 
