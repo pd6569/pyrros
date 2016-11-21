@@ -73,5 +73,6 @@
     <string name="edit_workout_num_exercises">Exercise Count</string>
     <string name="edit_workout_shared">Shared</string>
     <string name="edit_workout_user_count">User Count</string>
+    <string name="action_undo">UNDO</string>
 
 </resources>

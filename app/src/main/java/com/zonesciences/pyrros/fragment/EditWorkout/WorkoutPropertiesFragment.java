@@ -31,6 +31,8 @@ import com.zonesciences.pyrros.utils.Utils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WorkoutPropertiesFragment extends Fragment {
 
@@ -53,10 +55,16 @@ public class WorkoutPropertiesFragment extends Fragment {
     Switch mSharedSwitch;
     TextView mUserCountText;
 
+    boolean mPropertiesChanged;
+
     //Data
     boolean mIsShared;
     String mDate;
     String mWorkoutName;
+
+    //Data for user undo
+    String mPreviousDate;
+    String mPreviousWorkoutName;
 
     public static WorkoutPropertiesFragment newInstance(String userId, String workoutKey){
         Bundle args = new Bundle();
@@ -119,18 +127,31 @@ public class WorkoutPropertiesFragment extends Fragment {
         mDateText.setText(Utils.formatDate(mDate, 1));
         mDateText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 DatePickerFragment fragment = new DatePickerFragment();
                 fragment.setDate(Utils.convertToCalendarObj(mDate).get(Calendar.YEAR), Utils.convertToCalendarObj(mDate).get(Calendar.MONTH), Utils.convertToCalendarObj(mDate).get(Calendar.DAY_OF_MONTH));
                 fragment.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        mPropertiesChanged = true;
                         Calendar cal = Calendar.getInstance();
                         cal.set(year, month, day);
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+                        mPreviousDate = mDate;
                         mDate = sdf.format(cal.getTime());
+                        mWorkout.setClientTimeStamp(mDate);
                         Log.i(TAG, "New date: " + mDate);
                         mDateText.setText(Utils.formatDate(mDate, 1));
+                        Snackbar snackbar = Snackbar.make(view, "Workout date changed", Snackbar.LENGTH_LONG)
+                                .setAction(R.string.action_undo, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v){
+                                        mDate = mPreviousDate;
+                                        mWorkout.setClientTimeStamp(mDate);
+                                        mDateText.setText(Utils.formatDate(mDate, 1));
+                                    }
+                                });
+                        snackbar.show();
                     }
                 });
                 fragment.show(getChildFragmentManager(), "datePicker");
@@ -144,7 +165,7 @@ public class WorkoutPropertiesFragment extends Fragment {
         mNameText.setText(mWorkoutName);
         mNameText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 View dialogView = inflater.inflate(R.layout.dialog_user_input, null);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -158,8 +179,22 @@ public class WorkoutPropertiesFragment extends Fragment {
                         .setCancelable(false)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener(){
                             public void onClick(DialogInterface dialogBox, int id){
+                                mPropertiesChanged = true;
+                                mPreviousWorkoutName = mWorkoutName;
                                 mWorkoutName = userInputEditText.getText().toString();
+                                mWorkout.setName(mWorkoutName);
                                 mNameText.setText(mWorkoutName);
+
+                                Snackbar snackbar = Snackbar.make(view, "Workout name changed", Snackbar.LENGTH_LONG)
+                                        .setAction(R.string.action_undo, new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v){
+                                                mWorkoutName = mPreviousWorkoutName;
+                                                mWorkout.setName(mWorkoutName);
+                                                mNameText.setText(mWorkoutName);
+                                            }
+                                        });
+                                snackbar.show();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
@@ -181,6 +216,7 @@ public class WorkoutPropertiesFragment extends Fragment {
         mSharedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                mPropertiesChanged = true;
                 if (isChecked) {
                     mIsShared = true;
                     Snackbar snackbar = Snackbar.make(view, "Workout is shared", Snackbar.LENGTH_LONG);
@@ -190,12 +226,27 @@ public class WorkoutPropertiesFragment extends Fragment {
                     Snackbar snackbar = Snackbar.make(view, "Workout is not shared", Snackbar.LENGTH_LONG);
                     snackbar.show();
                 }
+                mWorkout.setShared(mIsShared);
             }
         });
 
         mUserCountText = (TextView) view.findViewById(R.id.user_count_textview);
         mUserCountText.setText(Integer.toString(mWorkout.getUserCount()));
 
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.i(TAG, "onPause(). Update properties");
+        if (mPropertiesChanged) {
+            if (mWorkout != null) {
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("/user-workouts/" + mUserId + "/" + mWorkoutKey, mWorkout);
+                childUpdates.put("/workouts/" + mWorkoutKey, mWorkout);
+                mDatabase.updateChildren(childUpdates);
+            }
+        }
     }
 
 }

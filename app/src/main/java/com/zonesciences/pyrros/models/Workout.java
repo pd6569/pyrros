@@ -110,5 +110,18 @@ public class Workout {
     public int getUserCount() {
         return userCount;
     }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setShared(Boolean shared) {
+        this.shared = shared;
+    }
+
+    public void setClientTimeStamp(String clientTimeStamp) {
+        this.clientTimeStamp = clientTimeStamp;
+    }
 }
 //[END workout_class]
