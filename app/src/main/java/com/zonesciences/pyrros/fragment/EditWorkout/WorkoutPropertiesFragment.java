@@ -2,10 +2,14 @@ package com.zonesciences.pyrros.fragment.EditWorkout;
 
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -14,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.fragment.DatePickerFragment;
 import com.zonesciences.pyrros.models.Workout;
 
 public class WorkoutPropertiesFragment extends Fragment {
@@ -28,12 +33,16 @@ public class WorkoutPropertiesFragment extends Fragment {
     private String mWorkoutKey;
 
     // Views
-    TextView mDate;
-    TextView mCreator;
-    TextView mName;
-    TextView mNumExercises;
-    TextView mShared;
-    TextView mUserCount;
+    TextView mDateText;
+    TextView mCreatorText;
+    TextView mNameText;
+    TextView mNumExercisesText;
+    Switch mSharedSwitch;
+    TextView mUserCountText;
+
+    //Data
+    boolean mIsShared;
+    String mDate;
 
     public static WorkoutPropertiesFragment newInstance(String userId, String workoutKey){
         Bundle args = new Bundle();
@@ -86,25 +95,50 @@ public class WorkoutPropertiesFragment extends Fragment {
         return rootView;
     }
 
-    public void setWorkoutDataView(View view){
+    public void setWorkoutDataView(final View view){
 
-        mDate = (TextView) view.findViewById(R.id.date_textview);
-        mDate.setText(mWorkout.getClientTimeStamp());
+        mIsShared = mWorkout.getShared();
+        mDate = mWorkout.getClientTimeStamp();
 
-        mCreator = (TextView) view.findViewById(R.id.creator_textview);
-        mCreator.setText(mWorkout.getCreator());
+        mDateText = (TextView) view.findViewById(R.id.date_textview);
+        mDateText.setText(mDate);
+        mDateText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment fragment = new DatePickerFragment();
+                fragment.show(getChildFragmentManager(), "datePicker");
+            }
+        });
 
-        mName = (TextView) view.findViewById(R.id.name_textview);
-        mName.setText(mWorkout.getName());
+        mCreatorText = (TextView) view.findViewById(R.id.creator_textview);
+        mCreatorText.setText(mWorkout.getCreator());
 
-        mNumExercises = (TextView) view.findViewById(R.id.num_exercises_textview);
-        mNumExercises.setText(Integer.toString(mWorkout.getNumExercises()));
+        mNameText = (TextView) view.findViewById(R.id.name_textview);
+        mNameText.setText(mWorkout.getName());
 
-        mShared = (TextView) view.findViewById(R.id.shared_textview);
-        mShared.setText(mWorkout.getShared().toString());
+        mNumExercisesText = (TextView) view.findViewById(R.id.num_exercises_textview);
+        mNumExercisesText.setText(Integer.toString(mWorkout.getNumExercises()));
 
-        mUserCount = (TextView) view.findViewById(R.id.user_count_textview);
-        mUserCount.setText(Integer.toString(mWorkout.getUserCount()));
+
+        mSharedSwitch = (Switch) view.findViewById(R.id.shared_switch);
+        mSharedSwitch.setChecked(mIsShared);
+        mSharedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked) {
+                    mIsShared = true;
+                    Snackbar snackbar = Snackbar.make(view, "Workout is shared", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                } else {
+                    mIsShared = false;
+                    Snackbar snackbar = Snackbar.make(view, "Workout is not shared", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            }
+        });
+
+        mUserCountText = (TextView) view.findViewById(R.id.user_count_textview);
+        mUserCountText.setText(Integer.toString(mWorkout.getUserCount()));
 
     }
 
