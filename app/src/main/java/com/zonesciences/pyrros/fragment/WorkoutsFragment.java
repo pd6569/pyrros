@@ -1,5 +1,6 @@
 package com.zonesciences.pyrros.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.HomeScreenPagerAdapter;
 import com.zonesciences.pyrros.adapters.WorkoutsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
@@ -57,6 +59,17 @@ public class WorkoutsFragment extends Fragment {
 
     public WorkoutsFragment() {}
 
+    //Listeners
+    HomeScreenPagerAdapter.WorkoutsFragmentListener mListener;
+
+    public static WorkoutsFragment newInstance(HomeScreenPagerAdapter.WorkoutsFragmentListener listener) {
+
+        Bundle args = new Bundle();
+        WorkoutsFragment fragment = new WorkoutsFragment();
+        fragment.setArguments(args);
+        fragment.setWorkoutsFragmentListener(listener);
+        return fragment;
+    }
 
 
     @Override
@@ -71,7 +84,6 @@ public class WorkoutsFragment extends Fragment {
 
         setHasOptionsMenu(true);
     }
-
 
 
     @Override
@@ -177,12 +189,15 @@ public class WorkoutsFragment extends Fragment {
 
         switch(i){
             case R.id.action_calendar_view:
-
+                mListener.onSwitchWorkoutsView();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void setWorkoutsFragmentListener (HomeScreenPagerAdapter.WorkoutsFragmentListener listener){
+        this.mListener = listener;
+    }
 
 }

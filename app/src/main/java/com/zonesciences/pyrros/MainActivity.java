@@ -10,6 +10,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,8 +31,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.adapters.HomeScreenPagerAdapter;
 import com.zonesciences.pyrros.fragment.DashboardFragment;
+import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.TrainerFragment;
+import com.zonesciences.pyrros.fragment.WorkoutsCalendarFragment;
 import com.zonesciences.pyrros.fragment.WorkoutsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
@@ -48,7 +52,7 @@ public class MainActivity extends BaseActivity {
 
     private DatabaseReference mDatabase;
 
-    private FragmentPagerAdapter mPagerAdapter;
+    private HomeScreenPagerAdapter mPagerAdapter;
     private ViewPager mViewPager;
 
     private String mUserId;
@@ -75,9 +79,8 @@ public class MainActivity extends BaseActivity {
 
             mViewPager = (ViewPager) findViewById(R.id.viewpager_homescreen);
 
-            mPagerAdapter = new FragmentHomescreenPagerAdapter(getSupportFragmentManager());
+            mPagerAdapter = new HomeScreenPagerAdapter(getSupportFragmentManager());
             mViewPager.setAdapter(mPagerAdapter);
-
 
 
             //Set locations to keep in sync
@@ -145,40 +148,6 @@ public class MainActivity extends BaseActivity {
     }
 
 
-
-
-    class FragmentHomescreenPagerAdapter extends FragmentPagerAdapter {
-
-        private final Fragment[] mFragments = new Fragment[] {
-                new WorkoutsFragment(),
-                new DashboardFragment(),
-        };
-
-        String tabTitles[] = new String[]{
-                "Workouts",
-                "Dashboard"
-        };
-
-        //constructor
-        public FragmentHomescreenPagerAdapter(FragmentManager fm){
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragments[position];
-        }
-
-        @Override
-        public int getCount() {
-            return mFragments.length;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position){
-            return tabTitles[position];
-        }
-    }
 
     public void purgeDatabase(){
         mDatabase.child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
