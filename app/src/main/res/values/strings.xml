@@ -75,5 +75,6 @@
     <string name="edit_workout_user_count">User Count</string>
     <string name="action_undo">UNDO</string>
     <string name="menu_calendar">Calendar</string>
+    <string name="menu_list_view">List view</string>
 
 </resources>

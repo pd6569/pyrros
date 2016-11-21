@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.zonesciences.pyrros.fragment.DashboardFragment;
 import com.zonesciences.pyrros.fragment.WorkoutsCalendarFragment;
+import com.zonesciences.pyrros.fragment.WorkoutsContainerFragment;
 import com.zonesciences.pyrros.fragment.WorkoutsListFragment;
 
 public class HomeScreenPagerAdapter extends FragmentPagerAdapter {
@@ -15,7 +16,7 @@ public class HomeScreenPagerAdapter extends FragmentPagerAdapter {
     private final FragmentManager mFragmentManager;
 
     Fragment[] fragments = new Fragment[]{
-            WorkoutsListFragment.newInstance(),
+            new WorkoutsContainerFragment(),
             new DashboardFragment()
     };
 

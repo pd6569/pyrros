@@ -55,13 +55,16 @@ public class WorkoutsListFragment extends Fragment {
 
     private String mUnits;
 
+    private WorkoutsContainerFragment.OnViewSwitchedListener mOnViewSwitchedListener;
+
     public WorkoutsListFragment() {}
 
-    public static WorkoutsListFragment newInstance() {
+    public static WorkoutsListFragment newInstance(WorkoutsContainerFragment.OnViewSwitchedListener listener) {
 
         Bundle args = new Bundle();
         WorkoutsListFragment fragment = new WorkoutsListFragment();
         fragment.setArguments(args);
+        fragment.setOnViewSwitchedListener(listener);
         return fragment;
     }
 
@@ -100,6 +103,8 @@ public class WorkoutsListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_workouts, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        MenuItem listView = (MenuItem) menu.findItem(R.id.action_list_view);
+        listView.setVisible(false);
     }
 
     @Override
@@ -152,16 +157,6 @@ public class WorkoutsListFragment extends Fragment {
                 mManager.setStackFromEnd(true);
                 mRecyclerView.setLayoutManager(mManager);
 
-                //Set up FirebaseRecyclerAdapter with the Query
-                //This is an abstract method that passes the database instance in and returns a query specific
-                //to the subclass that extends it. The method is overridden in the subclass (which is why it
-                //is declared abstract) with the specific query that should be utilised to display the relevant
-                //list of workouts.
-
-
-                // Need to make this flexible if want to filter by different workouts (e.g. all user workouts) and ensure that the HashMap is
-                // adjusted accordingly.
-
                 mUserWorkoutsQuery = mDatabase.child("user-workouts").child(getUid()).orderByChild("clientTimeStamp").limitToFirst(1000);
 
 
@@ -183,10 +178,16 @@ public class WorkoutsListFragment extends Fragment {
 
         switch(i){
             case R.id.action_calendar_view:
+                mOnViewSwitchedListener.switchView();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+
+
+    public void setOnViewSwitchedListener (WorkoutsContainerFragment.OnViewSwitchedListener listener){
+        this.mOnViewSwitchedListener = listener;
+    }
 }

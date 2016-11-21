@@ -13,6 +13,7 @@ import com.zonesciences.pyrros.R;
 
 public class WorkoutsContainerFragment extends Fragment {
 
+    private FragmentManager mFragmentManager;
 
     public WorkoutsContainerFragment() {
         // Required empty public constructor
@@ -29,10 +30,25 @@ public class WorkoutsContainerFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_workouts_container, container, false);
 
-        FragmentManager fm = getChildFragmentManager();
-        fm.beginTransaction().add(R.id.workouts_list_calendar_container, WorkoutsListFragment.newInstance()).commit();
+        mFragmentManager = getChildFragmentManager();
+        mFragmentManager.beginTransaction().add(R.id.workouts_list_calendar_container, WorkoutsListFragment.newInstance(new OnViewSwitchedListener() {
+            @Override
+            public void switchView() {
+                mFragmentManager.beginTransaction().replace(R.id.workouts_list_calendar_container, WorkoutsCalendarFragment.newInstance(new OnViewSwitchedListener() {
+                    @Override
+                    public void switchView() {
+                        mFragmentManager.popBackStack();
+                    }
+                })).addToBackStack(null).commit();
+            }
+        })).commit();
 
         return rootView;
+    }
+
+
+    public interface OnViewSwitchedListener{
+        void switchView();
     }
 
 }
