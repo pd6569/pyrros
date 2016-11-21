@@ -2,16 +2,19 @@ package com.zonesciences.pyrros.fragment.EditWorkout;
 
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -31,7 +34,7 @@ import java.util.Date;
 
 public class WorkoutPropertiesFragment extends Fragment {
 
-    private static final String TAG = "WorkoutPropertiesFragment";
+    private static final String TAG = "WorkoutProperties";
 
     private static final String ARG_USER_ID = "UserId";
     private static final String ARG_WORKOUT_KEY = "WorkoutKey";
@@ -53,6 +56,7 @@ public class WorkoutPropertiesFragment extends Fragment {
     //Data
     boolean mIsShared;
     String mDate;
+    String mWorkoutName;
 
     public static WorkoutPropertiesFragment newInstance(String userId, String workoutKey){
         Bundle args = new Bundle();
@@ -109,6 +113,7 @@ public class WorkoutPropertiesFragment extends Fragment {
 
         mIsShared = mWorkout.getShared();
         mDate = mWorkout.getClientTimeStamp();
+        mWorkoutName = mWorkout.getName();
 
         mDateText = (TextView) view.findViewById(R.id.date_textview);
         mDateText.setText(Utils.formatDate(mDate, 1));
@@ -136,7 +141,36 @@ public class WorkoutPropertiesFragment extends Fragment {
         mCreatorText.setText(mWorkout.getCreator());
 
         mNameText = (TextView) view.findViewById(R.id.name_textview);
-        mNameText.setText(mWorkout.getName());
+        mNameText.setText(mWorkoutName);
+        mNameText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                View dialogView = inflater.inflate(R.layout.dialog_user_input, null);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setView(dialogView);
+
+                final TextView dialogTitle = (TextView) dialogView.findViewById(R.id.dialog_title_textview);
+                dialogTitle.setVisibility(View.GONE);
+                final EditText userInputEditText = (EditText) dialogView.findViewById(R.id.user_input_edit_text);
+                userInputEditText.setHint("Enter workout name");
+                builder
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dialogBox, int id){
+                                mWorkoutName = userInputEditText.getText().toString();
+                                mNameText.setText(mWorkoutName);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dialogBox, int id){
+                                dialogBox.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+        });
 
         mNumExercisesText = (TextView) view.findViewById(R.id.num_exercises_textview);
         mNumExercisesText.setText(Integer.toString(mWorkout.getNumExercises()));

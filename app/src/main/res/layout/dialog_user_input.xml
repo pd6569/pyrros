@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/dialog_user_input"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="16dp">
+
+    <TextView
+        android:id="@+id/dialog_title_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dialog Title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/user_input_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Something"
+        android:inputType="text" />
+</LinearLayout>
