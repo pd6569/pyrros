@@ -323,8 +323,8 @@ public class NewWorkoutActivity extends BaseActivity {
 
         }
 
-        //Set Default workout title
-        String title = new String("" + Utils.getClientTimeStamp(false));
+        //Set Default workout title blank
+        String title = "";
 
         mCurrentWorkout = new Workout(userId, username, Utils.getClientTimeStamp(true), title, new Boolean(true));
         Map<String, Object> workoutValues = mCurrentWorkout.toMap();

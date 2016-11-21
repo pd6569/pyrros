@@ -23,7 +23,7 @@ public class WorkoutsFragment extends WorkoutsListFragment {
         // [START recent_workouts_query]
         // Last 100 workouts, these are automatically the 100 most recent
         // due to sorting by push() keys
-        Query userWorkoutsQuery = databaseReference.child("user-workouts").child(getUid()).limitToFirst(1000);
+        Query userWorkoutsQuery = databaseReference.child("user-workouts").child(getUid()).orderByChild("clientTimeStamp").limitToFirst(1000);
         // [END recent_posts_query]
 
         return userWorkoutsQuery;

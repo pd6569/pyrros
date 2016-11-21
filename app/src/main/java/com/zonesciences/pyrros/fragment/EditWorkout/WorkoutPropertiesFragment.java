@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.fragment.EditWorkout;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -162,7 +163,13 @@ public class WorkoutPropertiesFragment extends Fragment {
         mCreatorText.setText(mWorkout.getCreator());
 
         mNameText = (TextView) view.findViewById(R.id.name_textview);
-        mNameText.setText(mWorkoutName);
+
+        if (!mWorkoutName.isEmpty()) {
+            mNameText.setText(mWorkoutName);
+        } else {
+            mNameText.setText("No Title");
+            mNameText.setTypeface(null, Typeface.ITALIC);
+        }
         mNameText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -184,6 +191,7 @@ public class WorkoutPropertiesFragment extends Fragment {
                                 mWorkoutName = userInputEditText.getText().toString();
                                 mWorkout.setName(mWorkoutName);
                                 mNameText.setText(mWorkoutName);
+                                mNameText.setTypeface(null, Typeface.NORMAL);
 
                                 Snackbar snackbar = Snackbar.make(view, "Workout name changed", Snackbar.LENGTH_LONG)
                                         .setAction(R.string.action_undo, new View.OnClickListener() {

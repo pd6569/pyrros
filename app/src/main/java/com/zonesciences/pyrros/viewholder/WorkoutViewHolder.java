@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 
 import org.w3c.dom.Text;
 
@@ -48,7 +49,11 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
     public void bindToWorkout(Workout workout, String workoutExercisesReference,View.OnClickListener usersClickListener){
         Log.i(TAG, "bindToWorkout called");
 
-        titleTextView.setText(workout.name);
+        if (workout.getName().isEmpty()) {
+            titleTextView.setText(Utils.formatDate(workout.getClientTimeStamp(), 0));
+        } else {
+                titleTextView.setText(Utils.formatDate(workout.getClientTimeStamp(), 0) + " - " + workout.getName());
+            }
         creatorTextView.setText(workout.creator);
         numUsersTextView.setText(String.valueOf(workout.userCount));
         usersImageView.setOnClickListener(usersClickListener);
