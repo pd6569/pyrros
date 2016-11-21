@@ -15,7 +15,11 @@ import android.view.ViewGroup;
 import android.widget.CalendarView;
 
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.timessquare.CalendarPickerView;
 import com.zonesciences.pyrros.R;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class WorkoutsCalendarFragment extends Fragment {
 
@@ -51,7 +55,13 @@ public class WorkoutsCalendarFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
 
         Log.i(TAG, "WorkoutsCalendarFragment loaded");
-        mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
+        Calendar nextYear = Calendar.getInstance();
+        nextYear.add(Calendar.YEAR, 1);
+
+        CalendarPickerView calendar = (CalendarPickerView) rootView.findViewById(R.id.calendar_view);
+        Date today = new Date();
+        calendar.init(today, nextYear.getTime())
+                .withSelectedDate(today);
 
         return rootView;
     }
