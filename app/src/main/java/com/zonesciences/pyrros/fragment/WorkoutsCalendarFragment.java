@@ -55,12 +55,15 @@ public class WorkoutsCalendarFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
 
         Log.i(TAG, "WorkoutsCalendarFragment loaded");
+        Calendar lastYear = Calendar.getInstance();
+        lastYear.add(Calendar.YEAR, -1);
+
         Calendar nextYear = Calendar.getInstance();
         nextYear.add(Calendar.YEAR, 1);
 
         CalendarPickerView calendar = (CalendarPickerView) rootView.findViewById(R.id.calendar_view);
         Date today = new Date();
-        calendar.init(today, nextYear.getTime())
+        calendar.init(lastYear.getTime(), nextYear.getTime())
                 .withSelectedDate(today);
 
         return rootView;
