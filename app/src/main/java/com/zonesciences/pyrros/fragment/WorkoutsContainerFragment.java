@@ -33,6 +33,7 @@ public class WorkoutsContainerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
 
+        //remove all fragments, prevent duplication
         mFragmentManager = getChildFragmentManager();
         if (mFragmentManager.getFragments() != null) {
             for (Fragment frag : mFragmentManager.getFragments()) {
@@ -40,6 +41,7 @@ public class WorkoutsContainerFragment extends Fragment {
             }
         }
 
+        //  workout exercise map is set when calendar view is clicked from list view, and this map is passed to calendar fragment
         mFragmentManager.beginTransaction().add(R.id.workouts_list_calendar_container, WorkoutsListFragment.newInstance(new WorkoutsListFragment.OnSwitchToCalendarViewListener() {
             @Override
             public void displayCalendarView(Map<String, List<Exercise>> workoutExercisesMap) {

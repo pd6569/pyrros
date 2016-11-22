@@ -12,10 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +36,13 @@ public class WorkoutsCalendarFragment extends Fragment {
 
     private static final String ARG_WORKOUT_EXERCISES_MAP = "WorkoutExercisesMap";
 
+    private DatabaseReference mDatabase;
+
     CalendarView mCalendarView;
 
     // Data
     Map<String, List<Exercise>> mWorkoutExercisesMap;
+    Map<String, Map<String, String>> mWorkoutDatesMap = new HashMap<>();
 
     // Listener
     private OnSwitchToListViewListener mListViewListener;
@@ -56,6 +70,33 @@ public class WorkoutsCalendarFragment extends Fragment {
 
         Log.i(TAG, "mWorkoutExerciseMap has been received, size: " + mWorkoutExercisesMap.size());
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("user-workouts").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot workout : dataSnapshot.getChildren()) {
+                    Workout w = workout.getValue(Workout.class);
+                    String dateKey = Utils.formatDate(w.getClientTimeStamp(), 2);
+                    String timeKey = Utils.formatDate(w.getClientTimeStamp(), 3);
+
+                    if (mWorkoutDatesMap.containsKey(dateKey)) {
+                        mWorkoutDatesMap.get(dateKey).put(timeKey, workout.getKey());
+                    } else {
+                        Map<String, String> timeMap = new HashMap<>();
+                        timeMap.put(timeKey, workout.getKey());
+                        mWorkoutDatesMap.put(dateKey, timeMap);
+                    }
+                }
+                Log.i(TAG, "WorkoutDatesMap created, size: " + mWorkoutDatesMap.size());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
         setHasOptionsMenu(true);
     }
 
@@ -69,8 +110,24 @@ public class WorkoutsCalendarFragment extends Fragment {
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int year, int month, int day) {
-                Log.i(TAG, "Date changed");
+                Log.i(TAG, "Date changed, format: " + year + "-" + month + "-" + day);
+                //Convert selected date to same format as key for map
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.MONTH, month);
+                cal.set(Calendar.DAY_OF_MONTH, day);
 
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String date = sdf.format(cal.getTime());
+                Log.i (TAG, "Date formatted: " + date);
+
+                Map<String,String> map = mWorkoutDatesMap.get(date);
+                if (map != null){
+                    List<String> workoutTimes = new ArrayList<String>(map.keySet());
+                    Log.i(TAG, workoutTimes.size() + " workouts found for this date");
+                } else {
+                    Log.i(TAG, "No workout found for this date");
+                }
             }
         });
 

@@ -2,6 +2,8 @@ package com.zonesciences.pyrros.utils;
 
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,6 +42,10 @@ public class Utils {
             newDateFormat = "EEE, dd MMM";
         } else if (format == 1){
             newDateFormat = "EEE dd MMM, yyyy";
+        } else if (format == 2) {
+            newDateFormat = "yyyy-MM-dd";
+        } else if (format == 3) {
+            newDateFormat = "HH:mm";
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat(oldDateFormat);
@@ -76,5 +82,9 @@ public class Utils {
         }
         String date = df.format(Calendar.getInstance().getTime());
         return date;
+    }
+
+    public static String getUid(){
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 }
