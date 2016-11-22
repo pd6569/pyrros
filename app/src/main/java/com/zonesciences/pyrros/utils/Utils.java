@@ -32,19 +32,19 @@ public class Utils {
         return s;
     }
 
-    public static String formatDate(String date, int format) {
+    public static String formatDate(String date, String oldFormat, int newFormat) {
         String oldDate = date;
-        String oldDateFormat = "yyyy-MM-dd, HH:mm:ss";
+        String oldDateFormat = oldFormat;
         String newDate = new String();
         String newDateFormat = new String();
 
-        if (format == 0) {
+        if (newFormat == 0) {
             newDateFormat = "EEE, dd MMM";
-        } else if (format == 1){
+        } else if (newFormat == 1){
             newDateFormat = "EEE dd MMM, yyyy";
-        } else if (format == 2) {
+        } else if (newFormat == 2) {
             newDateFormat = "yyyy-MM-dd";
-        } else if (format == 3) {
+        } else if (newFormat == 3) {
             newDateFormat = "HH:mm";
         }
 

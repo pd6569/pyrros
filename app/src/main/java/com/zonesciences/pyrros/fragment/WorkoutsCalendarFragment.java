@@ -2,6 +2,8 @@ package com.zonesciences.pyrros.fragment;
 
 
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +12,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,6 +43,12 @@ public class WorkoutsCalendarFragment extends Fragment {
     private DatabaseReference mDatabase;
 
     CalendarView mCalendarView;
+
+    // Bottomsheet View
+    private View mBottomSheet;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private TextView mTitle;
+
 
     // Data
     Map<String, List<Exercise>> mWorkoutExercisesMap;
@@ -76,8 +86,8 @@ public class WorkoutsCalendarFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot workout : dataSnapshot.getChildren()) {
                     Workout w = workout.getValue(Workout.class);
-                    String dateKey = Utils.formatDate(w.getClientTimeStamp(), 2);
-                    String timeKey = Utils.formatDate(w.getClientTimeStamp(), 3);
+                    String dateKey = Utils.formatDate(w.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 2);
+                    String timeKey = Utils.formatDate(w.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 3);
 
                     if (mWorkoutDatesMap.containsKey(dateKey)) {
                         mWorkoutDatesMap.get(dateKey).put(timeKey, workout.getKey());
@@ -104,7 +114,13 @@ public class WorkoutsCalendarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
+
+        mBottomSheet = rootView.findViewById(R.id.bottom_sheet_calendar);
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+        mBottomSheetBehavior.setPeekHeight(0);
+
+        mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
 
         mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -122,6 +138,7 @@ public class WorkoutsCalendarFragment extends Fragment {
                 Log.i (TAG, "Date formatted: " + date);
 
                 Map<String,String> map = mWorkoutDatesMap.get(date);
+
                 if (map != null){
                     List<String> workoutTimes = new ArrayList<String>(map.keySet());
                     Log.i(TAG, workoutTimes.size() + " workouts found for this date");
@@ -131,12 +148,18 @@ public class WorkoutsCalendarFragment extends Fragment {
                         }
                     } else {
                         Log.i(TAG, "Only 1 workout performed on this day: " + workoutTimes.get(0));
+                        mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1));
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                     }
                 } else {
                     Log.i(TAG, "No workout found for this date");
+                    Snackbar snackbar = Snackbar.make(rootView, "No workouts on this date", Snackbar.LENGTH_SHORT);
+                    snackbar.show();
                 }
             }
         });
+
+        ;
 
 
         return rootView;
@@ -169,4 +192,5 @@ public class WorkoutsCalendarFragment extends Fragment {
     public void setOnSwitchToListViewListener (OnSwitchToListViewListener listener){
         this.mListViewListener = listener;
     }
+
 }

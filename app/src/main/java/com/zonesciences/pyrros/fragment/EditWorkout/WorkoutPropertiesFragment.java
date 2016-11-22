@@ -125,7 +125,7 @@ public class WorkoutPropertiesFragment extends Fragment {
         mWorkoutName = mWorkout.getName();
 
         mDateText = (TextView) view.findViewById(R.id.date_textview);
-        mDateText.setText(Utils.formatDate(mDate, 1));
+        mDateText.setText(Utils.formatDate(mDate, "yyyy-MM-dd, HH:mm:ss", 1));
         mDateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -142,14 +142,14 @@ public class WorkoutPropertiesFragment extends Fragment {
                         mDate = sdf.format(cal.getTime());
                         mWorkout.setClientTimeStamp(mDate);
                         Log.i(TAG, "New date: " + mDate);
-                        mDateText.setText(Utils.formatDate(mDate, 1));
+                        mDateText.setText(Utils.formatDate(mDate, "yyyy-MM-dd, HH:mm:ss", 1));
                         Snackbar snackbar = Snackbar.make(view, "Workout date changed", Snackbar.LENGTH_LONG)
                                 .setAction(R.string.action_undo, new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v){
                                         mDate = mPreviousDate;
                                         mWorkout.setClientTimeStamp(mDate);
-                                        mDateText.setText(Utils.formatDate(mDate, 1));
+                                        mDateText.setText(Utils.formatDate(mDate, "yyyy-MM-dd, HH:mm:ss", 1));
                                     }
                                 });
                         snackbar.show();

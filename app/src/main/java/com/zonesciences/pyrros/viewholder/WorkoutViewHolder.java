@@ -50,9 +50,9 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         Log.i(TAG, "bindToWorkout called");
 
         if (workout.getName().isEmpty()) {
-            titleTextView.setText(Utils.formatDate(workout.getClientTimeStamp(), 0));
+            titleTextView.setText(Utils.formatDate(workout.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 0));
         } else {
-                titleTextView.setText(Utils.formatDate(workout.getClientTimeStamp(), 0) + " - " + workout.getName());
+                titleTextView.setText(Utils.formatDate(workout.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 0) + " - " + workout.getName());
             }
         creatorTextView.setText(workout.creator);
         numUsersTextView.setText(String.valueOf(workout.userCount));
