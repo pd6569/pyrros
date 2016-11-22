@@ -102,11 +102,8 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
         } else {
             mExercises = mWorkoutExercisesMap.get(workoutRef.getKey());
 
-            Log.i(TAG, "mExercises before sort: " + mExercises);
             Collections.sort(mExercises);
-            for (Exercise e : mExercises){
-                Log.i(TAG, "Name of exercise: " + e.getName() + " Order: " + e.getOrder());
-            }
+
             mNumExercises = mExercises.size();
             Log.i(TAG, "mWorkoutExercises Map contains exercises: " + mNumExercises);
 

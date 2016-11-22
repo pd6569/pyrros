@@ -2,10 +2,12 @@ package com.zonesciences.pyrros.fragment;
 
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -30,6 +33,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +57,15 @@ public class WorkoutsCalendarFragment extends Fragment {
     // Data
     Map<String, List<Exercise>> mWorkoutExercisesMap;
     Map<String, Map<String, String>> mWorkoutDatesMap = new HashMap<>();
+    List<Exercise> mExercises = new ArrayList<>();
+
+    // Units
+    private String mUnit;
+    private double mConversionMultiple;
 
     // Listener
     private OnSwitchToListViewListener mListViewListener;
+
 
     public WorkoutsCalendarFragment() {
         // Required empty public constructor
@@ -106,6 +116,13 @@ public class WorkoutsCalendarFragment extends Fragment {
             }
         });
 
+        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString("pref_unit", null).equals("metric")){
+            mUnit = " kgs";
+            mConversionMultiple = 1.0;
+        } else {
+            mUnit = " lbs";
+            mConversionMultiple = 2.20462;
+        }
 
         setHasOptionsMenu(true);
     }
@@ -120,7 +137,8 @@ public class WorkoutsCalendarFragment extends Fragment {
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
         mBottomSheetBehavior.setPeekHeight(0);
 
-        mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
+        mTitle = (TextView) rootView.findViewById(R.id.workout_title);
+        mTitle.setGravity(Gravity.CENTER);
 
         mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -137,6 +155,7 @@ public class WorkoutsCalendarFragment extends Fragment {
                 String date = sdf.format(cal.getTime());
                 Log.i (TAG, "Date formatted: " + date);
 
+                //Get exercises times map (maps time to workout ID - important if more than one workout performed on a single day)
                 Map<String,String> map = mWorkoutDatesMap.get(date);
 
                 if (map != null){
@@ -147,8 +166,59 @@ public class WorkoutsCalendarFragment extends Fragment {
                             Log.i(TAG, "Workout at: " + time);
                         }
                     } else {
-                        Log.i(TAG, "Only 1 workout performed on this day: " + workoutTimes.get(0));
+
+                        String workoutKey = map.get(workoutTimes.get(0));
+                        mExercises = mWorkoutExercisesMap.get(workoutKey);
+
+                        Log.i(TAG, "Only 1 workout performed on this day: " + workoutTimes.get(0) + " Number of exercises performed: " + mExercises.size());
+
+                        Collections.sort(mExercises);
+
+                        int numExercises = mExercises.size();
+
                         mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1));
+
+                        LinearLayout exercisesContainer = (LinearLayout) rootView.findViewById(R.id.workout_exercises_container);
+                        exercisesContainer.removeAllViews();
+
+                        for (int i = 0; i < numExercises; i++) {
+
+                            Exercise currentExercise = mExercises.get(i);
+                            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_workout_exercises, null);
+                            TextView exerciseText = (TextView) view.findViewById(R.id.workout_exercise_name);
+                            LinearLayout setsContainer = (LinearLayout) view.findViewById(R.id.workout_sets_container);
+                            exerciseText.setText(currentExercise.getName());
+
+                            if (currentExercise.getSets() == 0){
+                                TextView noSets = (TextView) view.findViewById(R.id.workout_no_sets);
+                                noSets.setVisibility(View.VISIBLE);
+                            }
+
+                            for (int j = 0; j < currentExercise.getSets(); j++){
+
+                                Log.i(TAG, "GETTING SETS FOR: currentExercise = " + currentExercise.getName());
+                                View setsView = LayoutInflater.from(getContext()).inflate(R.layout.item_sets, null);
+                                TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
+                                TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
+                                TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
+
+                                setNumber.setVisibility(View.GONE);
+
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
+                                double weight = currentExercise.getWeight().get(j) * mConversionMultiple;
+                                String s = Utils.formatWeight(weight);
+                                setWeight.setText(s + mUnit);
+                                setWeight.setLayoutParams(params);
+                                setReps.setText("" + currentExercise.getReps().get(j) + " reps");
+                                setReps.setLayoutParams(params);
+
+                                setsContainer.addView(setsView);
+
+                            }
+
+                            exercisesContainer.addView(view);
+                        }
+
                         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                     }
                 } else {
