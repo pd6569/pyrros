@@ -24,7 +24,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.adapters.HomeScreenPagerAdapter;
 import com.zonesciences.pyrros.adapters.WorkoutsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
@@ -101,10 +100,8 @@ public class WorkoutsListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_workouts, menu);
+        inflater.inflate(R.menu.menu_workouts_list_view, menu);
         super.onCreateOptionsMenu(menu, inflater);
-        MenuItem listView = (MenuItem) menu.findItem(R.id.action_list_view);
-        listView.setVisible(false);
     }
 
     @Override

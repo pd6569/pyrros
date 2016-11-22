@@ -4,13 +4,6 @@
       xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/action_calendar_view"
-        android:title="@string/menu_calendar"
-        android:visible="true"
-        android:icon="@drawable/ic_date_range_white_24dp"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_list_view"
         android:title="@string/menu_list_view"
         android:visible="true"

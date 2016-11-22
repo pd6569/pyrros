@@ -1,9 +1,7 @@
 package com.zonesciences.pyrros.fragment;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,18 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 
-import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.timessquare.CalendarPickerView;
 import com.zonesciences.pyrros.R;
-
-import java.util.Calendar;
-import java.util.Date;
 
 public class WorkoutsCalendarFragment extends Fragment {
 
     private static final String TAG = "WorkoutsCalendar";
 
     CalendarView mCalendarView;
+
+    //Listener
     private WorkoutsContainerFragment.OnViewSwitchedListener mOnViewSwitchedListener;
 
     public WorkoutsCalendarFragment() {
@@ -54,28 +49,16 @@ public class WorkoutsCalendarFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
 
-        Log.i(TAG, "WorkoutsCalendarFragment loaded");
-        Calendar lastYear = Calendar.getInstance();
-        lastYear.add(Calendar.YEAR, -1);
+        mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
 
-        Calendar nextYear = Calendar.getInstance();
-        nextYear.add(Calendar.YEAR, 1);
-
-        CalendarPickerView calendar = (CalendarPickerView) rootView.findViewById(R.id.calendar_view);
-        Date today = new Date();
-        calendar.init(lastYear.getTime(), nextYear.getTime())
-                .withSelectedDate(today);
 
         return rootView;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_workouts, menu);
+        inflater.inflate(R.menu.menu_workouts_calendar_view, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem calendarView = (MenuItem) menu.findItem(R.id.action_calendar_view);
-        calendarView.setVisible(false);
     }
 
     @Override
