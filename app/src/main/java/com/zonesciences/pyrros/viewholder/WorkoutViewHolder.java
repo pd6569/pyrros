@@ -39,6 +39,7 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
 
         titleTextView = (TextView) itemView.findViewById(R.id.workout_title);
+        titleTextView.setVisibility(View.VISIBLE);
         creatorTextView = (TextView) itemView.findViewById(R.id.workout_creator);
         usersImageView = (ImageView) itemView.findViewById(R.id.workout_users);
         numUsersTextView = (TextView) itemView.findViewById(R.id.workout_num_users);

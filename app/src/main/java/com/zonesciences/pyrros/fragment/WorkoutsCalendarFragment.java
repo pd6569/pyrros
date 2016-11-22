@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -51,6 +53,7 @@ public class WorkoutsCalendarFragment extends Fragment {
     // Bottomsheet View
     private View mBottomSheet;
     private BottomSheetBehavior mBottomSheetBehavior;
+    private RelativeLayout mTitleContainer;
     private TextView mTitle;
 
 
@@ -137,8 +140,10 @@ public class WorkoutsCalendarFragment extends Fragment {
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
         mBottomSheetBehavior.setPeekHeight(0);
 
-        mTitle = (TextView) rootView.findViewById(R.id.workout_title);
-        mTitle.setGravity(Gravity.CENTER);
+        mTitleContainer = (RelativeLayout) rootView.findViewById(R.id.bottom_sheet_calendar_title_container);
+        mTitleContainer.setVisibility(View.VISIBLE);
+
+        mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
 
         mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
