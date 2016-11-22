@@ -54,16 +54,16 @@ public class WorkoutsListFragment extends Fragment {
 
     private String mUnits;
 
-    private WorkoutsContainerFragment.OnViewSwitchedListener mOnViewSwitchedListener;
+    private OnSwitchToCalendarViewListener mCalendarViewListener;
 
     public WorkoutsListFragment() {}
 
-    public static WorkoutsListFragment newInstance(WorkoutsContainerFragment.OnViewSwitchedListener listener) {
+    public static WorkoutsListFragment newInstance(OnSwitchToCalendarViewListener listener) {
 
         Bundle args = new Bundle();
         WorkoutsListFragment fragment = new WorkoutsListFragment();
         fragment.setArguments(args);
-        fragment.setOnViewSwitchedListener(listener);
+        fragment.setOnSwitchToCalendarViewListener(listener);
         return fragment;
     }
 
@@ -88,11 +88,6 @@ public class WorkoutsListFragment extends Fragment {
 
         Log.i(TAG, "onCreateView() called");
         View rootView = inflater.inflate(R.layout.fragment_workouts_list, container, false);
-
-        // [START create_database_reference]
-
-        // [END create_database_reference]
-
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.workouts_list);
         mRecyclerView.setHasFixedSize(true);
         return rootView;
@@ -175,7 +170,7 @@ public class WorkoutsListFragment extends Fragment {
 
         switch(i){
             case R.id.action_calendar_view:
-                mOnViewSwitchedListener.switchView();
+                mCalendarViewListener.displayCalendarView(mWorkoutExercisesMap);
                 break;
         }
 
@@ -184,7 +179,14 @@ public class WorkoutsListFragment extends Fragment {
 
 
 
-    public void setOnViewSwitchedListener (WorkoutsContainerFragment.OnViewSwitchedListener listener){
-        this.mOnViewSwitchedListener = listener;
+
+    public interface OnSwitchToCalendarViewListener {
+        void displayCalendarView(Map<String, List<Exercise>> workoutExercisesMap);
     }
+
+    public void setOnSwitchToCalendarViewListener (OnSwitchToCalendarViewListener listener){
+        this.mCalendarViewListener = listener;
+    }
+
+
 }

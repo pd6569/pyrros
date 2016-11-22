@@ -13,33 +13,49 @@ import android.view.ViewGroup;
 import android.widget.CalendarView;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.models.Exercise;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class WorkoutsCalendarFragment extends Fragment {
 
     private static final String TAG = "WorkoutsCalendar";
 
+    private static final String ARG_WORKOUT_EXERCISES_MAP = "WorkoutExercisesMap";
+
     CalendarView mCalendarView;
 
-    //Listener
-    private WorkoutsContainerFragment.OnViewSwitchedListener mOnViewSwitchedListener;
+    // Data
+    Map<String, List<Exercise>> mWorkoutExercisesMap;
+
+    // Listener
+    private OnSwitchToListViewListener mListViewListener;
 
     public WorkoutsCalendarFragment() {
         // Required empty public constructor
     }
 
-    public static WorkoutsCalendarFragment newInstance(WorkoutsContainerFragment.OnViewSwitchedListener listener) {
+    public static WorkoutsCalendarFragment newInstance(OnSwitchToListViewListener listener, Map<String, List<Exercise>> workoutExercisesMap) {
 
         Bundle args = new Bundle();
+        args.putSerializable(ARG_WORKOUT_EXERCISES_MAP, (Serializable) workoutExercisesMap);
         WorkoutsCalendarFragment fragment = new WorkoutsCalendarFragment();
         fragment.setArguments(args);
-        fragment.setOnViewSwitchedListener(listener);
+        fragment.setOnSwitchToListViewListener(listener);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate() called");
+
+        Bundle bundle = getArguments();
+        mWorkoutExercisesMap = (Map<String, List<Exercise>>) bundle.getSerializable(ARG_WORKOUT_EXERCISES_MAP);
+
+        Log.i(TAG, "mWorkoutExerciseMap has been received, size: " + mWorkoutExercisesMap.size());
+
         setHasOptionsMenu(true);
     }
 
@@ -50,6 +66,13 @@ public class WorkoutsCalendarFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
 
         mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
+        mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView calendarView, int year, int month, int day) {
+                Log.i(TAG, "Date changed");
+
+            }
+        });
 
 
         return rootView;
@@ -67,14 +90,19 @@ public class WorkoutsCalendarFragment extends Fragment {
 
         switch(i){
             case R.id.action_list_view:
-                mOnViewSwitchedListener.switchView();
+                mListViewListener.displayListView();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void setOnViewSwitchedListener (WorkoutsContainerFragment.OnViewSwitchedListener listener){
-        this.mOnViewSwitchedListener = listener;
+
+    public interface OnSwitchToListViewListener {
+        void displayListView();
+    }
+
+    public void setOnSwitchToListViewListener (OnSwitchToListViewListener listener){
+        this.mListViewListener = listener;
     }
 }

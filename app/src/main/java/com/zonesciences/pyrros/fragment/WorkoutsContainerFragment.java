@@ -10,6 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.models.Exercise;
+
+import java.util.List;
+import java.util.Map;
 
 
 public class WorkoutsContainerFragment extends Fragment {
@@ -17,6 +21,8 @@ public class WorkoutsContainerFragment extends Fragment {
     private static final String TAG = "WorkoutsContainer";
 
     private FragmentManager mFragmentManager;
+
+    private Map<String, List<Exercise>> mWorkoutExercisesMap;
 
     public WorkoutsContainerFragment() {
         // Required empty public constructor
@@ -33,17 +39,20 @@ public class WorkoutsContainerFragment extends Fragment {
                 mFragmentManager.beginTransaction().remove(frag).commit();
             }
         }
-        mFragmentManager.beginTransaction().add(R.id.workouts_list_calendar_container, WorkoutsListFragment.newInstance(new OnViewSwitchedListener() {
+
+        mFragmentManager.beginTransaction().add(R.id.workouts_list_calendar_container, WorkoutsListFragment.newInstance(new WorkoutsListFragment.OnSwitchToCalendarViewListener() {
             @Override
-            public void switchView() {
-                mFragmentManager.beginTransaction().replace(R.id.workouts_list_calendar_container, WorkoutsCalendarFragment.newInstance(new OnViewSwitchedListener() {
+            public void displayCalendarView(Map<String, List<Exercise>> workoutExercisesMap) {
+                mWorkoutExercisesMap = workoutExercisesMap;
+                mFragmentManager.beginTransaction().replace(R.id.workouts_list_calendar_container, WorkoutsCalendarFragment.newInstance(new WorkoutsCalendarFragment.OnSwitchToListViewListener() {
                     @Override
-                    public void switchView() {
+                    public void displayListView() {
                         mFragmentManager.popBackStack();
                     }
-                })).addToBackStack(null).commit();
+                }, mWorkoutExercisesMap)).addToBackStack(null).commit();
             }
         })).commit();
+
     }
 
     @Override
@@ -58,8 +67,6 @@ public class WorkoutsContainerFragment extends Fragment {
     }
 
 
-    public interface OnViewSwitchedListener{
-        void switchView();
-    }
+
 
 }
