@@ -1,11 +1,14 @@
 package com.zonesciences.pyrros.fragment;
 
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -27,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
@@ -45,6 +50,9 @@ public class WorkoutsCalendarFragment extends Fragment {
     private static final String TAG = "WorkoutsCalendar";
 
     private static final String ARG_WORKOUT_EXERCISES_MAP = "WorkoutExercisesMap";
+    private static final String WORKOUT_EXERCISES = "Workout Exercises";
+    private static final String WORKOUT_ID = "Workout ID";
+    private static final String WORKOUT_EXERCISES_OBJECTS = "WorkoutExerciseObjects";
 
     private DatabaseReference mDatabase;
 
@@ -55,6 +63,11 @@ public class WorkoutsCalendarFragment extends Fragment {
     private BottomSheetBehavior mBottomSheetBehavior;
     private RelativeLayout mTitleContainer;
     private TextView mTitle;
+    private ImageView mOverflowMenuImage;
+    private ImageView mLaunchWorkoutImage;
+
+    // Alert dialog for multiple workouts on same day
+    AlertDialog mAlertDialog;
 
 
     // Data
@@ -144,6 +157,8 @@ public class WorkoutsCalendarFragment extends Fragment {
         mTitleContainer.setVisibility(View.VISIBLE);
 
         mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
+        mLaunchWorkoutImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_go_to_workout);
+        mOverflowMenuImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_overflow_menu);
 
         mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -161,70 +176,32 @@ public class WorkoutsCalendarFragment extends Fragment {
                 Log.i (TAG, "Date formatted: " + date);
 
                 //Get exercises times map (maps time to workout ID - important if more than one workout performed on a single day)
-                Map<String,String> map = mWorkoutDatesMap.get(date);
+                Map<String,String> timeMap = mWorkoutDatesMap.get(date);
 
-                if (map != null){
-                    List<String> workoutTimes = new ArrayList<String>(map.keySet());
+                if (timeMap != null){
+                    List<String> workoutTimes = new ArrayList<String>(timeMap.keySet());
                     Log.i(TAG, workoutTimes.size() + " workouts found for this date");
                     if (workoutTimes.size() > 1){
+                        List<CharSequence> timeKeys = new ArrayList<>();
+                        List<String> workoutKeys = new ArrayList<String>();
+
                         for (String time : workoutTimes){
                             Log.i(TAG, "Workout at: " + time);
+                            timeKeys.add(time);
+                            String workoutKey = timeMap.get(time);
+                            workoutKeys.add(workoutKey);
+
                         }
+                        CharSequence[] timeOptions = timeKeys.toArray(new CharSequence[timeKeys.size()]);
+
+                        createAlertDialog(timeOptions, workoutKeys, date, rootView);
+
                     } else {
 
-                        String workoutKey = map.get(workoutTimes.get(0));
-                        mExercises = mWorkoutExercisesMap.get(workoutKey);
+                        final String workoutKey = timeMap.get(workoutTimes.get(0));
 
-                        Log.i(TAG, "Only 1 workout performed on this day: " + workoutTimes.get(0) + " Number of exercises performed: " + mExercises.size());
+                        createBottomSheet(workoutKey, date, rootView);
 
-                        Collections.sort(mExercises);
-
-                        int numExercises = mExercises.size();
-
-                        mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1));
-
-                        LinearLayout exercisesContainer = (LinearLayout) rootView.findViewById(R.id.workout_exercises_container);
-                        exercisesContainer.removeAllViews();
-
-                        for (int i = 0; i < numExercises; i++) {
-
-                            Exercise currentExercise = mExercises.get(i);
-                            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_workout_exercises, null);
-                            TextView exerciseText = (TextView) view.findViewById(R.id.workout_exercise_name);
-                            LinearLayout setsContainer = (LinearLayout) view.findViewById(R.id.workout_sets_container);
-                            exerciseText.setText(currentExercise.getName());
-
-                            if (currentExercise.getSets() == 0){
-                                TextView noSets = (TextView) view.findViewById(R.id.workout_no_sets);
-                                noSets.setVisibility(View.VISIBLE);
-                            }
-
-                            for (int j = 0; j < currentExercise.getSets(); j++){
-
-                                Log.i(TAG, "GETTING SETS FOR: currentExercise = " + currentExercise.getName());
-                                View setsView = LayoutInflater.from(getContext()).inflate(R.layout.item_sets, null);
-                                TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
-                                TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
-                                TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
-
-                                setNumber.setVisibility(View.GONE);
-
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
-                                double weight = currentExercise.getWeight().get(j) * mConversionMultiple;
-                                String s = Utils.formatWeight(weight);
-                                setWeight.setText(s + mUnit);
-                                setWeight.setLayoutParams(params);
-                                setReps.setText("" + currentExercise.getReps().get(j) + " reps");
-                                setReps.setLayoutParams(params);
-
-                                setsContainer.addView(setsView);
-
-                            }
-
-                            exercisesContainer.addView(view);
-                        }
-
-                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                     }
                 } else {
                     Log.i(TAG, "No workout found for this date");
@@ -239,6 +216,99 @@ public class WorkoutsCalendarFragment extends Fragment {
 
         return rootView;
     }
+
+    private void createAlertDialog(CharSequence[] timeOptions, final List<String> workoutKeys, final String date, final View rootView) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Multiple workouts found, please choose");
+        builder.setSingleChoiceItems(timeOptions, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int item) {
+                String key = workoutKeys.get(item);
+                createBottomSheet(key, date, rootView);
+                mAlertDialog.dismiss();
+            }
+        });
+
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
+
+    }
+
+    private void createBottomSheet(final String workoutKey, final String date, final View rootView){
+
+
+        mExercises = mWorkoutExercisesMap.get(workoutKey);
+
+        Collections.sort(mExercises);
+
+        int numExercises = mExercises.size();
+
+        mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1));
+        mLaunchWorkoutImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                List<CharSequence> exerciseKeys = new ArrayList<>();
+                for (Exercise e : mExercises) {
+                    exerciseKeys.add(e.getName());
+                }
+
+                Bundle extras = new Bundle();
+                extras.putSerializable(WORKOUT_EXERCISES, (ArrayList) exerciseKeys);
+                extras.putString(WORKOUT_ID, workoutKey);
+                extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, (ArrayList) mExercises);
+                Intent i = new Intent (getContext(), WorkoutActivity.class);
+                i.putExtras(extras);
+                startActivity(i);
+            }
+        });
+
+        LinearLayout exercisesContainer = (LinearLayout) rootView.findViewById(R.id.workout_exercises_container);
+        exercisesContainer.removeAllViews();
+
+        for (int i = 0; i < numExercises; i++) {
+
+            Exercise currentExercise = mExercises.get(i);
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_workout_exercises, null);
+            TextView exerciseText = (TextView) view.findViewById(R.id.workout_exercise_name);
+            LinearLayout setsContainer = (LinearLayout) view.findViewById(R.id.workout_sets_container);
+            exerciseText.setText(currentExercise.getName());
+
+            if (currentExercise.getSets() == 0){
+                TextView noSets = (TextView) view.findViewById(R.id.workout_no_sets);
+                noSets.setVisibility(View.VISIBLE);
+            }
+
+            for (int j = 0; j < currentExercise.getSets(); j++){
+
+                Log.i(TAG, "GETTING SETS FOR: currentExercise = " + currentExercise.getName());
+                View setsView = LayoutInflater.from(getContext()).inflate(R.layout.item_sets, null);
+                TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
+                TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
+                TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
+
+                setNumber.setVisibility(View.GONE);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
+                double weight = currentExercise.getWeight().get(j) * mConversionMultiple;
+                String s = Utils.formatWeight(weight);
+                setWeight.setText(s + mUnit);
+                setWeight.setLayoutParams(params);
+                setReps.setText("" + currentExercise.getReps().get(j) + " reps");
+                setReps.setLayoutParams(params);
+
+                setsContainer.addView(setsView);
+
+            }
+
+            exercisesContainer.addView(view);
+        }
+
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+    }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

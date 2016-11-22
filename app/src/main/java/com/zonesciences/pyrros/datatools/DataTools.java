@@ -366,6 +366,7 @@ public class DataTools {
         }
     }*/
 
+    //TODO: bug - does not return most reps for heaviest lift if less reps lifted on same weight in same session
     public Map<String, Object> heaviestWeightLifted(){
         Map<String, Object> heaviestWeightMap = new HashMap<>();
         double heaviestWeight = 0;
