@@ -125,6 +125,13 @@ public class WorkoutsCalendarFragment extends Fragment {
                 if (map != null){
                     List<String> workoutTimes = new ArrayList<String>(map.keySet());
                     Log.i(TAG, workoutTimes.size() + " workouts found for this date");
+                    if (workoutTimes.size() > 1){
+                        for (String time : workoutTimes){
+                            Log.i(TAG, "Workout at: " + time);
+                        }
+                    } else {
+                        Log.i(TAG, "Only 1 workout performed on this day: " + workoutTimes.get(0));
+                    }
                 } else {
                     Log.i(TAG, "No workout found for this date");
                 }
