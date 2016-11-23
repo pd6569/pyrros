@@ -77,7 +77,7 @@ public class ExerciseHistoryFragment extends Fragment {
         mExerciseDates = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY_DATES);
         mExercises = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY);
 
-        //TODO: METHODS TO SORT DATA INTO REVERSE ORDER
+        //TODO: EXERCISES DISPLAYED IN RANDOM ORDER - FIX
 
         mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseDates, mExercises);
 

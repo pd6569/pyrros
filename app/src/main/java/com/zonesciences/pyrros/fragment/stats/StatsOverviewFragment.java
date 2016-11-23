@@ -3,17 +3,21 @@ package com.zonesciences.pyrros.fragment.stats;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
@@ -169,10 +173,27 @@ public class StatsOverviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView");
-        View rootView =  inflater.inflate(R.layout.fragment_stats_overview, container, false);
+        final View rootView =  inflater.inflate(R.layout.fragment_stats_overview, container, false);
 
         mFilterButton = (Button) rootView.findViewById(R.id.stats_overview_filter_button);
+        mFilterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu menu = new PopupMenu(getContext(), mFilterButton);
+                menu.getMenuInflater().inflate(R.menu.menu_stats_overview_filter_popup, menu.getMenu());
 
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Log.i(TAG, "Showing stats for" + item.getTitle());
+                        Toast.makeText(getContext(), "Showing stats for: " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                });
+
+                menu.show();
+            }
+        });
 
         mStatsViewPager = (ViewPager) rootView.findViewById(R.id.viewpager_stats);
         mStatsRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_stats_overview);

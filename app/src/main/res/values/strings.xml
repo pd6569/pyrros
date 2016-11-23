@@ -76,5 +76,10 @@
     <string name="action_undo">UNDO</string>
     <string name="menu_calendar">Calendar</string>
     <string name="menu_list_view">List view</string>
+    <string name="menu_stats_today">Today</string>
+    <string name="menu_stats_this_month">This month</string>
+    <string name="menu_stats_last_28_days">Last 28 days</string>
+    <string name="menu_stats_this_year">This year</string>
+    <string name="menu_stats_all_time">All time</string>
 
 </resources>
