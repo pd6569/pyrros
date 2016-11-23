@@ -3,7 +3,6 @@ package com.zonesciences.pyrros.fragment.stats;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.adapters.SetsAdapter;
 import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Record;
@@ -156,18 +154,11 @@ public class StatsOverviewFragment extends Fragment {
 
         mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
 
-        mTotalSets = mDataTools.totalSets();
-        mTotalReps = mDataTools.totalReps();
-        mTotalVolume = mDataTools.totalVolume() * mConversionMultiple;
-        mNumSessions = mDataTools.getExercises().size();
-        mSetsPerSession = mDataTools.totalSets()/mDataTools.getExercises().size();
-        mHeaviestWeight = (Double) mDataTools.heaviestWeightLifted().get("weight");
-        mHeaviestWeightReps = (Integer) mDataTools.heaviestWeightLifted().get("reps");
-        mMostRepsWeight = (Double) mDataTools.mostReps().get("weight");
-        mMostReps = (Integer) mDataTools.mostReps().get("reps");
-        mMostVolume = (Double) mDataTools.mostVolume().get("volume");
+        setStatsVariables();
 
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -185,8 +176,17 @@ public class StatsOverviewFragment extends Fragment {
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        Log.i(TAG, "Showing stats for" + item.getTitle());
                         Toast.makeText(getContext(), "Showing stats for: " + item.getTitle(), Toast.LENGTH_SHORT).show();
+
+                        if (item.getItemId() == R.id.stats_menu_today){
+                            Log.i(TAG, "Stats for today requested");
+                            mDataTools = mDataTools.getExercisesForDates(mDataTools, DataTools.TODAY);
+                            Log.i(TAG, "mData tools set for today. Dates: " + mDataTools.getExerciseDates() + " Workout Ids: " + mDataTools.getWorkoutKeys() + " Exercises: " + mDataTools.getExercises());
+                            setStatsVariables();
+                            updateStatsVariableArray();
+                            mAdapter.notifyDataSetChanged();
+                        }
+
                         return true;
                     }
                 });
@@ -235,22 +235,26 @@ public class StatsOverviewFragment extends Fragment {
         return rootView;
     }
 
+    private void setStatsVariables() {
+        Log.i(TAG, "setStatsVariables");
+        mTotalSets = mDataTools.totalSets();
+        mTotalReps = mDataTools.totalReps();
+        mTotalVolume = mDataTools.totalVolume() * mConversionMultiple;
+        mNumSessions = mDataTools.getExercises().size();
+        mSetsPerSession = mDataTools.totalSets() / mDataTools.getExercises().size();
+        mHeaviestWeight = (Double) mDataTools.heaviestWeightLifted().get("weight");
+        mHeaviestWeightReps = (Integer) mDataTools.heaviestWeightLifted().get("reps");
+        mMostRepsWeight = (Double) mDataTools.mostReps().get("weight");
+        mMostReps = (Integer) mDataTools.mostReps().get("reps");
+        mMostVolume = (Double) mDataTools.mostVolume().get("volume");
+
+        Log.i(TAG, "sets: " + mTotalSets + "reps" + mTotalReps + " volume" + mTotalVolume + " sessions: " + mNumSessions + " heaviest weight: " + mHeaviestWeight + " heaviest weigh reps "+ mHeaviestWeightReps );
+    }
+
     private void setVariablesAndAdapter() {
 
-        mStatsVariables = new String[]{
-                Integer.toString(mTotalSets),
-                Integer.toString(mTotalReps),
-                Utils.formatWeight(mTotalVolume * mConversionMultiple) + mUnit,
-                Utils.formatWeight(mHeaviestWeight * mConversionMultiple) + mUnit + " x " + mHeaviestWeightReps,
-                Utils.formatWeight(mOneRepMax * mConversionMultiple),
-                Utils.formatWeight(mThreeRepMax * mConversionMultiple),
-                Utils.formatWeight(mFiveRepMax * mConversionMultiple),
-                Utils.formatWeight(mTenRepMax * mConversionMultiple),
-                Integer.toString(mNumSessions),
-                Integer.toString(mSetsPerSession),
-                Integer.toString(mMostReps) + " x " + Utils.formatWeight(mMostRepsWeight * mConversionMultiple) + mUnit,
-                Utils.formatWeight(mMostVolume * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mDataTools.mostVolume().get("weight") * mConversionMultiple) + mUnit + " x " + mDataTools.mostVolume().get("reps") + ")"
-        };
+        updateStatsVariableArray();
+
         mAdapter = new StatsOverviewAdapter();
         mStatsRecycler.setAdapter(mAdapter);
         mStatsRecycler.setHasFixedSize(true);
@@ -300,6 +304,28 @@ public class StatsOverviewFragment extends Fragment {
             mEstimatedTenRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 10) * mConversionMultiple);
         };
 
+    }
+
+    public void updateStatsVariableArray(){
+
+        if(mStatsVariables != null){
+            mStatsVariables = null;
+        }
+
+        mStatsVariables = new String[]{
+                Integer.toString(mTotalSets),
+                Integer.toString(mTotalReps),
+                Utils.formatWeight(mTotalVolume * mConversionMultiple) + mUnit,
+                Utils.formatWeight(mHeaviestWeight * mConversionMultiple) + mUnit + " x " + mHeaviestWeightReps,
+                Utils.formatWeight(mOneRepMax * mConversionMultiple),
+                Utils.formatWeight(mThreeRepMax * mConversionMultiple),
+                Utils.formatWeight(mFiveRepMax * mConversionMultiple),
+                Utils.formatWeight(mTenRepMax * mConversionMultiple),
+                Integer.toString(mNumSessions),
+                Integer.toString(mSetsPerSession),
+                Integer.toString(mMostReps) + " x " + Utils.formatWeight(mMostRepsWeight * mConversionMultiple) + mUnit,
+                Utils.formatWeight(mMostVolume * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mDataTools.mostVolume().get("weight") * mConversionMultiple) + mUnit + " x " + mDataTools.mostVolume().get("reps") + ")"
+        };
     }
 
     @Override
@@ -355,14 +381,22 @@ public class StatsOverviewFragment extends Fragment {
         public void onBindViewHolder(StatsOverviewAdapter.ViewHolder holder, int position) {
             holder.title.setText(mStatsVariableIndex[position]);
 
+            LinearLayout statsContentContainer = (LinearLayout) holder.itemView.findViewById(R.id.stats_overview_content_container);
+            statsContentContainer.removeAllViews();
+
+            View view = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.item_stats_overview_content, null);
+
+            TextView statsContentText = (TextView) view.findViewById(R.id.stats_overview_content);
+            LinearLayout maxContainer = (LinearLayout) view.findViewById(R.id.stats_overview_max_container);
+
             if (mStatsVariableIndex[position].contains("max")) {
 
-                holder.content.setVisibility(View.GONE);
-                LinearLayout maxContainer = (LinearLayout) holder.itemView.findViewById(R.id.stats_overview_max_container);
+                statsContentText.setVisibility(View.GONE);
+
                 maxContainer.setVisibility(View.VISIBLE);
 
-                TextView estimatedMax = (TextView) holder.itemView.findViewById(R.id.stats_overview_estimated_max);
-                TextView actualMax = (TextView) holder.itemView.findViewById(R.id.stats_overview_actual_max);
+                TextView estimatedMax = (TextView) view.findViewById(R.id.stats_overview_estimated_max);
+                TextView actualMax = (TextView) view.findViewById(R.id.stats_overview_actual_max);
 
                 if (mStatsVariables[position].equals("0")) {
                     actualMax.setText("Not set");
@@ -375,32 +409,37 @@ public class StatsOverviewFragment extends Fragment {
                     case "1 rep-max":
                         Log.i(TAG, "1 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedOneRep) + mUnit + " (estimated)");
+                        statsContentContainer.addView(view);
                         break;
 
                     case "3 rep-max":
                         Log.i(TAG, "3 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedThreeRep) + mUnit + " (estimated)");
+                        statsContentContainer.addView(view);
                         break;
 
                     case "5 rep-max":
                         Log.i(TAG, "5 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedFiveRep) + mUnit + " (estimated)");
+                        statsContentContainer.addView(view);
                         break;
 
                     case "10 rep-max":
                         Log.i(TAG, "10 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedTenRep) + mUnit + " (estimated)");
+                        statsContentContainer.addView(view);
                         break;
 
                 }
             } else {
-                holder.content.setText(mStatsVariables[position]);
+                statsContentText.setText(mStatsVariables[position]);
+                statsContentContainer.addView(view);
             }
         }
 
         @Override
         public int getItemCount() {
-            return mStatsVariableIndex.length;
+            return mStatsVariables.length;
         }
     }
 

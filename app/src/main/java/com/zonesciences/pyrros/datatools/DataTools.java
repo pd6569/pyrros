@@ -13,6 +13,7 @@ import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,15 +26,24 @@ public class DataTools {
 
     private static final String TAG = "DataTools.class";
 
+    public static final int TODAY = 1;
+    public static final int THIS_MONTH = 2;
+    public static final int LAST_28_DAYS = 3;
+    public static final int LAST_6_MONTHS = 4;
+    public static final int THIS_YEAR = 5;
+    public static final int ALL_TIME = 6;
+
     DatabaseReference mUserWorkoutExercisesRef;
 
     String mExerciseKey;
     String mUserId;
 
+
     ArrayList<Exercise> mExercises = new ArrayList<>();
     ArrayList<String> mExerciseDates = new ArrayList<>();
     ArrayList<String> mWorkoutKeys = new ArrayList<>();
     Record mExerciseRecord;
+
 
     int mSets;
     int mReps;
@@ -69,7 +79,6 @@ public class DataTools {
         mExerciseDates = workoutDates;
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
     }
-
 
 
     // Methods for loading data from Firebase
@@ -206,10 +215,26 @@ public class DataTools {
 
     public Record getExerciseRecord() { return mExerciseRecord; }
 
+    public String getExerciseKey() {
+        return mExerciseKey;
+    }
+
     // Setters
 
     public void setExerciseRecord(Record exerciseRecord) {
         mExerciseRecord = exerciseRecord;
+    }
+
+    public void setExercises(ArrayList<Exercise> exercises) {
+        mExercises = exercises;
+    }
+
+    public void setExerciseDates(ArrayList<String> exerciseDates) {
+        mExerciseDates = exerciseDates;
+    }
+
+    public void setWorkoutKeys(ArrayList<String> workoutKeys) {
+        mWorkoutKeys = workoutKeys;
     }
 
     // Maps
@@ -503,6 +528,55 @@ public class DataTools {
 
         return estimatedMax;
 
+    }
+
+    // Methods for getting data for specified date range
+
+    public DataTools getExercisesForDates(DataTools dataTools, int dateRange){
+
+        DataTools oldDataTools = dataTools;
+        DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
+
+        List<Exercise> exercisesOld = oldDataTools.getExercises();
+        List<String> datesOld = oldDataTools.getExerciseDates();
+        List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
+
+        List<Exercise> exercisesNew = new ArrayList<>();
+        List<String> datesNew = new ArrayList<>();
+        List<String> workoutKeysNew = new ArrayList<>();
+
+        Calendar calendar = Calendar.getInstance();
+        String today = Utils.convertCalendarDateToString(calendar);
+        Log.i(TAG, "Todays date: " + today + " Dates for this exercise: " + datesOld);
+
+        switch(dateRange){
+            case TODAY:
+                for (int j = 0; j < datesOld.size(); j++){
+                    if (datesOld.get(j).contains(today)){
+                        datesNew.add(datesOld.get(j));
+                        newDataTools.setExerciseDates((ArrayList) datesNew);
+
+                        exercisesNew.add(exercisesOld.get(j));
+                        newDataTools.setExercises((ArrayList) exercisesNew);
+
+                        workoutKeysNew.add(workoutKeysOld.get(j));
+                        newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
+                    }
+                }
+                break;
+            case THIS_MONTH:
+                break;
+            case LAST_28_DAYS:
+                break;
+            case LAST_6_MONTHS:
+                break;
+            case THIS_YEAR:
+                break;
+            case ALL_TIME:
+                newDataTools = oldDataTools;
+        }
+
+        return newDataTools;
     }
 
 }

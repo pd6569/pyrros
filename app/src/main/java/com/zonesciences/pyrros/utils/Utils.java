@@ -73,6 +73,11 @@ public class Utils {
         return cal;
     }
 
+    public static String convertCalendarDateToString (Calendar calendar){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(calendar.getTime());
+    }
+
     public static String getClientTimeStamp(boolean includeTime){
         SimpleDateFormat df;
         if (includeTime) {
