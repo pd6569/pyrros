@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -30,6 +31,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.models.Exercise;
@@ -57,6 +61,7 @@ public class WorkoutsCalendarFragment extends Fragment {
     private DatabaseReference mDatabase;
 
     CalendarView mCalendarView;
+    MaterialCalendarView mMaterialCalendarView;
 
     // Bottomsheet View
     private View mBottomSheet;
@@ -158,7 +163,7 @@ public class WorkoutsCalendarFragment extends Fragment {
         mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
         mLaunchWorkoutImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_go_to_workout);
 
-        mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
+       /* mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int year, int month, int day) {
@@ -207,9 +212,56 @@ public class WorkoutsCalendarFragment extends Fragment {
                     snackbar.show();
                 }
             }
+
+
+        });*/
+
+        mMaterialCalendarView = (MaterialCalendarView) rootView.findViewById(R.id.material_calendar_view);
+        mMaterialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay calendarDay, boolean selected) {
+                Calendar cal = calendarDay.getCalendar();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String date = sdf.format(cal.getTime());
+                Log.i (TAG, "Date formatted: " + date);
+
+                //Get exercises times map (maps time to workout ID - important if more than one workout performed on a single day)
+                Map<String,String> timeMap = mWorkoutDatesMap.get(date);
+
+                if (timeMap != null){
+                    List<String> workoutTimes = new ArrayList<String>(timeMap.keySet());
+                    Log.i(TAG, workoutTimes.size() + " workouts found for this date");
+                    if (workoutTimes.size() > 1){
+                        List<CharSequence> timeKeys = new ArrayList<>();
+                        List<String> workoutKeys = new ArrayList<String>();
+
+                        for (String time : workoutTimes){
+                            Log.i(TAG, "Workout at: " + time);
+                            timeKeys.add(time);
+                            String workoutKey = timeMap.get(time);
+                            workoutKeys.add(workoutKey);
+
+                        }
+                        CharSequence[] timeOptions = timeKeys.toArray(new CharSequence[timeKeys.size()]);
+
+                        createAlertDialog(timeOptions, workoutKeys, date, rootView);
+
+                    } else {
+
+                        final String workoutKey = timeMap.get(workoutTimes.get(0));
+
+                        createBottomSheet(workoutKey, date, "", rootView);
+
+                    }
+                } else {
+                    Log.i(TAG, "No workout found for this date");
+                    Snackbar snackbar = Snackbar.make(rootView, "No workouts on this date", Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                }
+
+            }
         });
 
-        ;
 
 
         return rootView;
