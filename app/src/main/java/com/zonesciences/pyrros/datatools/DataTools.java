@@ -70,14 +70,7 @@ public class DataTools {
         mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
     }
 
-    public DataTools (String userId, String exerciseKey, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys,  ArrayList<String> workoutDates){
-        mExerciseKey = exerciseKey;
-        mUserId = userId;
-        mExercises = exercises;
-        mWorkoutKeys = workoutKeys;
-        mExerciseDates = workoutDates;
-        mUserWorkoutExercisesRef = FirebaseDatabase.getInstance().getReference().child("user-workout-exercises").child(mUserId);
-    }
+
 
     // Methods for loading data from Firebase
 
