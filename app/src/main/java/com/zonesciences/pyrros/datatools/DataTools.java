@@ -563,6 +563,10 @@ public class DataTools {
                         newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
                     }
                 }
+                if (datesNew.size() == 0){
+                    Log.i(TAG, "No workouts found, return unchanged datatools object");
+                    newDataTools = oldDataTools;
+                }
                 break;
             case THIS_MONTH:
                 break;

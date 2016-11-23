@@ -176,16 +176,21 @@ public class StatsOverviewFragment extends Fragment {
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        Toast.makeText(getContext(), "Showing stats for: " + item.getTitle(), Toast.LENGTH_SHORT).show();
 
                         if (item.getItemId() == R.id.stats_menu_today){
                             Log.i(TAG, "Stats for today requested");
-                            mFilterButton.setText("TODAY");
+
+                            DataTools previousDataTools = mDataTools; // if there are no workouts performed today, then datatools will not change
                             mDataTools = mDataTools.getExercisesForDates(mDataTools, DataTools.TODAY);
-                            Log.i(TAG, "mData tools set for today. Dates: " + mDataTools.getExerciseDates() + " Workout Ids: " + mDataTools.getWorkoutKeys() + " Exercises: " + mDataTools.getExercises());
-                            setStatsVariables();
-                            updateStatsVariableArray();
-                            mAdapter.notifyDataSetChanged();
+                            if (mDataTools != previousDataTools) {
+                                Log.i(TAG, "mData tools set for today. Dates: " + mDataTools.getExerciseDates() + " Workout Ids: " + mDataTools.getWorkoutKeys() + " Exercises: " + mDataTools.getExercises());
+                                mFilterButton.setText("TODAY");
+                                setStatsVariables();
+                                updateStatsVariableArray();
+                                mAdapter.notifyDataSetChanged();
+                            } else {
+                                Toast.makeText(getContext(), "No workouts performed today", Toast.LENGTH_SHORT).show();
+                            }
                         } else if (item.getItemId() == R.id.stats_menu_all_time){
                             Log.i(TAG, "Stats for all time requested");
                             mFilterButton.setText("ALL TIME");
@@ -193,6 +198,7 @@ public class StatsOverviewFragment extends Fragment {
                             setStatsVariables();
                             updateStatsVariableArray();
                             mAdapter.notifyDataSetChanged();
+                            Toast.makeText(getContext(), "Showing stats for: " + item.getTitle(), Toast.LENGTH_SHORT).show();
                         }
 
                         return true;
