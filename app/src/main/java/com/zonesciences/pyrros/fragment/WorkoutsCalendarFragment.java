@@ -63,7 +63,6 @@ public class WorkoutsCalendarFragment extends Fragment {
     private BottomSheetBehavior mBottomSheetBehavior;
     private RelativeLayout mTitleContainer;
     private TextView mTitle;
-    private ImageView mOverflowMenuImage;
     private ImageView mLaunchWorkoutImage;
 
     // Alert dialog for multiple workouts on same day
@@ -158,7 +157,6 @@ public class WorkoutsCalendarFragment extends Fragment {
 
         mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
         mLaunchWorkoutImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_go_to_workout);
-        mOverflowMenuImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_overflow_menu);
 
         mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -200,7 +198,7 @@ public class WorkoutsCalendarFragment extends Fragment {
 
                         final String workoutKey = timeMap.get(workoutTimes.get(0));
 
-                        createBottomSheet(workoutKey, date, rootView);
+                        createBottomSheet(workoutKey, date, "", rootView);
 
                     }
                 } else {
@@ -217,7 +215,7 @@ public class WorkoutsCalendarFragment extends Fragment {
         return rootView;
     }
 
-    private void createAlertDialog(CharSequence[] timeOptions, final List<String> workoutKeys, final String date, final View rootView) {
+    private void createAlertDialog(final CharSequence[] timeOptions, final List<String> workoutKeys, final String date, final View rootView) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Multiple workouts found, please choose");
@@ -225,7 +223,7 @@ public class WorkoutsCalendarFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int item) {
                 String key = workoutKeys.get(item);
-                createBottomSheet(key, date, rootView);
+                createBottomSheet(key, date, (String) timeOptions[item], rootView);
                 mAlertDialog.dismiss();
             }
         });
@@ -235,16 +233,22 @@ public class WorkoutsCalendarFragment extends Fragment {
 
     }
 
-    private void createBottomSheet(final String workoutKey, final String date, final View rootView){
+    private void createBottomSheet(final String workoutKey, final String date, String time, final View rootView){
 
-
+        String workoutTime;
+        if (time.isEmpty()){
+            workoutTime = "";
+        } else {
+            workoutTime = " at " + time;
+        }
         mExercises = mWorkoutExercisesMap.get(workoutKey);
 
         Collections.sort(mExercises);
 
         int numExercises = mExercises.size();
 
-        mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1));
+        mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1) + workoutTime);
+
         mLaunchWorkoutImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
