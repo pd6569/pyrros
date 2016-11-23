@@ -10,4 +10,6 @@
     <color name="primaryText">#212121</color>
     <color name="secondaryText">#757575</color>
     <color name="textIcons">#757575</color>
+    <color name="button">#af52bf</color>
+
 </resources>

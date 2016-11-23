@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -43,6 +44,7 @@ public class StatsOverviewFragment extends Fragment {
     String mUserId;
 
     //View
+    Button mFilterButton;
     ViewPager mStatsViewPager;
 
     TextView mTotalSetsTextView;
@@ -168,6 +170,9 @@ public class StatsOverviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView");
         View rootView =  inflater.inflate(R.layout.fragment_stats_overview, container, false);
+
+        mFilterButton = (Button) rootView.findViewById(R.id.stats_overview_filter_button);
+
 
         mStatsViewPager = (ViewPager) rootView.findViewById(R.id.viewpager_stats);
         mStatsRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_stats_overview);

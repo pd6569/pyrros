@@ -61,7 +61,6 @@ public class WorkoutsCalendarFragment extends Fragment {
 
     private DatabaseReference mDatabase;
 
-    CalendarView mCalendarView;
     MaterialCalendarView mMaterialCalendarView;
 
     // Bottomsheet View
@@ -130,10 +129,7 @@ public class WorkoutsCalendarFragment extends Fragment {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
 
-
         mMaterialCalendarView = (MaterialCalendarView) rootView.findViewById(R.id.material_calendar_view);
-
-        mMaterialCalendarView.setSelectedDate(Calendar.getInstance());
 
         mDatabase.child("user-workouts").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -155,6 +151,7 @@ public class WorkoutsCalendarFragment extends Fragment {
                 List workoutKeys = new ArrayList(mWorkoutDatesMap.keySet());
                 mMaterialCalendarView.addDecorator(new HighlightWorkoutsDecorator(workoutKeys));
 
+
                 Log.i(TAG, "WorkoutDatesMap created, size: " + mWorkoutDatesMap.size());
             }
 
@@ -173,62 +170,6 @@ public class WorkoutsCalendarFragment extends Fragment {
 
         mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
         mLaunchWorkoutImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_go_to_workout);
-
-       /* mCalendarView = (CalendarView) rootView.findViewById(R.id.calendar_view);
-        mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(CalendarView calendarView, int year, int month, int day) {
-                Log.i(TAG, "Date changed, format: " + year + "-" + month + "-" + day);
-                //Convert selected date to same format as key for map
-                Calendar cal = Calendar.getInstance();
-                cal.set(Calendar.YEAR, year);
-                cal.set(Calendar.MONTH, month);
-                cal.set(Calendar.DAY_OF_MONTH, day);
-
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String date = sdf.format(cal.getTime());
-                Log.i (TAG, "Date formatted: " + date);
-
-                //Get exercises times map (maps time to workout ID - important if more than one workout performed on a single day)
-                Map<String,String> timeMap = mWorkoutDatesMap.get(date);
-
-                if (timeMap != null){
-                    List<String> workoutTimes = new ArrayList<String>(timeMap.keySet());
-                    Log.i(TAG, workoutTimes.size() + " workouts found for this date");
-                    if (workoutTimes.size() > 1){
-                        List<CharSequence> timeKeys = new ArrayList<>();
-                        List<String> workoutKeys = new ArrayList<String>();
-
-                        for (String time : workoutTimes){
-                            Log.i(TAG, "Workout at: " + time);
-                            timeKeys.add(time);
-                            String workoutKey = timeMap.get(time);
-                            workoutKeys.add(workoutKey);
-
-                        }
-                        CharSequence[] timeOptions = timeKeys.toArray(new CharSequence[timeKeys.size()]);
-
-                        createAlertDialog(timeOptions, workoutKeys, date, rootView);
-
-                    } else {
-
-                        final String workoutKey = timeMap.get(workoutTimes.get(0));
-
-                        createBottomSheet(workoutKey, date, "", rootView);
-
-                    }
-                } else {
-                    Log.i(TAG, "No workout found for this date");
-                    Snackbar snackbar = Snackbar.make(rootView, "No workouts on this date", Snackbar.LENGTH_SHORT);
-                    snackbar.show();
-                }
-            }
-
-
-        });*/
-
-
-
 
         mMaterialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
@@ -406,5 +347,7 @@ public class WorkoutsCalendarFragment extends Fragment {
     public void setOnSwitchToListViewListener (OnSwitchToListViewListener listener){
         this.mListViewListener = listener;
     }
+
+
 
 }

@@ -5,6 +5,16 @@
               android:orientation="vertical"
               android:layout_weight="4">
 
+    <Button
+        android:id="@+id/stats_overview_filter_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/button"
+        android:textSize="18dp"
+        android:text="Filter: Month"
+        android:textColor="#fff"
+        android:layout_margin="5dp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_stats_overview"
         android:layout_width="match_parent"

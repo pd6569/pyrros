@@ -26,13 +26,6 @@
                 app:mcv_selectionColor="@color/colorAccent"
                 />
 
-            <CalendarView
-                android:id="@+id/calendar_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone">
-            </CalendarView>
-
         </LinearLayout>
 
     </android.support.v7.widget.CardView>

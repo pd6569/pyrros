@@ -23,7 +23,6 @@ public class HighlightWorkoutsDecorator implements DayViewDecorator {
 
     private static final String TAG = "HighlightDecorator";
 
-    private final Calendar calendar = Calendar.getInstance();
     private List<Calendar> mWorkoutDates = new ArrayList<>();
 
     private final Drawable highlightDrawable;
