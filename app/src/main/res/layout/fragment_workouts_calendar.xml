@@ -21,6 +21,7 @@
                 android:id="@+id/material_calendar_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:mcv_arrowColor="?attr/colorPrimaryDark"
                 app:mcv_showOtherDates="all"
                 app:mcv_selectionColor="@color/colorAccent"
                 />

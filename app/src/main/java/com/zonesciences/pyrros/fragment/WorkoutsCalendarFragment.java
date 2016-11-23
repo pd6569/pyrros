@@ -36,6 +36,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
+import com.zonesciences.pyrros.calendarDecorators.HighlightWorkoutsDecorator;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
@@ -111,30 +112,6 @@ public class WorkoutsCalendarFragment extends Fragment {
         Log.i(TAG, "mWorkoutExerciseMap has been received, size: " + mWorkoutExercisesMap.size());
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("user-workouts").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot workout : dataSnapshot.getChildren()) {
-                    Workout w = workout.getValue(Workout.class);
-                    String dateKey = Utils.formatDate(w.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 2);
-                    String timeKey = Utils.formatDate(w.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 3);
-
-                    if (mWorkoutDatesMap.containsKey(dateKey)) {
-                        mWorkoutDatesMap.get(dateKey).put(timeKey, workout.getKey());
-                    } else {
-                        Map<String, String> timeMap = new HashMap<>();
-                        timeMap.put(timeKey, workout.getKey());
-                        mWorkoutDatesMap.put(dateKey, timeMap);
-                    }
-                }
-                Log.i(TAG, "WorkoutDatesMap created, size: " + mWorkoutDatesMap.size());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString("pref_unit", null).equals("metric")){
             mUnit = " kgs";
@@ -152,6 +129,40 @@ public class WorkoutsCalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
+
+
+        mMaterialCalendarView = (MaterialCalendarView) rootView.findViewById(R.id.material_calendar_view);
+
+        mMaterialCalendarView.setSelectedDate(Calendar.getInstance());
+
+        mDatabase.child("user-workouts").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot workout : dataSnapshot.getChildren()) {
+                    Workout w = workout.getValue(Workout.class);
+                    String dateKey = Utils.formatDate(w.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 2);
+                    String timeKey = Utils.formatDate(w.getClientTimeStamp(), "yyyy-MM-dd, HH:mm:ss", 3);
+
+                    if (mWorkoutDatesMap.containsKey(dateKey)) {
+                        mWorkoutDatesMap.get(dateKey).put(timeKey, workout.getKey());
+                    } else {
+                        Map<String, String> timeMap = new HashMap<>();
+                        timeMap.put(timeKey, workout.getKey());
+                        mWorkoutDatesMap.put(dateKey, timeMap);
+                    }
+                }
+
+                List workoutKeys = new ArrayList(mWorkoutDatesMap.keySet());
+                mMaterialCalendarView.addDecorator(new HighlightWorkoutsDecorator(workoutKeys));
+
+                Log.i(TAG, "WorkoutDatesMap created, size: " + mWorkoutDatesMap.size());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         mBottomSheet = rootView.findViewById(R.id.bottom_sheet_calendar);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
@@ -216,7 +227,9 @@ public class WorkoutsCalendarFragment extends Fragment {
 
         });*/
 
-        mMaterialCalendarView = (MaterialCalendarView) rootView.findViewById(R.id.material_calendar_view);
+
+
+
         mMaterialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay calendarDay, boolean selected) {
