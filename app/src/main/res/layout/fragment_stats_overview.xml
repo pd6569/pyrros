@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@color/button"
         android:textSize="18dp"
-        android:text="Filter: Month"
+        android:text="ALL TIME"
         android:textColor="#fff"
         android:layout_margin="5dp"/>
 

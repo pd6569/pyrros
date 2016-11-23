@@ -180,8 +180,16 @@ public class StatsOverviewFragment extends Fragment {
 
                         if (item.getItemId() == R.id.stats_menu_today){
                             Log.i(TAG, "Stats for today requested");
+                            mFilterButton.setText("TODAY");
                             mDataTools = mDataTools.getExercisesForDates(mDataTools, DataTools.TODAY);
                             Log.i(TAG, "mData tools set for today. Dates: " + mDataTools.getExerciseDates() + " Workout Ids: " + mDataTools.getWorkoutKeys() + " Exercises: " + mDataTools.getExercises());
+                            setStatsVariables();
+                            updateStatsVariableArray();
+                            mAdapter.notifyDataSetChanged();
+                        } else if (item.getItemId() == R.id.stats_menu_all_time){
+                            Log.i(TAG, "Stats for all time requested");
+                            mFilterButton.setText("ALL TIME");
+                            mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
                             setStatsVariables();
                             updateStatsVariableArray();
                             mAdapter.notifyDataSetChanged();

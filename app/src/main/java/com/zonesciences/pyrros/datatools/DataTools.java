@@ -573,7 +573,7 @@ public class DataTools {
             case THIS_YEAR:
                 break;
             case ALL_TIME:
-                newDataTools = oldDataTools;
+                break;
         }
 
         return newDataTools;
