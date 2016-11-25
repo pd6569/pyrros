@@ -220,6 +220,32 @@ public class StatsOverviewFragment extends Fragment {
 
                                 break;
 
+                            case R.id.stats_menu_28_days:
+                                Log.i(TAG, "Stats for last 28 days requested");
+
+                                filterRequested = DataTools.LAST_28_DAYS;
+                                setDataTools(filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+
+                                break;
+
+                            case R.id.stats_menu_6_months:
+                                Log.i(TAG, "Stats for last 6 months requested");
+
+                                filterRequested = DataTools.LAST_6_MONTHS;
+                                setDataTools(filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+
+                                break;
+
+                            case R.id.stats_menu_year:
+                                Log.i(TAG, "Stats for this year requested");
+
+                                filterRequested = DataTools.THIS_YEAR;
+                                setDataTools(filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+
+                                break;
                         }
 
                         return true;

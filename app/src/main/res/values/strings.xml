@@ -83,5 +83,6 @@
     <string name="menu_stats_all_time">All time</string>
     <string name="menu_stats_this_session">This session</string>
     <string name="menu_stats_this_week">This week</string>
+    <string name="menu_stats_last_6_months">Last 6 months</string>
 
 </resources>

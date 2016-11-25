@@ -557,6 +557,8 @@ public class DataTools {
 
         String dateQuery;
 
+        DateTime now = new DateTime();
+
         switch(dateRange){
 
             case THIS_SESSION:
@@ -566,7 +568,6 @@ public class DataTools {
                 newDataTools = setNewDataTools(dateQuery, oldDataTools);
                 break;
             case THIS_WEEK:
-                DateTime now = new DateTime();
                 dateFrom = now.withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
                 dateTo = now.withDayOfWeek(DateTimeConstants.SUNDAY).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
                 newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
@@ -576,11 +577,19 @@ public class DataTools {
                 newDataTools = setNewDataTools(dateQuery, oldDataTools);
                 break;
             case LAST_28_DAYS:
+                dateFrom = now.minusDays(28).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case LAST_6_MONTHS:
-
+                dateFrom = now.minusMonths(6).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case THIS_YEAR:
+                dateFrom = new DateTime().dayOfYear().withMinimumValue().withTimeAtStartOfDay();
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case ALL_TIME:
                 break;
@@ -632,7 +641,6 @@ public class DataTools {
         List<Exercise> exercisesOld = oldDataTools.getExercises();
 
         List<String> datesOld = oldDataTools.getExerciseDates();
-        Collections.sort(datesOld);
 
         List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
 
@@ -649,39 +657,32 @@ public class DataTools {
             DateTime date = DateTime.parse(datesOld.get(i), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
             Log.i(TAG, "dates of this exercise: " + date.toString());
             if (interval.contains(date)) {
-                Log.i(TAG, "This workout was performed this week on " + date.toString() + " workoutKey: " + workoutKeysOld.get(i));
+                Log.i(TAG, "This workout was performed on " + date.toString() + " workoutKey: " + workoutKeysOld.get(i));
                 datesNew.add(datesOld.get(i));
                 newDataTools.setExerciseDates((ArrayList) datesNew);
+
 
                 exercisesNew.add(exercisesOld.get(i));
                 newDataTools.setExercises((ArrayList) exercisesNew);
 
+
                 workoutKeysNew.add(workoutKeysOld.get(i));
                 newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
+
             }
         }
+
+        Log.i(TAG, "datesNew: " + newDataTools.getExerciseDates());
+        for (Exercise e : newDataTools.getExercises()) {
+            Log.i(TAG, "exercisesNew: " + e.getReps());
+        }
+        Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
+
 
         if (datesNew.size() == 0){
             Log.i(TAG, "No workouts found, return unchanged datatools object");
             newDataTools = oldDataTools;
         }
-
-        /*for (int j = 0; j < datesOld.size(); j++){
-            if (datesOld.get(j).contains(dateQuery)){
-                datesNew.add(datesOld.get(j));
-                newDataTools.setExerciseDates((ArrayList) datesNew);
-
-                exercisesNew.add(exercisesOld.get(j));
-                newDataTools.setExercises((ArrayList) exercisesNew);
-
-                workoutKeysNew.add(workoutKeysOld.get(j));
-                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
-            }
-        }
-        if (datesNew.size() == 0){
-            Log.i(TAG, "No workouts found, return unchanged datatools object");
-            newDataTools = oldDataTools;
-        }*/
 
         return newDataTools;
 

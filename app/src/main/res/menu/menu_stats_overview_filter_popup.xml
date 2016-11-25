@@ -16,6 +16,9 @@
     <item android:title="@string/menu_stats_last_28_days"
           android:id="@+id/stats_menu_28_days"/>
 
+    <item android:title="@string/menu_stats_last_6_months"
+          android:id="@+id/stats_menu_6_months"/>
+
     <item android:title="@string/menu_stats_this_year"
           android:id="@+id/stats_menu_year"/>
 
