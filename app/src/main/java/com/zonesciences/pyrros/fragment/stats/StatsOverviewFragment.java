@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.fragment.stats;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
@@ -114,6 +115,8 @@ public class StatsOverviewFragment extends Fragment {
     String mUnit;
     Double mConversionMultiple;
 
+    // Filter
+    int mCurrentFilter = DataTools.ALL_TIME; //defaults to all time
 
     public static StatsOverviewFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates) {
         Bundle args = new Bundle();
@@ -176,31 +179,83 @@ public class StatsOverviewFragment extends Fragment {
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        DataTools previousDataTools = mDataTools; // if there are no workouts for date range, then datatools will not change
+                        int filterRequested;
 
-                        if (item.getItemId() == R.id.stats_menu_today){
+                        switch(item.getItemId()){
+                            case R.id.stats_menu_today:
+                                Log.i(TAG, "Stats for today requested");
+                                filterRequested = DataTools.TODAY;
+
+                                mDataTools = mDataTools.getExercisesForDates(mDataTools, DataTools.TODAY);
+
+                                if (mDataTools != previousDataTools) {
+                                    setFilter(item.getTitle(), filterRequested);
+
+                                } else {
+                                    Toast.makeText(getContext(), "No workouts performed today", Toast.LENGTH_SHORT).show();
+                                }
+                                break;
+
+                            case R.id.stats_menu_all_time:
+                                Log.i(TAG, "Stats for all time requested");
+                                filterRequested = DataTools.ALL_TIME;
+
+                                resetDataTools();
+                                setFilter(item.getTitle(), filterRequested);
+
+                                break;
+
+                            case R.id.stats_menu_month:
+                                Log.i(TAG, "Stats for this month requested");
+                                filterRequested = DataTools.THIS_MONTH;
+
+                                setDataTools(filterRequested);
+
+                                boolean filterNotChanged = false;
+                                if(mCurrentFilter == filterRequested) { filterNotChanged = true; }
+
+                                if (mDataTools != previousDataTools) {
+                                    setFilter(item.getTitle(), filterRequested);
+                                } else {
+                                    if (filterNotChanged){
+                                        Toast.makeText(getContext(), "Filter not changed, dickhead", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getContext(), "No workouts performed this month", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                break;
+                        }
+
+
+/*if (item.getItemId() == R.id.stats_menu_today){
                             Log.i(TAG, "Stats for today requested");
-
                             DataTools previousDataTools = mDataTools; // if there are no workouts performed today, then datatools will not change
                             mDataTools = mDataTools.getExercisesForDates(mDataTools, DataTools.TODAY);
                             if (mDataTools != previousDataTools) {
-                                Log.i(TAG, "mData tools set for today. Dates: " + mDataTools.getExerciseDates() + " Workout Ids: " + mDataTools.getWorkoutKeys() + " Exercises: " + mDataTools.getExercises());
-                                mFilterButton.setText("TODAY");
-                                setStatsVariables();
-                                updateStatsVariableArray();
-                                mAdapter.notifyDataSetChanged();
+                                setFilter(item.getTitle());
+                                mCurrentFilter = DataTools.TODAY;
                             } else {
                                 Toast.makeText(getContext(), "No workouts performed today", Toast.LENGTH_SHORT).show();
                             }
                         } else if (item.getItemId() == R.id.stats_menu_all_time){
                             Log.i(TAG, "Stats for all time requested");
-                            mFilterButton.setText("ALL TIME");
                             mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
-                            setStatsVariables();
-                            updateStatsVariableArray();
-                            mAdapter.notifyDataSetChanged();
-                            Toast.makeText(getContext(), "Showing stats for: " + item.getTitle(), Toast.LENGTH_SHORT).show();
-                        }
+                            setFilter(item.getTitle());
+                            mCurrentFilter = DataTools.ALL_TIME;
+                        } else if (item.getItemId() == R.id.stats_menu_month){
+                            Log.i(TAG, "Stats for this month requested");
 
+                            DataTools previousDataTools = mDataTools; // if there are no workouts performed this month, then datatools will not change
+                            mDataTools = mDataTools.getExercisesForDates(mDataTools, DataTools.THIS_MONTH);
+                            if (mDataTools != previousDataTools) {
+                                setFilter(item.getTitle());
+                                mCurrentFilter = DataTools.THIS_MONTH;
+                            } else {
+                                Toast.makeText(getContext(), "No workouts performed this month", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }*/
                         return true;
                     }
                 });
@@ -247,6 +302,37 @@ public class StatsOverviewFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+
+    private void setDataTools(int filterRequested){
+
+        if (mCurrentFilter == DataTools.ALL_TIME) {
+            Log.i(TAG, "Current filter is ALL_TIME, just load data tools for requested filter");
+            mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+        } else if (mCurrentFilter == filterRequested){
+            Log.i(TAG, "Already viewing stats for this particular filter, dickhead");
+            return;
+        } else {
+            Log.i(TAG, "Current filter not ALL_TIME, reset data tools and load data tools for requested filter");
+            resetDataTools();
+            mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+        }
+
+    }
+
+    private void resetDataTools() {
+        Log.i(TAG, "Data tools reset to include all exercises from all time");
+        mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
+    }
+
+    private void setFilter(CharSequence filterTitle, int filterRequested){
+        mFilterButton.setText(filterTitle);
+        setStatsVariables();
+        updateStatsVariableArray();
+        mAdapter.notifyDataSetChanged();
+        Toast.makeText(getContext(), "Showing stats for: " + filterTitle, Toast.LENGTH_SHORT).show();
+        mCurrentFilter = filterRequested;
     }
 
     private void setStatsVariables() {

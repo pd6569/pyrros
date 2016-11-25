@@ -81,5 +81,6 @@
     <string name="menu_stats_last_28_days">Last 28 days</string>
     <string name="menu_stats_this_year">This year</string>
     <string name="menu_stats_all_time">All time</string>
+    <string name="menu_stats_this_session">This session</string>
 
 </resources>

@@ -32,6 +32,7 @@ public class DataTools {
     public static final int LAST_6_MONTHS = 4;
     public static final int THIS_YEAR = 5;
     public static final int ALL_TIME = 6;
+    public static final int THIS_SESSION = 7;
 
     DatabaseReference mUserWorkoutExercisesRef;
 
@@ -532,6 +533,7 @@ public class DataTools {
 
     // Methods for getting data for specified date range
 
+    //TODO: finish this method
     public DataTools getExercisesForDates(DataTools dataTools, int dateRange){
 
         DataTools oldDataTools = dataTools;
@@ -546,10 +548,14 @@ public class DataTools {
         List<String> workoutKeysNew = new ArrayList<>();
 
         Calendar calendar = Calendar.getInstance();
-        String today = Utils.convertCalendarDateToString(calendar);
+        String today = Utils.convertCalendarDateToString(calendar, "yyyy-MM-dd");
+        String month = Utils.convertCalendarDateToString(calendar, "yyyy-MM");
         Log.i(TAG, "Todays date: " + today + " Dates for this exercise: " + datesOld);
 
         switch(dateRange){
+
+            case THIS_SESSION:
+                break;
             case TODAY:
                 for (int j = 0; j < datesOld.size(); j++){
                     if (datesOld.get(j).contains(today)){
@@ -569,6 +575,22 @@ public class DataTools {
                 }
                 break;
             case THIS_MONTH:
+                for (int j = 0; j < datesOld.size(); j++){
+                    if (datesOld.get(j).contains(month)){
+                        datesNew.add(datesOld.get(j));
+                        newDataTools.setExerciseDates((ArrayList) datesNew);
+
+                        exercisesNew.add(exercisesOld.get(j));
+                        newDataTools.setExercises((ArrayList) exercisesNew);
+
+                        workoutKeysNew.add(workoutKeysOld.get(j));
+                        newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
+                    }
+                }
+                if (datesNew.size() == 0){
+                    Log.i(TAG, "No workouts this month, return unchanged datatools object");
+                    newDataTools = oldDataTools;
+                }
                 break;
             case LAST_28_DAYS:
                 break;

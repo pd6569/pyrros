@@ -73,8 +73,8 @@ public class Utils {
         return cal;
     }
 
-    public static String convertCalendarDateToString (Calendar calendar){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    public static String convertCalendarDateToString (Calendar calendar, String formatRequired){
+        SimpleDateFormat sdf = new SimpleDateFormat(formatRequired);
         return sdf.format(calendar.getTime());
     }
 
