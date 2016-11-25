@@ -214,9 +214,9 @@ public class StatsOverviewFragment extends Fragment {
                             case R.id.stats_menu_week:
                                 Log.i(TAG, "Stats for this week requested");
 
-                                /*filterRequested = DataTools.THIS_WEEK;
+                                filterRequested = DataTools.THIS_WEEK;
                                 setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);*/
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
 
                                 break;
 

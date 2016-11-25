@@ -13,6 +13,13 @@ import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -545,8 +552,8 @@ public class DataTools {
         String today = Utils.convertCalendarDateToString(calendar, "yyyy-MM-dd");
         String month = Utils.convertCalendarDateToString(calendar, "yyyy-MM");
 
-        String dateFrom;
-        String dateTo;
+        DateTime dateFrom;
+        DateTime dateTo;
 
         String dateQuery;
 
@@ -559,16 +566,10 @@ public class DataTools {
                 newDataTools = setNewDataTools(dateQuery, oldDataTools);
                 break;
             case THIS_WEEK:
-               /* List<String> week = new ArrayList<>();
-                for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++){
-                    calendar.set(Calendar.DAY_OF_WEEK, i);
-                    week.add(Utils.convertCalendarDateToString(calendar, "yyyy-MM-dd"));
-                }
-                Collections.sort(week);
-                Log.i(TAG, "Dates of this week: " + week);
-                dateFrom = week.get(0);
-                dateTo = week.get(week.size()-1);
-                newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);*/
+                DateTime now = new DateTime();
+                dateFrom = now.withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withDayOfWeek(DateTimeConstants.SUNDAY).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case THIS_MONTH:
                 dateQuery = month;
@@ -623,7 +624,7 @@ public class DataTools {
     }
 
     //TODO: make this method work
-    private DataTools setNewDataTools(String dateFrom, String dateTo, DataTools dataTools){
+    private DataTools setNewDataTools(DateTime dateFrom, DateTime dateTo, DataTools dataTools){
 
         DataTools oldDataTools = dataTools;
         DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
@@ -642,12 +643,27 @@ public class DataTools {
 
         Log.i(TAG, "Date from: " + dateFrom + " Date to: " + dateTo);
 
+        Interval interval = new Interval(dateFrom, dateTo);
+
         for (int i = 0; i < datesOld.size(); i++){
-            Calendar calOld = Utils.convertDateStringToCalendar(Utils.formatDate(datesOld.get(i), "yyyy-MM-dd, HH:mm:ss", 2), "yyyy-MM-dd");
-            Log.i(TAG, "Dates: " + calOld.getTime());
-            if (datesOld.get(i).contains(dateFrom)){
-                Log.i(TAG, "Found workout on this date: " + dateFrom + " workout key: " + workoutKeysOld.get(i));
+            DateTime date = DateTime.parse(datesOld.get(i), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
+            Log.i(TAG, "dates of this exercise: " + date.toString());
+            if (interval.contains(date)) {
+                Log.i(TAG, "This workout was performed this week on " + date.toString() + " workoutKey: " + workoutKeysOld.get(i));
+                datesNew.add(datesOld.get(i));
+                newDataTools.setExerciseDates((ArrayList) datesNew);
+
+                exercisesNew.add(exercisesOld.get(i));
+                newDataTools.setExercises((ArrayList) exercisesNew);
+
+                workoutKeysNew.add(workoutKeysOld.get(i));
+                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
             }
+        }
+
+        if (datesNew.size() == 0){
+            Log.i(TAG, "No workouts found, return unchanged datatools object");
+            newDataTools = oldDataTools;
         }
 
         /*for (int j = 0; j < datesOld.size(); j++){
