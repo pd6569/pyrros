@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import org.joda.time.DateTime;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -92,15 +94,26 @@ public class Utils {
     }
 
     public static String getClientTimeStamp(boolean includeTime){
-        SimpleDateFormat df;
+        /*SimpleDateFormat df;
         if (includeTime) {
             df = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
         } else {
             df = new SimpleDateFormat("EEE, dd MMM");
         }
-        String date = df.format(Calendar.getInstance().getTime());
-        return date;
+        String date = df.format(Calendar.getInstance().getTime());*/
+
+        String format;
+        if (includeTime) {
+            format = "yyyy-MM-dd, HH:mm:ss";
+        } else {
+            format = "EEE, dd MMM";
+        }
+
+        DateTime now = new DateTime();
+        return now.toString(format);
     }
+
+
 
     public static String getUid(){
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
