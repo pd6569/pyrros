@@ -73,6 +73,19 @@ public class Utils {
         return cal;
     }
 
+    public static Calendar convertDateStringToCalendar (String dateToConvert, String format) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        Calendar cal = Calendar.getInstance();
+        try {
+            Date date = sdf.parse(dateToConvert);
+            cal.setTime(date);
+        } catch (ParseException e) {
+            Log.i(TAG, "Failed to parse date: " + e);
+        }
+
+        return cal;
+    }
+
     public static String convertCalendarDateToString (Calendar calendar, String formatRequired){
         SimpleDateFormat sdf = new SimpleDateFormat(formatRequired);
         return sdf.format(calendar.getTime());

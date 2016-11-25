@@ -186,54 +186,46 @@ public class StatsOverviewFragment extends Fragment {
                         switch(item.getItemId()){
                             case R.id.stats_menu_today:
                                 Log.i(TAG, "Stats for today requested");
+
                                 filterRequested = DataTools.TODAY;
-
                                 setDataTools(filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
 
-                                if (mDataTools != previousDataTools) {
-                                    setFilter(item.getTitle(), filterRequested);
-                                } else {
-                                    filterUnchangedMessage(filterNotChanged);
-
-                                }
                                 break;
 
                             case R.id.stats_menu_all_time:
                                 Log.i(TAG, "Stats for all time requested");
+
                                 filterRequested = DataTools.ALL_TIME;
-
                                 setDataTools(filterRequested);
-
-                                setFilter(item.getTitle(), filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_month:
                                 Log.i(TAG, "Stats for this month requested");
+
                                 filterRequested = DataTools.THIS_MONTH;
-
                                 setDataTools(filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
 
-                                if(mCurrentFilter == filterRequested) { filterNotChanged = true; }
-
-                                if (mDataTools != previousDataTools) {
-                                    setFilter(item.getTitle(), filterRequested);
-                                } else {
-                                    filterUnchangedMessage(filterNotChanged);
-                                }
                                 break;
+
+                            case R.id.stats_menu_week:
+                                Log.i(TAG, "Stats for this week requested");
+
+                                /*filterRequested = DataTools.THIS_WEEK;
+                                setDataTools(filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);*/
+
+                                break;
+
                         }
 
                         return true;
                     }
 
-                    private void filterUnchangedMessage(boolean filterNotChanged) {
-                        if (filterNotChanged){
-                            Toast.makeText(getContext(), "Filter not changed, dickhead", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "No workouts for this filter", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+
                 });
 
                 menu.show();
@@ -307,14 +299,29 @@ public class StatsOverviewFragment extends Fragment {
         Log.i(TAG, "Number of exercises: " + mExercises.size());
     }
 
-    private void setFilter(CharSequence filterTitle, int filterRequested){
-        mFilterButton.setText(filterTitle);
-        setStatsVariables();
-        updateStatsVariableArray();
-        mAdapter.notifyDataSetChanged();
-        Toast.makeText(getContext(), "Showing stats for: " + filterTitle, Toast.LENGTH_SHORT).show();
-        mCurrentFilter = filterRequested;
+    private void setFilter(CharSequence filterTitle, int filterRequested, DataTools previousDataTools){
+
+        boolean filterNotChanged = false;
+
+        if(mCurrentFilter == filterRequested) { filterNotChanged = true; }
+
+        if (mDataTools != previousDataTools) {
+            mFilterButton.setText(filterTitle);
+            setStatsVariables();
+            updateStatsVariableArray();
+            mAdapter.notifyDataSetChanged();
+            Toast.makeText(getContext(), "Showing stats for: " + filterTitle, Toast.LENGTH_SHORT).show();
+            mCurrentFilter = filterRequested;
+        } else {
+            if (filterNotChanged){
+                Toast.makeText(getContext(), "Filter not changed, dickhead", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "No workouts for this filter", Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
+
 
     private void setStatsVariables() {
         Log.i(TAG, "setStatsVariables");

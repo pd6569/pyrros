@@ -7,6 +7,9 @@
     <item android:title="@string/menu_stats_today"
           android:id="@+id/stats_menu_today"/>
 
+    <item android:title="@string/menu_stats_this_week"
+          android:id="@+id/stats_menu_week"/>
+
     <item android:title="@string/menu_stats_this_month"
           android:id="@+id/stats_menu_month"/>
 

@@ -82,5 +82,6 @@
     <string name="menu_stats_this_year">This year</string>
     <string name="menu_stats_all_time">All time</string>
     <string name="menu_stats_this_session">This session</string>
+    <string name="menu_stats_this_week">This week</string>
 
 </resources>
