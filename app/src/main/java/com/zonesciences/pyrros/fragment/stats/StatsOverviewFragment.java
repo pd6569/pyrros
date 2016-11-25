@@ -181,19 +181,24 @@ public class StatsOverviewFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         DataTools previousDataTools = mDataTools; // if there are no workouts for date range, then datatools will not change
                         int filterRequested;
+                        boolean filterNotChanged = false;
 
                         switch(item.getItemId()){
                             case R.id.stats_menu_today:
                                 Log.i(TAG, "Stats for today requested");
                                 filterRequested = DataTools.TODAY;
 
-                                mDataTools = mDataTools.getExercisesForDates(mDataTools, DataTools.TODAY);
+                                setDataTools(filterRequested);
 
                                 if (mDataTools != previousDataTools) {
                                     setFilter(item.getTitle(), filterRequested);
 
                                 } else {
-                                    Toast.makeText(getContext(), "No workouts performed today", Toast.LENGTH_SHORT).show();
+                                    if (filterNotChanged){
+                                        Toast.makeText(getContext(), "Filter not changed, dickhead", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getContext(), "No workouts performed today", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                                 break;
 
@@ -201,7 +206,8 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for all time requested");
                                 filterRequested = DataTools.ALL_TIME;
 
-                                resetDataTools();
+                                setDataTools(filterRequested);
+
                                 setFilter(item.getTitle(), filterRequested);
 
                                 break;
@@ -212,7 +218,6 @@ public class StatsOverviewFragment extends Fragment {
 
                                 setDataTools(filterRequested);
 
-                                boolean filterNotChanged = false;
                                 if(mCurrentFilter == filterRequested) { filterNotChanged = true; }
 
                                 if (mDataTools != previousDataTools) {
@@ -307,7 +312,7 @@ public class StatsOverviewFragment extends Fragment {
 
     private void setDataTools(int filterRequested){
 
-        if (mCurrentFilter == DataTools.ALL_TIME) {
+        /*if (mCurrentFilter == DataTools.ALL_TIME) {
             Log.i(TAG, "Current filter is ALL_TIME, just load data tools for requested filter");
             mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
         } else if (mCurrentFilter == filterRequested){
@@ -317,6 +322,22 @@ public class StatsOverviewFragment extends Fragment {
             Log.i(TAG, "Current filter not ALL_TIME, reset data tools and load data tools for requested filter");
             resetDataTools();
             mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+        }*/
+
+        if (filterRequested < mCurrentFilter) {
+            Log.i(TAG, "Current filter will include all data necessary for the requested filter");
+            mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+        } else if (mCurrentFilter == filterRequested){
+            Log.i(TAG, "Already viewing stats for this particular filter, dickhead");
+            return;
+        } else {
+            Log.i(TAG, "Current filter requires more data than the current filter includes, reset datatools");
+            resetDataTools();
+            if (filterRequested == DataTools.ALL_TIME){
+                return;
+            } else {
+                mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+            }
         }
 
     }

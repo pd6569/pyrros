@@ -27,12 +27,13 @@ public class DataTools {
     private static final String TAG = "DataTools.class";
 
     public static final int TODAY = 1;
-    public static final int THIS_MONTH = 2;
-    public static final int LAST_28_DAYS = 3;
-    public static final int LAST_6_MONTHS = 4;
-    public static final int THIS_YEAR = 5;
-    public static final int ALL_TIME = 6;
-    public static final int THIS_SESSION = 7;
+    public static final int THIS_WEEK = 2;
+    public static final int THIS_MONTH = 3;
+    public static final int LAST_28_DAYS = 4;
+    public static final int LAST_6_MONTHS = 5;
+    public static final int THIS_YEAR = 6;
+    public static final int ALL_TIME = 7;
+    public static final int THIS_SESSION = 10;
 
     DatabaseReference mUserWorkoutExercisesRef;
 
