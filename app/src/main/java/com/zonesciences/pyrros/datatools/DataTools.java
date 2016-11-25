@@ -1,5 +1,6 @@
 package com.zonesciences.pyrros.datatools;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -540,25 +541,30 @@ public class DataTools {
         DataTools oldDataTools = dataTools;
         DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
 
+        /*DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
+
         List<Exercise> exercisesOld = oldDataTools.getExercises();
         List<String> datesOld = oldDataTools.getExerciseDates();
         List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
 
         List<Exercise> exercisesNew = new ArrayList<>();
         List<String> datesNew = new ArrayList<>();
-        List<String> workoutKeysNew = new ArrayList<>();
+        List<String> workoutKeysNew = new ArrayList<>();*/
 
         Calendar calendar = Calendar.getInstance();
         String today = Utils.convertCalendarDateToString(calendar, "yyyy-MM-dd");
         String month = Utils.convertCalendarDateToString(calendar, "yyyy-MM");
-        Log.i(TAG, "Todays date: " + today + " Dates for this exercise: " + datesOld);
+
+        String dateQuery;
 
         switch(dateRange){
 
             case THIS_SESSION:
                 break;
             case TODAY:
-                for (int j = 0; j < datesOld.size(); j++){
+                dateQuery = today;
+                newDataTools = setNewDataTools(dateQuery, oldDataTools);
+                /*for (int j = 0; j < datesOld.size(); j++){
                     if (datesOld.get(j).contains(today)){
                         datesNew.add(datesOld.get(j));
                         newDataTools.setExerciseDates((ArrayList) datesNew);
@@ -573,10 +579,12 @@ public class DataTools {
                 if (datesNew.size() == 0){
                     Log.i(TAG, "No workouts found, return unchanged datatools object");
                     newDataTools = oldDataTools;
-                }
+                }*/
                 break;
             case THIS_MONTH:
-                for (int j = 0; j < datesOld.size(); j++){
+                dateQuery = month;
+                newDataTools = setNewDataTools(dateQuery, oldDataTools);
+                /*for (int j = 0; j < datesOld.size(); j++){
                     if (datesOld.get(j).contains(month)){
                         datesNew.add(datesOld.get(j));
                         newDataTools.setExerciseDates((ArrayList) datesNew);
@@ -591,7 +599,7 @@ public class DataTools {
                 if (datesNew.size() == 0){
                     Log.i(TAG, "No workouts this month, return unchanged datatools object");
                     newDataTools = oldDataTools;
-                }
+                }*/
                 break;
             case LAST_28_DAYS:
                 break;
@@ -604,6 +612,40 @@ public class DataTools {
         }
 
         return newDataTools;
+    }
+
+    private DataTools setNewDataTools(String dateQuery, DataTools dataTools){
+
+        DataTools oldDataTools = dataTools;
+        DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
+
+        List<Exercise> exercisesOld = oldDataTools.getExercises();
+        List<String> datesOld = oldDataTools.getExerciseDates();
+        List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
+
+        List<Exercise> exercisesNew = new ArrayList<>();
+        List<String> datesNew = new ArrayList<>();
+        List<String> workoutKeysNew = new ArrayList<>();
+
+        for (int j = 0; j < datesOld.size(); j++){
+            if (datesOld.get(j).contains(dateQuery)){
+                datesNew.add(datesOld.get(j));
+                newDataTools.setExerciseDates((ArrayList) datesNew);
+
+                exercisesNew.add(exercisesOld.get(j));
+                newDataTools.setExercises((ArrayList) exercisesNew);
+
+                workoutKeysNew.add(workoutKeysOld.get(j));
+                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
+            }
+        }
+        if (datesNew.size() == 0){
+            Log.i(TAG, "No workouts found, return unchanged datatools object");
+            newDataTools = oldDataTools;
+        }
+
+        return newDataTools;
+
     }
 
 }
