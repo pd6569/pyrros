@@ -177,8 +177,9 @@ public class WorkoutActivity extends BaseActivity {
 
                 ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
                 ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+                ArrayList<String> workoutKeys = (ArrayList) currentFragment.getStatsExerciseWorkoutKeys();
 
-                mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises);
+                mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises, workoutKeys);
                 setFragment();
 
             } else {
@@ -193,8 +194,9 @@ public class WorkoutActivity extends BaseActivity {
                         Log.i(TAG, "Callback now received from fragment, load complete, load stats");
                         ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
                         ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
+                        ArrayList<String> workoutKeys = (ArrayList) currentFragment.getStatsExerciseWorkoutKeys();
 
-                        mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises);
+                        mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises, workoutKeys);
                         setFragment();
                         hideProgressDialog();
                     }

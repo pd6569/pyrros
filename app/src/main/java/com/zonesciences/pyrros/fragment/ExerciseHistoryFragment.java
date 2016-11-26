@@ -18,6 +18,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.ExerciseHistoryAdapter;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.ExerciseHistory;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ public class ExerciseHistoryFragment extends Fragment {
     private static final String ARG_USER_ID = "UserId";
     private static final String ARG_EXERCISE_HISTORY_DATES = "ExerciseHistoryDates";
     private static final String ARG_EXERCISE_HISTORY = "ExerciseHistory";
+    private static final String ARG_WORKOUT_KEYS = "WorkoutKeys";
 
 
     DatabaseReference mUserWorkoutExercisesRef;
@@ -43,6 +48,7 @@ public class ExerciseHistoryFragment extends Fragment {
     //Data
     List<Exercise> mExercises;
     List<String> mExerciseDates;
+    List<String> mWorkoutKeys;
 
     //RecyclerView
     RecyclerView mExerciseHistoryRecycler;
@@ -52,12 +58,13 @@ public class ExerciseHistoryFragment extends Fragment {
     //Sort order
     boolean newestFirst = true;
 
-    public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises) {
+    public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises, List<String> workoutKeys) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
         args.putStringArrayList(ARG_EXERCISE_HISTORY_DATES, (ArrayList<String>) exerciseDates);
         args.putSerializable(ARG_EXERCISE_HISTORY, (Serializable) exercises);
+        args.putStringArrayList(ARG_WORKOUT_KEYS, (ArrayList<String>) workoutKeys);
         ExerciseHistoryFragment fragment = new ExerciseHistoryFragment();
         fragment.setArguments(args);
         return fragment;
@@ -76,14 +83,24 @@ public class ExerciseHistoryFragment extends Fragment {
         mUserId = bundle.getString(ARG_USER_ID);
         mExerciseDates = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY_DATES);
         mExercises = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY);
+        mWorkoutKeys = (List) bundle.getSerializable(ARG_WORKOUT_KEYS);
 
         //TODO: EXERCISES DISPLAYED IN RANDOM ORDER - FIX
 
-        mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseDates, mExercises);
+
 
         Log.i(TAG, "Exercise history obtained. " + mExercises.size());
         Log.i(TAG, "Exercise dates obtained. " + mExerciseDates.size());
 
+        List<ExerciseHistory> exerciseHistory = new ArrayList<>();
+        for (int i = 0; i < mExercises.size(); i++){
+            DateTime date = DateTime.parse(mExerciseDates.get(i), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
+            exerciseHistory.add(new ExerciseHistory(date, mWorkoutKeys.get(i), mExercises.get(i)));
+        }
+        Collections.sort(exerciseHistory);
+        Collections.reverse(exerciseHistory);
+
+        mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseDates, mExercises);
 
         setHasOptionsMenu(true);
     }

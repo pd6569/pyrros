@@ -1,25 +1,27 @@
 package com.zonesciences.pyrros.models;
 
+import org.joda.time.DateTime;
+
 /**
  * Created by Peter on 26/11/2016.
  */
-public class ExerciseHistory {
+public class ExerciseHistory implements Comparable<ExerciseHistory> {
 
-    String date;
+    DateTime date;
     String workoutId;
     Exercise exercise;
 
-    public ExerciseHistory(String date, String workoutId, Exercise exercise){
+    public ExerciseHistory(DateTime date, String workoutId, Exercise exercise){
         this.date = date;
         this.workoutId = workoutId;
         this.exercise = exercise;
     }
 
-    public String getDate() {
+    public DateTime getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(DateTime date) {
         this.date = date;
     }
 
@@ -37,5 +39,10 @@ public class ExerciseHistory {
 
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
+    }
+
+    @Override
+    public int compareTo(ExerciseHistory exerciseHistory) {
+        return getDate().compareTo(exerciseHistory.getDate());
     }
 }
