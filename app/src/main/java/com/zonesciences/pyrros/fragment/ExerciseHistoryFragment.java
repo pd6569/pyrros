@@ -135,18 +135,17 @@ public class ExerciseHistoryFragment extends Fragment {
 
         switch(i){
             case R.id.action_reverse_order:
-                /*newestFirst = !newestFirst;
+                newestFirst = !newestFirst;
                 Log.i(TAG, "Reverse the order");
-                Collections.reverse(mExerciseDates);
-                Collections.reverse(mExercises);
+                Collections.reverse(mExerciseHistoryList);
+
                 mAdapter.notifyDataSetChanged();
 
                 if (newestFirst) {
                     item.setTitle(R.string.menu_oldest_first);
                 } else {
                     item.setTitle(R.string.menu_newest_first);
-                }*/
-
+                }
 
                 break;
         }
