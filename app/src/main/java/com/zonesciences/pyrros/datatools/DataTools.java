@@ -344,8 +344,7 @@ public class DataTools {
         String workoutDate = mExerciseDates.get(mWorkoutKeys.indexOf(workoutKey));
         LocalTime timeNow = new LocalTime();
         String format = "yyyy-MM-dd, HH:mm:ss";
-        DateTime recordDate = DateTime.parse((workoutDate), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
-        recordDate.withHourOfDay(timeNow.getHourOfDay()).withMinuteOfHour(timeNow.getMinuteOfHour()).withSecondOfMinute(timeNow.getSecondOfMinute());
+        DateTime recordDate = DateTime.parse((workoutDate), DateTimeFormat.forPattern(format)).withHourOfDay(timeNow.getHourOfDay()).withMinuteOfHour(timeNow.getMinuteOfHour()).withSecondOfMinute(timeNow.getSecondOfMinute());
         String date = recordDate.toString(format);
 
         if (records == null){
