@@ -49,6 +49,7 @@ public class ExerciseHistoryFragment extends Fragment {
     List<Exercise> mExercises;
     List<String> mExerciseDates;
     List<String> mWorkoutKeys;
+    List<ExerciseHistory> mExerciseHistoryList = new ArrayList<>();
 
     //RecyclerView
     RecyclerView mExerciseHistoryRecycler;
@@ -92,15 +93,14 @@ public class ExerciseHistoryFragment extends Fragment {
         Log.i(TAG, "Exercise history obtained. " + mExercises.size());
         Log.i(TAG, "Exercise dates obtained. " + mExerciseDates.size());
 
-        List<ExerciseHistory> exerciseHistory = new ArrayList<>();
         for (int i = 0; i < mExercises.size(); i++){
             DateTime date = DateTime.parse(mExerciseDates.get(i), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
-            exerciseHistory.add(new ExerciseHistory(date, mWorkoutKeys.get(i), mExercises.get(i)));
+            mExerciseHistoryList.add(new ExerciseHistory(date, mWorkoutKeys.get(i), mExercises.get(i)));
         }
-        Collections.sort(exerciseHistory);
-        Collections.reverse(exerciseHistory);
+        Collections.sort(mExerciseHistoryList);
+        Collections.reverse(mExerciseHistoryList);
 
-        mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseDates, mExercises);
+        mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseHistoryList);
 
         setHasOptionsMenu(true);
     }

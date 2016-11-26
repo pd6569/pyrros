@@ -12,7 +12,11 @@ import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.ExerciseHistory;
 import com.zonesciences.pyrros.utils.Utils;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
 
@@ -32,11 +36,11 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
     //Exercise data
     List<String> mWorkoutDates;
     List<Exercise> mExercises;
+    List<ExerciseHistory> mExerciseHistory;
 
-    public ExerciseHistoryAdapter(Context context, List<String> workoutDate, List<Exercise> exercises){
+    public ExerciseHistoryAdapter(Context context, List<ExerciseHistory> exerciseHistory){
         this.mContext = context;
-        this.mWorkoutDates = workoutDate;
-        this.mExercises = exercises;
+        this.mExerciseHistory = exerciseHistory;
 
         if (PreferenceManager.getDefaultSharedPreferences(mContext).getString("pref_unit", null).equals("metric")){
             mUnit = " kgs";
@@ -58,16 +62,19 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
     public void onBindViewHolder(ViewHolder holder, int position) {
         Log.i(TAG, "onBindViewHolder()");
 
-        String workoutDate = Utils.formatDate(mWorkoutDates.get(position), "yyyy-MM-dd, HH:mm:ss", 0);
+        /*String workoutDate = Utils.formatDate(mWorkoutDates.get(position), "yyyy-MM-dd, HH:mm:ss", 0);*/
+
+        DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
+        String workoutDate = mExerciseHistory.get(position).getDate().toString(format);
 
         holder.mExerciseDate.setText(workoutDate);
 
         LinearLayout setsContainer = (LinearLayout) holder.itemView.findViewById(R.id.exercise_history_sets_container);
         setsContainer.removeAllViews();
 
-        Exercise currentExercise = mExercises.get(position);
+        Exercise currentExercise = mExerciseHistory.get(position).getExercise();
         Log.i(TAG, "New exercise object created for view: " + currentExercise.getName());
-        int numSets = mExercises.get(position).getSets();
+        int numSets = currentExercise.getSets();
 
         if (numSets == 0) {
             holder.mNoSetsCreated.setVisibility(View.VISIBLE);
@@ -97,7 +104,7 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
 
     @Override
     public int getItemCount() {
-        return mExercises.size();
+        return mExerciseHistory.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
