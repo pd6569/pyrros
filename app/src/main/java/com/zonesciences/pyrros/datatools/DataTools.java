@@ -559,22 +559,28 @@ public class DataTools {
 
         DateTime now = new DateTime();
 
+        LocalDate date = new LocalDate();
+
         switch(dateRange){
 
             case THIS_SESSION:
                 break;
             case TODAY:
-                dateQuery = today;
-                newDataTools = setNewDataTools(dateQuery, oldDataTools);
+                dateFrom = now.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case THIS_WEEK:
                 dateFrom = now.withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
                 dateTo = now.withDayOfWeek(DateTimeConstants.SUNDAY).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+
                 newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case THIS_MONTH:
-                dateQuery = month;
-                newDataTools = setNewDataTools(dateQuery, oldDataTools);
+                dateFrom = now.withDayOfMonth(1).withTimeAtStartOfDay();
+                dateTo = dateFrom.plusMonths(1).minusDays(1).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                Log.i(TAG, "dateFrom: " + dateFrom.toString() + " dateTo: " + dateTo.toString());
+                newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case LAST_28_DAYS:
                 dateFrom = now.minusDays(28).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
@@ -598,7 +604,7 @@ public class DataTools {
         return newDataTools;
     }
 
-    private DataTools setNewDataTools(String dateQuery, DataTools dataTools){
+    /*private DataTools setNewDataTools(String dateQuery, DataTools dataTools){
 
         DataTools oldDataTools = dataTools;
         DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
@@ -630,9 +636,9 @@ public class DataTools {
 
         return newDataTools;
 
-    }
+    }*/
 
-    //TODO: make this method work
+
     private DataTools setNewDataTools(DateTime dateFrom, DateTime dateTo, DataTools dataTools){
 
         DataTools oldDataTools = dataTools;
