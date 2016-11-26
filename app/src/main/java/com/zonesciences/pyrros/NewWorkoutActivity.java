@@ -300,6 +300,7 @@ public class NewWorkoutActivity extends BaseActivity {
 
             //create new exercise to add to user-exercises
             mExercise = new Exercise(userId, exercise);
+            mExercise.setExerciseId(getUUID());
             mRecord = new Record(mExerciseKey, userId);
 
         } else {
@@ -310,6 +311,7 @@ public class NewWorkoutActivity extends BaseActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     mExercise = dataSnapshot.getValue(Exercise.class);
+                    mExercise.setExerciseId(getUUID());
                     Log.i(TAG, "Adding existing exercise to new workout, setting exercise object to existing exercise values: " + mExercise.getName());
                     updateWorkoutExercises(mExercise);
                 }
@@ -344,6 +346,10 @@ public class NewWorkoutActivity extends BaseActivity {
         }
         mDatabase.updateChildren(childUpdates);
 
+        if(exerciseKey == null){
+            mDatabase.child("user-exercises").child(userId).child(mExerciseKey).child("exerciseId").setValue(null);
+        }
+
         Snackbar snackbar = Snackbar.make(mCoordinatorLayout, "Added exercise: " + mExerciseKey, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
@@ -366,6 +372,7 @@ public class NewWorkoutActivity extends BaseActivity {
                 Log.d(TAG, "exercise does not already exist, created new exercise key: " + mExerciseKey);
                 mUserExerciseKeys.add(exercise);
                 mExercise = new Exercise(userId, exercise);
+                mExercise.setExerciseId(getUUID());
                 mRecord = new Record(mExerciseKey, userId);
 
                 Map <String, Object> childUpdates = new HashMap<>();
@@ -376,6 +383,7 @@ public class NewWorkoutActivity extends BaseActivity {
                 childUpdates.put("/records/" + mExerciseKey + "/" + userId, mRecord);
                 mDatabase.updateChildren(childUpdates);
 
+                mDatabase.child("user-exercises").child(userId).child(mExerciseKey).child("exerciseId").setValue(null);
 
             } else {
                 Log.d(TAG, "exercise already exists with exercise key: " + exerciseKey);
@@ -385,6 +393,7 @@ public class NewWorkoutActivity extends BaseActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         mExercise = dataSnapshot.getValue(Exercise.class);
+                        mExercise.setExerciseId(getUUID());
                         Log.i(TAG, "Adding existing exercise to current workout, setting exercise object to existing exercise values: " + mExercise.getName());
 
                         /*mDatabase.child("workout-exercises/").child(mWorkoutKey).child(mExerciseKey).updateChildren(mExercise.toMap());
@@ -452,13 +461,14 @@ public class NewWorkoutActivity extends BaseActivity {
         //write the exercise order as an exercise property and assign unique ID
         Map<String, Object> childUpdates = new HashMap<String, Object>();
         for (int i = 0; i < mExerciseKeysList.size(); i++) {
-            String uuid = (UUID.randomUUID()).toString();
+
+            /*String uuid = (UUID.randomUUID()).toString();*/
 
             childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/order/", i + 1);
-            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/exerciseId/", uuid);
+            /*childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/exerciseId/", uuid);*/
 
             childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/order/", i + 1);
-            childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/exerciseId/", uuid);
+            /*childUpdates.put("/user-workout-exercises/" + getUid() + "/" + mWorkoutKey + "/" + mExerciseKeysList.get(i) + "/exerciseId/", uuid);*/
         }
         mDatabase.updateChildren(childUpdates);
         Log.i(TAG, "Finished updating order");
@@ -516,6 +526,10 @@ public class NewWorkoutActivity extends BaseActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    public String getUUID(){
+        return (UUID.randomUUID()).toString();
     }
 
 

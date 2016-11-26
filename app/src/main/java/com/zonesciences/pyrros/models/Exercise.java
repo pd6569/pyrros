@@ -112,6 +112,11 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     }
 
     @Exclude
+    public void setExerciseId(String exerciseId) {
+        this.exerciseId = exerciseId;
+    }
+
+    @Exclude
     public void addWeight(Double newWeight){
         if(weight == null){
             weight = new ArrayList<>();

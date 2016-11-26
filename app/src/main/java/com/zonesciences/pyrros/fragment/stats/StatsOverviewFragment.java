@@ -95,18 +95,18 @@ public class StatsOverviewFragment extends Fragment {
     private double mEstimatedTenRep;
 
     String[] mStatsVariableIndex = new String[]{
-            "Total Sets",
-            "Total Reps",
-            "Total Volume",
+            "Sessions",
+            "Sets",
+            "Reps",
+            "Volume",
             "Heaviest Weight",
+            "Most reps",
+            "Most volume (Single Set)",
             "1 rep-max",
             "3 rep-max",
             "5 rep-max",
-            "10 rep-max",
-            "Sessions",
-            "Sets per session",
-            "Most reps",
-            "Most volume"};
+            "10 rep-max"
+    };
 
     String[] mStatsVariables;
 
@@ -152,10 +152,10 @@ public class StatsOverviewFragment extends Fragment {
         mCurrentWorkoutKey = bundle.getString(ARG_CURRENT_WORKOUT_KEY);
 
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("pref_unit", null).equals("metric")){
-            mUnit = " kgs";
+            mUnit = Utils.UNIT_METRIC;
             mConversionMultiple = 1.0;
         } else {
-            mUnit = " lbs";
+            mUnit = Utils.UNIT_IMPERIAL;
             mConversionMultiple = 2.20462;
         }
 
@@ -397,7 +397,7 @@ public class StatsOverviewFragment extends Fragment {
         mAdapter = new StatsOverviewAdapter();
         mStatsRecycler.setAdapter(mAdapter);
         mStatsRecycler.setHasFixedSize(true);
-        mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mGridLayoutManager = new GridLayoutManager(getActivity(), 1);
         mStatsRecycler.setLayoutManager(mGridLayoutManager);
 
     }
@@ -407,6 +407,7 @@ public class StatsOverviewFragment extends Fragment {
 
         try{
             mOneRepMax = mRecord.getRecords().get("1 rep-max").get(mRecord.getRecords().get("1 rep-max").size() - 1);
+            mDataTools.getRecordForDateRange(mRecord, DataTools.THIS_MONTH);
             mEstimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1) * mConversionMultiple);
 
         } catch (Exception e) {
@@ -452,18 +453,17 @@ public class StatsOverviewFragment extends Fragment {
         }
 
         mStatsVariables = new String[]{
+                Integer.toString(mNumSessions),
                 Integer.toString(mTotalSets),
                 Integer.toString(mTotalReps),
                 Utils.formatWeight(mTotalVolume * mConversionMultiple) + mUnit,
                 Utils.formatWeight(mHeaviestWeight * mConversionMultiple) + mUnit + " x " + mHeaviestWeightReps,
+                Integer.toString(mMostReps) + " x " + Utils.formatWeight(mMostRepsWeight * mConversionMultiple) + mUnit,
+                Utils.formatWeight(mMostVolume * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mDataTools.mostVolume().get("weight") * mConversionMultiple) + mUnit + " x " + mDataTools.mostVolume().get("reps") + ")",
                 Utils.formatWeight(mOneRepMax * mConversionMultiple),
                 Utils.formatWeight(mThreeRepMax * mConversionMultiple),
                 Utils.formatWeight(mFiveRepMax * mConversionMultiple),
-                Utils.formatWeight(mTenRepMax * mConversionMultiple),
-                Integer.toString(mNumSessions),
-                Integer.toString(mSetsPerSession),
-                Integer.toString(mMostReps) + " x " + Utils.formatWeight(mMostRepsWeight * mConversionMultiple) + mUnit,
-                Utils.formatWeight(mMostVolume * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mDataTools.mostVolume().get("weight") * mConversionMultiple) + mUnit + " x " + mDataTools.mostVolume().get("reps") + ")"
+                Utils.formatWeight(mTenRepMax * mConversionMultiple)
         };
     }
 
@@ -540,32 +540,32 @@ public class StatsOverviewFragment extends Fragment {
                 if (mStatsVariables[position].equals("0")) {
                     actualMax.setText("Not set");
                 } else {
-                    actualMax.setText(mStatsVariables[position] + mUnit + " (actual)");
+                    actualMax.setText(mStatsVariables[position] + mUnit);
                 }
 
                 switch (mStatsVariableIndex[position]) {
 
                     case "1 rep-max":
                         Log.i(TAG, "1 rep-max");
-                        estimatedMax.setText(Utils.formatWeight(mEstimatedOneRep) + mUnit + " (estimated)");
+                        estimatedMax.setText(Utils.formatWeight(mEstimatedOneRep) + mUnit);
                         statsContentContainer.addView(view);
                         break;
 
                     case "3 rep-max":
                         Log.i(TAG, "3 rep-max");
-                        estimatedMax.setText(Utils.formatWeight(mEstimatedThreeRep) + mUnit + " (estimated)");
+                        estimatedMax.setText(Utils.formatWeight(mEstimatedThreeRep) + mUnit);
                         statsContentContainer.addView(view);
                         break;
 
                     case "5 rep-max":
                         Log.i(TAG, "5 rep-max");
-                        estimatedMax.setText(Utils.formatWeight(mEstimatedFiveRep) + mUnit + " (estimated)");
+                        estimatedMax.setText(Utils.formatWeight(mEstimatedFiveRep) + mUnit);
                         statsContentContainer.addView(view);
                         break;
 
                     case "10 rep-max":
                         Log.i(TAG, "10 rep-max");
-                        estimatedMax.setText(Utils.formatWeight(mEstimatedTenRep) + mUnit + " (estimated)");
+                        estimatedMax.setText(Utils.formatWeight(mEstimatedTenRep) + mUnit);
                         statsContentContainer.addView(view);
                         break;
 

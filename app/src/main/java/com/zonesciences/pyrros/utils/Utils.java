@@ -18,6 +18,10 @@ public class Utils {
 
     public static final String TAG = "Utils";
 
+    // Units
+    public static final String UNIT_METRIC = " kgs";
+    public static final String UNIT_IMPERIAL = " lbs";
+
     public static String formatWeight(double weight){
         String s;
         if (weight == Math.floor(weight)){

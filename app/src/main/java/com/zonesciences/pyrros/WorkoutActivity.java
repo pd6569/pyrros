@@ -317,7 +317,10 @@ public class WorkoutActivity extends BaseActivity {
         Exercise currentExercise = currentFragment.getCurrentExercise();
         ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();
 
+        Log.i(TAG, "currentExercise: " + currentExercise.getName() + " reps: " + currentExercise.getReps() + " List of exercises size: " + exercises.size());
+
         for (int i = 0; i < exercises.size(); i++){
+            Log.i(TAG, "Looping through exercises " + i + " exercise: " + exercises.get(i).getExerciseId() );
             Exercise e = exercises.get(i);
             if (e.getExerciseId().equals(currentExercise.getExerciseId())){
                 Log.i(TAG, "Found matching exercise in list with id: " + e.getExerciseId() + " At index: " + i + " Weights lifted: " + e.getWeight());

@@ -17,6 +17,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -336,6 +337,17 @@ public class DataTools {
         boolean recordSet = false;
         String key = reps + " rep-max";
         Map<String, List<Double>> records = mExerciseRecord.getRecords();
+
+        // Set record date to same date as workout and set time of record to current time of adding
+        // This is to ensure that if a record is back dated on an EARLIER date, it is not recorded with the current date
+
+        String workoutDate = mExerciseDates.get(mWorkoutKeys.indexOf(workoutKey));
+        LocalTime timeNow = new LocalTime();
+        String format = "yyyy-MM-dd, HH:mm:ss";
+        DateTime recordDate = DateTime.parse((workoutDate), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
+        recordDate.withHourOfDay(timeNow.getHourOfDay()).withMinuteOfHour(timeNow.getMinuteOfHour()).withSecondOfMinute(timeNow.getSecondOfMinute());
+        String date = recordDate.toString(format);
+
         if (records == null){
             Log.i(TAG, "sets map not yet created");
         } else {
@@ -351,7 +363,10 @@ public class DataTools {
                     mExerciseRecord.getRecords().get(key).add(weight);
 
                     //update record date
-                    mExerciseRecord.getDate().get(key).add(Utils.getClientTimeStamp(true));
+
+
+
+                    mExerciseRecord.getDate().get(key).add(date);
 
                     //update workout key
                     mExerciseRecord.getWorkoutKey().get(key).add(workoutKey);
@@ -366,7 +381,7 @@ public class DataTools {
                 weightList.add(weight);
 
                 List<String> dateList = new ArrayList<>();
-                dateList.add(Utils.getClientTimeStamp(true));
+                dateList.add(date);
 
                 List<String> workoutKeyList = new ArrayList<>();
                 workoutKeyList.add(workoutKey);
@@ -609,6 +624,47 @@ public class DataTools {
         return newDataTools;
     }
 
+    private Interval getInterval(int dateRange) {
+
+        DateTime now = new DateTime();
+        DateTime dateFrom;
+        DateTime dateTo;
+
+        switch (dateRange) {
+            case TODAY:
+                dateFrom = now.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                return new Interval(dateFrom, dateTo);
+
+            case THIS_WEEK:
+                dateFrom = now.withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withDayOfWeek(DateTimeConstants.SUNDAY).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                return new Interval(dateFrom, dateTo);
+
+            case THIS_MONTH:
+                dateFrom = now.withDayOfMonth(1).withTimeAtStartOfDay();
+                dateTo = dateFrom.plusMonths(1).minusDays(1).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                return new Interval(dateFrom, dateTo);
+
+            case LAST_28_DAYS:
+                dateFrom = now.minusDays(28).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                return new Interval(dateFrom, dateTo);
+
+            case LAST_6_MONTHS:
+                dateFrom = now.minusMonths(6).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                return new Interval(dateFrom, dateTo);
+
+            case THIS_YEAR:
+                dateFrom = new DateTime().dayOfYear().withMinimumValue().withTimeAtStartOfDay();
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                return new Interval(dateFrom, dateTo);
+        }
+
+        return null;
+    }
+
     private DataTools setNewDataTools(DateTime dateFrom, DateTime dateTo, DataTools dataTools){
 
         DataTools oldDataTools = dataTools;
@@ -694,6 +750,30 @@ public class DataTools {
         Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
 
         return newDataTools;
+    }
+
+    // Record analysis
+    public Record getRecordForDateRange(Record record, int dateRange){
+        Map<String, List<String>> dates = record.getDate();
+        Record newRecord = new Record();
+
+        List<String> oneRepDates = dates.get("1 rep-max");
+        List<String> threeRepDates = dates.get("3 rep-max");
+        List<String> fiveRepDates = dates.get("5 rep-max");
+        List<String> tenRepDates = dates.get("10 rep-max");
+
+        Interval interval;
+
+        interval = getInterval(dateRange);
+        for (int i = 0; i < oneRepDates.size(); i++){
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
+            DateTime date = formatter.parseDateTime(oneRepDates.get(i));
+            if (interval.contains(date)){
+                Log.i(TAG, "One rep maxes found in this range on date: " + date.toString());
+            }
+        }
+
+        return newRecord;
     }
 
 }
