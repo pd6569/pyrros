@@ -470,6 +470,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         return mStatsDataLoaded;
     }
 
+    public String getWorkoutKey() {
+        return mWorkoutKey;
+    }
+
     // Listener
 
     public interface OnStatsDataLoaded {

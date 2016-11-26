@@ -27,6 +27,7 @@ public class StatsFragment extends Fragment {
     private static final String ARG_EXERCISES = "Exercises";
     private static final String ARG_WORKOUT_KEYS = "WorkoutKeys";
     private static final String ARG_WORKOUT_DATES = "WorkoutDates";
+    private static final String ARG_CURRENT_WORKOUT_KEY = "CurrentWorkoutKey";
 
     private ViewPager mViewPager;
     private FragmentPagerAdapter mPagerAdapter;
@@ -39,15 +40,17 @@ public class StatsFragment extends Fragment {
     List<Exercise> mExercises;
     List<String> mWorkoutKeys;
     List<String> mWorkoutDates;
+    String mCurrentWorkoutKey;
 
 
-    public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates) {
+    public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates, String currentWorkoutKey) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
         args.putSerializable(ARG_EXERCISES, exercises);
         args.putSerializable(ARG_WORKOUT_KEYS, workoutKeys);
         args.putSerializable(ARG_WORKOUT_DATES, workoutDates);
+        args.putString(ARG_CURRENT_WORKOUT_KEY, currentWorkoutKey);
 
         StatsFragment fragment = new StatsFragment();
         fragment.setArguments(args);
@@ -69,6 +72,7 @@ public class StatsFragment extends Fragment {
         mExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
         mWorkoutKeys = (ArrayList) bundle.getSerializable(ARG_WORKOUT_KEYS);
         mWorkoutDates = (ArrayList) bundle.getSerializable(ARG_WORKOUT_DATES);
+        mCurrentWorkoutKey = bundle.getString(ARG_CURRENT_WORKOUT_KEY);
 
     }
 
@@ -117,7 +121,7 @@ public class StatsFragment extends Fragment {
 
     private class FragmentStatsPagerAdapter extends FragmentPagerAdapter {
 
-        StatsOverviewFragment mStatsOverviewFragment = StatsOverviewFragment.newInstance(mExerciseKey, mUserId, (ArrayList) mExercises, (ArrayList) mWorkoutKeys, (ArrayList) mWorkoutDates);
+        StatsOverviewFragment mStatsOverviewFragment = StatsOverviewFragment.newInstance(mExerciseKey, mUserId, (ArrayList) mExercises, (ArrayList) mWorkoutKeys, (ArrayList) mWorkoutDates, mCurrentWorkoutKey);
         StatsRepMaxFragment mStatsRepMaxFragment = new StatsRepMaxFragment();
         StatsGraphFragment mStatsGraphFragment = new StatsGraphFragment();
         StatsCompareFragment mStatsCompareFragment = new StatsCompareFragment();

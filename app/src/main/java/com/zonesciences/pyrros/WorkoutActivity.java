@@ -328,8 +328,10 @@ public class WorkoutActivity extends BaseActivity {
         ArrayList<String> workoutKeys = (ArrayList)currentFragment.getStatsExerciseWorkoutKeys();
         ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
         Record exerciseRecord = currentFragment.getRecord();
+        String currentWorkoutKey = currentFragment.getWorkoutKey();
+        Log.i(TAG, "Current workout key = " + currentWorkoutKey);
 
-        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, exercises, workoutKeys, workoutDates);
+        mFragment = StatsFragment.newInstance(mExerciseKey, mUserId, exercises, workoutKeys, workoutDates, currentWorkoutKey);
         setFragment();
 
     }

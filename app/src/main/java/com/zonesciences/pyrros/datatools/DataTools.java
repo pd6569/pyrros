@@ -34,6 +34,7 @@ public class DataTools {
 
     private static final String TAG = "DataTools.class";
 
+    public static final int THIS_SESSION = 0;
     public static final int TODAY = 1;
     public static final int THIS_WEEK = 2;
     public static final int THIS_MONTH = 3;
@@ -41,10 +42,11 @@ public class DataTools {
     public static final int LAST_6_MONTHS = 5;
     public static final int THIS_YEAR = 6;
     public static final int ALL_TIME = 7;
-    public static final int THIS_SESSION = 10;
+
 
     DatabaseReference mUserWorkoutExercisesRef;
 
+    String mRequestorWorkoutKey;
     String mExerciseKey;
     String mUserId;
 
@@ -229,6 +231,10 @@ public class DataTools {
         return mExerciseKey;
     }
 
+    public String getRequestorWorkoutKey() {
+        return mRequestorWorkoutKey;
+    }
+
     // Setters
 
     public void setExerciseRecord(Record exerciseRecord) {
@@ -245,6 +251,10 @@ public class DataTools {
 
     public void setWorkoutKeys(ArrayList<String> workoutKeys) {
         mWorkoutKeys = workoutKeys;
+    }
+
+    public void setRequestorWorkoutKey(String requestorWorkoutKey) {
+        mRequestorWorkoutKey = requestorWorkoutKey;
     }
 
     // Maps
@@ -541,8 +551,6 @@ public class DataTools {
     }
 
     // Methods for getting data for specified date range
-
-    //TODO: finish this method
     public DataTools getExercisesForDates(DataTools dataTools, int dateRange){
 
         DataTools oldDataTools = dataTools;
@@ -563,8 +571,6 @@ public class DataTools {
 
         switch(dateRange){
 
-            case THIS_SESSION:
-                break;
             case TODAY:
                 dateFrom = now.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
                 dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
@@ -573,7 +579,6 @@ public class DataTools {
             case THIS_WEEK:
                 dateFrom = now.withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
                 dateTo = now.withDayOfWeek(DateTimeConstants.SUNDAY).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
-
                 newDataTools = setNewDataTools(dateFrom, dateTo, oldDataTools);
                 break;
             case THIS_MONTH:
@@ -604,62 +609,25 @@ public class DataTools {
         return newDataTools;
     }
 
-    /*private DataTools setNewDataTools(String dateQuery, DataTools dataTools){
-
-        DataTools oldDataTools = dataTools;
-        DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
-
-        List<Exercise> exercisesOld = oldDataTools.getExercises();
-        List<String> datesOld = oldDataTools.getExerciseDates();
-        List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
-
-        List<Exercise> exercisesNew = new ArrayList<>();
-        List<String> datesNew = new ArrayList<>();
-        List<String> workoutKeysNew = new ArrayList<>();
-
-        for (int j = 0; j < datesOld.size(); j++){
-            if (datesOld.get(j).contains(dateQuery)){
-                datesNew.add(datesOld.get(j));
-                newDataTools.setExerciseDates((ArrayList) datesNew);
-
-                exercisesNew.add(exercisesOld.get(j));
-                newDataTools.setExercises((ArrayList) exercisesNew);
-
-                workoutKeysNew.add(workoutKeysOld.get(j));
-                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
-            }
-        }
-        if (datesNew.size() == 0){
-            Log.i(TAG, "No workouts found, return unchanged datatools object");
-            newDataTools = oldDataTools;
-        }
-
-        return newDataTools;
-
-    }*/
-
-
     private DataTools setNewDataTools(DateTime dateFrom, DateTime dateTo, DataTools dataTools){
 
         DataTools oldDataTools = dataTools;
         DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
 
         List<Exercise> exercisesOld = oldDataTools.getExercises();
-
         List<String> datesOld = oldDataTools.getExerciseDates();
-
         List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
-
 
         List<Exercise> exercisesNew = new ArrayList<>();
         List<String> datesNew = new ArrayList<>();
         List<String> workoutKeysNew = new ArrayList<>();
 
+
         Log.i(TAG, "Date from: " + dateFrom + " Date to: " + dateTo);
 
         Interval interval = new Interval(dateFrom, dateTo);
 
-        for (int i = 0; i < datesOld.size(); i++){
+        for (int i = 0; i < datesOld.size(); i++) {
             DateTime date = DateTime.parse(datesOld.get(i), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
             Log.i(TAG, "dates of this exercise: " + date.toString());
             if (interval.contains(date)) {
@@ -674,7 +642,48 @@ public class DataTools {
 
                 workoutKeysNew.add(workoutKeysOld.get(i));
                 newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
+            }
+        }
 
+
+        if (datesNew.size() == 0){
+            Log.i(TAG, "No workouts found, return unchanged datatools object");
+            newDataTools = oldDataTools;
+        }
+
+        Log.i(TAG, "datesNew: " + newDataTools.getExerciseDates());
+        for (Exercise e : newDataTools.getExercises()) {
+            Log.i(TAG, "exercisesNew: " + e.getReps());
+        }
+        Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
+
+        return newDataTools;
+
+    }
+
+    public DataTools getToolsForSingleSession (String workoutKey){
+
+        DataTools newDataTools = new DataTools(Utils.getUid(), getExerciseKey());
+
+        List<Exercise> exercisesOld = getExercises();
+        List<String> datesOld = getExerciseDates();
+        List<String> workoutKeysOld = getWorkoutKeys();
+
+        List<Exercise> exercisesNew = new ArrayList<>();
+        List<String> datesNew = new ArrayList<>();
+        List<String> workoutKeysNew = new ArrayList<>();
+
+        for (int i = 0; i < workoutKeysOld.size(); i++) {
+            if (workoutKeysOld.get(i).contains(workoutKey)) {
+                Log.i(TAG, "Workout found for this date");
+                datesNew.add(datesOld.get(i));
+                newDataTools.setExerciseDates((ArrayList) datesNew);
+
+                exercisesNew.add(exercisesOld.get(i));
+                newDataTools.setExercises((ArrayList) exercisesNew);
+
+                workoutKeysNew.add(workoutKeysOld.get(i));
+                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
             }
         }
 
@@ -684,14 +693,7 @@ public class DataTools {
         }
         Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
 
-
-        if (datesNew.size() == 0){
-            Log.i(TAG, "No workouts found, return unchanged datatools object");
-            newDataTools = oldDataTools;
-        }
-
         return newDataTools;
-
     }
 
 }

@@ -9,7 +9,7 @@
         android:id="@+id/stats_overview_filter_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/button"
+        android:background="@color/colorPrimaryDark"
         android:textSize="18dp"
         android:text="ALL TIME"
         android:textColor="#fff"

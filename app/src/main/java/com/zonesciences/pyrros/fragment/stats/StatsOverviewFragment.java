@@ -42,8 +42,10 @@ public class StatsOverviewFragment extends Fragment {
     private static final String ARG_EXERCISES = "Exercises";
     private static final String ARG_WORKOUT_KEYS = "WorkoutKeys";
     private static final String ARG_WORKOUT_DATES = "WorkoutDates";
+    private static final String ARG_CURRENT_WORKOUT_KEY = "CurrentWorkoutKey";
 
     String mExerciseKey;
+    String mCurrentWorkoutKey;
     String mUserId;
 
     //View
@@ -118,13 +120,14 @@ public class StatsOverviewFragment extends Fragment {
     // Filter
     int mCurrentFilter = DataTools.ALL_TIME; //defaults to all time
 
-    public static StatsOverviewFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates) {
+    public static StatsOverviewFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates, String currentWorkoutKey) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
         args.putSerializable(ARG_EXERCISES, exercises);
         args.putSerializable(ARG_WORKOUT_KEYS, workoutKeys);
         args.putSerializable(ARG_WORKOUT_DATES, workoutDates);
+        args.putString(ARG_CURRENT_WORKOUT_KEY, currentWorkoutKey);
 
         StatsOverviewFragment fragment = new StatsOverviewFragment();
         fragment.setArguments(args);
@@ -146,6 +149,7 @@ public class StatsOverviewFragment extends Fragment {
         mExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
         mWorkoutKeys = (ArrayList) bundle.getSerializable(ARG_WORKOUT_KEYS);
         mWorkoutDates = (ArrayList) bundle.getSerializable(ARG_WORKOUT_DATES);
+        mCurrentWorkoutKey = bundle.getString(ARG_CURRENT_WORKOUT_KEY);
 
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("pref_unit", null).equals("metric")){
             mUnit = " kgs";
@@ -188,6 +192,15 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for today requested");
 
                                 filterRequested = DataTools.TODAY;
+                                setDataTools(filterRequested);
+                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+
+                                break;
+
+                            case R.id.stats_menu_this_session:
+                                Log.i(TAG, "Stats for this session");
+
+                                filterRequested = DataTools.THIS_SESSION;
                                 setDataTools(filterRequested);
                                 setFilter(item.getTitle(), filterRequested, previousDataTools);
 
@@ -303,6 +316,15 @@ public class StatsOverviewFragment extends Fragment {
 
         if (filterRequested < mCurrentFilter) {
             Log.i(TAG, "Current filter will include all data necessary for the requested filter");
+
+            // Filter for this session requires all exercise data, as the active ssession could be from ANY time range, however it only contains a single random workout, therefore
+            // it is LOWEST in the hierarchy below today with value 0
+            if (filterRequested == DataTools.THIS_SESSION) {
+                Log.i(TAG, "Filter requested = THIS SESSION. Trying to set workout key: " + mCurrentWorkoutKey);
+                resetDataTools();
+                mDataTools = mDataTools.getToolsForSingleSession(mCurrentWorkoutKey);
+                return;
+            }
             mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
         } else if (mCurrentFilter == filterRequested){
             Log.i(TAG, "Already viewing stats for this particular filter, dickhead");
@@ -313,10 +335,12 @@ public class StatsOverviewFragment extends Fragment {
             if (filterRequested == DataTools.ALL_TIME){
                 return;
             } else {
+
                 mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+
+                Log.i(TAG, "mDataTools set: " + mDataTools.getExerciseDates() + " exercises : " + mDataTools.getExercises().size() + " workout keys: " + mDataTools.getWorkoutKeys());
             }
         }
-
     }
 
     private void resetDataTools() {
@@ -333,6 +357,7 @@ public class StatsOverviewFragment extends Fragment {
 
         if (mDataTools != previousDataTools) {
             mFilterButton.setText(filterTitle);
+            Log.i(TAG, "new data tools set: " + mDataTools.getExercises() + " DATES: " + mDataTools.getExerciseDates());
             setStatsVariables();
             updateStatsVariableArray();
             mAdapter.notifyDataSetChanged();
