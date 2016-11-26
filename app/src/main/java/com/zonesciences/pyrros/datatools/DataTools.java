@@ -761,16 +761,27 @@ public class DataTools {
         List<String> fiveRepDates = dates.get("5 rep-max");
         List<String> tenRepDates = dates.get("10 rep-max");
 
+        double oneRepMax;
+        double threeRepMax;
+        double fiveRepMax;
+        double tenRepMax;
+
         Interval interval;
 
         interval = getInterval(dateRange);
+
+        int oneRepIndex = -1;
         for (int i = 0; i < oneRepDates.size(); i++){
+
             DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
             DateTime date = formatter.parseDateTime(oneRepDates.get(i));
             if (interval.contains(date)){
-                Log.i(TAG, "One rep maxes found in this range on date: " + date.toString());
+                oneRepIndex++;
+                Log.i(TAG, "One rep maxes found in this range on date: " + date.toString() + " index" + oneRepIndex);
             }
         }
+        oneRepMax = record.getRecords().get("1 rep-max").get(oneRepIndex);
+        Log.i(TAG, "One rep-max for this date range = " + oneRepMax);
 
         return newRecord;
     }

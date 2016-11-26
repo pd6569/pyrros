@@ -407,7 +407,17 @@ public class StatsOverviewFragment extends Fragment {
 
         try{
             mOneRepMax = mRecord.getRecords().get("1 rep-max").get(mRecord.getRecords().get("1 rep-max").size() - 1);
+            Log.i(TAG, "Getting rep maxes for this month");
             mDataTools.getRecordForDateRange(mRecord, DataTools.THIS_MONTH);
+            Log.i(TAG, "Getting rep maxes for today");
+            mDataTools.getRecordForDateRange(mRecord, DataTools.TODAY);
+
+            Log.i(TAG, "Getting rep maxes for this year");
+            mDataTools.getRecordForDateRange(mRecord, DataTools.THIS_YEAR);
+
+            Log.i(TAG, "Getting rep maxes for last 6 months");
+            mDataTools.getRecordForDateRange(mRecord, DataTools.LAST_6_MONTHS);
+
             mEstimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1) * mConversionMultiple);
 
         } catch (Exception e) {
