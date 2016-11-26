@@ -112,14 +112,17 @@ public class Workout {
     }
 
 
+    @Exclude
     public void setName(String name) {
         this.name = name;
     }
 
+    @Exclude
     public void setShared(Boolean shared) {
         this.shared = shared;
     }
 
+    @Exclude
     public void setClientTimeStamp(String clientTimeStamp) {
         this.clientTimeStamp = clientTimeStamp;
     }
