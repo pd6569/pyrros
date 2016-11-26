@@ -38,12 +38,14 @@ public class ExerciseHistoryFragment extends Fragment {
     private static final String ARG_EXERCISE_HISTORY_DATES = "ExerciseHistoryDates";
     private static final String ARG_EXERCISE_HISTORY = "ExerciseHistory";
     private static final String ARG_WORKOUT_KEYS = "WorkoutKeys";
+    private static final String ARG_REQUESTOR_WORKOUT_KEY = "RequestorWorkoutKey";
 
 
     DatabaseReference mUserWorkoutExercisesRef;
 
     String mExerciseKey;
     String mUserId;
+    String mRequestorWorkoutKey;
 
     //Data
     List<Exercise> mExercises;
@@ -59,13 +61,14 @@ public class ExerciseHistoryFragment extends Fragment {
     //Sort order
     boolean newestFirst = true;
 
-    public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises, List<String> workoutKeys) {
+    public static ExerciseHistoryFragment newInstance(String exerciseKey, String userId, List<String> exerciseDates, List<Exercise> exercises, List<String> workoutKeys, String requestorWorkoutKey) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
         args.putString(ARG_USER_ID, userId);
         args.putStringArrayList(ARG_EXERCISE_HISTORY_DATES, (ArrayList<String>) exerciseDates);
         args.putSerializable(ARG_EXERCISE_HISTORY, (Serializable) exercises);
         args.putStringArrayList(ARG_WORKOUT_KEYS, (ArrayList<String>) workoutKeys);
+        args.putString(ARG_REQUESTOR_WORKOUT_KEY, requestorWorkoutKey);
         ExerciseHistoryFragment fragment = new ExerciseHistoryFragment();
         fragment.setArguments(args);
         return fragment;
@@ -85,6 +88,7 @@ public class ExerciseHistoryFragment extends Fragment {
         mExerciseDates = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY_DATES);
         mExercises = (List) bundle.getSerializable(ARG_EXERCISE_HISTORY);
         mWorkoutKeys = (List) bundle.getSerializable(ARG_WORKOUT_KEYS);
+        mRequestorWorkoutKey = bundle.getString(ARG_REQUESTOR_WORKOUT_KEY);
 
         //TODO: EXERCISES DISPLAYED IN RANDOM ORDER - FIX
 
@@ -99,6 +103,10 @@ public class ExerciseHistoryFragment extends Fragment {
         }
         Collections.sort(mExerciseHistoryList);
         Collections.reverse(mExerciseHistoryList);
+        if (mExerciseHistoryList.get(0).getWorkoutId().equals(mRequestorWorkoutKey)){
+            Log.i(TAG, "History requested by most recent exercise");
+            mExerciseHistoryList.remove(0);
+        }
 
         mAdapter = new ExerciseHistoryAdapter(getContext(), mExerciseHistoryList);
 

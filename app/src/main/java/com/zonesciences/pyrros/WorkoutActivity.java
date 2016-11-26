@@ -179,7 +179,7 @@ public class WorkoutActivity extends BaseActivity {
                 ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
                 ArrayList<String> workoutKeys = (ArrayList) currentFragment.getStatsExerciseWorkoutKeys();
 
-                mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises, workoutKeys);
+                mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises, workoutKeys, mWorkoutKey);
                 setFragment();
 
             } else {
@@ -196,7 +196,7 @@ public class WorkoutActivity extends BaseActivity {
                         ArrayList<String> workoutDates = (ArrayList) currentFragment.getStatsExerciseDates();
                         ArrayList<String> workoutKeys = (ArrayList) currentFragment.getStatsExerciseWorkoutKeys();
 
-                        mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises, workoutKeys);
+                        mFragment = ExerciseHistoryFragment.newInstance(mExerciseKey, mUserId, workoutDates, exercises, workoutKeys, mWorkoutKey);
                         setFragment();
                         hideProgressDialog();
                     }
