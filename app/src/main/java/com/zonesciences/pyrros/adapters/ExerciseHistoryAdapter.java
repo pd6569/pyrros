@@ -64,7 +64,7 @@ public class ExerciseHistoryAdapter extends RecyclerView.Adapter<ExerciseHistory
 
         /*String workoutDate = Utils.formatDate(mWorkoutDates.get(position), "yyyy-MM-dd, HH:mm:ss", 0);*/
 
-        DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
+        DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd MMM, yyyy");
         String workoutDate = mExerciseHistory.get(position).getDate().toString(format);
 
         holder.mExerciseDate.setText(workoutDate);
