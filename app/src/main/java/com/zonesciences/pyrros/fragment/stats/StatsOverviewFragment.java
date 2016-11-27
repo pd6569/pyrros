@@ -359,6 +359,7 @@ public class StatsOverviewFragment extends Fragment {
             mFilterButton.setText(filterTitle);
             Log.i(TAG, "new data tools set: " + mDataTools.getExercises() + " DATES: " + mDataTools.getExerciseDates());
             setStatsVariables();
+            setRepMaxStats();
             updateStatsVariableArray();
             mAdapter.notifyDataSetChanged();
             Toast.makeText(getContext(), "Showing stats for: " + filterTitle, Toast.LENGTH_SHORT).show();
@@ -406,20 +407,21 @@ public class StatsOverviewFragment extends Fragment {
     private void setRepMaxStats() {
 
         try{
-            mOneRepMax = mRecord.getRecords().get("1 rep-max").get(mRecord.getRecords().get("1 rep-max").size() - 1);
-            Log.i(TAG, "Getting rep maxes for this month");
-            mDataTools.getRecordForDateRange(mRecord, DataTools.THIS_MONTH);
+            mOneRepMax = mDataTools.getRepMax(1);
+            Log.i(TAG, "One rep max for this date range: " + mDataTools.getRepMax(1));
+            /*Log.i(TAG, "Getting rep maxes for this month");
+            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.THIS_MONTH);
             Log.i(TAG, "Getting rep maxes for today");
-            mDataTools.getRecordForDateRange(mRecord, DataTools.TODAY);
+            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.TODAY);
 
             Log.i(TAG, "Getting rep maxes for this year");
-            mDataTools.getRecordForDateRange(mRecord, DataTools.THIS_YEAR);
+            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.THIS_YEAR);
 
             Log.i(TAG, "Getting rep maxes for last 6 months");
-            mDataTools.getRecordForDateRange(mRecord, DataTools.LAST_6_MONTHS);
+            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.LAST_6_MONTHS);
 
             Log.i(TAG, "Getting rep maxes for all time");
-            mDataTools.getRecordForDateRange(mRecord, DataTools.ALL_TIME);
+            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.ALL_TIME);*/
 
             mEstimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1) * mConversionMultiple);
 
@@ -430,7 +432,8 @@ public class StatsOverviewFragment extends Fragment {
 
 
         try{
-            mThreeRepMax = (mRecord.getRecords().get("3 rep-max").get(mRecord.getRecords().get("3 rep-max").size() - 1));
+            mThreeRepMax = mDataTools.getRepMax(3);
+            Log.i(TAG, "Three rep max for this date range: " + mDataTools.getRepMax(3));
             mEstimatedThreeRep = Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 3) * mConversionMultiple);
 
         } catch (Exception e) {
@@ -440,7 +443,8 @@ public class StatsOverviewFragment extends Fragment {
         };
 
         try{
-            mFiveRepMax = (mRecord.getRecords().get("5 rep-max").get(mRecord.getRecords().get("5 rep-max").size() - 1));
+            mFiveRepMax = mDataTools.getRepMax(5);
+            Log.i(TAG, "Five rep max for this date range: " + mDataTools.getRepMax(5));
             mEstimatedFiveRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 5) * mConversionMultiple);
 
         } catch (Exception e) {
@@ -449,7 +453,8 @@ public class StatsOverviewFragment extends Fragment {
         };
 
         try{
-            mTenRepMax = (mRecord.getRecords().get("10 rep-max").get(mRecord.getRecords().get("10 rep-max").size() - 1));
+            mTenRepMax = mDataTools.getRepMax(10);
+            Log.i(TAG, "Ten rep max for this date range: " + mDataTools.getRepMax(10));
             mEstimatedTenRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 10) * mConversionMultiple);
 
         } catch (Exception e) {

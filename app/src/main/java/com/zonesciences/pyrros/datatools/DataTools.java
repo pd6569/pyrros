@@ -764,43 +764,109 @@ public class DataTools {
     }
 
     // Record analysis
-    public Record getRecordForDateRange(Record record, int dateRange){
-        Map<String, List<String>> dates = record.getDate();
+    public double getRepMax(int numReps){
+
+        double maxWeight = 0.0;
+
+        for (Exercise e : mExercises){
+            if (e.getReps() != null) {
+                for (int i = 0; i < e.getReps().size(); i++) {
+                    if (e.getReps().get(i) == numReps) {
+                        double currentWeight = e.getWeight().get(i);
+                        Log.i(TAG, "Reps found matching rep-max, and weight lifted: " + currentWeight);
+                        if (currentWeight > maxWeight) {
+                            maxWeight = currentWeight;
+                        }
+                    }
+                }
+            }
+        }
+
+        Log.i(TAG, numReps + " rep-max found for this date range: " + maxWeight);
+        return maxWeight;
+
+        /*Map<String, List<String>> dates = record.getDate();
         Record newRecord = new Record();
 
-        List<String> oneRepDates = dates.get("1 rep-max");
+        List<String> maxDates = new ArrayList<>();
+        switch(recordKey){
+            case "1 rep-max":
+                maxDates = dates.get("1 rep-max");
+                break;
+            case "3 rep-max":
+                maxDates = dates.get("3 rep-max");
+                break;
+            case "5 rep-max":
+                maxDates = dates.get("5 rep-max");
+                break;
+            case "10 rep-max":
+                maxDates = dates.get("10 rep-max");
+                break;
+            default:
+                Log.i(TAG, "Invalid recordKey");
+                break;
+        }
+
+
+        *//*List<String> oneRepDates = dates.get("1 rep-max");
         List<String> threeRepDates = dates.get("3 rep-max");
         List<String> fiveRepDates = dates.get("5 rep-max");
-        List<String> tenRepDates = dates.get("10 rep-max");
+        List<String> tenRepDates = dates.get("10 rep-max");*//*
 
-        double oneRepMax;
+        *//*double oneRepMax;
         double threeRepMax;
         double fiveRepMax;
-        double tenRepMax;
+        double tenRepMax;*//*
+
+        double repMax = 0.0;
 
         Interval interval;
 
         interval = getInterval(dateRange);
 
-        int oneRepIndex = -1;
-        for (int i = 0; i < oneRepDates.size(); i++){
+
+        int index = -1;
+        for (int i = 0; i < maxDates.size(); i++) {
 
             DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
-            DateTime date = formatter.parseDateTime(oneRepDates.get(i));
-            if (interval.contains(date)){
-                oneRepIndex++;
-                Log.i(TAG, "One rep maxes found in this range on date: " + date.toString() + " index" + oneRepIndex);
+            DateTime date = formatter.parseDateTime(maxDates.get(i));
+            if (interval.contains(date)) {
+                index++;
+                Log.i(TAG, recordKey + " found in this range on date: " + date.toString() + " index" + index);
             } else {
                 Log.i(TAG, "No rep maxes found in this range");
             }
         }
 
-        if (oneRepIndex > -1) {
-            oneRepMax = record.getRecords().get("1 rep-max").get(oneRepIndex);
-            Log.i(TAG, "One rep-max for this date range = " + oneRepMax);
+        if (index > -1) {
+            repMax = record.getRecords().get(recordKey).get(index);
+            Log.i(TAG, recordKey + " for this date range = " + repMax);
+            return repMax;
         }
 
-        return newRecord;
+
+        *//*if (recordKey.equals("1 rep-max")) {
+            int oneRepIndex = -1;
+            for (int i = 0; i < oneRepDates.size(); i++) {
+
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
+                DateTime date = formatter.parseDateTime(oneRepDates.get(i));
+                if (interval.contains(date)) {
+                    oneRepIndex++;
+                    Log.i(TAG, "One rep maxes found in this range on date: " + date.toString() + " index" + oneRepIndex);
+                } else {
+                    Log.i(TAG, "No rep maxes found in this range");
+                }
+            }
+
+            if (oneRepIndex > -1) {
+                oneRepMax = record.getRecords().get("1 rep-max").get(oneRepIndex);
+                Log.i(TAG, "One rep-max for this date range = " + oneRepMax);
+                repMax = oneRepMax;
+                return repMax;
+            }
+        } */
+
     }
 
 }
