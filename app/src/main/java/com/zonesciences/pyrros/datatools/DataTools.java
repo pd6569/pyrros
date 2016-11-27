@@ -659,9 +659,21 @@ public class DataTools {
                 dateFrom = new DateTime().dayOfYear().withMinimumValue().withTimeAtStartOfDay();
                 dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
                 return new Interval(dateFrom, dateTo);
+
+            case ALL_TIME:
+                dateFrom = getFirstWorkoutDate();
+                dateTo = now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59);
+                return new Interval(dateFrom, dateTo);
         }
 
         return null;
+    }
+
+    public DateTime getFirstWorkoutDate(){
+        Collections.sort(mExerciseDates);
+        DateTime date = Utils.getDateTimeFromString(mExerciseDates.get(0), Utils.DATE_FORMAT_FULL);
+        Log.i(TAG, "First workout date: " + date.toString());
+        return date;
     }
 
     private DataTools setNewDataTools(DateTime dateFrom, DateTime dateTo, DataTools dataTools){
@@ -778,10 +790,15 @@ public class DataTools {
             if (interval.contains(date)){
                 oneRepIndex++;
                 Log.i(TAG, "One rep maxes found in this range on date: " + date.toString() + " index" + oneRepIndex);
+            } else {
+                Log.i(TAG, "No rep maxes found in this range");
             }
         }
-        oneRepMax = record.getRecords().get("1 rep-max").get(oneRepIndex);
-        Log.i(TAG, "One rep-max for this date range = " + oneRepMax);
+
+        if (oneRepIndex > -1) {
+            oneRepMax = record.getRecords().get("1 rep-max").get(oneRepIndex);
+            Log.i(TAG, "One rep-max for this date range = " + oneRepMax);
+        }
 
         return newRecord;
     }

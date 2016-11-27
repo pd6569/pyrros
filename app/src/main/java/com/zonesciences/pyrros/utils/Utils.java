@@ -5,6 +5,8 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +23,14 @@ public class Utils {
     // Units
     public static final String UNIT_METRIC = " kgs";
     public static final String UNIT_IMPERIAL = " lbs";
+
+    // Date formats
+
+    public static final String DATE_FORMAT_FULL = "yyyy-MM-dd, HH:mm:ss";
+    public static final String DATE_FORMAT_1 = "EEE, dd MMM";
+    public static final String DATE_FORMAT_2 = "EEE dd MMM, yyyy";
+    public static final String DATE_FORMAT_DATE_ONLY = "yyyy-MM-dd";
+    public static final String DATE_FORMAT_TIME_ONLY = "HH:mm";
 
     public static String formatWeight(double weight){
         String s;
@@ -97,6 +107,12 @@ public class Utils {
         return sdf.format(calendar.getTime());
     }
 
+    public static DateTime getDateTimeFromString(String date, String dateFormat){
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
+        DateTime dateTime = formatter.parseDateTime(date);
+        return dateTime;
+    }
+
     public static String getClientTimeStamp(boolean includeTime){
         /*SimpleDateFormat df;
         if (includeTime) {
@@ -118,8 +134,8 @@ public class Utils {
     }
 
 
-
     public static String getUid(){
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
+
 }

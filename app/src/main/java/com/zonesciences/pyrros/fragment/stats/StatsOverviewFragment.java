@@ -418,6 +418,9 @@ public class StatsOverviewFragment extends Fragment {
             Log.i(TAG, "Getting rep maxes for last 6 months");
             mDataTools.getRecordForDateRange(mRecord, DataTools.LAST_6_MONTHS);
 
+            Log.i(TAG, "Getting rep maxes for all time");
+            mDataTools.getRecordForDateRange(mRecord, DataTools.ALL_TIME);
+
             mEstimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1) * mConversionMultiple);
 
         } catch (Exception e) {
