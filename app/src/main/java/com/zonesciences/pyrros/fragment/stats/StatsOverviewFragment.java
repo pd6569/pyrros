@@ -3,9 +3,7 @@ package com.zonesciences.pyrros.fragment.stats;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -22,12 +20,9 @@ import android.widget.Toast;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
-import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,18 +45,6 @@ public class StatsOverviewFragment extends Fragment {
 
     //View
     Button mFilterButton;
-    ViewPager mStatsViewPager;
-
-    TextView mTotalSetsTextView;
-    TextView mTotalRepsTextView;
-    TextView mTotalVolumeTextView;
-    TextView mHeaviestWeightLiftedTextView;
-    TextView mOneRepMaxTextView;
-    TextView mThreeRepMaxTextView;
-    TextView mFiveRepMaxTextView;
-    TextView mTenRepMaxTextView;
-    TextView mNumSessionsTextView;
-    TextView mSetsPerSessionTextView;
 
     //RecyclerView
     RecyclerView mStatsRecycler;
@@ -72,7 +55,6 @@ public class StatsOverviewFragment extends Fragment {
     ArrayList<Exercise> mExercises = new ArrayList<>();
     ArrayList<String> mWorkoutKeys;
     ArrayList<String> mWorkoutDates;
-    Map<String, Object> mHeaviestWeightMap = new HashMap<>();
 
     // Stats variables
     int mTotalSets;
@@ -94,7 +76,7 @@ public class StatsOverviewFragment extends Fragment {
     private double mEstimatedFiveRep;
     private double mEstimatedTenRep;
 
-    String[] mStatsVariableIndex = new String[]{
+    String[] mStatsTitles = new String[]{
             "Sessions",
             "Sets",
             "Reps",
@@ -108,10 +90,10 @@ public class StatsOverviewFragment extends Fragment {
             "10 rep-max"
     };
 
-    String[] mStatsVariables;
+    String[] mStatsContentArray; // contains string representation of stats content
 
-    DataTools mDataTools;
-    Record mRecord;
+    DataTools mDataTools; // contains data tools for specified date range
+
 
     //Units
     String mUnit;
@@ -161,7 +143,8 @@ public class StatsOverviewFragment extends Fragment {
 
         mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
 
-        setStatsVariables();
+        setStats();
+        setRepMaxes();
 
     }
 
@@ -184,79 +167,79 @@ public class StatsOverviewFragment extends Fragment {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         DataTools previousDataTools = mDataTools; // if there are no workouts for date range, then datatools will not change
-                        int filterRequested;
+                        int dateRange;
                         boolean filterNotChanged = false;
 
                         switch(item.getItemId()){
                             case R.id.stats_menu_today:
                                 Log.i(TAG, "Stats for today requested");
 
-                                filterRequested = DataTools.TODAY;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.TODAY;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_this_session:
                                 Log.i(TAG, "Stats for this session");
 
-                                filterRequested = DataTools.THIS_SESSION;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.THIS_SESSION;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_all_time:
                                 Log.i(TAG, "Stats for all time requested");
 
-                                filterRequested = DataTools.ALL_TIME;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.ALL_TIME;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_month:
                                 Log.i(TAG, "Stats for this month requested");
 
-                                filterRequested = DataTools.THIS_MONTH;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.THIS_MONTH;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_week:
                                 Log.i(TAG, "Stats for this week requested");
 
-                                filterRequested = DataTools.THIS_WEEK;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.THIS_WEEK;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_28_days:
                                 Log.i(TAG, "Stats for last 28 days requested");
 
-                                filterRequested = DataTools.LAST_28_DAYS;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.LAST_28_DAYS;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_6_months:
                                 Log.i(TAG, "Stats for last 6 months requested");
 
-                                filterRequested = DataTools.LAST_6_MONTHS;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.LAST_6_MONTHS;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
 
                             case R.id.stats_menu_year:
                                 Log.i(TAG, "Stats for this year requested");
 
-                                filterRequested = DataTools.THIS_YEAR;
-                                setDataTools(filterRequested);
-                                setFilter(item.getTitle(), filterRequested, previousDataTools);
+                                dateRange = DataTools.THIS_YEAR;
+                                setDataTools(dateRange);
+                                setFilter(item.getTitle(), dateRange, previousDataTools);
 
                                 break;
                         }
@@ -271,42 +254,15 @@ public class StatsOverviewFragment extends Fragment {
             }
         });
 
-        mStatsViewPager = (ViewPager) rootView.findViewById(R.id.viewpager_stats);
         mStatsRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_stats_overview);
 
+        updateStatsContentView();
 
-        if (mRecord == null) {
-            Log.i(TAG, "mRecord has not been initialised yet, load from datatools");
-            mDataTools.loadRecord();
-            mDataTools.setOnDataLoadCompleteListener(new DataTools.OnDataLoadCompleteListener() {
-                @Override
-                public void onExercisesLoadComplete() {
-
-                }
-
-                @Override
-                public void onWorkoutDatesLoadComplete() {
-
-                }
-
-                @Override
-                public void onWorkoutKeysLoadComplete() {
-
-                }
-
-                @Override
-                public void onExerciseRecordLoadComplete() {
-                    Log.i(TAG, "Exercise record loaded");
-                    mRecord = mDataTools.getExerciseRecord();
-                    setRepMaxStats();
-                    setVariablesAndAdapter();
-
-                }
-            });
-        } else {
-            setRepMaxStats();
-            setVariablesAndAdapter();
-        }
+        mAdapter = new StatsOverviewAdapter();
+        mStatsRecycler.setAdapter(mAdapter);
+        mStatsRecycler.setHasFixedSize(true);
+        mGridLayoutManager = new GridLayoutManager(getActivity(), 1);
+        mStatsRecycler.setLayoutManager(mGridLayoutManager);
 
         return rootView;
     }
@@ -322,10 +278,10 @@ public class StatsOverviewFragment extends Fragment {
             if (filterRequested == DataTools.THIS_SESSION) {
                 Log.i(TAG, "Filter requested = THIS SESSION. Trying to set workout key: " + mCurrentWorkoutKey);
                 resetDataTools();
-                mDataTools = mDataTools.getToolsForSingleSession(mCurrentWorkoutKey);
+                mDataTools = mDataTools.getDataToolsForSingleSession(mCurrentWorkoutKey);
                 return;
             }
-            mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+            mDataTools = mDataTools.getDataToolsForDateRange(mDataTools, filterRequested);
         } else if (mCurrentFilter == filterRequested){
             Log.i(TAG, "Already viewing stats for this particular filter, dickhead");
             return;
@@ -336,7 +292,7 @@ public class StatsOverviewFragment extends Fragment {
                 return;
             } else {
 
-                mDataTools = mDataTools.getExercisesForDates(mDataTools, filterRequested);
+                mDataTools = mDataTools.getDataToolsForDateRange(mDataTools, filterRequested);
 
                 Log.i(TAG, "mDataTools set: " + mDataTools.getExerciseDates() + " exercises : " + mDataTools.getExercises().size() + " workout keys: " + mDataTools.getWorkoutKeys());
             }
@@ -358,9 +314,9 @@ public class StatsOverviewFragment extends Fragment {
         if (mDataTools != previousDataTools) {
             mFilterButton.setText(filterTitle);
             Log.i(TAG, "new data tools set: " + mDataTools.getExercises() + " DATES: " + mDataTools.getExerciseDates());
-            setStatsVariables();
-            setRepMaxStats();
-            updateStatsVariableArray();
+            setStats();
+            setRepMaxes();
+            updateStatsContentView();
             mAdapter.notifyDataSetChanged();
             Toast.makeText(getContext(), "Showing stats for: " + filterTitle, Toast.LENGTH_SHORT).show();
             mCurrentFilter = filterRequested;
@@ -375,8 +331,8 @@ public class StatsOverviewFragment extends Fragment {
     }
 
 
-    private void setStatsVariables() {
-        Log.i(TAG, "setStatsVariables");
+    private void setStats() {
+        Log.i(TAG, "setStats");
         mTotalSets = mDataTools.totalSets();
         mTotalReps = mDataTools.totalReps();
         mTotalVolume = mDataTools.totalVolume() * mConversionMultiple;
@@ -391,38 +347,11 @@ public class StatsOverviewFragment extends Fragment {
         Log.i(TAG, "sets: " + mTotalSets + "reps" + mTotalReps + " volume" + mTotalVolume + " sessions: " + mNumSessions + " heaviest weight: " + mHeaviestWeight + " heaviest weigh reps "+ mHeaviestWeightReps );
     }
 
-    private void setVariablesAndAdapter() {
-
-        updateStatsVariableArray();
-
-        mAdapter = new StatsOverviewAdapter();
-        mStatsRecycler.setAdapter(mAdapter);
-        mStatsRecycler.setHasFixedSize(true);
-        mGridLayoutManager = new GridLayoutManager(getActivity(), 1);
-        mStatsRecycler.setLayoutManager(mGridLayoutManager);
-
-    }
-
-
-    private void setRepMaxStats() {
+    private void setRepMaxes() {
 
         try{
             mOneRepMax = mDataTools.getRepMax(1);
             Log.i(TAG, "One rep max for this date range: " + mDataTools.getRepMax(1));
-            /*Log.i(TAG, "Getting rep maxes for this month");
-            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.THIS_MONTH);
-            Log.i(TAG, "Getting rep maxes for today");
-            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.TODAY);
-
-            Log.i(TAG, "Getting rep maxes for this year");
-            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.THIS_YEAR);
-
-            Log.i(TAG, "Getting rep maxes for last 6 months");
-            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.LAST_6_MONTHS);
-
-            Log.i(TAG, "Getting rep maxes for all time");
-            mDataTools.getRecordForDateRange(mRecord, "1 rep-max", DataTools.ALL_TIME);*/
-
             mEstimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1) * mConversionMultiple);
 
         } catch (Exception e) {
@@ -464,13 +393,13 @@ public class StatsOverviewFragment extends Fragment {
 
     }
 
-    public void updateStatsVariableArray(){
+    public void updateStatsContentView(){
 
-        if(mStatsVariables != null){
-            mStatsVariables = null;
+        if(mStatsContentArray != null){
+            mStatsContentArray = null;
         }
 
-        mStatsVariables = new String[]{
+        mStatsContentArray = new String[]{
                 Integer.toString(mNumSessions),
                 Integer.toString(mTotalSets),
                 Integer.toString(mTotalReps),
@@ -536,7 +465,7 @@ public class StatsOverviewFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(StatsOverviewAdapter.ViewHolder holder, int position) {
-            holder.title.setText(mStatsVariableIndex[position]);
+            holder.title.setText(mStatsTitles[position]);
 
             LinearLayout statsContentContainer = (LinearLayout) holder.itemView.findViewById(R.id.stats_overview_content_container);
             statsContentContainer.removeAllViews();
@@ -546,7 +475,7 @@ public class StatsOverviewFragment extends Fragment {
             TextView statsContentText = (TextView) view.findViewById(R.id.stats_overview_content);
             LinearLayout maxContainer = (LinearLayout) view.findViewById(R.id.stats_overview_max_container);
 
-            if (mStatsVariableIndex[position].contains("max")) {
+            if (mStatsTitles[position].contains("max")) {
 
                 statsContentText.setVisibility(View.GONE);
 
@@ -555,13 +484,13 @@ public class StatsOverviewFragment extends Fragment {
                 TextView estimatedMax = (TextView) view.findViewById(R.id.stats_overview_estimated_max);
                 TextView actualMax = (TextView) view.findViewById(R.id.stats_overview_actual_max);
 
-                if (mStatsVariables[position].equals("0")) {
+                if (mStatsContentArray[position].equals("0")) {
                     actualMax.setText("Not set");
                 } else {
-                    actualMax.setText(mStatsVariables[position] + mUnit);
+                    actualMax.setText(mStatsContentArray[position] + mUnit);
                 }
 
-                switch (mStatsVariableIndex[position]) {
+                switch (mStatsTitles[position]) {
 
                     case "1 rep-max":
                         Log.i(TAG, "1 rep-max");
@@ -589,14 +518,14 @@ public class StatsOverviewFragment extends Fragment {
 
                 }
             } else {
-                statsContentText.setText(mStatsVariables[position]);
+                statsContentText.setText(mStatsContentArray[position]);
                 statsContentContainer.addView(view);
             }
         }
 
         @Override
         public int getItemCount() {
-            return mStatsVariables.length;
+            return mStatsContentArray.length;
         }
     }
 

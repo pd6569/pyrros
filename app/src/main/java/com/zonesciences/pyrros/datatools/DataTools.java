@@ -564,24 +564,16 @@ public class DataTools {
 
     }
 
-    // Methods for getting data for specified date range
-    public DataTools getExercisesForDates(DataTools dataTools, int dateRange){
+    // Create DataTools for specified date range - can then analyse statistics for date range using normal data tools methods.
+    public DataTools getDataToolsForDateRange(DataTools dataTools, int dateRange){
 
         DataTools oldDataTools = dataTools;
         DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
 
-        Calendar calendar = Calendar.getInstance();
-        String today = Utils.convertCalendarDateToString(calendar, "yyyy-MM-dd");
-        String month = Utils.convertCalendarDateToString(calendar, "yyyy-MM");
-
         DateTime dateFrom;
         DateTime dateTo;
 
-        String dateQuery;
-
         DateTime now = new DateTime();
-
-        LocalDate date = new LocalDate();
 
         switch(dateRange){
 
@@ -622,6 +614,96 @@ public class DataTools {
 
         return newDataTools;
     }
+
+
+
+    private DataTools setNewDataTools(DateTime dateFrom, DateTime dateTo, DataTools dataTools){
+
+        DataTools oldDataTools = dataTools;
+        DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
+
+        List<Exercise> exercisesOld = oldDataTools.getExercises();
+        List<String> datesOld = oldDataTools.getExerciseDates();
+        List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
+
+        List<Exercise> exercisesNew = new ArrayList<>();
+        List<String> datesNew = new ArrayList<>();
+        List<String> workoutKeysNew = new ArrayList<>();
+
+
+        Log.i(TAG, "Date from: " + dateFrom + " Date to: " + dateTo);
+
+        Interval interval = new Interval(dateFrom, dateTo);
+
+        for (int i = 0; i < datesOld.size(); i++) {
+            DateTime date = DateTime.parse(datesOld.get(i), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
+            Log.i(TAG, "dates of this exercise: " + date.toString());
+            if (interval.contains(date)) {
+                Log.i(TAG, "This workout was performed on " + date.toString() + " workoutKey: " + workoutKeysOld.get(i));
+                datesNew.add(datesOld.get(i));
+                newDataTools.setExerciseDates((ArrayList) datesNew);
+
+
+                exercisesNew.add(exercisesOld.get(i));
+                newDataTools.setExercises((ArrayList) exercisesNew);
+
+
+                workoutKeysNew.add(workoutKeysOld.get(i));
+                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
+            }
+        }
+
+
+        if (datesNew.size() == 0){
+            Log.i(TAG, "No workouts found, return unchanged datatools object");
+            newDataTools = oldDataTools;
+        }
+
+        Log.i(TAG, "datesNew: " + newDataTools.getExerciseDates());
+        for (Exercise e : newDataTools.getExercises()) {
+            Log.i(TAG, "exercisesNew: " + e.getReps());
+        }
+        Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
+
+        return newDataTools;
+
+    }
+
+    public DataTools getDataToolsForSingleSession(String workoutKey){
+
+        DataTools newDataTools = new DataTools(Utils.getUid(), getExerciseKey());
+
+        List<Exercise> exercisesOld = getExercises();
+        List<String> datesOld = getExerciseDates();
+        List<String> workoutKeysOld = getWorkoutKeys();
+
+        List<Exercise> exercisesNew = new ArrayList<>();
+        List<String> datesNew = new ArrayList<>();
+        List<String> workoutKeysNew = new ArrayList<>();
+
+        for (int i = 0; i < workoutKeysOld.size(); i++) {
+            if (workoutKeysOld.get(i).contains(workoutKey)) {
+                Log.i(TAG, "Workout found for this date");
+                datesNew.add(datesOld.get(i));
+                newDataTools.setExerciseDates((ArrayList) datesNew);
+
+                exercisesNew.add(exercisesOld.get(i));
+                newDataTools.setExercises((ArrayList) exercisesNew);
+
+                workoutKeysNew.add(workoutKeysOld.get(i));
+                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
+            }
+        }
+
+        Log.i(TAG, "datesNew: " + newDataTools.getExerciseDates());
+        for (Exercise e : newDataTools.getExercises()) {
+            Log.i(TAG, "exercisesNew: " + e.getReps());
+        }
+        Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
+
+        return newDataTools;
+    }
+
 
     private Interval getInterval(int dateRange) {
 
@@ -676,93 +758,6 @@ public class DataTools {
         return date;
     }
 
-    private DataTools setNewDataTools(DateTime dateFrom, DateTime dateTo, DataTools dataTools){
-
-        DataTools oldDataTools = dataTools;
-        DataTools newDataTools = new DataTools(Utils.getUid(), oldDataTools.getExerciseKey());
-
-        List<Exercise> exercisesOld = oldDataTools.getExercises();
-        List<String> datesOld = oldDataTools.getExerciseDates();
-        List<String> workoutKeysOld = oldDataTools.getWorkoutKeys();
-
-        List<Exercise> exercisesNew = new ArrayList<>();
-        List<String> datesNew = new ArrayList<>();
-        List<String> workoutKeysNew = new ArrayList<>();
-
-
-        Log.i(TAG, "Date from: " + dateFrom + " Date to: " + dateTo);
-
-        Interval interval = new Interval(dateFrom, dateTo);
-
-        for (int i = 0; i < datesOld.size(); i++) {
-            DateTime date = DateTime.parse(datesOld.get(i), DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss"));
-            Log.i(TAG, "dates of this exercise: " + date.toString());
-            if (interval.contains(date)) {
-                Log.i(TAG, "This workout was performed on " + date.toString() + " workoutKey: " + workoutKeysOld.get(i));
-                datesNew.add(datesOld.get(i));
-                newDataTools.setExerciseDates((ArrayList) datesNew);
-
-
-                exercisesNew.add(exercisesOld.get(i));
-                newDataTools.setExercises((ArrayList) exercisesNew);
-
-
-                workoutKeysNew.add(workoutKeysOld.get(i));
-                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
-            }
-        }
-
-
-        if (datesNew.size() == 0){
-            Log.i(TAG, "No workouts found, return unchanged datatools object");
-            newDataTools = oldDataTools;
-        }
-
-        Log.i(TAG, "datesNew: " + newDataTools.getExerciseDates());
-        for (Exercise e : newDataTools.getExercises()) {
-            Log.i(TAG, "exercisesNew: " + e.getReps());
-        }
-        Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
-
-        return newDataTools;
-
-    }
-
-    public DataTools getToolsForSingleSession (String workoutKey){
-
-        DataTools newDataTools = new DataTools(Utils.getUid(), getExerciseKey());
-
-        List<Exercise> exercisesOld = getExercises();
-        List<String> datesOld = getExerciseDates();
-        List<String> workoutKeysOld = getWorkoutKeys();
-
-        List<Exercise> exercisesNew = new ArrayList<>();
-        List<String> datesNew = new ArrayList<>();
-        List<String> workoutKeysNew = new ArrayList<>();
-
-        for (int i = 0; i < workoutKeysOld.size(); i++) {
-            if (workoutKeysOld.get(i).contains(workoutKey)) {
-                Log.i(TAG, "Workout found for this date");
-                datesNew.add(datesOld.get(i));
-                newDataTools.setExerciseDates((ArrayList) datesNew);
-
-                exercisesNew.add(exercisesOld.get(i));
-                newDataTools.setExercises((ArrayList) exercisesNew);
-
-                workoutKeysNew.add(workoutKeysOld.get(i));
-                newDataTools.setWorkoutKeys((ArrayList) workoutKeysNew);
-            }
-        }
-
-        Log.i(TAG, "datesNew: " + newDataTools.getExerciseDates());
-        for (Exercise e : newDataTools.getExercises()) {
-            Log.i(TAG, "exercisesNew: " + e.getReps());
-        }
-        Log.i(TAG, "workoutKeysNew: " + newDataTools.getWorkoutKeys());
-
-        return newDataTools;
-    }
-
     // Record analysis
     public double getRepMax(int numReps){
 
@@ -784,88 +779,6 @@ public class DataTools {
 
         Log.i(TAG, numReps + " rep-max found for this date range: " + maxWeight);
         return maxWeight;
-
-        /*Map<String, List<String>> dates = record.getDate();
-        Record newRecord = new Record();
-
-        List<String> maxDates = new ArrayList<>();
-        switch(recordKey){
-            case "1 rep-max":
-                maxDates = dates.get("1 rep-max");
-                break;
-            case "3 rep-max":
-                maxDates = dates.get("3 rep-max");
-                break;
-            case "5 rep-max":
-                maxDates = dates.get("5 rep-max");
-                break;
-            case "10 rep-max":
-                maxDates = dates.get("10 rep-max");
-                break;
-            default:
-                Log.i(TAG, "Invalid recordKey");
-                break;
-        }
-
-
-        *//*List<String> oneRepDates = dates.get("1 rep-max");
-        List<String> threeRepDates = dates.get("3 rep-max");
-        List<String> fiveRepDates = dates.get("5 rep-max");
-        List<String> tenRepDates = dates.get("10 rep-max");*//*
-
-        *//*double oneRepMax;
-        double threeRepMax;
-        double fiveRepMax;
-        double tenRepMax;*//*
-
-        double repMax = 0.0;
-
-        Interval interval;
-
-        interval = getInterval(dateRange);
-
-
-        int index = -1;
-        for (int i = 0; i < maxDates.size(); i++) {
-
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
-            DateTime date = formatter.parseDateTime(maxDates.get(i));
-            if (interval.contains(date)) {
-                index++;
-                Log.i(TAG, recordKey + " found in this range on date: " + date.toString() + " index" + index);
-            } else {
-                Log.i(TAG, "No rep maxes found in this range");
-            }
-        }
-
-        if (index > -1) {
-            repMax = record.getRecords().get(recordKey).get(index);
-            Log.i(TAG, recordKey + " for this date range = " + repMax);
-            return repMax;
-        }
-
-
-        *//*if (recordKey.equals("1 rep-max")) {
-            int oneRepIndex = -1;
-            for (int i = 0; i < oneRepDates.size(); i++) {
-
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd, HH:mm:ss");
-                DateTime date = formatter.parseDateTime(oneRepDates.get(i));
-                if (interval.contains(date)) {
-                    oneRepIndex++;
-                    Log.i(TAG, "One rep maxes found in this range on date: " + date.toString() + " index" + oneRepIndex);
-                } else {
-                    Log.i(TAG, "No rep maxes found in this range");
-                }
-            }
-
-            if (oneRepIndex > -1) {
-                oneRepMax = record.getRecords().get("1 rep-max").get(oneRepIndex);
-                Log.i(TAG, "One rep-max for this date range = " + oneRepMax);
-                repMax = oneRepMax;
-                return repMax;
-            }
-        } */
 
     }
 
