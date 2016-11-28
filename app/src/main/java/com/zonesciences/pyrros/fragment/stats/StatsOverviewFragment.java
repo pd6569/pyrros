@@ -399,9 +399,9 @@ public class StatsOverviewFragment extends Fragment {
                 Integer.toString(mTotalSets),
                 Integer.toString(mTotalReps),
                 Utils.formatWeight(mTotalVolume * mConversionMultiple) + mUnit,
-                Utils.formatWeight((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mHeaviestWeight.get(DataTools.KEY_REPS),
-                Integer.toString((int) mMostReps.get(DataTools.KEY_REPS)) + " x " + Utils.formatWeight((double) mMostReps.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit,
-                Utils.formatWeight((double) mMostVolume.get(DataTools.KEY_VOLUME) * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mMostVolume.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostVolume.get(DataTools.KEY_REPS) + ")",
+                Utils.formatWeight((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit,
+                Integer.toString((int) mMostReps.get(DataTools.KEY_REPS)),
+                Utils.formatWeight((double) mMostVolume.get(DataTools.KEY_VOLUME) * mConversionMultiple) + mUnit,
                 Utils.formatWeight((double) mOneRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
                 Utils.formatWeight((double) mThreeRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
                 Utils.formatWeight((double) mFiveRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
@@ -471,6 +471,9 @@ public class StatsOverviewFragment extends Fragment {
             LinearLayout maxContainer = (LinearLayout) view.findViewById(R.id.stats_overview_max_container);
             LinearLayout statsAdditionalInfoContainer = (LinearLayout) view.findViewById(R.id.stats_overview_additional_info_container);
 
+            TextView date = (TextView) view.findViewById(R.id.stats_overview_workout_date);
+            TextView setInfo = (TextView) view.findViewById(R.id.stats_overview_set_info);
+
             if (mStatsTitles[position].contains("max")) {
 
                 statsContentText.setVisibility(View.GONE);
@@ -481,7 +484,7 @@ public class StatsOverviewFragment extends Fragment {
 
                 TextView estimatedMax = (TextView) view.findViewById(R.id.stats_overview_estimated_max);
                 TextView actualMax = (TextView) view.findViewById(R.id.stats_overview_actual_max);
-                TextView date = (TextView) view.findViewById(R.id.stats_overview_workout_date);
+
 
                 if (mStatsContentArray[position].equals("0")) {
                     actualMax.setText("Not set");
@@ -526,8 +529,26 @@ public class StatsOverviewFragment extends Fragment {
             }
 
             if (mStatsTitles[position].contains("Heaviest Weight")) {
-
+                statsAdditionalInfoContainer.setVisibility(View.VISIBLE);
+                setInfo.setText(Utils.formatWeight((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mHeaviestWeight.get(DataTools.KEY_REPS));
+                setInfo.setVisibility(View.VISIBLE);
+                date.setText(Utils.formatDate((String) mHeaviestWeight.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
             }
+
+            if (mStatsTitles[position].contains("Most Reps")) {
+                statsAdditionalInfoContainer.setVisibility(View.VISIBLE);
+                setInfo.setText(Utils.formatWeight((int) mMostReps.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostReps.get(DataTools.KEY_REPS));
+                setInfo.setVisibility(View.VISIBLE);
+                date.setText(Utils.formatDate((String) mMostReps.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
+            }
+
+            if (mStatsTitles[position].contains("Most volume (Single Set)")) {
+                statsAdditionalInfoContainer.setVisibility(View.VISIBLE);
+                setInfo.setText(Utils.formatWeight((double) mMostVolume.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostVolume.get(DataTools.KEY_REPS));
+                setInfo.setVisibility(View.VISIBLE);
+                date.setText(Utils.formatDate((String) mMostVolume.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
+            }
+
         }
 
         @Override

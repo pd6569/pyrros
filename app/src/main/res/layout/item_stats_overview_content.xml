@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/stats_numbers"
+        android:paddingBottom="10dp"
         android:gravity="center_horizontal"/>
 
     <LinearLayout
@@ -73,25 +74,32 @@
         android:id="@+id/stats_overview_additional_info_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        android:weightSum="2"
         android:visibility="gone">
 
-
-        <TextView
-            android:id="@+id/stats_overview_workout_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/stats_additional_info"
-            android:gravity="center_horizontal"/>
 
         <TextView
             android:id="@+id/stats_overview_set_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/stats_additional_info"
+            android:textColor="@color/colorPrimaryDark"
             android:gravity="center_horizontal"
+            android:layout_weight="1"
             android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/stats_overview_workout_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/stats_additional_info"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"/>
+
+
 
     </LinearLayout>
 

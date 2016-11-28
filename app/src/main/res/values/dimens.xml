@@ -3,6 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="floating_buttons_margin">16dp</dimen>
-    <dimen name="stats_numbers">28dp</dimen>
+    <dimen name="stats_numbers">32dp</dimen>
     <dimen name="stats_additional_info">16dp</dimen>
 </resources>
