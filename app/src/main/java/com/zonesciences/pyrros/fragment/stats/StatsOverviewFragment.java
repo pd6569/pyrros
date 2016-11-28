@@ -23,6 +23,7 @@ import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,10 +68,10 @@ public class StatsOverviewFragment extends Fragment {
     double mMostRepsWeight;
     int mMostReps;
     double mMostVolume;
-    double mOneRepMax;
-    double mThreeRepMax;
-    double mFiveRepMax;
-    double mTenRepMax;
+    Map<String, Object> mOneRepMax;
+    Map<String, Object> mThreeRepMax;
+    Map<String, Object> mFiveRepMax;
+    Map<String, Object> mTenRepMax;
     private double mEstimatedOneRep;
     private double mEstimatedThreeRep;
     private double mEstimatedFiveRep;
@@ -407,10 +408,10 @@ public class StatsOverviewFragment extends Fragment {
                 Utils.formatWeight(mHeaviestWeight * mConversionMultiple) + mUnit + " x " + mHeaviestWeightReps,
                 Integer.toString(mMostReps) + " x " + Utils.formatWeight(mMostRepsWeight * mConversionMultiple) + mUnit,
                 Utils.formatWeight(mMostVolume * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mDataTools.mostVolume().get("weight") * mConversionMultiple) + mUnit + " x " + mDataTools.mostVolume().get("reps") + ")",
-                Utils.formatWeight(mOneRepMax * mConversionMultiple),
-                Utils.formatWeight(mThreeRepMax * mConversionMultiple),
-                Utils.formatWeight(mFiveRepMax * mConversionMultiple),
-                Utils.formatWeight(mTenRepMax * mConversionMultiple)
+                Utils.formatWeight((double) mOneRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
+                Utils.formatWeight((double) mThreeRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
+                Utils.formatWeight((double) mFiveRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
+                Utils.formatWeight((double) mTenRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple)
         };
     }
 
@@ -474,15 +475,19 @@ public class StatsOverviewFragment extends Fragment {
 
             TextView statsContentText = (TextView) view.findViewById(R.id.stats_overview_content);
             LinearLayout maxContainer = (LinearLayout) view.findViewById(R.id.stats_overview_max_container);
+            LinearLayout statsAdditionalInfoContainer = (LinearLayout) view.findViewById(R.id.stats_overview_additional_info_container);
 
             if (mStatsTitles[position].contains("max")) {
 
                 statsContentText.setVisibility(View.GONE);
 
                 maxContainer.setVisibility(View.VISIBLE);
+                statsAdditionalInfoContainer.setVisibility(View.VISIBLE);
+
 
                 TextView estimatedMax = (TextView) view.findViewById(R.id.stats_overview_estimated_max);
                 TextView actualMax = (TextView) view.findViewById(R.id.stats_overview_actual_max);
+                TextView date = (TextView) view.findViewById(R.id.stats_overview_workout_date);
 
                 if (mStatsContentArray[position].equals("0")) {
                     actualMax.setText("Not set");
@@ -495,24 +500,28 @@ public class StatsOverviewFragment extends Fragment {
                     case "1 rep-max":
                         Log.i(TAG, "1 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedOneRep) + mUnit);
+                        date.setText(Utils.formatDate((String) mOneRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
                         break;
 
                     case "3 rep-max":
                         Log.i(TAG, "3 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedThreeRep) + mUnit);
+                        date.setText(Utils.formatDate((String) mThreeRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
                         break;
 
                     case "5 rep-max":
                         Log.i(TAG, "5 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedFiveRep) + mUnit);
+                        date.setText(Utils.formatDate((String) mFiveRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
                         break;
 
                     case "10 rep-max":
                         Log.i(TAG, "10 rep-max");
                         estimatedMax.setText(Utils.formatWeight(mEstimatedTenRep) + mUnit);
+                        date.setText(Utils.formatDate((String) mTenRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
                         break;
 

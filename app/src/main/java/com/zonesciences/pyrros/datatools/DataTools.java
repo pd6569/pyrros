@@ -35,6 +35,7 @@ public class DataTools {
 
     private static final String TAG = "DataTools.class";
 
+    // Date Range
     public static final int THIS_SESSION = 0;
     public static final int TODAY = 1;
     public static final int THIS_WEEK = 2;
@@ -43,6 +44,13 @@ public class DataTools {
     public static final int LAST_6_MONTHS = 5;
     public static final int THIS_YEAR = 6;
     public static final int ALL_TIME = 7;
+
+    // Keys for maps
+    public static final String KEY_VOLUME = "volume";
+    public static final String KEY_WEIGHT = "weight";
+    public static final String KEY_REPS = "reps";
+    public static final String KEY_DATE = "date";
+    public static final String KEY_WORKOUT_KEY = "workoutKey";
 
 
     DatabaseReference mUserWorkoutExercisesRef;
@@ -459,10 +467,10 @@ public class DataTools {
         workoutKey = mWorkoutKeys.get(index);
         workoutDate = mExerciseDates.get(index);
 
-        heaviestWeightMap.put("weight", heaviestWeight);
-        heaviestWeightMap.put("reps", numReps);
-        heaviestWeightMap.put("date", workoutDate);
-        heaviestWeightMap.put("workoutKey", workoutKey);
+        heaviestWeightMap.put(KEY_WEIGHT, heaviestWeight);
+        heaviestWeightMap.put(KEY_REPS, numReps);
+        heaviestWeightMap.put(KEY_DATE, workoutDate);
+        heaviestWeightMap.put(KEY_WORKOUT_KEY, workoutKey);
 
         Log.i(TAG, "Heaviest weight : " + heaviestWeight + " lifted for " + numReps + " reps" + " Exercise index: " + index + " on: " + workoutDate + " workoutKey: " + workoutKey);
 
@@ -500,10 +508,10 @@ public class DataTools {
         workoutKey = mWorkoutKeys.get(index);
         workoutDate = mExerciseDates.get(index);
 
-        mostRepsMap.put("weight", weight);
-        mostRepsMap.put("reps", mostReps);
-        mostRepsMap.put("date", workoutDate);
-        mostRepsMap.put("workoutKey", workoutKey);
+        mostRepsMap.put(KEY_WEIGHT, weight);
+        mostRepsMap.put(KEY_REPS, mostReps);
+        mostRepsMap.put(KEY_DATE, workoutDate);
+        mostRepsMap.put(KEY_WORKOUT_KEY, workoutKey);
 
         Log.i(TAG, "Weight : " + weight + " lifted for " + mostReps + " reps" + " Exercise index: " + index + " on: " + workoutDate + " workoutKey: " + workoutKey);
 
@@ -540,16 +548,17 @@ public class DataTools {
         workoutKey = mWorkoutKeys.get(index);
         workoutDate = mExerciseDates.get(index);
 
-        mostVolumeMap.put("volume", mostVol);
-        mostVolumeMap.put("weight", weight);
-        mostVolumeMap.put("reps", reps);
-        mostVolumeMap.put("date", workoutDate);
-        mostVolumeMap.put("workoutKey", workoutKey);
+        mostVolumeMap.put(KEY_VOLUME, mostVol);
+        mostVolumeMap.put(KEY_WEIGHT, weight);
+        mostVolumeMap.put(KEY_REPS, reps);
+        mostVolumeMap.put(KEY_DATE, workoutDate);
+        mostVolumeMap.put(KEY_WORKOUT_KEY, workoutKey);
 
         Log.i(TAG, "Maximum volume in single set: " + mostVol + " set on: " + workoutDate + " workoutKey: " +workoutKey);
 
         return mostVolumeMap;
     }
+
 
     public double estimatedMax(double weightLifted, int reps, int repMax) {
         double oneRepMaxEstimate = (weightLifted / (1.0278 - (0.0278 * reps)));
@@ -759,11 +768,17 @@ public class DataTools {
     }
 
     // Record analysis
-    public double getRepMax(int numReps){
+    public Map<String, Object> getRepMax(int numReps){
+
+        Map<String, Object> repMaxMap = new HashMap<>();
 
         double maxWeight = 0.0;
+        String workoutDate = new String();
+        String workoutKey = new String();
+        int index = 0;
 
-        for (Exercise e : mExercises){
+        for (int j = 0; j < mExercises.size(); j++){
+            Exercise e = mExercises.get(j);
             if (e.getReps() != null) {
                 for (int i = 0; i < e.getReps().size(); i++) {
                     if (e.getReps().get(i) == numReps) {
@@ -771,14 +786,22 @@ public class DataTools {
                         Log.i(TAG, "Reps found matching rep-max, and weight lifted: " + currentWeight);
                         if (currentWeight > maxWeight) {
                             maxWeight = currentWeight;
+                            index = j;
+                            workoutDate = mExerciseDates.get(index);
+                            workoutKey = mWorkoutKeys.get(index);
                         }
                     }
                 }
             }
         }
 
-        Log.i(TAG, numReps + " rep-max found for this date range: " + maxWeight);
-        return maxWeight;
+        repMaxMap.put(KEY_WEIGHT, maxWeight);
+        repMaxMap.put(KEY_DATE, workoutDate);
+        repMaxMap.put(KEY_WORKOUT_KEY, workoutKey);
+
+        Log.i(TAG, numReps + " rep-max found for this date range: " + maxWeight + " At index: " + index + " Date set: " + workoutDate + " workoutKey: " + workoutKey);
+
+        return repMaxMap;
 
     }
 
