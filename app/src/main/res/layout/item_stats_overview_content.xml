@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/stats_additional_info"
             android:gravity="center_horizontal"
-            android:visibility="invisible"/>
+            android:visibility="gone"/>
 
     </LinearLayout>
 

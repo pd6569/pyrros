@@ -63,11 +63,9 @@ public class StatsOverviewFragment extends Fragment {
     double mTotalVolume;
     int mNumSessions;
     int mSetsPerSession;
-    double mHeaviestWeight;
-    int mHeaviestWeightReps;
-    double mMostRepsWeight;
-    int mMostReps;
-    double mMostVolume;
+    Map<String, Object> mHeaviestWeight;
+    Map<String, Object>  mMostReps;
+    Map<String, Object>  mMostVolume;
     Map<String, Object> mOneRepMax;
     Map<String, Object> mThreeRepMax;
     Map<String, Object> mFiveRepMax;
@@ -339,13 +337,9 @@ public class StatsOverviewFragment extends Fragment {
         mTotalVolume = mDataTools.totalVolume() * mConversionMultiple;
         mNumSessions = mDataTools.getExercises().size();
         mSetsPerSession = mDataTools.totalSets() / mDataTools.getExercises().size();
-        mHeaviestWeight = (Double) mDataTools.heaviestWeightLifted().get("weight");
-        mHeaviestWeightReps = (Integer) mDataTools.heaviestWeightLifted().get("reps");
-        mMostRepsWeight = (Double) mDataTools.mostReps().get("weight");
-        mMostReps = (Integer) mDataTools.mostReps().get("reps");
-        mMostVolume = (Double) mDataTools.mostVolume().get("volume");
-
-        Log.i(TAG, "sets: " + mTotalSets + "reps" + mTotalReps + " volume" + mTotalVolume + " sessions: " + mNumSessions + " heaviest weight: " + mHeaviestWeight + " heaviest weigh reps "+ mHeaviestWeightReps );
+        mHeaviestWeight = mDataTools.heaviestWeightLifted();
+        mMostReps = mDataTools.mostReps();
+        mMostVolume = mDataTools.mostVolume();
     }
 
     private void setRepMaxes() {
@@ -353,43 +347,43 @@ public class StatsOverviewFragment extends Fragment {
         try{
             mOneRepMax = mDataTools.getRepMax(1);
             Log.i(TAG, "One rep max for this date range: " + mDataTools.getRepMax(1));
-            mEstimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1) * mConversionMultiple);
+            mEstimatedOneRep =  Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 1) * mConversionMultiple);
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 1 rep-max created. Error: " + e.toString());
-            mEstimatedOneRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 1) * mConversionMultiple);
+            mEstimatedOneRep =  Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 1) * mConversionMultiple);
         };
 
 
         try{
             mThreeRepMax = mDataTools.getRepMax(3);
             Log.i(TAG, "Three rep max for this date range: " + mDataTools.getRepMax(3));
-            mEstimatedThreeRep = Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 3) * mConversionMultiple);
+            mEstimatedThreeRep = Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 3) * mConversionMultiple);
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 3 rep-max created. Error: " + e.toString());
-            mEstimatedThreeRep = Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 3) * mConversionMultiple);
+            mEstimatedThreeRep = Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 3) * mConversionMultiple);
 
         };
 
         try{
             mFiveRepMax = mDataTools.getRepMax(5);
             Log.i(TAG, "Five rep max for this date range: " + mDataTools.getRepMax(5));
-            mEstimatedFiveRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 5) * mConversionMultiple);
+            mEstimatedFiveRep =  Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 5) * mConversionMultiple);
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 5 rep-max created. Error: " + e.toString());
-            mEstimatedFiveRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 5) * mConversionMultiple);
+            mEstimatedFiveRep =  Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 5) * mConversionMultiple);
         };
 
         try{
             mTenRepMax = mDataTools.getRepMax(10);
             Log.i(TAG, "Ten rep max for this date range: " + mDataTools.getRepMax(10));
-            mEstimatedTenRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 10) * mConversionMultiple);
+            mEstimatedTenRep =  Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 10) * mConversionMultiple);
 
         } catch (Exception e) {
             Log.i(TAG, "No data for 10 rep-max created. Error: " + e.toString());
-            mEstimatedTenRep =  Math.round(mDataTools.estimatedMax(mHeaviestWeight, mHeaviestWeightReps, 10) * mConversionMultiple);
+            mEstimatedTenRep =  Math.round(mDataTools.estimatedMax((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT), (int) mHeaviestWeight.get(DataTools.KEY_REPS), 10) * mConversionMultiple);
         };
 
     }
@@ -405,9 +399,9 @@ public class StatsOverviewFragment extends Fragment {
                 Integer.toString(mTotalSets),
                 Integer.toString(mTotalReps),
                 Utils.formatWeight(mTotalVolume * mConversionMultiple) + mUnit,
-                Utils.formatWeight(mHeaviestWeight * mConversionMultiple) + mUnit + " x " + mHeaviestWeightReps,
-                Integer.toString(mMostReps) + " x " + Utils.formatWeight(mMostRepsWeight * mConversionMultiple) + mUnit,
-                Utils.formatWeight(mMostVolume * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mDataTools.mostVolume().get("weight") * mConversionMultiple) + mUnit + " x " + mDataTools.mostVolume().get("reps") + ")",
+                Utils.formatWeight((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mHeaviestWeight.get(DataTools.KEY_REPS),
+                Integer.toString((int) mMostReps.get(DataTools.KEY_REPS)) + " x " + Utils.formatWeight((double) mMostReps.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit,
+                Utils.formatWeight((double) mMostVolume.get(DataTools.KEY_VOLUME) * mConversionMultiple) + mUnit + "\n (" + Utils.formatWeight((Double) mMostVolume.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostVolume.get(DataTools.KEY_REPS) + ")",
                 Utils.formatWeight((double) mOneRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
                 Utils.formatWeight((double) mThreeRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
                 Utils.formatWeight((double) mFiveRepMax.get(DataTools.KEY_WEIGHT) * mConversionMultiple),
@@ -529,6 +523,10 @@ public class StatsOverviewFragment extends Fragment {
             } else {
                 statsContentText.setText(mStatsContentArray[position]);
                 statsContentContainer.addView(view);
+            }
+
+            if (mStatsTitles[position].contains("Heaviest Weight")) {
+
             }
         }
 
