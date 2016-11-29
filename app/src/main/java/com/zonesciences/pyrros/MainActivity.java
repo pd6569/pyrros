@@ -1,5 +1,6 @@
 package com.zonesciences.pyrros;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
@@ -29,7 +30,17 @@ import com.google.firebase.storage.StorageReference;
 import com.zonesciences.pyrros.adapters.HomeScreenPagerAdapter;
 import com.zonesciences.pyrros.models.User;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends BaseActivity {
@@ -46,6 +57,10 @@ public class MainActivity extends BaseActivity {
     private String mUserId;
     private User mUser;
 
+    private Context mContext;
+
+    private String mExercisesFile = "exercises";
+
     private boolean mAdmin;
 
     @Override
@@ -58,6 +73,7 @@ public class MainActivity extends BaseActivity {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mContext = getApplicationContext();
 
         if (mFirebaseUser == null) {
             loadLoginView();
@@ -138,6 +154,17 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onSuccess(byte[] bytes) {
                     Log.i(TAG, "Exercise list downloaded successfully");
+                    try {
+                        FileOutputStream fos = openFileOutput(mExercisesFile, MODE_PRIVATE);
+                        fos.write(bytes);
+                        fos.close();
+                        Toast.makeText(mContext, "Exercises saved to internal storage", Toast.LENGTH_SHORT).show();
+                        processExercises();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -150,7 +177,39 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void processExercises(){
+        try {
+            List<String[]> exercises = new ArrayList<>();
+            FileInputStream fin = openFileInput(mExercisesFile);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+            String line;
+            while ((line = reader.readLine()) != null){
+                String[] RowData = line.split(",");
+                exercises.add(RowData);
+                String exerciseName = RowData[0];
+                String muscleGroup = RowData[1];
+                Log.i (TAG, "Exercise Name: " + exerciseName + " Muscle group: " + muscleGroup);
+                createExercises(exercises);
+            }
+            fin.close();
 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void createExercises(List<String[]> exerciseData){
+        Map<String, Object> childUpdates = new HashMap<>();
+        for (int i = 0; i < exerciseData.size(); i++){
+            String exerciseKey = exerciseData.get(i)[0];
+            childUpdates.put("/exercises/" + exerciseKey + "/name/", exerciseData.get(i)[0]);
+            childUpdates.put("/exercises/" + exerciseKey + "/muscleGroup/", exerciseData.get(i)[1]);
+        }
+        mDatabase.updateChildren(childUpdates);
+    }
 
     public void purgeDatabase(){
         mDatabase.child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
