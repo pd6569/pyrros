@@ -124,6 +124,8 @@ public class MainActivity extends BaseActivity {
         } else if ( i == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
+        } else if (i == R.id.action_sync_exercises){
+
         }
 
         return super.onOptionsItemSelected(item);
