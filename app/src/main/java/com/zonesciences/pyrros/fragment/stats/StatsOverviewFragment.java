@@ -1,8 +1,11 @@
 package com.zonesciences.pyrros.fragment.stats;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -13,16 +16,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +54,13 @@ public class StatsOverviewFragment extends Fragment {
 
     //View
     Button mFilterButton;
+
+    // Bottomsheet View
+    private View mBottomSheet;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private RelativeLayout mTitleContainer;
+    private TextView mTitle;
+    private ImageView mLaunchWorkoutImage;
 
     //RecyclerView
     RecyclerView mStatsRecycler;
@@ -253,6 +268,16 @@ public class StatsOverviewFragment extends Fragment {
             }
         });
 
+        mBottomSheet = rootView.findViewById(R.id.bottom_sheet_stats_overview);
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+        mBottomSheetBehavior.setPeekHeight(0);
+
+        mTitleContainer = (RelativeLayout) rootView.findViewById(R.id.bottom_sheet_calendar_title_container);
+        mTitleContainer.setVisibility(View.VISIBLE);
+
+        mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
+        mLaunchWorkoutImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_go_to_workout);
+
         mStatsRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_stats_overview);
 
         updateStatsContentView();
@@ -459,8 +484,15 @@ public class StatsOverviewFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(StatsOverviewAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(StatsOverviewAdapter.ViewHolder holder, final int position) {
             holder.title.setText(mStatsTitles[position]);
+
+            View.OnClickListener listener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i(TAG, "Just a normal stats title: " + mStatsTitles[position]);
+                }
+            };
 
             LinearLayout statsContentContainer = (LinearLayout) holder.itemView.findViewById(R.id.stats_overview_content_container);
             statsContentContainer.removeAllViews();
@@ -499,6 +531,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedOneRep) + mUnit);
                         date.setText(Utils.formatDate((String) mOneRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
+                        listener = setClickListener(position, (String) mOneRepMax.get(DataTools.KEY_WORKOUT_KEY));
                         break;
 
                     case "3 rep-max":
@@ -506,6 +539,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedThreeRep) + mUnit);
                         date.setText(Utils.formatDate((String) mThreeRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
+                        listener = setClickListener(position, (String) mThreeRepMax.get(DataTools.KEY_WORKOUT_KEY));
                         break;
 
                     case "5 rep-max":
@@ -513,6 +547,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedFiveRep) + mUnit);
                         date.setText(Utils.formatDate((String) mFiveRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
+                        listener = setClickListener(position, (String) mFiveRepMax.get(DataTools.KEY_WORKOUT_KEY));
                         break;
 
                     case "10 rep-max":
@@ -520,6 +555,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedTenRep) + mUnit);
                         date.setText(Utils.formatDate((String) mTenRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
+                        listener = setClickListener(position, (String) mTenRepMax.get(DataTools.KEY_WORKOUT_KEY));
                         break;
 
                 }
@@ -533,13 +569,15 @@ public class StatsOverviewFragment extends Fragment {
                 setInfo.setText(Utils.formatWeight((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mHeaviestWeight.get(DataTools.KEY_REPS));
                 setInfo.setVisibility(View.VISIBLE);
                 date.setText(Utils.formatDate((String) mHeaviestWeight.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
+                listener = setClickListener(position, (String) mHeaviestWeight.get(DataTools.KEY_WORKOUT_KEY));
             }
 
-            if (mStatsTitles[position].contains("Most Reps")) {
+            if (mStatsTitles[position].contains("Most reps")) {
                 statsAdditionalInfoContainer.setVisibility(View.VISIBLE);
-                setInfo.setText(Utils.formatWeight((int) mMostReps.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostReps.get(DataTools.KEY_REPS));
+                setInfo.setText(Utils.formatWeight((double) mMostReps.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostReps.get(DataTools.KEY_REPS));
                 setInfo.setVisibility(View.VISIBLE);
                 date.setText(Utils.formatDate((String) mMostReps.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
+                listener = setClickListener(position, (String) mMostReps.get(DataTools.KEY_WORKOUT_KEY));
             }
 
             if (mStatsTitles[position].contains("Most volume (Single Set)")) {
@@ -547,8 +585,18 @@ public class StatsOverviewFragment extends Fragment {
                 setInfo.setText(Utils.formatWeight((double) mMostVolume.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostVolume.get(DataTools.KEY_REPS));
                 setInfo.setVisibility(View.VISIBLE);
                 date.setText(Utils.formatDate((String) mMostVolume.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
+                listener = setClickListener(position, (String) mMostVolume.get(DataTools.KEY_WORKOUT_KEY));
+
             }
 
+            holder.itemView.setOnClickListener(listener);
+
+            /*holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i(TAG, "Statistic selected: " + mStatsTitles[position]);
+                }
+            });*/
         }
 
         @Override
@@ -556,5 +604,96 @@ public class StatsOverviewFragment extends Fragment {
             return mStatsContentArray.length;
         }
     }
+
+    private View.OnClickListener setClickListener(final int position, final String workoutKey){
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i(TAG, "Statistic selected: " + mStatsTitles[position] + " Workout key: " + workoutKey);
+            }
+        };
+        return listener;
+    }
+
+
+   /* private void createBottomSheet(final String workoutKey, final String date, String time, final View rootView){
+
+        String workoutTime;
+        if (time.isEmpty()){
+            workoutTime = "";
+        } else {
+            workoutTime = " at " + time;
+        }
+        mExercises = mWorkoutExercisesMap.get(workoutKey);
+
+        Collections.sort(mExercises);
+
+        int numExercises = mExercises.size();
+
+        mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1) + workoutTime);
+
+        mLaunchWorkoutImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                List<CharSequence> exerciseKeys = new ArrayList<>();
+                for (Exercise e : mExercises) {
+                    exerciseKeys.add(e.getName());
+                }
+
+                Bundle extras = new Bundle();
+                extras.putSerializable(WORKOUT_EXERCISES, (ArrayList) exerciseKeys);
+                extras.putString(WORKOUT_ID, workoutKey);
+                extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, (ArrayList) mExercises);
+                Intent i = new Intent (getContext(), WorkoutActivity.class);
+                i.putExtras(extras);
+                startActivity(i);
+            }
+        });
+
+        LinearLayout exercisesContainer = (LinearLayout) rootView.findViewById(R.id.workout_exercises_container);
+        exercisesContainer.removeAllViews();
+
+        for (int i = 0; i < numExercises; i++) {
+
+            Exercise currentExercise = mExercises.get(i);
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_workout_exercises, null);
+            TextView exerciseText = (TextView) view.findViewById(R.id.workout_exercise_name);
+            LinearLayout setsContainer = (LinearLayout) view.findViewById(R.id.workout_sets_container);
+            exerciseText.setText(currentExercise.getName());
+
+            if (currentExercise.getSets() == 0){
+                TextView noSets = (TextView) view.findViewById(R.id.workout_no_sets);
+                noSets.setVisibility(View.VISIBLE);
+            }
+
+            for (int j = 0; j < currentExercise.getSets(); j++){
+
+                Log.i(TAG, "GETTING SETS FOR: currentExercise = " + currentExercise.getName());
+                View setsView = LayoutInflater.from(getContext()).inflate(R.layout.item_sets, null);
+                TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
+                TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
+                TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
+
+                setNumber.setVisibility(View.GONE);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
+                double weight = currentExercise.getWeight().get(j) * mConversionMultiple;
+                String s = Utils.formatWeight(weight);
+                setWeight.setText(s + mUnit);
+                setWeight.setLayoutParams(params);
+                setReps.setText("" + currentExercise.getReps().get(j) + " reps");
+                setReps.setLayoutParams(params);
+
+                setsContainer.addView(setsView);
+
+            }
+
+            exercisesContainer.addView(view);
+        }
+
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+    }*/
 
 }

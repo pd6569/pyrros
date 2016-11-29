@@ -1,24 +1,49 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:layout_weight="4">
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/stats_overview_filter_button"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical"
+                  android:layout_weight="4">
+
+        <Button
+            android:id="@+id/stats_overview_filter_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:text="ALL TIME"
+            android:textColor="#fff"
+            android:layout_margin="5dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_stats_overview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            tools:listitem="@layout/item_stats_overview" />
+
+    </LinearLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/bottom_sheet_stats_overview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:textSize="18dp"
-        android:text="ALL TIME"
-        android:textColor="#fff"
-        android:layout_margin="5dp"/>
+        android:layout_height="350dp"
+        android:clipToPadding="true"
+        android:background="#fff"
+        android:elevation="10dp"
+        android:paddingLeft="10dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_stats_overview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_stats_overview" />
+        <include layout="@layout/include_workout_content"/>
 
-</LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.design.widget.CoordinatorLayout>
