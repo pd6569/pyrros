@@ -1,10 +1,11 @@
 package com.zonesciences.pyrros.fragment.stats;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -58,6 +59,11 @@ public class StatsOverviewFragment extends Fragment {
     private static final String WORKOUT_ID = "Workout ID";
     private static final String WORKOUT_EXERCISES_OBJECTS = "WorkoutExerciseObjects";
 
+    // prefs
+    private static final String PREFS_STATS = "StatsPrefs";
+    private static final String PREFS_CURRENT_FILTER = "StatsPrefsCurrentFilter";
+    private static final String PREFS_CURRENT_FILTER_NAME = "StatsPrefsCurrentFilterName";
+
     String mExerciseKey;
     String mCurrentWorkoutKey;
     String mUserId;
@@ -101,6 +107,7 @@ public class StatsOverviewFragment extends Fragment {
     private double mEstimatedFiveRep;
     private double mEstimatedTenRep;
 
+
     String[] mStatsTitles = new String[]{
             "Sessions",
             "Sets",
@@ -128,6 +135,11 @@ public class StatsOverviewFragment extends Fragment {
 
     // Filter
     int mCurrentFilter = DataTools.ALL_TIME; //defaults to all time
+    String mCurrentFilterName = "ALL TIME"; //defaults  to all time
+
+    // Preferences
+    SharedPreferences mFilterPreferences;
+    SharedPreferences.Editor mEditor;
 
     public static StatsOverviewFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates, String currentWorkoutKey) {
         Bundle args = new Bundle();
@@ -151,6 +163,7 @@ public class StatsOverviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
+
         Bundle bundle = getArguments();
 
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
@@ -172,6 +185,35 @@ public class StatsOverviewFragment extends Fragment {
 
         mDataTools = new DataTools(mUserId, mExerciseKey, mExercises, mWorkoutKeys, mWorkoutDates);
 
+        mFilterPreferences = getContext().getSharedPreferences(PREFS_STATS, Context.MODE_PRIVATE);
+
+        int filterRequested = mFilterPreferences.getInt(PREFS_CURRENT_FILTER, Context.MODE_PRIVATE);
+        mCurrentFilterName = mFilterPreferences.getString(PREFS_CURRENT_FILTER_NAME, null);
+
+        Log.i(TAG, "Filter set from prefs: " + mCurrentFilterName);
+
+        if (mCurrentFilterName == null){
+            mCurrentFilter = DataTools.ALL_TIME;
+            mCurrentFilterName = "ALL TIME";
+        } else {
+            DataTools previousDataTools = mDataTools;
+            setDataTools(filterRequested);
+
+            // if DataTools is unchanged this means that workouts are not found for this date range OR viewing same filter as before
+            if (mDataTools == previousDataTools){
+                Log.i(TAG, "Datatools is unchanged");
+                mCurrentFilter = DataTools.ALL_TIME;
+                mCurrentFilterName = "ALL TIME";
+            } else {
+                Log.i(TAG, "Datatools has changed");
+                setStats();
+                setRepMaxes();
+                updateStatsContentView();
+                mCurrentFilter = filterRequested;
+                Log.i(TAG, "Filter set from prefs: " + mCurrentFilterName + " Filter value: " + filterRequested);
+            }
+        }
+
         setStats();
         setRepMaxes();
 
@@ -186,6 +228,7 @@ public class StatsOverviewFragment extends Fragment {
         final View rootView =  inflater.inflate(R.layout.fragment_stats_overview, container, false);
 
         mFilterButton = (Button) rootView.findViewById(R.id.stats_overview_filter_button);
+        mFilterButton.setText(mCurrentFilterName);
         mFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -198,12 +241,16 @@ public class StatsOverviewFragment extends Fragment {
                         DataTools previousDataTools = mDataTools; // if there are no workouts for date range, then datatools will not change
                         int dateRange;
                         boolean filterNotChanged = false;
+                        mEditor = mFilterPreferences.edit();
 
                         switch(item.getItemId()){
                             case R.id.stats_menu_today:
                                 Log.i(TAG, "Stats for today requested");
 
                                 dateRange = DataTools.TODAY;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -213,6 +260,9 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for this session");
 
                                 dateRange = DataTools.THIS_SESSION;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -222,6 +272,9 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for all time requested");
 
                                 dateRange = DataTools.ALL_TIME;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -231,6 +284,9 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for this month requested");
 
                                 dateRange = DataTools.THIS_MONTH;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -240,6 +296,9 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for this week requested");
 
                                 dateRange = DataTools.THIS_WEEK;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -249,6 +308,9 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for last 28 days requested");
 
                                 dateRange = DataTools.LAST_28_DAYS;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -258,6 +320,9 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for last 6 months requested");
 
                                 dateRange = DataTools.LAST_6_MONTHS;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -267,6 +332,9 @@ public class StatsOverviewFragment extends Fragment {
                                 Log.i(TAG, "Stats for this year requested");
 
                                 dateRange = DataTools.THIS_YEAR;
+                                mEditor.putInt(PREFS_CURRENT_FILTER, dateRange);
+                                mEditor.putString(PREFS_CURRENT_FILTER_NAME, (String) item.getTitle());
+                                mEditor.commit();
                                 setDataTools(dateRange);
                                 setFilter(item.getTitle(), dateRange, previousDataTools);
 
@@ -322,13 +390,13 @@ public class StatsOverviewFragment extends Fragment {
                 return;
             }
             mDataTools = mDataTools.getDataToolsForDateRange(mDataTools, filterRequested);
-        } else if (mCurrentFilter == filterRequested){
+        } else if (mCurrentFilter == filterRequested) {
             Log.i(TAG, "Already viewing stats for this particular filter, dickhead");
             return;
         } else {
             Log.i(TAG, "Current filter requires more data than the current filter includes, reset datatools");
             resetDataTools();
-            if (filterRequested == DataTools.ALL_TIME){
+            if (filterRequested == DataTools.ALL_TIME) {
                 return;
             } else {
 
@@ -361,6 +429,7 @@ public class StatsOverviewFragment extends Fragment {
             Toast.makeText(getContext(), "Showing stats for: " + filterTitle, Toast.LENGTH_SHORT).show();
             mCurrentFilter = filterRequested;
         } else {
+            Log.i(TAG, "date tools not changed");
             if (filterNotChanged){
                 Toast.makeText(getContext(), "Filter not changed, dickhead", Toast.LENGTH_SHORT).show();
             } else {
@@ -457,7 +526,7 @@ public class StatsOverviewFragment extends Fragment {
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
     }
@@ -472,7 +541,23 @@ public class StatsOverviewFragment extends Fragment {
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
+
     }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        Log.i(TAG, "onStop");
+
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.i(TAG, "onDestroy");
+
+    }
+
 
     public class StatsOverviewAdapter extends RecyclerView.Adapter<StatsOverviewAdapter.ViewHolder> {
 
@@ -607,12 +692,6 @@ public class StatsOverviewFragment extends Fragment {
 
             holder.itemView.setOnClickListener(listener);
 
-            /*holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.i(TAG, "Statistic selected: " + mStatsTitles[position]);
-                }
-            });*/
         }
 
         @Override
@@ -647,15 +726,7 @@ public class StatsOverviewFragment extends Fragment {
 
                         Log.i(TAG, "Exercise names: " + exerciseNames);
 
-                        createBottomSheet(workoutKey, date, exercises);
-
-                        /*Bundle extras = new Bundle();
-                        extras.putSerializable(WORKOUT_EXERCISES, (ArrayList) exerciseNames);
-                        extras.putString(WORKOUT_ID, workoutKey);
-                        extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, (ArrayList) exercises);
-                        Intent i = new Intent (getActivity(), WorkoutActivity.class);
-                        i.putExtras(extras);
-                        startActivity(i);*/
+                        createBottomSheet(workoutKey, date, exercises, exerciseNames);
 
                     }
 
@@ -671,7 +742,7 @@ public class StatsOverviewFragment extends Fragment {
     }
 
 
-    private void createBottomSheet(final String workoutKey, final String date, final List<Exercise> exercises){
+    private void createBottomSheet(final String workoutKey, final String date, final List<Exercise> exercises, final List<String> exerciseNames){
 
         int numExercises = exercises.size();
 
@@ -681,6 +752,13 @@ public class StatsOverviewFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
+                Bundle extras = new Bundle();
+                extras.putSerializable(WORKOUT_EXERCISES, (ArrayList) exerciseNames);
+                extras.putString(WORKOUT_ID, workoutKey);
+                extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, (ArrayList) exercises);
+                Intent i = new Intent (getActivity(), WorkoutActivity.class);
+                i.putExtras(extras);
+                startActivity(i);
             }
         });
 

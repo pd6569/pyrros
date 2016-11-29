@@ -42,6 +42,17 @@ public class StatsFragment extends Fragment {
     List<String> mWorkoutDates;
     String mCurrentWorkoutKey;
 
+    // Data for child fragments
+    int mCurrentFilter;
+
+    // Fragments
+    StatsOverviewFragment mStatsOverviewFragment;
+    StatsRepMaxFragment mStatsRepMaxFragment;
+    StatsGraphFragment mStatsGraphFragment;
+    StatsCompareFragment mStatsCompareFragment;
+
+    // State information
+    private static final String STATE_CURRENT_FILTER = "CurrentFilter";
 
     public static StatsFragment newInstance(String exerciseKey, String userId, ArrayList<Exercise> exercises, ArrayList<String> workoutKeys, ArrayList<String> workoutDates, String currentWorkoutKey) {
         Bundle args = new Bundle();
@@ -65,7 +76,6 @@ public class StatsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
-
         Bundle bundle = getArguments();
         mExerciseKey = bundle.getString(ARG_EXERCISE_KEY);
         mUserId = bundle.getString(ARG_USER_ID);
@@ -73,6 +83,13 @@ public class StatsFragment extends Fragment {
         mWorkoutKeys = (ArrayList) bundle.getSerializable(ARG_WORKOUT_KEYS);
         mWorkoutDates = (ArrayList) bundle.getSerializable(ARG_WORKOUT_DATES);
         mCurrentWorkoutKey = bundle.getString(ARG_CURRENT_WORKOUT_KEY);
+
+
+        // Create fragments
+        mStatsOverviewFragment = StatsOverviewFragment.newInstance(mExerciseKey, mUserId, (ArrayList) mExercises, (ArrayList) mWorkoutKeys, (ArrayList) mWorkoutDates, mCurrentWorkoutKey);
+        mStatsRepMaxFragment = new StatsRepMaxFragment();
+        mStatsGraphFragment = new StatsGraphFragment();
+        mStatsCompareFragment = new StatsCompareFragment();
 
     }
 
@@ -119,15 +136,21 @@ public class StatsFragment extends Fragment {
         Log.i(TAG, "onPause");
     }
 
-    private class FragmentStatsPagerAdapter extends FragmentPagerAdapter {
+    @Override
+    public void onStop(){
+        super.onStop();
+        Log.i(TAG, "onStop");
+    }
 
-        StatsOverviewFragment mStatsOverviewFragment = StatsOverviewFragment.newInstance(mExerciseKey, mUserId, (ArrayList) mExercises, (ArrayList) mWorkoutKeys, (ArrayList) mWorkoutDates, mCurrentWorkoutKey);
-        StatsRepMaxFragment mStatsRepMaxFragment = new StatsRepMaxFragment();
-        StatsGraphFragment mStatsGraphFragment = new StatsGraphFragment();
-        StatsCompareFragment mStatsCompareFragment = new StatsCompareFragment();
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.i(TAG, "onDestroy");
+    }
 
+    public class FragmentStatsPagerAdapter extends FragmentPagerAdapter {
 
-        private final Fragment[] mFragments = new Fragment[] {
+        public Fragment[] mFragments = new Fragment[] {
                 mStatsOverviewFragment,
                 mStatsRepMaxFragment,
                 mStatsGraphFragment,
@@ -159,5 +182,17 @@ public class StatsFragment extends Fragment {
         public CharSequence getPageTitle(int position){
             return tabTitles[position];
         }
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle outState){
+        Log.i(TAG, "onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+    }
+
+    public Bundle getState(){
+        Bundle bundle = new Bundle();
+        bundle.putInt(STATE_CURRENT_FILTER, mCurrentFilter);
+        return bundle;
     }
 }

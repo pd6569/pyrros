@@ -374,5 +374,4 @@ public class WorkoutActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
 }

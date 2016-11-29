@@ -90,10 +90,6 @@ public class ExerciseHistoryFragment extends Fragment {
         mWorkoutKeys = (List) bundle.getSerializable(ARG_WORKOUT_KEYS);
         mRequestorWorkoutKey = bundle.getString(ARG_REQUESTOR_WORKOUT_KEY);
 
-        //TODO: EXERCISES DISPLAYED IN RANDOM ORDER - FIX
-
-
-
         Log.i(TAG, "Exercise history obtained. " + mExercises.size());
         Log.i(TAG, "Exercise dates obtained. " + mExerciseDates.size());
 

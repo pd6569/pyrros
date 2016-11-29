@@ -106,7 +106,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
                 notifyDataSetChanged();
             }
 
-            //TODO: Clean up this method
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
