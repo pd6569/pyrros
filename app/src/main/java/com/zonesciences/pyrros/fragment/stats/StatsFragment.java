@@ -190,9 +190,4 @@ public class StatsFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
 
-    public Bundle getState(){
-        Bundle bundle = new Bundle();
-        bundle.putInt(STATE_CURRENT_FILTER, mCurrentFilter);
-        return bundle;
-    }
 }
