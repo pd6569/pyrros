@@ -367,6 +367,10 @@ public class WorkoutActivity extends BaseActivity {
             return true;
         }
 
+        if (i == android.R.id.home){
+            finish();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

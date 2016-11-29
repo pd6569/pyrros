@@ -22,6 +22,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.datatools.DataTools;
@@ -48,6 +53,11 @@ public class StatsOverviewFragment extends Fragment {
     private static final String ARG_WORKOUT_DATES = "WorkoutDates";
     private static final String ARG_CURRENT_WORKOUT_KEY = "CurrentWorkoutKey";
 
+    //To pass to new workout
+    private static final String WORKOUT_EXERCISES = "Workout Exercises";
+    private static final String WORKOUT_ID = "Workout ID";
+    private static final String WORKOUT_EXERCISES_OBJECTS = "WorkoutExerciseObjects";
+
     String mExerciseKey;
     String mCurrentWorkoutKey;
     String mUserId;
@@ -61,6 +71,7 @@ public class StatsOverviewFragment extends Fragment {
     private RelativeLayout mTitleContainer;
     private TextView mTitle;
     private ImageView mLaunchWorkoutImage;
+    private LinearLayout mExercisesContainer;
 
     //RecyclerView
     RecyclerView mStatsRecycler;
@@ -108,6 +119,8 @@ public class StatsOverviewFragment extends Fragment {
 
     DataTools mDataTools; // contains data tools for specified date range
 
+    //Database
+    DatabaseReference mDatabase;
 
     //Units
     String mUnit;
@@ -146,6 +159,8 @@ public class StatsOverviewFragment extends Fragment {
         mWorkoutKeys = (ArrayList) bundle.getSerializable(ARG_WORKOUT_KEYS);
         mWorkoutDates = (ArrayList) bundle.getSerializable(ARG_WORKOUT_DATES);
         mCurrentWorkoutKey = bundle.getString(ARG_CURRENT_WORKOUT_KEY);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("pref_unit", null).equals("metric")){
             mUnit = Utils.UNIT_METRIC;
@@ -277,6 +292,7 @@ public class StatsOverviewFragment extends Fragment {
 
         mTitle = (TextView) rootView.findViewById(R.id.bottom_sheet_calendar_title);
         mLaunchWorkoutImage = (ImageView) rootView.findViewById(R.id.bottom_sheet_calendar_go_to_workout);
+        mExercisesContainer = (LinearLayout) rootView.findViewById(R.id.workout_exercises_container);
 
         mStatsRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_stats_overview);
 
@@ -531,7 +547,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedOneRep) + mUnit);
                         date.setText(Utils.formatDate((String) mOneRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
-                        listener = setClickListener(position, (String) mOneRepMax.get(DataTools.KEY_WORKOUT_KEY));
+                        listener = setClickListener(position, (String) mOneRepMax.get(DataTools.KEY_WORKOUT_KEY), Utils.formatDate((String) mOneRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         break;
 
                     case "3 rep-max":
@@ -539,7 +555,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedThreeRep) + mUnit);
                         date.setText(Utils.formatDate((String) mThreeRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
-                        listener = setClickListener(position, (String) mThreeRepMax.get(DataTools.KEY_WORKOUT_KEY));
+                        listener = setClickListener(position, (String) mThreeRepMax.get(DataTools.KEY_WORKOUT_KEY), Utils.formatDate((String) mThreeRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         break;
 
                     case "5 rep-max":
@@ -547,7 +563,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedFiveRep) + mUnit);
                         date.setText(Utils.formatDate((String) mFiveRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
-                        listener = setClickListener(position, (String) mFiveRepMax.get(DataTools.KEY_WORKOUT_KEY));
+                        listener = setClickListener(position, (String) mFiveRepMax.get(DataTools.KEY_WORKOUT_KEY), Utils.formatDate((String) mFiveRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         break;
 
                     case "10 rep-max":
@@ -555,7 +571,7 @@ public class StatsOverviewFragment extends Fragment {
                         estimatedMax.setText(Utils.formatWeight(mEstimatedTenRep) + mUnit);
                         date.setText(Utils.formatDate((String) mTenRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         statsContentContainer.addView(view);
-                        listener = setClickListener(position, (String) mTenRepMax.get(DataTools.KEY_WORKOUT_KEY));
+                        listener = setClickListener(position, (String) mTenRepMax.get(DataTools.KEY_WORKOUT_KEY), Utils.formatDate((String) mTenRepMax.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
                         break;
 
                 }
@@ -569,7 +585,7 @@ public class StatsOverviewFragment extends Fragment {
                 setInfo.setText(Utils.formatWeight((double) mHeaviestWeight.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mHeaviestWeight.get(DataTools.KEY_REPS));
                 setInfo.setVisibility(View.VISIBLE);
                 date.setText(Utils.formatDate((String) mHeaviestWeight.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
-                listener = setClickListener(position, (String) mHeaviestWeight.get(DataTools.KEY_WORKOUT_KEY));
+                listener = setClickListener(position, (String) mHeaviestWeight.get(DataTools.KEY_WORKOUT_KEY), Utils.formatDate((String) mHeaviestWeight.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
             }
 
             if (mStatsTitles[position].contains("Most reps")) {
@@ -577,7 +593,7 @@ public class StatsOverviewFragment extends Fragment {
                 setInfo.setText(Utils.formatWeight((double) mMostReps.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostReps.get(DataTools.KEY_REPS));
                 setInfo.setVisibility(View.VISIBLE);
                 date.setText(Utils.formatDate((String) mMostReps.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
-                listener = setClickListener(position, (String) mMostReps.get(DataTools.KEY_WORKOUT_KEY));
+                listener = setClickListener(position, (String) mMostReps.get(DataTools.KEY_WORKOUT_KEY), Utils.formatDate((String) mMostReps.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
             }
 
             if (mStatsTitles[position].contains("Most volume (Single Set)")) {
@@ -585,7 +601,7 @@ public class StatsOverviewFragment extends Fragment {
                 setInfo.setText(Utils.formatWeight((double) mMostVolume.get(DataTools.KEY_WEIGHT) * mConversionMultiple) + mUnit + " x " + mMostVolume.get(DataTools.KEY_REPS));
                 setInfo.setVisibility(View.VISIBLE);
                 date.setText(Utils.formatDate((String) mMostVolume.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
-                listener = setClickListener(position, (String) mMostVolume.get(DataTools.KEY_WORKOUT_KEY));
+                listener = setClickListener(position, (String) mMostVolume.get(DataTools.KEY_WORKOUT_KEY), Utils.formatDate((String) mMostVolume.get(DataTools.KEY_DATE), Utils.DATE_FORMAT_FULL, 1));
 
             }
 
@@ -605,58 +621,74 @@ public class StatsOverviewFragment extends Fragment {
         }
     }
 
-    private View.OnClickListener setClickListener(final int position, final String workoutKey){
+    private View.OnClickListener setClickListener(final int position, final String workoutKey, final String date){
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Statistic selected: " + mStatsTitles[position] + " Workout key: " + workoutKey);
+
+                final List<Exercise> exercises = new ArrayList<>();
+                final List<String> exerciseNames = new ArrayList<>();
+
+                mDatabase.child("user-workout-exercises").child(mUserId).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot exercise : dataSnapshot.getChildren()){
+                            Exercise e = exercise.getValue(Exercise.class);
+                            exercises.add(e);
+                        }
+                        Collections.sort(exercises);
+
+                        for (Exercise e : exercises){
+                            Log.i(TAG, "Exercises for this workout: " + e.getName());
+                            String name = e.getName();
+                            exerciseNames.add(name);
+                        }
+
+                        Log.i(TAG, "Exercise names: " + exerciseNames);
+
+                        createBottomSheet(workoutKey, date, exercises);
+
+                        /*Bundle extras = new Bundle();
+                        extras.putSerializable(WORKOUT_EXERCISES, (ArrayList) exerciseNames);
+                        extras.putString(WORKOUT_ID, workoutKey);
+                        extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, (ArrayList) exercises);
+                        Intent i = new Intent (getActivity(), WorkoutActivity.class);
+                        i.putExtras(extras);
+                        startActivity(i);*/
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         };
         return listener;
     }
 
 
-   /* private void createBottomSheet(final String workoutKey, final String date, String time, final View rootView){
+    private void createBottomSheet(final String workoutKey, final String date, final List<Exercise> exercises){
 
-        String workoutTime;
-        if (time.isEmpty()){
-            workoutTime = "";
-        } else {
-            workoutTime = " at " + time;
-        }
-        mExercises = mWorkoutExercisesMap.get(workoutKey);
+        int numExercises = exercises.size();
 
-        Collections.sort(mExercises);
-
-        int numExercises = mExercises.size();
-
-        mTitle.setText(Utils.formatDate(date, "yyyy-MM-dd", 1) + workoutTime);
+        mTitle.setText(date);
 
         mLaunchWorkoutImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                List<CharSequence> exerciseKeys = new ArrayList<>();
-                for (Exercise e : mExercises) {
-                    exerciseKeys.add(e.getName());
-                }
-
-                Bundle extras = new Bundle();
-                extras.putSerializable(WORKOUT_EXERCISES, (ArrayList) exerciseKeys);
-                extras.putString(WORKOUT_ID, workoutKey);
-                extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, (ArrayList) mExercises);
-                Intent i = new Intent (getContext(), WorkoutActivity.class);
-                i.putExtras(extras);
-                startActivity(i);
             }
         });
 
-        LinearLayout exercisesContainer = (LinearLayout) rootView.findViewById(R.id.workout_exercises_container);
-        exercisesContainer.removeAllViews();
+        mExercisesContainer.removeAllViews();
 
         for (int i = 0; i < numExercises; i++) {
 
-            Exercise currentExercise = mExercises.get(i);
+            Exercise currentExercise = exercises.get(i);
             View view = LayoutInflater.from(getContext()).inflate(R.layout.item_workout_exercises, null);
             TextView exerciseText = (TextView) view.findViewById(R.id.workout_exercise_name);
             LinearLayout setsContainer = (LinearLayout) view.findViewById(R.id.workout_sets_container);
@@ -689,11 +721,11 @@ public class StatsOverviewFragment extends Fragment {
 
             }
 
-            exercisesContainer.addView(view);
+            mExercisesContainer.addView(view);
         }
 
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-    }*/
+    }
 
 }
