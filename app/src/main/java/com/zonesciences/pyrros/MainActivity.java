@@ -189,9 +189,9 @@ public class MainActivity extends BaseActivity {
                 String exerciseName = RowData[0];
                 String muscleGroup = RowData[1];
                 Log.i (TAG, "Exercise Name: " + exerciseName + " Muscle group: " + muscleGroup);
-                createExercises(exercises);
             }
             fin.close();
+            createExercises(exercises);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
