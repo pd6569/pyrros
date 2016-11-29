@@ -86,5 +86,6 @@
     <string name="menu_stats_last_6_months">Last 6 months</string>
     <string name="pref_stats">Stats</string>
     <string name="menu_sync_exercises">Sync Exercises</string>
+    <string name="hint_search">Search exercises</string>
 
 </resources>

@@ -1,5 +1,7 @@
 package com.zonesciences.pyrros;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -173,6 +175,10 @@ public class NewWorkoutActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_new_workout, menu);
         mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+
         return true;
     }
 
