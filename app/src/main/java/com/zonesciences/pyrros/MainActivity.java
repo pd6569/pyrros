@@ -107,7 +107,8 @@ public class MainActivity extends BaseActivity {
             findViewById(R.id.fab_new_workout).setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(MainActivity.this, NewWorkoutActivity.class));
+                    /*startActivity(new Intent(MainActivity.this, NewWorkoutActivity.class));*/
+                    startActivity(new Intent(MainActivity.this, CreateWorkoutActivity.class));
                 }
             });
         }

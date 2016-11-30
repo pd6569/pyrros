@@ -37,12 +37,7 @@
         </activity>
         <activity android:name=".EditWorkoutActivity">
         </activity>
-        <activity android:name=".ExerciseDirectory">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                       android:resource="@xml/searchable"/>
+        <activity android:name=".CreateWorkoutActivity">
         </activity>
     </application>
 

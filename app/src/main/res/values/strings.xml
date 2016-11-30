@@ -87,5 +87,6 @@
     <string name="pref_stats">Stats</string>
     <string name="menu_sync_exercises">Sync Exercises</string>
     <string name="hint_search">Search exercises</string>
+    <string name="menu_filter_exercises">Filter exercises</string>
 
 </resources>

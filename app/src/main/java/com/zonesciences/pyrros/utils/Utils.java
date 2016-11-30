@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.models.Exercise;
@@ -150,4 +151,8 @@ public class Utils {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
+    public static FirebaseDatabase getDatabase(){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        return database;
+    }
 }
