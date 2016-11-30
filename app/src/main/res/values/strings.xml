@@ -88,5 +88,13 @@
     <string name="menu_sync_exercises">Sync Exercises</string>
     <string name="hint_search">Search exercises</string>
     <string name="menu_filter_exercises">Filter exercises</string>
+    <string name="menu_exercises_filter_biceps">Biceps</string>
+    <string name="menu_exercises_filter_triceps">Triceps</string>
+    <string name="menu_exercises_filter_chest">Chest</string>
+    <string name="menu_exercises_filter_shoulders">Shoulders</string>
+    <string name="menu_exercises_filter_back">Back</string>
+    <string name="menu_exercises_filter_legs">Legs</string>
+    <string name="menu_exercises_filter_abs">Abs</string>
+    <string name="menu_exercises_filter_full_body">Full Body</string>
 
 </resources>

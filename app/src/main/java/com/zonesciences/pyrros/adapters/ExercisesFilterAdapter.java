@@ -32,7 +32,7 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
         }
     }
 
-    public ExercisesFilterAdapter(Context context, List<Exercise> exercises){
+    public ExercisesFilterAdapter(final Context context, List<Exercise> exercises){
         this.mContext = context;
         this.mExercises = exercises;
     }

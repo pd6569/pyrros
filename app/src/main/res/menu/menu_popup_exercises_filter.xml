@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/menu_exercises_filter_biceps"
+          android:id="@+id/menu_exercises_filter_biceps"/>
+
+    <item android:title="@string/menu_exercises_filter_triceps"
+          android:id="@+id/menu_exercises_filter_triceps"/>
+
+    <item android:title="@string/menu_exercises_filter_chest"
+          android:id="@+id/menu_exercises_filter_chest"/>
+
+    <item android:title="@string/menu_exercises_filter_shoulders"
+          android:id="@+id/menu_exercises_filter_shoulders"/>
+
+    <item android:title="@string/menu_exercises_filter_back"
+          android:id="@+id/menu_exercises_filter_back"/>
+
+    <item android:title="@string/menu_exercises_filter_legs"
+          android:id="@+id/menu_exercises_filter_legs"/>
+
+    <item android:title="@string/menu_exercises_filter_abs"
+          android:id="@+id/menu_exercises_filter_abs"/>
+
+    <item android:title="@string/menu_exercises_filter_full_body"
+          android:id="@+id/menu_exercises_filter_full_body"/>
+
+</menu>

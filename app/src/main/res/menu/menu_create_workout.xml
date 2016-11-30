@@ -9,4 +9,12 @@
         android:icon="@drawable/ic_filter_list_white_24dp"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/filter_exercises_spinner"
+        android:title="Filter Exercises Spinner"
+        app:actionViewClass = "android.widget.Spinner"
+        android:visible="true"
+        android:icon="@drawable/ic_filter_list_white_24dp"
+        app:showAsAction="always" />
+
 </menu>

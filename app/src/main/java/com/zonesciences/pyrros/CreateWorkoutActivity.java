@@ -1,15 +1,17 @@
 package com.zonesciences.pyrros;
 
-import android.app.SearchManager;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,25 +26,51 @@ import java.util.List;
 
 public class CreateWorkoutActivity extends BaseActivity {
 
+    private static final String TAG = "CreateWorkout";
+
+    Context mContext;
+
+    // Data
+    List<Exercise> mAllExercises = new ArrayList<>();
+    List<Exercise> mFilteredExercises = new ArrayList<>();
+
+    // Database
+    DatabaseReference mDatabase;
+
+    // View
+    Spinner mBodypartSpinner;
+    Spinner mEquipmentSpinner;
     RecyclerView mExercisesFilterRecycler;
-    ExercisesFilterAdapter mAdapter;
     LinearLayoutManager mLayoutManager;
 
-    List<Exercise> mExercises = new ArrayList<>();
-    DatabaseReference mDatabase;
+
+    // Adapter
+    ExercisesFilterAdapter mAdapter;
 
     // Menu
     MenuItem mFilterExercisesMenuItem;
+
+    String[] mBodyPartsArray;
+    String[] mEquipmentArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_workout);
 
+        mContext = getApplicationContext();
         mExercisesFilterRecycler = (RecyclerView) findViewById(R.id.recycler_exercises_filter);
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
         mExercisesFilterRecycler.setHasFixedSize(true);
         mExercisesFilterRecycler.setLayoutManager(mLayoutManager);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_create_workout);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("New Workout");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mBodyPartsArray = getResources().getStringArray(R.array.bodyparts);
+        mEquipmentArray = getResources().getStringArray(R.array.equipment);
 
         mDatabase = Utils.getDatabase().getReference();
         mDatabase.child("exercises").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -50,9 +78,10 @@ public class CreateWorkoutActivity extends BaseActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot exercise : dataSnapshot.getChildren()){
                     Exercise e = exercise.getValue(Exercise.class);
-                    mExercises.add(e);
+                    mAllExercises.add(e);
                 }
-                mAdapter = new ExercisesFilterAdapter(getApplicationContext(), mExercises);
+                mFilteredExercises = mAllExercises;
+                mAdapter = new ExercisesFilterAdapter(mContext, mFilteredExercises);
                 mExercisesFilterRecycler.setAdapter(mAdapter);
             }
 
@@ -62,20 +91,103 @@ public class CreateWorkoutActivity extends BaseActivity {
             }
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_create_workout);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("New Workout");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        mBodypartSpinner = (Spinner) findViewById(R.id.spinner_bodypart_filter);
+        ArrayAdapter<CharSequence> bodypartAdapter = ArrayAdapter.createFromResource(this, R.array.bodyparts, R.layout.simple_spinner_item);
+        bodypartAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mBodypartSpinner.setAdapter(bodypartAdapter);
+        mBodypartSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                Toast.makeText(getApplicationContext(), "Filter selected: " + mBodyPartsArray[pos], Toast.LENGTH_SHORT).show();
+                if (pos == 0) {
+                    Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase());
+                    mFilteredExercises = mAllExercises;
+
+                } else {
+                    Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " mAllExercises size: " + mAllExercises.size());
+                    List<Exercise> list = new ArrayList<Exercise>();
+                    for (Exercise e : mAllExercises) {
+                        Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " Exercise: " + e.getName() + " bodypart: " + e.getMuscleGroup());
+                        if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[pos].toLowerCase())) {
+                            Log.i(TAG, "Found exercises for " + mBodyPartsArray[pos]);
+                            list.add(e);
+                        }
+                    }
+                    mFilteredExercises = list;
+                    Log.i(TAG, "mFilteredExercises SIZE: " + mFilteredExercises.size() + " list size: " + list.size());
+                }
+
+                mAdapter = null;
+                mAdapter = new ExercisesFilterAdapter(mContext, mFilteredExercises);
+                mExercisesFilterRecycler.setAdapter(mAdapter);
+                Log.i(TAG, "mAdapter size: " + mAdapter.getItemCount());
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        mEquipmentSpinner = (Spinner) findViewById(R.id.spinner_equipment_filter);
+        ArrayAdapter<CharSequence> equipmentAdapter = ArrayAdapter.createFromResource(this, R.array.equipment, R.layout.simple_spinner_item);
+        equipmentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mEquipmentSpinner.setAdapter(equipmentAdapter);
+        mEquipmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                Toast.makeText(getApplicationContext(), "Filter selected: " + mEquipmentArray[pos], Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
-    @Override
+
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_create_workout, menu);
 
         mFilterExercisesMenuItem = menu.findItem(R.id.action_filter_exercises);
+        MenuItem spinnerItem = menu.findItem(R.id.filter_exercises_spinner);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(spinnerItem);
 
+
+
+        spinner.setAdapter(adapter);
 
         return true;
+    }*/
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_filter_exercises:
+               /* PopupMenu menu = new PopupMenu(getApplicationContext(), mFilterExercisesMenuItem);
+                menu.getMenuInflater().inflate(R.menu.menu_stats_overview_filter_popup, menu.getMenu());
+
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return true;
+                    }
+                });
+                menu.show();*/
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+
     }
+
 }
