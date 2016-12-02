@@ -37,6 +37,7 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
     // Data
     List<Exercise> mAllExercises = new ArrayList<>();
     List<Exercise> mFilteredExercises = new ArrayList<>();
+    List<List<Exercise>> mFilterHistory = new ArrayList<>();
 
     // Database
     DatabaseReference mDatabase;
@@ -57,7 +58,11 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
     String[] mBodyPartsArray;
     String[] mEquipmentArray;
 
+    // Search Filter
     int mPreviousSearchStringLength;
+
+    // Spinner Filter
+    int mCurrentBodyPartFilterIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +111,8 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
         mBodypartSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                mFilterHistory.clear();
+                mCurrentBodyPartFilterIndex = pos;
                 Toast.makeText(getApplicationContext(), "Filter selected: " + mBodyPartsArray[pos], Toast.LENGTH_SHORT).show();
                 if (pos == 0) {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase());
@@ -113,19 +120,13 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
                     mFilteredExercises.addAll(mAllExercises);
                 } else {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " mAllExercises size: " + mAllExercises.size());
-                    List<Exercise> list = new ArrayList<Exercise>();
-                    for (Exercise e : mAllExercises) {
-                        Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " Exercise: " + e.getName() + " bodypart: " + e.getMuscleGroup());
-                        if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[pos].toLowerCase())) {
-                            Log.i(TAG, "Found exercises for " + mBodyPartsArray[pos]);
-                            list.add(e);
-                        }
-                    }
+
+                    List<Exercise> list = getExercisesForFilter(pos);
+
                     Log.i(TAG, "mFilteredExercises SIZE: " + mFilteredExercises.size() + " list size: " + list.size() + " mAllExercises: " + mAllExercises.size());
+
                     mFilteredExercises.clear();
                     mFilteredExercises.addAll(list);
-                    /*mFilteredExercises = list;*/
-
                 }
 
                 if (mAdapter != null) {
@@ -177,30 +178,68 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        boolean addHistory = true;
         int length = newText.length();
+        List<Exercise> exercisesToSearch = new ArrayList<>();
+
+        if (length == 0){
+            mFilterHistory.clear();
+        }
+
+        if(mFilterHistory.isEmpty()){
+            mFilterHistory.add(getExercisesForFilter(mCurrentBodyPartFilterIndex));
+            mAdapter.notifyDataSetChanged();
+        }
+
         Log.i(TAG, "onQueryTextChange. newText Length: " + length + " previous Text Length: " + mPreviousSearchStringLength);
         if (length < mPreviousSearchStringLength) {
-            mFilteredExercises.clear();
-            mFilteredExercises.addAll(mAllExercises);
+            addHistory = false;
         }
+
+        exercisesToSearch = mFilterHistory.get(mFilterHistory.size()-1);
 
         newText = newText.toLowerCase();
         ArrayList<Exercise> newList = new ArrayList<>();
-        for (Exercise exercise : mFilteredExercises){
+        for (Exercise exercise : exercisesToSearch){
             String name = exercise.getName().toLowerCase();
             if(name.contains(newText)){
                 newList.add(exercise);
             }
         }
+
+        if (addHistory) {
+            mFilterHistory.add(newList);
+        } else {
+            if(mFilterHistory.size()>1){
+                mFilterHistory.remove(mFilterHistory.size()-1);
+            }
+        }
+
         setFilter(newList);
         mPreviousSearchStringLength = newText.length();
         return true;
     }
 
     public void setFilter(ArrayList<Exercise> newList){
+
         mFilteredExercises.clear();
         mFilteredExercises.addAll(newList);
+
+        Log.i(TAG, "mFilter history added: " + mFilterHistory.size());
+
         mAdapter.notifyDataSetChanged();
+    }
+
+    public List<Exercise> getExercisesForFilter(int index){
+        List<Exercise> filteredList = new ArrayList<>();
+        for (Exercise e : mAllExercises) {
+            Log.i(TAG, "Filter: " + mBodyPartsArray[index].toLowerCase() + " Exercise: " + e.getName() + " bodypart: " + e.getMuscleGroup());
+            if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[index].toLowerCase())) {
+                Log.i(TAG, "Found exercises for " + mBodyPartsArray[index]);
+                filteredList.add(e);
+            }
+        }
+        return filteredList;
     }
 
 
