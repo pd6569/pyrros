@@ -57,6 +57,8 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
     String[] mBodyPartsArray;
     String[] mEquipmentArray;
 
+    int mPreviousSearchStringLength;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,7 +177,13 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Log.i(TAG, "onQueryTextChange");
+        int length = newText.length();
+        Log.i(TAG, "onQueryTextChange. newText Length: " + length + " previous Text Length: " + mPreviousSearchStringLength);
+        if (length < mPreviousSearchStringLength) {
+            mFilteredExercises.clear();
+            mFilteredExercises.addAll(mAllExercises);
+        }
+
         newText = newText.toLowerCase();
         ArrayList<Exercise> newList = new ArrayList<>();
         for (Exercise exercise : mFilteredExercises){
@@ -184,8 +192,8 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
                 newList.add(exercise);
             }
         }
-
         setFilter(newList);
+        mPreviousSearchStringLength = newText.length();
         return true;
     }
 
