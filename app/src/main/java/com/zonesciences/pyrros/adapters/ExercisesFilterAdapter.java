@@ -108,4 +108,7 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
         this.mExercisesListener = listener;
     }
 
+    public List<Exercise> getWorkoutExercises() {
+        return mWorkoutExercises;
+    }
 }
