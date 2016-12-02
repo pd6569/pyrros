@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class CreateWorkoutActivity extends BaseActivity implements SearchView.OnQueryTextListener {
 
@@ -316,6 +317,7 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
 
 
                 Workout newWorkout = new Workout(mUserId, mUsername, Utils.getClientTimeStamp(true), "", true);
+                newWorkout.setNumExercises(exercisesToLoad.size());
 
                 // Write to database
                 Map<String, Object> childUpdates = new HashMap<>();
@@ -323,10 +325,11 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
                 childUpdates.put("/user-workouts/" + mUserId + "/" + mWorkoutKey, newWorkout);
                 childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
                 for (Exercise exercise : exercisesToLoad){
+                    exercise.setExerciseId(UUID.randomUUID().toString());
                     String exerciseKey = exercise.getName();
                     exerciseKeysList.add(exerciseKey);
-                    childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + exerciseKey, exercise);
-                    childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + exerciseKey, exercise);
+                    childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + exerciseKey, exercise.toMap());
+                    childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + exerciseKey, exercise.toMap());
                 }
                 mDatabase.updateChildren(childUpdates);
 

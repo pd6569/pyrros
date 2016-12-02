@@ -9,32 +9,74 @@
     tools:context="com.zonesciences.pyrros.CreateWorkoutActivity"
     tools:showIn="@layout/activity_create_workout">
 
-    <LinearLayout
-        android:id="@+id/filters_linear_layout"
+    <android.support.v7.widget.CardView
+        android:id="@+id/filters_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:layout_margin="5dp"
+        app:cardBackgroundColor="@color/cardBackground"
+        app:cardElevation="3dp">
 
-        <android.support.v7.widget.AppCompatSpinner
-            android:id="@+id/spinner_bodypart_filter"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/filters_linear_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_weight="1"/>
+            android:orientation="vertical"
+            android:weightSum="2">
 
-        <android.support.v7.widget.AppCompatSpinner
-            android:id="@+id/spinner_equipment_filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_weight="1"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-    </LinearLayout>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Body Part"
+                    android:gravity="center"
+                    android:textSize="@dimen/filter_spinner_text"
+                    android:layout_weight="1"/>
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/spinner_bodypart_filter"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:layout_weight="1"/>
+
+                </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Equipment"
+                    android:gravity="center"
+                    android:textSize="@dimen/filter_spinner_text"
+                    android:layout_weight="1"/>
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/spinner_equipment_filter"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_exercises_filter"
-        android:layout_below="@id/filters_linear_layout"
+        android:layout_below="@id/filters_cardview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"

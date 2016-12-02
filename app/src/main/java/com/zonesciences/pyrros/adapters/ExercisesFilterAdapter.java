@@ -1,7 +1,9 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -76,6 +78,8 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
                         mWorkoutExercises.add(exercise);
                         mExercisesListener.onExercisesAdded();
                         Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " added to workout", Snackbar.LENGTH_SHORT);
+                        View sbView = snackbar.getView();
+                        sbView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.snackbarPositive));
                         snackbar.show();
                         Log.i(TAG, "Exercise added to mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
                     }
@@ -85,6 +89,8 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
                         mExercisesListener.onExercisesEmpty();
                     }
                     Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " removed from workout", Snackbar.LENGTH_SHORT);
+                    View sbView = snackbar.getView();
+                    sbView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.snackbarNegative));
                     snackbar.show();
                     Log.i(TAG, "Exercise removed from mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
                 }

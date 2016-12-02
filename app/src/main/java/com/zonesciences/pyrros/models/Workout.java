@@ -122,6 +122,13 @@ public class Workout {
         this.shared = shared;
     }
 
+
+    @Exclude
+    public void setNumExercises(int numExercises) {
+        this.numExercises = numExercises;
+    }
+
+
     @Exclude
     public void setClientTimeStamp(String clientTimeStamp) {
         this.clientTimeStamp = clientTimeStamp;

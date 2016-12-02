@@ -11,6 +11,9 @@
     <color name="secondaryText">#757575</color>
     <color name="textIcons">#757575</color>
     <color name="button">#af52bf</color>
-    <color name="colorStatsAdditionalInfo">#4CAF50</color>
+    <color name="snackbarPositive">#4CAF50</color>
+    <color name="snackbarNegative">#F44336</color>
+
+
 
 </resources>
