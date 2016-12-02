@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +56,11 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
     }
 
 
-
+    public void setFilter(ArrayList<Exercise> newList){
+        mExercises = new ArrayList<Exercise>();
+        mExercises.addAll(newList);
+        notifyDataSetChanged();
+    }
 
 
 }

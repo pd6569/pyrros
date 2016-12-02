@@ -2,10 +2,14 @@ package com.zonesciences.pyrros;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,7 +28,7 @@ import com.zonesciences.pyrros.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateWorkoutActivity extends BaseActivity {
+public class CreateWorkoutActivity extends BaseActivity implements SearchView.OnQueryTextListener {
 
     private static final String TAG = "CreateWorkout";
 
@@ -48,7 +52,7 @@ public class CreateWorkoutActivity extends BaseActivity {
     ExercisesFilterAdapter mAdapter;
 
     // Menu
-    MenuItem mFilterExercisesMenuItem;
+
 
     String[] mBodyPartsArray;
     String[] mEquipmentArray;
@@ -80,7 +84,7 @@ public class CreateWorkoutActivity extends BaseActivity {
                     Exercise e = exercise.getValue(Exercise.class);
                     mAllExercises.add(e);
                 }
-                mFilteredExercises = mAllExercises;
+                mFilteredExercises.addAll(mAllExercises);
                 mAdapter = new ExercisesFilterAdapter(mContext, mFilteredExercises);
                 mExercisesFilterRecycler.setAdapter(mAdapter);
             }
@@ -103,8 +107,8 @@ public class CreateWorkoutActivity extends BaseActivity {
                 Toast.makeText(getApplicationContext(), "Filter selected: " + mBodyPartsArray[pos], Toast.LENGTH_SHORT).show();
                 if (pos == 0) {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase());
-                    mFilteredExercises = mAllExercises;
-
+                    mFilteredExercises.clear();
+                    mFilteredExercises.addAll(mAllExercises);
                 } else {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " mAllExercises size: " + mAllExercises.size());
                     List<Exercise> list = new ArrayList<Exercise>();
@@ -115,14 +119,17 @@ public class CreateWorkoutActivity extends BaseActivity {
                             list.add(e);
                         }
                     }
-                    mFilteredExercises = list;
-                    Log.i(TAG, "mFilteredExercises SIZE: " + mFilteredExercises.size() + " list size: " + list.size());
+                    Log.i(TAG, "mFilteredExercises SIZE: " + mFilteredExercises.size() + " list size: " + list.size() + " mAllExercises: " + mAllExercises.size());
+                    mFilteredExercises.clear();
+                    mFilteredExercises.addAll(list);
+                    /*mFilteredExercises = list;*/
+
                 }
 
-                mAdapter = null;
-                mAdapter = new ExercisesFilterAdapter(mContext, mFilteredExercises);
-                mExercisesFilterRecycler.setAdapter(mAdapter);
-                Log.i(TAG, "mAdapter size: " + mAdapter.getItemCount());
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
+
 
             }
 
@@ -150,27 +157,42 @@ public class CreateWorkoutActivity extends BaseActivity {
     }
 
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_create_workout, menu);
-
-        mFilterExercisesMenuItem = menu.findItem(R.id.action_filter_exercises);
-        MenuItem spinnerItem = menu.findItem(R.id.filter_exercises_spinner);
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(spinnerItem);
-
-
-
-        spinner.setAdapter(adapter);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(this);
 
         return true;
-    }*/
+    }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        newText = newText.toLowerCase();
+        ArrayList<Exercise> newList = new ArrayList<>();
+        for (Exercise exercise : mFilteredExercises){
+            String name = exercise.getName().toLowerCase();
+            if(name.contains(newText)){
+                newList.add(exercise);
+            }
+        }
+
+        mAdapter.setFilter(newList);
+        return true;
+    }
+
+    /*public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
             case R.id.action_filter_exercises:
-               /* PopupMenu menu = new PopupMenu(getApplicationContext(), mFilterExercisesMenuItem);
+               *//* PopupMenu menu = new PopupMenu(getApplicationContext(), mFilterExercisesMenuItem);
                 menu.getMenuInflater().inflate(R.menu.menu_stats_overview_filter_popup, menu.getMenu());
 
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -179,7 +201,7 @@ public class CreateWorkoutActivity extends BaseActivity {
                         return true;
                     }
                 });
-                menu.show();*/
+                menu.show();*//*
                 return true;
 
             default:
@@ -188,6 +210,6 @@ public class CreateWorkoutActivity extends BaseActivity {
                 return super.onOptionsItemSelected(item);
         }
 
-    }
+    }*/
 
 }
