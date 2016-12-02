@@ -56,11 +56,6 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
     }
 
 
-    public void setFilter(ArrayList<Exercise> newList){
-        mExercises = new ArrayList<Exercise>();
-        mExercises.addAll(newList);
-        notifyDataSetChanged();
-    }
 
 
 }

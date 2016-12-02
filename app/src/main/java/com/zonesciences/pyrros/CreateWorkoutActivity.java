@@ -175,6 +175,7 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        Log.i(TAG, "onQueryTextChange");
         newText = newText.toLowerCase();
         ArrayList<Exercise> newList = new ArrayList<>();
         for (Exercise exercise : mFilteredExercises){
@@ -184,9 +185,16 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
             }
         }
 
-        mAdapter.setFilter(newList);
+        setFilter(newList);
         return true;
     }
+
+    public void setFilter(ArrayList<Exercise> newList){
+        mFilteredExercises.clear();
+        mFilteredExercises.addAll(newList);
+        mAdapter.notifyDataSetChanged();
+    }
+
 
     /*public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
