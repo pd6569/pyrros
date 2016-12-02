@@ -187,7 +187,11 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
         }
 
         if(mFilterHistory.isEmpty()){
-            mFilterHistory.add(getExercisesForFilter(mCurrentBodyPartFilterIndex));
+            if (mCurrentBodyPartFilterIndex == 0) {
+                mFilterHistory.add(mAllExercises);
+            } else {
+                mFilterHistory.add(getExercisesForFilter(mCurrentBodyPartFilterIndex));
+            }
             mAdapter.notifyDataSetChanged();
         }
 
