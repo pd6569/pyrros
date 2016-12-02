@@ -1,10 +1,14 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
@@ -18,18 +22,24 @@ import java.util.List;
  */
 public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilterAdapter.ExercisesFilterViewHolder> {
 
+    private static final String TAG = "ExercisesFilterAdapter" ;
     Context mContext;
 
     List<Exercise> mExercises;
+    List<Exercise> mWorkoutExercises = new ArrayList<>();
 
+    boolean mIsInWorkout;
 
     public class ExercisesFilterViewHolder extends RecyclerView.ViewHolder {
 
         TextView mExerciseName;
+        CheckBox mCheckBox;
 
         public ExercisesFilterViewHolder(View itemView) {
             super(itemView);
             mExerciseName = (TextView) itemView.findViewById(R.id.exercise_filter_name);
+            mCheckBox = (CheckBox) itemView.findViewById(R.id.exercise_filter_check_box);
+
         }
     }
 
@@ -46,8 +56,30 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
     }
 
     @Override
-    public void onBindViewHolder(ExercisesFilterAdapter.ExercisesFilterViewHolder holder, int position) {
+    public void onBindViewHolder(final ExercisesFilterAdapter.ExercisesFilterViewHolder holder, final int position) {
+
         holder.mExerciseName.setText(mExercises.get(position).getName());
+
+        final Exercise exercise = mExercises.get(position);
+
+        holder.mCheckBox.setOnCheckedChangeListener(null);
+        holder.mCheckBox.setChecked(exercise.isSelected);
+        holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                exercise.setSelected(isChecked);
+                if (exercise.isSelected){
+                    if (!mWorkoutExercises.contains(exercise)){
+                        mWorkoutExercises.add(exercise);
+                        Log.i(TAG, "Exercise added to mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
+                    }
+                } else {
+                    mWorkoutExercises.remove(exercise);
+                    Log.i(TAG, "Exercise removed from mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
+                }
+            }
+        });
+
     }
 
     @Override

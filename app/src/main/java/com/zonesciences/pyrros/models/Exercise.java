@@ -23,6 +23,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     public int sets;
     public int order;
     public String exerciseId;
+    public boolean isSelected;
 
     public Exercise(){
         // Default constructor required for calls to DataSnapshot.getValue(Exercise.class)
@@ -114,6 +115,16 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     @Exclude
     public void setExerciseId(String exerciseId) {
         this.exerciseId = exerciseId;
+    }
+
+    @Exclude
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    @Exclude
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     @Exclude

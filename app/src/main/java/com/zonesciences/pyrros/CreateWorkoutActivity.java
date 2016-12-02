@@ -3,6 +3,7 @@ package com.zonesciences.pyrros;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
     List<Exercise> mAllExercises = new ArrayList<>();
     List<Exercise> mFilteredExercises = new ArrayList<>();
     List<List<Exercise>> mFilterHistory = new ArrayList<>();
+    List<Exercise> mWorkoutExercises = new ArrayList<>();
 
     // Database
     DatabaseReference mDatabase;
@@ -47,6 +50,7 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
     Spinner mEquipmentSpinner;
     RecyclerView mExercisesFilterRecycler;
     LinearLayoutManager mLayoutManager;
+    DividerItemDecoration mDivider;
 
 
     // Adapter
@@ -74,6 +78,8 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
         mLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
         mExercisesFilterRecycler.setHasFixedSize(true);
         mExercisesFilterRecycler.setLayoutManager(mLayoutManager);
+        mDivider = new DividerItemDecoration(mExercisesFilterRecycler.getContext(), mLayoutManager.getOrientation());
+        mExercisesFilterRecycler.addItemDecoration(mDivider);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_create_workout);
         setSupportActionBar(toolbar);
