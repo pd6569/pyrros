@@ -30,6 +30,9 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
 
     boolean mIsInWorkout;
 
+    // Listener
+    ExercisesListener mExercisesListener;
+
     public class ExercisesFilterViewHolder extends RecyclerView.ViewHolder {
 
         TextView mExerciseName;
@@ -71,10 +74,18 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
                 if (exercise.isSelected){
                     if (!mWorkoutExercises.contains(exercise)){
                         mWorkoutExercises.add(exercise);
+                        mExercisesListener.onExercisesAdded();
+                        Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " added to workout", Snackbar.LENGTH_SHORT);
+                        snackbar.show();
                         Log.i(TAG, "Exercise added to mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
                     }
                 } else {
                     mWorkoutExercises.remove(exercise);
+                    if (mWorkoutExercises.size() == 0){
+                        mExercisesListener.onExercisesEmpty();
+                    }
+                    Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " removed from workout", Snackbar.LENGTH_SHORT);
+                    snackbar.show();
                     Log.i(TAG, "Exercise removed from mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
                 }
             }
@@ -87,7 +98,14 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
         return mExercises.size();
     }
 
+    public interface ExercisesListener {
+        public void onExercisesAdded ();
+        public void onExercisesEmpty ();
+        public void onExerciseRemoved ();
+    }
 
-
+    public void setExercisesListener(ExercisesListener listener){
+        this.mExercisesListener = listener;
+    }
 
 }

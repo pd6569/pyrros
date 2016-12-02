@@ -57,6 +57,7 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
     ExercisesFilterAdapter mAdapter;
 
     // Menu
+    MenuItem mStartWorkoutAction;
 
 
     String[] mBodyPartsArray;
@@ -99,6 +100,26 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
                 }
                 mFilteredExercises.addAll(mAllExercises);
                 mAdapter = new ExercisesFilterAdapter(mContext, mFilteredExercises);
+                mAdapter.setExercisesListener(new ExercisesFilterAdapter.ExercisesListener() {
+                    @Override
+                    public void onExercisesAdded() {
+                        Log.i(TAG, "Exercise Added");
+                        if (!mStartWorkoutAction.isVisible()){
+                            mStartWorkoutAction.setVisible(true);
+                        }
+                    }
+
+                    @Override
+                    public void onExercisesEmpty() {
+                        Log.i(TAG, "Exercises Empty");
+                        mStartWorkoutAction.setVisible(false);
+                    }
+
+                    @Override
+                    public void onExerciseRemoved() {
+
+                    }
+                });
                 mExercisesFilterRecycler.setAdapter(mAdapter);
             }
 
@@ -170,6 +191,7 @@ public class CreateWorkoutActivity extends BaseActivity implements SearchView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_create_workout, menu);
+        mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
         MenuItem menuItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchView.setOnQueryTextListener(this);
