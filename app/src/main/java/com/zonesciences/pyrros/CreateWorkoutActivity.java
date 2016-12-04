@@ -140,13 +140,14 @@ public class CreateWorkoutActivity extends BaseActivity {
                         mWorkoutExercises = exerciseList;
                         SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
                         sortWorkoutFragment.setWorkoutExercises(mWorkoutExercises);
+                        sortWorkoutFragment.getAdapter().notifyDataSetChanged();
                         Log.i(TAG, "Exercise changed in adapter, activity notified: " + mWorkoutExercises.size());
                     }
                 });
                 mFragmentReferenceMap.put(position, frag);
                 return frag;
             } else {
-                SortWorkoutFragment frag = SortWorkoutFragment.newInstance(mWorkoutExercises);
+                SortWorkoutFragment frag = SortWorkoutFragment.newInstance();
                 mFragmentReferenceMap.put(position, frag);
                 return frag;
             }

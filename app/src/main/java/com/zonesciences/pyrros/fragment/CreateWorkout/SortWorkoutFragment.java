@@ -1,8 +1,10 @@
 package com.zonesciences.pyrros.fragment.CreateWorkout;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,17 +27,22 @@ public class SortWorkoutFragment extends Fragment {
 
     private static final String ARG_EXERCISES = "WorkoutExerciseList";
 
-    // View
+    // RecyclerView components
     RecyclerView mRecyclerView;
+    SortWorkoutAdapter mAdapter;
+    LinearLayoutManager mLayoutManager;
+
+    TextView mTextView;
+
+    // Context
+    Context mContext;
 
     // Data
-    List<Exercise> mWorkoutExercises;
+    ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
+    boolean mExercisesAdded;
 
-    public static SortWorkoutFragment newInstance(List<Exercise> exerciseList){
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(ARG_EXERCISES, (ArrayList) exerciseList);
+    public static SortWorkoutFragment newInstance(){
         SortWorkoutFragment fragment = new SortWorkoutFragment();
-        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -46,12 +54,10 @@ public class SortWorkoutFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
         Log.i(TAG, "onCreate");
 
-        Bundle bundle = getArguments();
-        mWorkoutExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
-        Log.i(TAG, "mWorkoutExercises received, size: " + mWorkoutExercises.size());
+        mContext = getContext();
+
     }
 
 
@@ -63,16 +69,15 @@ public class SortWorkoutFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_sort_workout, container, false);
 
-        final TextView textView = (TextView) rootView.findViewById(R.id.text_workout_exercises);
-        textView.setText("Number of exercises: " + mWorkoutExercises.size());
+        mTextView = (TextView) rootView.findViewById(R.id.text_workout_exercises);
+        mTextView.setText("Number of exercises: " + mWorkoutExercises.size());
 
-        Button button = (Button) rootView.findViewById(R.id.button_num_exercises);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                textView.setText("Number of exercises: " + mWorkoutExercises.size());
-            }
-        });
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_sort_workout);
+        mLayoutManager = new LinearLayoutManager(mContext);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mAdapter = new SortWorkoutAdapter(mContext, mWorkoutExercises);
+        mRecyclerView.setAdapter(mAdapter);
 
         return rootView;
     }
@@ -87,6 +92,8 @@ public class SortWorkoutFragment extends Fragment {
     public void onStart(){
         super.onStart();
         Log.i(TAG, "onStart");
+
+
     }
 
     @Override
@@ -107,11 +114,32 @@ public class SortWorkoutFragment extends Fragment {
         Log.i(TAG, "onStop");
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser){
+        if (isVisibleToUser) {
+
+            Log.i(TAG, "SortWorkout Fragment is now visible");
+            mTextView.setText("Number of exercises: " + mWorkoutExercises.size());
+            if (!mExercisesAdded) {
+                if (!mWorkoutExercises.isEmpty()) {
+                    mExercisesAdded = true;
+                    mAdapter = new SortWorkoutAdapter(mContext, mWorkoutExercises);
+                    mRecyclerView.setAdapter(mAdapter);
+                }
+            }
+        }
+    }
+
+
     public List<Exercise> getWorkoutExercises() {
         return mWorkoutExercises;
     }
 
     public void setWorkoutExercises(List<Exercise> workoutExercises) {
-        mWorkoutExercises = workoutExercises;
+        mWorkoutExercises = (ArrayList) workoutExercises;
+    }
+
+    public SortWorkoutAdapter getAdapter() {
+        return mAdapter;
     }
 }
