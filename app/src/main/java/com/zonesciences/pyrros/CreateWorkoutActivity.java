@@ -104,7 +104,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
         String[] tabTitles = new String[]{
                 "Select Exercises",
-                "Your workout"
+                "My workout"
         };
 
         Fragment[] fragments = new Fragment[]{
@@ -138,6 +138,7 @@ public class CreateWorkoutActivity extends BaseActivity {
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
                         mWorkoutExercises = exerciseList;
+                        boolean isFirstExercise;
                         SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
                         sortWorkoutFragment.setWorkoutExercises(mWorkoutExercises);
                         sortWorkoutFragment.getAdapter().notifyDataSetChanged();

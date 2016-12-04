@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
@@ -40,6 +42,10 @@ public class SortWorkoutFragment extends Fragment {
     // Data
     ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
     boolean mExercisesAdded;
+
+    // Touch Helper
+    ItemTouchHelper mItemTouchHelper;
+    ItemTouchHelper.Callback mItemTouchHelperCallback;
 
     public static SortWorkoutFragment newInstance(){
         SortWorkoutFragment fragment = new SortWorkoutFragment();
@@ -78,6 +84,10 @@ public class SortWorkoutFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mAdapter = new SortWorkoutAdapter(mContext, mWorkoutExercises);
         mRecyclerView.setAdapter(mAdapter);
+
+        mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter);
+        mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
         return rootView;
     }

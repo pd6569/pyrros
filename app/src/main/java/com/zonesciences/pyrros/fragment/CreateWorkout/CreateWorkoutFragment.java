@@ -145,8 +145,6 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         mExercisesFilterRecycler.addItemDecoration(mDivider);
 
 
-
-
         mDatabase.child("exercises").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -445,4 +443,5 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         super.onStop();
         Log.i(TAG, "onStop");
     }
+
 }
