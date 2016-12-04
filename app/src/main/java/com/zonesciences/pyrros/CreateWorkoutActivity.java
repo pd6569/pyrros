@@ -48,6 +48,8 @@ import java.util.UUID;
 
 public class CreateWorkoutActivity extends BaseActivity {
 
+    private static final String TAG = "CreateWorkoutActivity";
+
     // Database, workout and user details
     DatabaseReference mDatabase;
     String mWorkoutKey;
@@ -59,6 +61,12 @@ public class CreateWorkoutActivity extends BaseActivity {
     TabLayout mTabLayout;
     ViewPager mViewPager;
     CreateWorkoutPagerAdapter mPagerAdapter;
+
+    // Fragment reference
+    Map<Integer, Fragment> mFragmentReferenceMap = new HashMap<>();
+
+    // Current workout list
+    ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -101,7 +109,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
         Fragment[] fragments = new Fragment[]{
                 CreateWorkoutFragment.newInstance(mUserId, mUsername),
-                new SortWorkoutFragment(),
+                new SortWorkoutFragment()
         };
 
         public CreateWorkoutPagerAdapter (FragmentManager fm){
@@ -110,7 +118,38 @@ public class CreateWorkoutActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return fragments[position];
+            if (position == 0){
+                CreateWorkoutFragment frag = CreateWorkoutFragment.newInstance(mUserId, mUsername);
+                frag.setExercisesListener(new ExercisesFilterAdapter.ExercisesListener() {
+                    @Override
+                    public void onExerciseAdded(Exercise exercise) {
+
+                    }
+
+                    @Override
+                    public void onExercisesEmpty() {
+
+                    }
+
+                    @Override
+                    public void onExerciseRemoved(Exercise exercise) {
+                    }
+
+                    @Override
+                    public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                        mWorkoutExercises = exerciseList;
+                        SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
+                        sortWorkoutFragment.setWorkoutExercises(mWorkoutExercises);
+                        Log.i(TAG, "Exercise changed in adapter, activity notified: " + mWorkoutExercises.size());
+                    }
+                });
+                mFragmentReferenceMap.put(position, frag);
+                return frag;
+            } else {
+                SortWorkoutFragment frag = SortWorkoutFragment.newInstance(mWorkoutExercises);
+                mFragmentReferenceMap.put(position, frag);
+                return frag;
+            }
         }
 
         @Override
@@ -121,6 +160,10 @@ public class CreateWorkoutActivity extends BaseActivity {
         @Override
         public CharSequence getPageTitle(int position){
             return tabTitles[position];
+        }
+
+        public Fragment getFragment (int position){
+            return mFragmentReferenceMap.get(position);
         }
     }
 

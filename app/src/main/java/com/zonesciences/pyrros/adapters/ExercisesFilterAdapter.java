@@ -27,8 +27,8 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
     private static final String TAG = "ExercisesFilterAdapter" ;
     Context mContext;
 
-    List<Exercise> mExercises;
-    List<Exercise> mWorkoutExercises = new ArrayList<>();
+    ArrayList<Exercise> mExercises;
+    ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
 
     boolean mIsInWorkout;
 
@@ -48,7 +48,7 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
         }
     }
 
-    public ExercisesFilterAdapter(final Context context, List<Exercise> exercises){
+    public ExercisesFilterAdapter(final Context context, ArrayList<Exercise> exercises){
         this.mContext = context;
         this.mExercises = exercises;
     }
@@ -76,7 +76,8 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
                 if (exercise.isSelected){
                     if (!mWorkoutExercises.contains(exercise)){
                         mWorkoutExercises.add(exercise);
-                        mExercisesListener.onExercisesAdded();
+                        mExercisesListener.onExerciseAdded(exercise);
+                        mExercisesListener.onExercisesChanged(mWorkoutExercises);
                         Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " added to workout", Snackbar.LENGTH_SHORT);
                         View sbView = snackbar.getView();
                         sbView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.snackbarPositive));
@@ -85,6 +86,8 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
                     }
                 } else {
                     mWorkoutExercises.remove(exercise);
+                    mExercisesListener.onExerciseRemoved(exercise);
+                    mExercisesListener.onExercisesChanged(mWorkoutExercises);
                     if (mWorkoutExercises.size() == 0){
                         mExercisesListener.onExercisesEmpty();
                     }
@@ -105,9 +108,10 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
     }
 
     public interface ExercisesListener {
-        public void onExercisesAdded ();
+        public void onExerciseAdded (Exercise exercise);
         public void onExercisesEmpty ();
-        public void onExerciseRemoved ();
+        public void onExerciseRemoved (Exercise exercise);
+        public void onExercisesChanged (ArrayList<Exercise> exerciseList);
     }
 
     public void setExercisesListener(ExercisesListener listener){

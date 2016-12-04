@@ -67,7 +67,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         return fragment;
     }
 
-    private static final String TAG = "CreateWorkout";
+    private static final String TAG = "CreateWorkoutFrag";
 
     private static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
     private static final String WORKOUT_EXERCISES = "Workout Exercises";
@@ -79,7 +79,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     List<Exercise> mAllExercises = new ArrayList<>();
     List<Exercise> mFilteredExercises = new ArrayList<>();
     List<List<Exercise>> mFilterHistory = new ArrayList<>();
-    List<Exercise> mWorkoutExercises = new ArrayList<>();
+    List<List<Exercise>> mWorkoutExercises = new ArrayList<>();
 
     // Database, workout and user details
     DatabaseReference mDatabase;
@@ -110,6 +110,9 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     // Spinner Filter
     int mCurrentBodyPartFilterIndex;
 
+    // Exercise listener
+    ExercisesFilterAdapter.ExercisesListener mExercisesListener;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -131,6 +134,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        Log.i(TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_create_workout, container, false);
 
         mExercisesFilterRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_exercises_filter);
@@ -151,11 +155,10 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     mAllExercises.add(e);
                 }
                 mFilteredExercises.addAll(mAllExercises);
-                mAdapter = new ExercisesFilterAdapter(mContext, mFilteredExercises);
+                mAdapter = new ExercisesFilterAdapter(mContext, (ArrayList) mFilteredExercises);
                 mAdapter.setExercisesListener(new ExercisesFilterAdapter.ExercisesListener() {
                     @Override
-                    public void onExercisesAdded() {
-                        Log.i(TAG, "Exercise Added");
+                    public void onExerciseAdded(Exercise exercise) {
                         if (!mStartWorkoutAction.isVisible()){
                             mStartWorkoutAction.setVisible(true);
                         }
@@ -167,9 +170,16 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                         mStartWorkoutAction.setVisible(false);
                     }
 
-                    @Override
-                    public void onExerciseRemoved() {
 
+                    @Override
+                    public void onExerciseRemoved(Exercise exercise) {
+                    }
+
+                    @Override
+                    public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                        mWorkoutExercises = (ArrayList) exerciseList;
+                        mExercisesListener.onExercisesChanged((ArrayList) mWorkoutExercises);
+                        Log.i(TAG, "Exercises changed: " + mWorkoutExercises.size());
                     }
                 });
                 mExercisesFilterRecycler.setAdapter(mAdapter);
@@ -396,4 +406,43 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     }
 
+    public List<Exercise> getWorkoutExercises (){
+        return mAdapter.getWorkoutExercises();
+    }
+
+
+    public void setExercisesListener(ExercisesFilterAdapter.ExercisesListener listener){
+        this.mExercisesListener = listener;
+    }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+        Log.i(TAG, "onActivityCreated");
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        Log.i(TAG, "onStart");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.i(TAG, "onResume");
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.i(TAG, "onPause");
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        Log.i(TAG, "onStop");
+    }
 }
