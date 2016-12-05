@@ -14,6 +14,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
@@ -107,12 +108,12 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
         return mExercises.size();
     }
 
-    public interface ExercisesListener {
+    /*public interface ExercisesListener {
         public void onExerciseAdded (Exercise exercise);
         public void onExercisesEmpty ();
         public void onExerciseRemoved (Exercise exercise);
         public void onExercisesChanged (ArrayList<Exercise> exerciseList);
-    }
+    }*/
 
     public void setExercisesListener(ExercisesListener listener){
         this.mExercisesListener = listener;

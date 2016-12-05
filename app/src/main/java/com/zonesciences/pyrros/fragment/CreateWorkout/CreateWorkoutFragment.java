@@ -111,7 +111,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     int mCurrentBodyPartFilterIndex;
 
     // Exercise listener
-    ExercisesFilterAdapter.ExercisesListener mExercisesListener;
+    ExercisesListener mExercisesListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -154,7 +154,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                 }
                 mFilteredExercises.addAll(mAllExercises);
                 mAdapter = new ExercisesFilterAdapter(mContext, (ArrayList) mFilteredExercises);
-                mAdapter.setExercisesListener(new ExercisesFilterAdapter.ExercisesListener() {
+                mAdapter.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
                         if (!mStartWorkoutAction.isVisible()){
@@ -409,10 +409,13 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     }
 
 
-    public void setExercisesListener(ExercisesFilterAdapter.ExercisesListener listener){
+    public void setExercisesListener(ExercisesListener listener){
         this.mExercisesListener = listener;
     }
 
+    public void setWorkoutExercises(List<List<Exercise>> workoutExercises) {
+        mWorkoutExercises = workoutExercises;
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){

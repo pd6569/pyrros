@@ -21,6 +21,7 @@ import com.zonesciences.pyrros.ActionMode.RecyclerTouchListener;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.ExercisesFilterAdapter;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 
@@ -54,6 +55,9 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
 
     // Action Mode
     ActionMode mActionMode;
+
+    // Exercise Listener
+    ExercisesListener mExercisesListener;
 
     public static SortWorkoutFragment newInstance(){
         SortWorkoutFragment fragment = new SortWorkoutFragment();
@@ -200,6 +204,29 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
                 if (!mWorkoutExercises.isEmpty()) {
                     mExercisesAdded = true;
                     mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
+                    mAdapter.setExercisesListener(new ExercisesListener() {
+                        @Override
+                        public void onExerciseAdded(Exercise exercise) {
+
+                        }
+
+                        @Override
+                        public void onExercisesEmpty() {
+
+                        }
+
+                        @Override
+                        public void onExerciseRemoved(Exercise exercise) {
+
+                        }
+
+                        @Override
+                        public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                            Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
+                            mWorkoutExercises = exerciseList;
+                            mExercisesListener.onExercisesChanged(mWorkoutExercises);
+                        }
+                    });
                     mRecyclerView.setAdapter(mAdapter);
                     mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter);
                     mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
@@ -234,5 +261,14 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
         isBeingDragged = false;
         Log.i(TAG, "Item has finished being dragged, allow selection");
     }
+
+    /**
+     * Set exercise change listener
+     */
+
+    public void setExercisesListener(ExercisesListener listener){
+        this.mExercisesListener = listener;
+    }
+
 
 }

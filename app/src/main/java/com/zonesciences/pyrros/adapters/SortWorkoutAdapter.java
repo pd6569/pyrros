@@ -19,6 +19,7 @@ import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperViewHolder;
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.models.Exercise;
 
 
@@ -38,6 +39,9 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     SparseBooleanArray mSelectedExerciseIds;
     boolean allowReordering = true;
+
+    // Listener
+    ExercisesListener mExercisesListener;
 
     public class SortWorkoutViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
@@ -68,7 +72,10 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         this.mWorkoutExercises = workoutExercises;
         this.mDragListener = dragListener;
         mSelectedExerciseIds = new SparseBooleanArray();
+        setExerciseOrder();
     }
+
+
 
     @Override
     public SortWorkoutViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -108,6 +115,16 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         return mWorkoutExercises.size();
     }
 
+
+    // Update exercise order
+    private void setExerciseOrder() {
+        for (int i = 0; i < mWorkoutExercises.size(); i++){
+            mWorkoutExercises.get(i).setOrder(i);
+            Log.i(TAG, "Setting exercise order. Exercise: " + mWorkoutExercises.get(i).getName() + " order: " + mWorkoutExercises.get(i).getOrder());
+        }
+    }
+
+
     /**
      * Methods for handling list reordering
      */
@@ -126,6 +143,8 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         }
 
         notifyItemMoved(fromPosition, toPosition);
+        setExerciseOrder();
+        mExercisesListener.onExercisesChanged(mWorkoutExercises);
         return true;
     }
 
@@ -189,8 +208,12 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
             }
         }
         setAllowReordering(true);
+        setExerciseOrder();
         notifyDataSetChanged();
         mSelectedExerciseIds.clear();
+
+        // Notify fragment
+        mExercisesListener.onExercisesChanged(mWorkoutExercises);
 
         Log.i(TAG, mSelectedExerciseIds.size() + " items deleted" + " Selected now: " + mSelectedExerciseIds);
     }
@@ -198,4 +221,14 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     public void setAllowReordering(boolean allowReordering) {
         this.allowReordering = allowReordering;
     }
+
+
+    /**
+     * Set exercise change listener
+     */
+
+    public void setExercisesListener(ExercisesListener listener){
+        this.mExercisesListener = listener;
+    }
+
 }

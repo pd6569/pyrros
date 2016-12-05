@@ -32,6 +32,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.adapters.ExercisesFilterAdapter;
 import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
+import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Record;
@@ -121,7 +122,7 @@ public class CreateWorkoutActivity extends BaseActivity {
         public Fragment getItem(int position) {
             if (position == 0){
                 CreateWorkoutFragment frag = CreateWorkoutFragment.newInstance(mUserId, mUsername);
-                frag.setExercisesListener(new ExercisesFilterAdapter.ExercisesListener() {
+                frag.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
 
@@ -150,6 +151,30 @@ public class CreateWorkoutActivity extends BaseActivity {
                 return frag;
             } else {
                 SortWorkoutFragment frag = SortWorkoutFragment.newInstance();
+                frag.setExercisesListener(new ExercisesListener() {
+                    @Override
+                    public void onExerciseAdded(Exercise exercise) {
+                        Log.i(TAG, "Exercises added");
+                    }
+
+                    @Override
+                    public void onExercisesEmpty() {
+                        Log.i(TAG, "Exercises empty");
+                    }
+
+                    @Override
+                    public void onExerciseRemoved(Exercise exercise) {
+                        Log.i(TAG, "Exercise removed");
+                    }
+
+                    @Override
+                    public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+
+                        mWorkoutExercises = exerciseList;
+                        Log.i(TAG, "Exercises changed. New workout exercises list size: " + mWorkoutExercises.size());
+
+                    }
+                });
                 mFragmentReferenceMap.put(position, frag);
                 return frag;
             }
@@ -170,7 +195,4 @@ public class CreateWorkoutActivity extends BaseActivity {
         }
     }
 
-    public Fragment getFragment (int position){
-        return mFragmentReferenceMap.get(position);
-    }
 }
