@@ -1,18 +1,13 @@
 package com.zonesciences.pyrros.ActionMode;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
-import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
-import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
@@ -28,7 +23,7 @@ public class ActionModeCallback implements ActionMode.Callback {
     private ArrayList<Exercise> mWorkoutExercises;
 
     // Exercises changed listener
-    OnExercisesChangedListener mExercisesChangedListener;
+    onFinishedActionMode mActionModeFinishedListener;
 
     public ActionModeCallback(Context context, SortWorkoutAdapter sortWorkoutAdapter, ArrayList<Exercise> workoutExercise){
         this.mContext = context;
@@ -55,7 +50,7 @@ public class ActionModeCallback implements ActionMode.Callback {
             case R.id.action_delete:
                 Log.i(TAG, "Delete the exercise. get selected exercises: " + mSortWorkoutAdapter.getSelectedExerciseIds());
                 mSortWorkoutAdapter.deleteSelectedExercises();
-                mExercisesChangedListener.onExercisesDeleted();
+                mActionModeFinishedListener.onActionModeFinished();
                 break;
         }
         return true;
@@ -63,14 +58,16 @@ public class ActionModeCallback implements ActionMode.Callback {
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-
+        Log.i(TAG, "onDestroyActionMode");
+        mSortWorkoutAdapter.clearSelectedExercises();
+        mActionModeFinishedListener.onActionModeFinished();
     }
 
-    public interface OnExercisesChangedListener {
-        void onExercisesDeleted();
+    public interface onFinishedActionMode {
+        void onActionModeFinished();
     }
 
-    public void setOnExercisesChangedListener (OnExercisesChangedListener listener){
-        this.mExercisesChangedListener = listener;
+    public void setOnFinishedActionModeListener(onFinishedActionMode listener){
+        this.mActionModeFinishedListener = listener;
     }
 }

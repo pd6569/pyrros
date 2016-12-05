@@ -1,20 +1,14 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +17,7 @@ import android.widget.TextView;
 
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperViewHolder;
-import com.zonesciences.pyrros.ItemTouchHelper.OnStartDragListener;
+import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
 
@@ -40,9 +34,10 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     private static final String TAG = "SortWorkoutAdapter";
     Activity mActivity;
     ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
-    OnStartDragListener mStartDragListener;
+    OnDragListener mDragListener;
 
     SparseBooleanArray mSelectedExerciseIds;
+    boolean allowReordering = true;
 
     public class SortWorkoutViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
@@ -67,11 +62,11 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     }
 
-    public SortWorkoutAdapter (Activity activity, ArrayList<Exercise> workoutExercises, OnStartDragListener startDragListener){
+    public SortWorkoutAdapter (Activity activity, ArrayList<Exercise> workoutExercises, OnDragListener dragListener){
         System.out.println("sort workout adapter called");
         this.mActivity = activity;
         this.mWorkoutExercises = workoutExercises;
-        this.mStartDragListener = startDragListener;
+        this.mDragListener = dragListener;
         mSelectedExerciseIds = new SparseBooleanArray();
     }
 
@@ -85,15 +80,24 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     @Override
     public void onBindViewHolder(final SortWorkoutViewHolder holder, int position) {
         holder.exerciseName.setText(mWorkoutExercises.get(position).getName());
-        holder.reorderHandle.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN){
-                    mStartDragListener.onStartDrag(holder);
+        if (allowReordering) {
+            holder.reorderHandle.setVisibility(View.VISIBLE);
+            holder.reorderHandle.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
+                        Log.i(TAG, "Drag started");
+                        mDragListener.onStartDrag(holder);
+
+                    }
+
+
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+        } else {
+            holder.reorderHandle.setVisibility(View.GONE);
+        }
 
         /** Change background color of the selected items in list view  **/
         holder.itemView.setBackgroundColor(mSelectedExerciseIds.get(position) ? ResourcesCompat.getColor(mActivity.getResources(), R.color.colorAccent, null) : Color.WHITE);
@@ -104,6 +108,9 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         return mWorkoutExercises.size();
     }
 
+    /**
+     * Methods for handling list reordering
+     */
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
@@ -129,6 +136,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     @Override
     public void onMoveCompleted() {
+        mDragListener.onStopDrag();
     }
 
     /***
@@ -137,7 +145,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     // Toggle selection methods
     public void toggleSelection(int position) {
-        selectView(position, !mSelectedExerciseIds.get(position));
+        selectExercise(position, !mSelectedExerciseIds.get(position));
     }
 
     // Remove selected selections
@@ -147,7 +155,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     }
 
     //Put or delete selected position into SparseBooleanArray
-    public void selectView(int position, boolean isSelected){
+    public void selectExercise(int position, boolean isSelected){
         if (isSelected){
             mSelectedExerciseIds.put(position, isSelected);
         } else {
@@ -166,6 +174,11 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         return mSelectedExerciseIds;
     }
 
+    public void clearSelectedExercises(){
+        mSelectedExerciseIds.clear();
+        allowReordering = true;
+        notifyDataSetChanged();
+    }
 
     public void deleteSelectedExercises(){
 
@@ -173,12 +186,16 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
             if (mSelectedExerciseIds.valueAt(i)){
                 //if current id is selected remove the item via key
                 mWorkoutExercises.remove(mSelectedExerciseIds.keyAt(i));
-                notifyDataSetChanged();
             }
         }
+        setAllowReordering(true);
+        notifyDataSetChanged();
         mSelectedExerciseIds.clear();
+
         Log.i(TAG, mSelectedExerciseIds.size() + " items deleted" + " Selected now: " + mSelectedExerciseIds);
     }
 
-
+    public void setAllowReordering(boolean allowReordering) {
+        this.allowReordering = allowReordering;
+    }
 }

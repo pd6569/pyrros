@@ -1,7 +1,6 @@
 package com.zonesciences.pyrros.fragment.CreateWorkout;
 
 
-import android.app.Notification;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,28 +10,24 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.ActionMode.ActionModeCallback;
 import com.zonesciences.pyrros.ActionMode.RecyclerClickListener;
 import com.zonesciences.pyrros.ActionMode.RecyclerTouchListener;
-import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
-import com.zonesciences.pyrros.ItemTouchHelper.OnStartDragListener;
+import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SortWorkoutFragment extends Fragment implements OnStartDragListener {
+public class SortWorkoutFragment extends Fragment implements OnDragListener {
 
     private static final String TAG = "SortWorkoutFrag";
 
@@ -55,6 +50,7 @@ public class SortWorkoutFragment extends Fragment implements OnStartDragListener
     // Touch Helper
     ItemTouchHelper mItemTouchHelper;
     ItemTouchHelper.Callback mItemTouchHelperCallback;
+    boolean isBeingDragged;
 
     // Action Mode
     ActionMode mActionMode;
@@ -100,13 +96,18 @@ public class SortWorkoutFragment extends Fragment implements OnStartDragListener
             @Override
             public void onClick(View view, int position) {
                 if (mActionMode != null){
+                    // select with single click if action mode is active
                     onExerciseSelected(position);
                 }
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                onExerciseSelected(position);
+                if (!isBeingDragged) {
+                    mAdapter.setAllowReordering(false);
+                    mAdapter.notifyDataSetChanged();
+                    onExerciseSelected(position);
+                }
             }
         }));
 
@@ -121,9 +122,9 @@ public class SortWorkoutFragment extends Fragment implements OnStartDragListener
             // there are some selected items, start the action mode
             Log.i(TAG, "Start action mode");
             ActionModeCallback actionModeCallback = new ActionModeCallback(getActivity(), mAdapter, mWorkoutExercises);
-            actionModeCallback.setOnExercisesChangedListener(new ActionModeCallback.OnExercisesChangedListener() {
+            actionModeCallback.setOnFinishedActionModeListener(new ActionModeCallback.onFinishedActionMode() {
                 @Override
-                public void onExercisesDeleted() {
+                public void onActionModeFinished() {
                     if (mActionMode != null){
                         mActionMode.finish();
                         setActionModeNull();
@@ -137,6 +138,8 @@ public class SortWorkoutFragment extends Fragment implements OnStartDragListener
             Log.i(TAG, "End action mode");
             mActionMode.finish();
             setActionModeNull();
+            mAdapter.setAllowReordering(true);
+            mAdapter.notifyDataSetChanged();
         }
         if (mActionMode != null){
             //set action mode title on item selection
@@ -222,6 +225,14 @@ public class SortWorkoutFragment extends Fragment implements OnStartDragListener
     @Override
     public void onStartDrag (RecyclerView.ViewHolder viewHolder){
         mItemTouchHelper.startDrag(viewHolder);
+        isBeingDragged = true;
+        Log.i(TAG, "Item is being dragged, do not allow selection");
+    }
+
+    @Override
+    public void onStopDrag(){
+        isBeingDragged = false;
+        Log.i(TAG, "Item has finished being dragged, allow selection");
     }
 
 }
