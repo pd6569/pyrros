@@ -1,23 +1,35 @@
 package com.zonesciences.pyrros.adapters;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.MotionEventCompat;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperViewHolder;
+import com.zonesciences.pyrros.ItemTouchHelper.OnStartDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Exercise;
 
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -25,37 +37,66 @@ import java.util.Map;
  */
 public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.SortWorkoutViewHolder> implements ItemTouchHelperAdapter {
 
-    Context mContext;
+    private static final String TAG = "SortWorkoutAdapter";
+    Activity mActivity;
     ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
+    OnStartDragListener mStartDragListener;
 
-    boolean mMoved;
+    SparseBooleanArray mSelectedExerciseIds;
 
-    public class SortWorkoutViewHolder extends RecyclerView.ViewHolder {
+    public class SortWorkoutViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
         TextView exerciseName;
+        ImageView reorderHandle;
 
         public SortWorkoutViewHolder(View itemView) {
             super(itemView);
             exerciseName = (TextView) itemView.findViewById(R.id.sort_workout_exercise_name);
+            reorderHandle = (ImageView) itemView.findViewById(R.id.sort_workout_reorder_handle);
         }
+
+        @Override
+        public void onSelected() {
+            itemView.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.colorAccent));
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.cardBackground));
+        }
+
     }
 
-    public SortWorkoutAdapter (Context context, ArrayList<Exercise> workoutExercises){
+    public SortWorkoutAdapter (Activity activity, ArrayList<Exercise> workoutExercises, OnStartDragListener startDragListener){
         System.out.println("sort workout adapter called");
-        this.mContext = context;
+        this.mActivity = activity;
         this.mWorkoutExercises = workoutExercises;
+        this.mStartDragListener = startDragListener;
+        mSelectedExerciseIds = new SparseBooleanArray();
     }
 
     @Override
     public SortWorkoutViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+        LayoutInflater inflater = LayoutInflater.from(mActivity);
         View view = inflater.inflate(R.layout.item_sort_workout, parent, false);
         return new SortWorkoutViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(SortWorkoutViewHolder holder, int position) {
+    public void onBindViewHolder(final SortWorkoutViewHolder holder, int position) {
         holder.exerciseName.setText(mWorkoutExercises.get(position).getName());
+        holder.reorderHandle.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN){
+                    mStartDragListener.onStartDrag(holder);
+                }
+                return false;
+            }
+        });
+
+        /** Change background color of the selected items in list view  **/
+        holder.itemView.setBackgroundColor(mSelectedExerciseIds.get(position) ? ResourcesCompat.getColor(mActivity.getResources(), R.color.colorAccent, null) : Color.WHITE);
     }
 
     @Override
@@ -88,6 +129,55 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     @Override
     public void onMoveCompleted() {
+    }
+
+    /***
+     * Methods for selecting exercises
+     */
+
+    // Toggle selection methods
+    public void toggleSelection(int position) {
+        selectView(position, !mSelectedExerciseIds.get(position));
+    }
+
+    // Remove selected selections
+    public void removeSelection(){
+        mSelectedExerciseIds = new SparseBooleanArray();
+        notifyDataSetChanged();
+    }
+
+    //Put or delete selected position into SparseBooleanArray
+    public void selectView(int position, boolean isSelected){
+        if (isSelected){
+            mSelectedExerciseIds.put(position, isSelected);
+        } else {
+            mSelectedExerciseIds.delete(position);
+        }
+        notifyDataSetChanged();
+    }
+
+    // Get total selected count
+    public int getSelectedCount(){
+        return mSelectedExerciseIds.size();
+    }
+
+    // Return all selected exercises
+    public SparseBooleanArray getSelectedExerciseIds(){
+        return mSelectedExerciseIds;
+    }
+
+
+    public void deleteSelectedExercises(){
+
+        for (int i = (mSelectedExerciseIds.size()-1); i >= 0; i--){
+            if (mSelectedExerciseIds.valueAt(i)){
+                //if current id is selected remove the item via key
+                mWorkoutExercises.remove(mSelectedExerciseIds.keyAt(i));
+                notifyDataSetChanged();
+            }
+        }
+        mSelectedExerciseIds.clear();
+        Log.i(TAG, mSelectedExerciseIds.size() + " items deleted" + " Selected now: " + mSelectedExerciseIds);
     }
 
 

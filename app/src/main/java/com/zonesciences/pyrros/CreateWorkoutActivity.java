@@ -100,6 +100,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
     }
 
+
     class CreateWorkoutPagerAdapter extends FragmentPagerAdapter {
 
         String[] tabTitles = new String[]{
@@ -169,4 +170,7 @@ public class CreateWorkoutActivity extends BaseActivity {
         }
     }
 
+    public Fragment getFragment (int position){
+        return mFragmentReferenceMap.get(position);
+    }
 }

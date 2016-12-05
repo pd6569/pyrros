@@ -20,7 +20,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean isLongPressDragEnabled(){
-        return true;
+        return false;
     }
 
     @Override
@@ -59,5 +59,20 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
         super.clearView(recyclerView, viewHolder);
         Log.i(TAG, "clearView");
         mAdapter.onMoveCompleted();
+        if (viewHolder instanceof ItemTouchHelperViewHolder){
+            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
+            itemViewHolder.onItemClear();
+        }
+    }
+
+    @Override
+    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState){
+        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+            if(viewHolder instanceof ItemTouchHelperViewHolder){
+                ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
+                itemViewHolder.onSelected();
+            }
+        }
+        super.onSelectedChanged(viewHolder, actionState);
     }
 }

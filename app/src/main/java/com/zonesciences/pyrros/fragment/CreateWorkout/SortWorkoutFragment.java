@@ -1,20 +1,29 @@
 package com.zonesciences.pyrros.fragment.CreateWorkout;
 
 
+import android.app.Notification;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.zonesciences.pyrros.ActionMode.ActionModeCallback;
+import com.zonesciences.pyrros.ActionMode.RecyclerClickListener;
+import com.zonesciences.pyrros.ActionMode.RecyclerTouchListener;
+import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
+import com.zonesciences.pyrros.ItemTouchHelper.OnStartDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
@@ -23,7 +32,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SortWorkoutFragment extends Fragment {
+public class SortWorkoutFragment extends Fragment implements OnStartDragListener {
 
     private static final String TAG = "SortWorkoutFrag";
 
@@ -46,6 +55,9 @@ public class SortWorkoutFragment extends Fragment {
     // Touch Helper
     ItemTouchHelper mItemTouchHelper;
     ItemTouchHelper.Callback mItemTouchHelperCallback;
+
+    // Action Mode
+    ActionMode mActionMode;
 
     public static SortWorkoutFragment newInstance(){
         SortWorkoutFragment fragment = new SortWorkoutFragment();
@@ -82,12 +94,66 @@ public class SortWorkoutFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mAdapter = new SortWorkoutAdapter(mContext, mWorkoutExercises);
+        mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerView, new RecyclerClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                if (mActionMode != null){
+                    onExerciseSelected(position);
+                }
+            }
 
+            @Override
+            public void onLongClick(View view, int position) {
+                onExerciseSelected(position);
+            }
+        }));
 
         return rootView;
     }
+
+    private void onExerciseSelected(int position){
+        mAdapter.toggleSelection(position);
+        boolean hasSelectedExercises = mAdapter.getSelectedCount() > 0;
+
+        if (hasSelectedExercises && mActionMode == null){
+            // there are some selected items, start the action mode
+            Log.i(TAG, "Start action mode");
+            ActionModeCallback actionModeCallback = new ActionModeCallback(getActivity(), mAdapter, mWorkoutExercises);
+            actionModeCallback.setOnExercisesChangedListener(new ActionModeCallback.OnExercisesChangedListener() {
+                @Override
+                public void onExercisesDeleted() {
+                    if (mActionMode != null){
+                        mActionMode.finish();
+                        setActionModeNull();
+                    }
+                }
+            });
+            mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
+        }
+        else if (!hasSelectedExercises && mActionMode != null){
+            // no selected items, finish action mode
+            Log.i(TAG, "End action mode");
+            mActionMode.finish();
+            setActionModeNull();
+        }
+        if (mActionMode != null){
+            //set action mode title on item selection
+            mActionMode.setTitle(String.valueOf(mAdapter.getSelectedCount()) + " selected");
+
+        }
+    }
+
+    //set action mode null after use
+    public void setActionModeNull(){
+        if (mActionMode != null){
+            mActionMode = null;
+        }
+    }
+
+    // delete selected exercises
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
@@ -130,7 +196,7 @@ public class SortWorkoutFragment extends Fragment {
             if (!mExercisesAdded) {
                 if (!mWorkoutExercises.isEmpty()) {
                     mExercisesAdded = true;
-                    mAdapter = new SortWorkoutAdapter(mContext, mWorkoutExercises);
+                    mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
                     mRecyclerView.setAdapter(mAdapter);
                     mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter);
                     mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
@@ -152,4 +218,10 @@ public class SortWorkoutFragment extends Fragment {
     public SortWorkoutAdapter getAdapter() {
         return mAdapter;
     }
+
+    @Override
+    public void onStartDrag (RecyclerView.ViewHolder viewHolder){
+        mItemTouchHelper.startDrag(viewHolder);
+    }
+
 }
