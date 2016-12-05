@@ -85,9 +85,6 @@ public class SortWorkoutFragment extends Fragment {
         mAdapter = new SortWorkoutAdapter(mContext, mWorkoutExercises);
         mRecyclerView.setAdapter(mAdapter);
 
-        mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
         return rootView;
     }
@@ -135,6 +132,9 @@ public class SortWorkoutFragment extends Fragment {
                     mExercisesAdded = true;
                     mAdapter = new SortWorkoutAdapter(mContext, mWorkoutExercises);
                     mRecyclerView.setAdapter(mAdapter);
+                    mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter);
+                    mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+                    mItemTouchHelper.attachToRecyclerView(mRecyclerView);
                 }
             }
         }

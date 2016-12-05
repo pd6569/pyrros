@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.adapters;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,8 +66,8 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        mMoved = true;
-        /*if (fromPosition < toPosition){
+        System.out.println("Attemping to moving exercise. mWorkoutExercises size: " + mWorkoutExercises.size() + " from position: " + fromPosition + " toPosition: " + toPosition);
+        if (fromPosition < toPosition){
             for (int i = fromPosition; i < toPosition; i++){
                 Collections.swap(mWorkoutExercises, i, i + 1);
             }
@@ -76,7 +77,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
             }
         }
 
-        notifyItemMoved(fromPosition, toPosition);*/
+        notifyItemMoved(fromPosition, toPosition);
         return true;
     }
 
@@ -87,10 +88,6 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     @Override
     public void onMoveCompleted() {
-        if (mMoved) {
-            notifyDataSetChanged();
-        } else { // do nothing }
-        }
     }
 
 
