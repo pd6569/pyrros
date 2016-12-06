@@ -203,7 +203,8 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
         for (int i = (mSelectedExerciseIds.size()-1); i >= 0; i--){
             if (mSelectedExerciseIds.valueAt(i)){
-                //if current id is selected remove the item via key
+                //if current id is selected set exercise as not selected in the workout and remove the item via key
+                mWorkoutExercises.get(mSelectedExerciseIds.keyAt(i)).setSelected(false);
                 mWorkoutExercises.remove(mSelectedExerciseIds.keyAt(i));
             }
         }

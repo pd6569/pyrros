@@ -108,18 +108,15 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
         return mExercises.size();
     }
 
-    /*public interface ExercisesListener {
-        public void onExerciseAdded (Exercise exercise);
-        public void onExercisesEmpty ();
-        public void onExerciseRemoved (Exercise exercise);
-        public void onExercisesChanged (ArrayList<Exercise> exerciseList);
-    }*/
-
     public void setExercisesListener(ExercisesListener listener){
         this.mExercisesListener = listener;
     }
 
     public List<Exercise> getWorkoutExercises() {
         return mWorkoutExercises;
+    }
+
+    public void setWorkoutExercises(ArrayList<Exercise> workoutExercises) {
+        mWorkoutExercises = workoutExercises;
     }
 }

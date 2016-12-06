@@ -79,7 +79,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     List<Exercise> mAllExercises = new ArrayList<>();
     List<Exercise> mFilteredExercises = new ArrayList<>();
     List<List<Exercise>> mFilterHistory = new ArrayList<>();
-    List<List<Exercise>> mWorkoutExercises = new ArrayList<>();
+    List<Exercise> mWorkoutExercises = new ArrayList<>();
 
     // Database, workout and user details
     DatabaseReference mDatabase;
@@ -205,6 +205,11 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase());
                     mFilteredExercises.clear();
                     mFilteredExercises.addAll(mAllExercises);
+                    for (Exercise e : mAllExercises){
+                        if (e.isSelected){
+                            Log.i(TAG, "Exercise " + e.getName() + " is selected");
+                        }
+                    }
                 } else {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " mAllExercises size: " + mAllExercises.size());
 
@@ -214,6 +219,11 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
                     mFilteredExercises.clear();
                     mFilteredExercises.addAll(list);
+                    for (Exercise e : mFilteredExercises){
+                        if (e.isSelected){
+                            Log.i(TAG, "Exercise " + e.getName() + " is selected");
+                        }
+                    }
                 }
 
                 if (mAdapter != null) {
@@ -329,9 +339,8 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     public List<Exercise> getExercisesForFilter(int index){
         List<Exercise> filteredList = new ArrayList<>();
         for (Exercise e : mAllExercises) {
-            Log.i(TAG, "Filter: " + mBodyPartsArray[index].toLowerCase() + " Exercise: " + e.getName() + " bodypart: " + e.getMuscleGroup());
             if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[index].toLowerCase())) {
-                Log.i(TAG, "Found exercises for " + mBodyPartsArray[index]);
+                Log.i(TAG, "Found exercises for " + mBodyPartsArray[index] + " Exercise: " + e.getName() + " Is selected: "+ e.isSelected());
                 filteredList.add(e);
             }
         }
@@ -408,14 +417,15 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         return mAdapter.getWorkoutExercises();
     }
 
+    public ExercisesFilterAdapter getAdapter() {
+        return mAdapter;
+    }
+
 
     public void setExercisesListener(ExercisesListener listener){
         this.mExercisesListener = listener;
     }
 
-    public void setWorkoutExercises(List<List<Exercise>> workoutExercises) {
-        mWorkoutExercises = workoutExercises;
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
