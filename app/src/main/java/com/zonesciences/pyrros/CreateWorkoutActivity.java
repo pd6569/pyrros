@@ -170,7 +170,6 @@ public class CreateWorkoutActivity extends BaseActivity {
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
                         mWorkoutExercises = exerciseList;
-
                         CreateWorkoutFragment createWorkoutFragment = (CreateWorkoutFragment) mFragmentReferenceMap.get(0);
                         createWorkoutFragment.getAdapter().notifyDataSetChanged();
 

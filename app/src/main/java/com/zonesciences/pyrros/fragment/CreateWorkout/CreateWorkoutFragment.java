@@ -75,9 +75,14 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     Context mContext;
 
+    // mAllExercises contains all exercise objects. IT IS THE SOURCE OF THE EXERCISE OBJECTS, EVERYTHING ELSE SIMPLY REFERENCES THESE EXERCISES MEMORY LOCATIONS
+    // Therefore changes to the exercises via filters, in the adapters are all done on the same original exercises generated and stored in AllExercises
+    // Changes made in sortworkout adapter also hold reference to these exercises, and therefore when order is updated or exericses unselected, this is made
+    // on the same exercises. No new exercise objects are instantiated, the references are simply passed around.
+
     // Data
     List<Exercise> mAllExercises = new ArrayList<>();
-    List<Exercise> mFilteredExercises = new ArrayList<>();
+    List<Exercise> mFilteredExercises = new ArrayList<>(); // references the exercise objects contained in all exercises - NOT NEW OBJECTS IN MEMORY
     List<List<Exercise>> mFilterHistory = new ArrayList<>();
     List<Exercise> mWorkoutExercises = new ArrayList<>();
 
@@ -205,11 +210,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase());
                     mFilteredExercises.clear();
                     mFilteredExercises.addAll(mAllExercises);
-                    for (Exercise e : mAllExercises){
-                        if (e.isSelected){
-                            Log.i(TAG, "Exercise " + e.getName() + " is selected");
-                        }
-                    }
+
                 } else {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " mAllExercises size: " + mAllExercises.size());
 
@@ -219,11 +220,6 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
                     mFilteredExercises.clear();
                     mFilteredExercises.addAll(list);
-                    for (Exercise e : mFilteredExercises){
-                        if (e.isSelected){
-                            Log.i(TAG, "Exercise " + e.getName() + " is selected");
-                        }
-                    }
                 }
 
                 if (mAdapter != null) {
