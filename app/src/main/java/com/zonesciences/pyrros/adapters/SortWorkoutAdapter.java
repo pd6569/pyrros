@@ -103,7 +103,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                 }
             });
         } else {
-            holder.reorderHandle.setVisibility(View.GONE);
+            holder.reorderHandle.setVisibility(View.INVISIBLE);
         }
 
         /** Change background color of the selected items in list view  **/
