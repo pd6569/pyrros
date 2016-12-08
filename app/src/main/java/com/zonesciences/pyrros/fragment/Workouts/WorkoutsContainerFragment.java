@@ -72,6 +72,8 @@ public class WorkoutsContainerFragment extends Fragment {
         return rootView;
     }
 
+
+
     public void setWorkoutViewListener (WorkoutViewListener listener){
         this.mWorkoutViewListener = listener;
     }

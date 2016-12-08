@@ -115,6 +115,14 @@ public class CreateWorkoutActivity extends BaseActivity {
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_workout);
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mToolbar.findViewById(R.id.toolbar_title_create_workout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i(TAG, "Title clicked");
+            }
+        });
+
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs_create_workout);
         mTabLayout.setupWithViewPager(mViewPager);
 

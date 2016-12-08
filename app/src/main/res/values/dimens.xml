@@ -6,4 +6,5 @@
     <dimen name="stats_numbers">32dp</dimen>
     <dimen name="stats_additional_info">16dp</dimen>
     <dimen name="filter_spinner_text">16dp</dimen>
+    <dimen name="toolbar_title">20dp</dimen>
 </resources>
