@@ -61,9 +61,10 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                     int position = getAdapterPosition();
                     mWorkoutExercises.get(position).setSelected(false);
                     mWorkoutExercises.remove(position);
-                    notifyDataSetChanged();
+                    notifyItemRemoved(position);
                     setExerciseOrder();
                     mExercisesListener.onExercisesChanged(mWorkoutExercises);
+
                 }
             });
         }
