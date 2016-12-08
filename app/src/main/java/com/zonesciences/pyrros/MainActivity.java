@@ -6,6 +6,9 @@ import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -27,12 +30,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.zonesciences.pyrros.adapters.HomeScreenPagerAdapter;
+import com.zonesciences.pyrros.fragment.DashboardFragment;
+import com.zonesciences.pyrros.fragment.Workouts.WorkoutsContainerFragment;
 import com.zonesciences.pyrros.models.User;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -239,6 +241,42 @@ public class MainActivity extends BaseActivity {
 
             }
         });
+    }
+
+    public class HomeScreenPagerAdapter extends FragmentPagerAdapter {
+
+        Fragment[] fragments = new Fragment[]{
+                new WorkoutsContainerFragment(),
+                new DashboardFragment()
+        };
+
+        String tabTitles[] = new String[]{
+                "Workouts",
+                "Dashboard"
+        };
+
+        //constructor
+        public HomeScreenPagerAdapter(FragmentManager fm){
+            super(fm);
+        }
+
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragments[position];
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position){
+            return tabTitles[position];
+        }
+
+
     }
 
 

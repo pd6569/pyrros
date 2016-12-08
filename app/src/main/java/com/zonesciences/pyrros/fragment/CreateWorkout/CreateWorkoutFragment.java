@@ -90,6 +90,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     String mWorkoutKey;
     String mUserId;
     String mUsername;
+    String mWorkoutDate;
 
     // View
     Spinner mBodypartSpinner;
@@ -129,6 +130,8 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mUserId = bundle.getString(ARG_USER_ID);
+
+        mWorkoutDate = ((CreateWorkoutActivity) getActivity()).getWorkoutDate();
 
         setHasOptionsMenu(true);
 
@@ -383,8 +386,13 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         ArrayList<Exercise> exercisesToLoad = (ArrayList) mAdapter.getWorkoutExercises();
         final ArrayList<String> exerciseKeysList = new ArrayList<>();
 
-        Log.i(TAG, "user name: " + mUsername);
-        Workout newWorkout = new Workout(mUserId, mUsername, Utils.getClientTimeStamp(true), "", true);
+        String workoutDate;
+        if (mWorkoutDate == null){
+            workoutDate = Utils.getClientTimeStamp(true);
+        } else {
+            workoutDate = mWorkoutDate;
+        }
+        Workout newWorkout = new Workout(mUserId, mUsername, workoutDate, "", true);
         newWorkout.setNumExercises(exercisesToLoad.size());
 
         // Write to database

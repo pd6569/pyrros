@@ -1,4 +1,4 @@
-package com.zonesciences.pyrros.fragment;
+package com.zonesciences.pyrros.fragment.Workouts;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -96,5 +96,6 @@
     <string name="menu_exercises_filter_legs">Legs</string>
     <string name="menu_exercises_filter_abs">Abs</string>
     <string name="menu_exercises_filter_full_body">Full Body</string>
+    <string name="action_create_workout">CREATE WORKOUT</string>
 
 </resources>

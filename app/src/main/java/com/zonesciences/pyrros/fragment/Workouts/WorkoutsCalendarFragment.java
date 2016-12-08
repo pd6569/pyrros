@@ -1,4 +1,4 @@
-package com.zonesciences.pyrros.fragment;
+package com.zonesciences.pyrros.fragment.Workouts;
 
 
 import android.content.DialogInterface;
@@ -10,17 +10,13 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -34,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.calendarDecorators.HighlightWorkoutsDecorator;
@@ -58,6 +55,7 @@ public class WorkoutsCalendarFragment extends Fragment {
     private static final String WORKOUT_EXERCISES = "Workout Exercises";
     private static final String WORKOUT_ID = "Workout ID";
     private static final String WORKOUT_EXERCISES_OBJECTS = "WorkoutExerciseObjects";
+    private static final String ARG_WORKOUT_DATE = "WorkoutDate";
 
     private DatabaseReference mDatabase;
 
@@ -174,7 +172,7 @@ public class WorkoutsCalendarFragment extends Fragment {
         mMaterialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay calendarDay, boolean selected) {
-                Calendar cal = calendarDay.getCalendar();
+                final Calendar cal = calendarDay.getCalendar();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 String date = sdf.format(cal.getTime());
                 Log.i (TAG, "Date formatted: " + date);
@@ -209,7 +207,16 @@ public class WorkoutsCalendarFragment extends Fragment {
                     }
                 } else {
                     Log.i(TAG, "No workout found for this date");
-                    Snackbar snackbar = Snackbar.make(rootView, "No workouts on this date", Snackbar.LENGTH_SHORT);
+                    Snackbar snackbar = Snackbar.make(rootView, "No workouts on this date", Snackbar.LENGTH_SHORT)
+                            .setAction(R.string.action_create_workout, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    String date = Utils.convertCalendarDateToString(cal, Utils.DATE_FORMAT_FULL);
+                                    Intent i = new Intent(getActivity(), CreateWorkoutActivity.class);
+                                    i.putExtra(ARG_WORKOUT_DATE, date);
+                                    getActivity().startActivity(i);
+                                }
+                            });
                     snackbar.show();
                 }
 
