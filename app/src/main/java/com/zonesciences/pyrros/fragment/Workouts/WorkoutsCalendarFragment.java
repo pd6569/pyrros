@@ -128,6 +128,7 @@ public class WorkoutsCalendarFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_workouts_calendar, container, false);
 
         mMaterialCalendarView = (MaterialCalendarView) rootView.findViewById(R.id.material_calendar_view);
+        mMaterialCalendarView.setSelectedDate(Calendar.getInstance().getTime());
 
         mDatabase.child("user-workouts").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
