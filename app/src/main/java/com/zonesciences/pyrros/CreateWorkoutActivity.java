@@ -51,6 +51,14 @@ public class CreateWorkoutActivity extends BaseActivity {
 
     private static final String TAG = "CreateWorkoutActivity";
 
+    // Args to pass to workout
+    private static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
+    private static final String WORKOUT_EXERCISES = "Workout Exercises";
+    private static final String WORKOUT_ID = "Workout ID";
+
+    // Context
+    Context mContext;
+
     // Database, workout and user details
     DatabaseReference mDatabase;
     String mWorkoutKey;
@@ -73,6 +81,8 @@ public class CreateWorkoutActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_workout);
+
+        mContext = getApplicationContext();
 
         // Initialise database and get user details
         mDatabase = Utils.getDatabase().getReference();
@@ -196,5 +206,20 @@ public class CreateWorkoutActivity extends BaseActivity {
             return mFragmentReferenceMap.get(position);
         }
     }
+
+    public Fragment getFragment (int position){
+        return mFragmentReferenceMap.get(position);
+    }
+
+    /*public void startWorkout(ArrayList<String> exerciseKeysList, String workoutKey, ArrayList<Exercise> exercisesToLoad){
+        Bundle extras = new Bundle();
+        Log.i(TAG, "Exercises to pass to new activity " + exerciseKeysList);
+        extras.putSerializable(WORKOUT_EXERCISES, exerciseKeysList);
+        extras.putString(WORKOUT_ID, workoutKey);
+        extras.putSerializable(WORKOUT_EXERCISE_OBJECTS, exercisesToLoad);
+        Intent i = new Intent (this, WorkoutActivity.class);
+        i.putExtras(extras);
+        startActivity(i);
+    }*/
 
 }

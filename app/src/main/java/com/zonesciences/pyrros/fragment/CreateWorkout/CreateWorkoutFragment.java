@@ -263,7 +263,12 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         super.onCreateOptionsMenu(menu, inflater);
 
         mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
+        if (mWorkoutExercises.size() > 0){
+            mStartWorkoutAction.setVisible(true);
+        }
+
         MenuItem menuItem = menu.findItem(R.id.action_search);
+
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchView.setOnQueryTextListener(this);
 
@@ -349,56 +354,8 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
             case R.id.action_start_workout:
 
-                mWorkoutKey = mDatabase.child("workouts").push().getKey();
+                startWorkout();
 
-                ArrayList<Exercise> exercisesToLoad = (ArrayList) mAdapter.getWorkoutExercises();
-                final ArrayList<String> exerciseKeysList = new ArrayList<>();
-
-
-                Workout newWorkout = new Workout(mUserId, mUsername, Utils.getClientTimeStamp(true), "", true);
-                newWorkout.setNumExercises(exercisesToLoad.size());
-
-                // Write to database
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put("/workouts/" + mWorkoutKey, newWorkout);
-                childUpdates.put("/user-workouts/" + mUserId + "/" + mWorkoutKey, newWorkout);
-                childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
-                for (Exercise exercise : exercisesToLoad){
-                    exercise.setExerciseId(UUID.randomUUID().toString());
-                    String exerciseKey = exercise.getName();
-                    exerciseKeysList.add(exerciseKey);
-                    childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + exerciseKey, exercise.toMap());
-                    childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + exerciseKey, exercise.toMap());
-                }
-                mDatabase.updateChildren(childUpdates);
-
-                mDatabase.child("records").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (String exerciseKey : exerciseKeysList){
-                            if (!dataSnapshot.hasChild(exerciseKey)){
-                                Record record = new Record(exerciseKey, mUserId);
-                                mDatabase.child("records").child(exerciseKey).child(mUserId).setValue(record);
-                                mDatabase.child("user-records").child(mUserId).child(exerciseKey).setValue(record);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
-                Bundle extras = new Bundle();
-                Log.i(TAG, "Exercises to pass to new activity " + exerciseKeysList);
-                extras.putSerializable(WORKOUT_EXERCISES, exerciseKeysList);
-                extras.putString(WORKOUT_ID, mWorkoutKey);
-                extras.putSerializable(WORKOUT_EXERCISE_OBJECTS, exercisesToLoad);
-                Intent i = new Intent (getActivity(), WorkoutActivity.class);
-                i.putExtras(extras);
-                startActivity(i);
                 return true;
 
             default:
@@ -422,6 +379,58 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         this.mExercisesListener = listener;
     }
 
+    public void startWorkout(){
+        mWorkoutKey = mDatabase.child("workouts").push().getKey();
+
+        ArrayList<Exercise> exercisesToLoad = (ArrayList) mAdapter.getWorkoutExercises();
+        final ArrayList<String> exerciseKeysList = new ArrayList<>();
+
+
+        Workout newWorkout = new Workout(mUserId, mUsername, Utils.getClientTimeStamp(true), "", true);
+        newWorkout.setNumExercises(exercisesToLoad.size());
+
+        // Write to database
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workouts/" + mWorkoutKey, newWorkout);
+        childUpdates.put("/user-workouts/" + mUserId + "/" + mWorkoutKey, newWorkout);
+        childUpdates.put("/timestamps/workouts/" + mWorkoutKey + "/created/", ServerValue.TIMESTAMP);
+        for (Exercise exercise : exercisesToLoad){
+            exercise.setExerciseId(UUID.randomUUID().toString());
+            String exerciseKey = exercise.getName();
+            exerciseKeysList.add(exerciseKey);
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + exerciseKey, exercise.toMap());
+            childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + exerciseKey, exercise.toMap());
+        }
+        mDatabase.updateChildren(childUpdates);
+
+        mDatabase.child("records").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (String exerciseKey : exerciseKeysList){
+                    if (!dataSnapshot.hasChild(exerciseKey)){
+                        Record record = new Record(exerciseKey, mUserId);
+                        mDatabase.child("records").child(exerciseKey).child(mUserId).setValue(record);
+                        mDatabase.child("user-records").child(mUserId).child(exerciseKey).setValue(record);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        Bundle extras = new Bundle();
+        Log.i(TAG, "Exercises to pass to new activity " + exerciseKeysList);
+        extras.putSerializable(WORKOUT_EXERCISES, exerciseKeysList);
+        extras.putString(WORKOUT_ID, mWorkoutKey);
+        extras.putSerializable(WORKOUT_EXERCISE_OBJECTS, exercisesToLoad);
+        Intent i = new Intent (getActivity(), WorkoutActivity.class);
+        i.putExtras(extras);
+        startActivity(i);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
@@ -452,5 +461,6 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         super.onStop();
         Log.i(TAG, "onStop");
     }
+
 
 }

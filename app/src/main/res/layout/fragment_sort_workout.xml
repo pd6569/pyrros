@@ -4,16 +4,11 @@
              android:layout_height="match_parent"
               android:orientation="vertical"
              tools:context="com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment">
-    <TextView
-        android:id="@+id/text_workout_exercises"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Number of exercises"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_sort_workout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:scrollbars="vertical"
         tools:listitem="@layout/item_sort_workout">
     </android.support.v7.widget.RecyclerView>

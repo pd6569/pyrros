@@ -213,6 +213,8 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         notifyDataSetChanged();
         mSelectedExerciseIds.clear();
 
+        if(mWorkoutExercises.size() == 0) mExercisesListener.onExercisesEmpty();
+
         // Notify fragment
         mExercisesListener.onExercisesChanged(mWorkoutExercises);
 

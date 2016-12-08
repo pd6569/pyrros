@@ -4,13 +4,18 @@ package com.zonesciences.pyrros.fragment.CreateWorkout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -18,6 +23,7 @@ import android.widget.TextView;
 import com.zonesciences.pyrros.ActionMode.ActionModeCallback;
 import com.zonesciences.pyrros.ActionMode.RecyclerClickListener;
 import com.zonesciences.pyrros.ActionMode.RecyclerTouchListener;
+import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
@@ -59,6 +65,9 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
     // Exercise Listener
     ExercisesListener mExercisesListener;
 
+    // Menu
+    private MenuItem mStartWorkoutAction;
+
     public static SortWorkoutFragment newInstance(){
         SortWorkoutFragment fragment = new SortWorkoutFragment();
         return fragment;
@@ -75,7 +84,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
         Log.i(TAG, "onCreate");
 
         mContext = getContext();
-
+        setHasOptionsMenu(true);
     }
 
 
@@ -86,9 +95,6 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
         Log.i(TAG, "onCreateView");
 
         View rootView = inflater.inflate(R.layout.fragment_sort_workout, container, false);
-
-        mTextView = (TextView) rootView.findViewById(R.id.text_workout_exercises);
-        mTextView.setText("Number of exercises: " + mWorkoutExercises.size());
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_sort_workout);
         mLayoutManager = new LinearLayoutManager(mContext);
@@ -198,8 +204,6 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
     public void setUserVisibleHint(boolean isVisibleToUser){
         if (isVisibleToUser) {
 
-            Log.i(TAG, "SortWorkout Fragment is now visible");
-            mTextView.setText("Number of exercises: " + mWorkoutExercises.size());
             if (!mExercisesAdded) {
                 if (!mWorkoutExercises.isEmpty()) {
                     mExercisesAdded = true;
@@ -212,7 +216,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
 
                         @Override
                         public void onExercisesEmpty() {
-
+                            mStartWorkoutAction.setVisible(false);
                         }
 
                         @Override
@@ -271,4 +275,35 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
     }
 
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_create_workout, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
+        if (mWorkoutExercises.size() > 0){
+            mStartWorkoutAction.setVisible(true);
+        }
+
+        MenuItem search = menu.findItem(R.id.action_search);
+        search.setVisible(false);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_start_workout:
+
+                CreateWorkoutFragment frag = (CreateWorkoutFragment) ((CreateWorkoutActivity) getActivity()).getFragment(0);
+                frag.startWorkout();
+
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 }
