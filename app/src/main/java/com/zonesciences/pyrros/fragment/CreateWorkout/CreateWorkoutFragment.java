@@ -58,10 +58,9 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         // Required empty public constructor
     }
 
-    public static CreateWorkoutFragment newInstance(String userId, String username){
+    public static CreateWorkoutFragment newInstance(String userId){
         Bundle bundle = new Bundle();
         bundle.putString(ARG_USER_ID, userId);
-        bundle.putString(ARG_USER_NAME, username);
         CreateWorkoutFragment fragment = new CreateWorkoutFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -130,7 +129,6 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mUserId = bundle.getString(ARG_USER_ID);
-        mUsername = bundle.getString(ARG_USER_NAME);
 
         setHasOptionsMenu(true);
 
@@ -385,7 +383,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         ArrayList<Exercise> exercisesToLoad = (ArrayList) mAdapter.getWorkoutExercises();
         final ArrayList<String> exerciseKeysList = new ArrayList<>();
 
-
+        Log.i(TAG, "user name: " + mUsername);
         Workout newWorkout = new Workout(mUserId, mUsername, Utils.getClientTimeStamp(true), "", true);
         newWorkout.setNumExercises(exercisesToLoad.size());
 
@@ -462,5 +460,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         Log.i(TAG, "onStop");
     }
 
-
+    public void setUsername(String username) {
+        mUsername = username;
+    }
 }

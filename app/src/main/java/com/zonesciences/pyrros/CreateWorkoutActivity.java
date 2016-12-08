@@ -92,6 +92,11 @@ public class CreateWorkoutActivity extends BaseActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 mUsername = user.getUsername();
+                if (mFragmentReferenceMap.get(0) != null){
+                    CreateWorkoutFragment frag = (CreateWorkoutFragment) mFragmentReferenceMap.get(0);
+                    frag.setUsername(mUsername);
+                }
+                Log.i(TAG, "Username: " + mUsername);
             }
 
             @Override
@@ -120,7 +125,7 @@ public class CreateWorkoutActivity extends BaseActivity {
         };
 
         Fragment[] fragments = new Fragment[]{
-                CreateWorkoutFragment.newInstance(mUserId, mUsername),
+                CreateWorkoutFragment.newInstance(mUserId),
                 new SortWorkoutFragment()
         };
 
@@ -131,7 +136,7 @@ public class CreateWorkoutActivity extends BaseActivity {
         @Override
         public Fragment getItem(int position) {
             if (position == 0){
-                CreateWorkoutFragment frag = CreateWorkoutFragment.newInstance(mUserId, mUsername);
+                CreateWorkoutFragment frag = CreateWorkoutFragment.newInstance(mUserId);
                 frag.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {

@@ -47,11 +47,25 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
         TextView exerciseName;
         ImageView reorderHandle;
+        ImageView deleteExercise;
 
         public SortWorkoutViewHolder(View itemView) {
             super(itemView);
             exerciseName = (TextView) itemView.findViewById(R.id.sort_workout_exercise_name);
             reorderHandle = (ImageView) itemView.findViewById(R.id.sort_workout_reorder_handle);
+            deleteExercise = (ImageView) itemView.findViewById(R.id.sort_workout_delete);
+            deleteExercise.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view){
+                    int position = getAdapterPosition();
+                    mWorkoutExercises.get(position).setSelected(false);
+                    mWorkoutExercises.remove(position);
+                    notifyDataSetChanged();
+                    setExerciseOrder();
+                    mExercisesListener.onExercisesChanged(mWorkoutExercises);
+                }
+            });
         }
 
         @Override
@@ -85,10 +99,11 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     }
 
     @Override
-    public void onBindViewHolder(final SortWorkoutViewHolder holder, int position) {
+    public void onBindViewHolder(final SortWorkoutViewHolder holder, final int position) {
         holder.exerciseName.setText(mWorkoutExercises.get(position).getName());
         if (allowReordering) {
             holder.reorderHandle.setVisibility(View.VISIBLE);
+            holder.deleteExercise.setVisibility(View.VISIBLE);
             holder.reorderHandle.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -104,10 +119,12 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
             });
         } else {
             holder.reorderHandle.setVisibility(View.INVISIBLE);
+            holder.deleteExercise.setVisibility(View.INVISIBLE);
         }
 
         /** Change background color of the selected items in list view  **/
         holder.itemView.setBackgroundColor(mSelectedExerciseIds.get(position) ? ResourcesCompat.getColor(mActivity.getResources(), R.color.colorAccent, null) : Color.WHITE);
+
     }
 
     @Override
