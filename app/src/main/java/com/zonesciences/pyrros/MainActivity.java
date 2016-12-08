@@ -30,7 +30,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.fragment.DashboardFragment;
+import com.zonesciences.pyrros.fragment.Workouts.WorkoutViewListener;
 import com.zonesciences.pyrros.fragment.Workouts.WorkoutsContainerFragment;
 import com.zonesciences.pyrros.models.User;
 
@@ -263,7 +265,27 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return fragments[position];
+            Fragment fragment = new Fragment();
+            if (position == 0){
+                WorkoutsContainerFragment workoutsContainerFragment = new WorkoutsContainerFragment();
+                workoutsContainerFragment.setWorkoutViewListener(new WorkoutViewListener() {
+                    @Override
+                    public void calendarViewActive() {
+                        Log.i(TAG, "CalendarView Active");
+                    }
+
+                    @Override
+                    public void listViewActive() {
+                        Log.i(TAG, "ListView Active");
+                    }
+                });
+                fragment = workoutsContainerFragment;
+
+            } else if (position == 1){
+                fragment = new DashboardFragment();
+            }
+
+            return fragment;
         }
 
         @Override

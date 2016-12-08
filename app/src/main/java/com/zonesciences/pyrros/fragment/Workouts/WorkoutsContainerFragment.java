@@ -24,6 +24,8 @@ public class WorkoutsContainerFragment extends Fragment {
 
     private Map<String, List<Exercise>> mWorkoutExercisesMap;
 
+    WorkoutViewListener mWorkoutViewListener;
+
     public WorkoutsContainerFragment() {
         // Required empty public constructor
     }
@@ -50,8 +52,10 @@ public class WorkoutsContainerFragment extends Fragment {
                     @Override
                     public void displayListView() {
                         mFragmentManager.popBackStack();
+                        mWorkoutViewListener.listViewActive();
                     }
                 }, mWorkoutExercisesMap)).addToBackStack(null).commit();
+                mWorkoutViewListener.calendarViewActive();
             }
         })).commit();
 
@@ -68,7 +72,8 @@ public class WorkoutsContainerFragment extends Fragment {
         return rootView;
     }
 
-
-
+    public void setWorkoutViewListener (WorkoutViewListener listener){
+        this.mWorkoutViewListener = listener;
+    }
 
 }
