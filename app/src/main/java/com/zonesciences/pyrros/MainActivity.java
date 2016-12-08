@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -67,6 +68,9 @@ public class MainActivity extends BaseActivity {
 
     private boolean mAdmin;
 
+    // Views
+    FloatingActionButton mFab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +112,8 @@ public class MainActivity extends BaseActivity {
             getSupportActionBar().setTitle("Pyros Trainer");
 
             //Button launches NewWorkoutActivity
-            findViewById(R.id.fab_new_workout).setOnClickListener(new View.OnClickListener(){
+            mFab = (FloatingActionButton) findViewById(R.id.fab_new_workout);
+            mFab.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
                     /*startActivity(new Intent(MainActivity.this, NewWorkoutActivity.class));*/
@@ -272,11 +277,13 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void calendarViewActive() {
                         Log.i(TAG, "CalendarView Active");
+                        mFab.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
                     public void listViewActive() {
                         Log.i(TAG, "ListView Active");
+                        mFab.setVisibility(View.VISIBLE);
                     }
                 });
                 fragment = workoutsContainerFragment;

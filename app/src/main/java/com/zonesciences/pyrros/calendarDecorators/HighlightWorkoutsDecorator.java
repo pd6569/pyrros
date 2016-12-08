@@ -1,13 +1,16 @@
 package com.zonesciences.pyrros.calendarDecorators;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.content.res.AppCompatResources;
 import android.util.Log;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
+import com.zonesciences.pyrros.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +24,8 @@ import java.util.List;
  */
 public class HighlightWorkoutsDecorator implements DayViewDecorator {
 
+    private Context mContext;
+
     private static final String TAG = "HighlightDecorator";
 
     private List<Calendar> mWorkoutDates = new ArrayList<>();
@@ -28,8 +33,9 @@ public class HighlightWorkoutsDecorator implements DayViewDecorator {
     private final Drawable highlightDrawable;
     private static final int color = Color.parseColor("#feefae");
 
-    public HighlightWorkoutsDecorator(List<String> workoutKeys){
-        highlightDrawable = new ColorDrawable(color);
+    public HighlightWorkoutsDecorator(Context context, List<String> workoutKeys){
+        mContext = context;
+        highlightDrawable = AppCompatResources.getDrawable(context, R.drawable.shape_calendar_workout_day);
         createCalendarDates(workoutKeys);
     }
 

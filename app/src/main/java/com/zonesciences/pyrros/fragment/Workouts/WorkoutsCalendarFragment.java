@@ -147,7 +147,7 @@ public class WorkoutsCalendarFragment extends Fragment {
                 }
 
                 List workoutKeys = new ArrayList(mWorkoutDatesMap.keySet());
-                mMaterialCalendarView.addDecorator(new HighlightWorkoutsDecorator(workoutKeys));
+                mMaterialCalendarView.addDecorator(new HighlightWorkoutsDecorator(getContext(), workoutKeys));
 
 
                 Log.i(TAG, "WorkoutDatesMap created, size: " + mWorkoutDatesMap.size());
