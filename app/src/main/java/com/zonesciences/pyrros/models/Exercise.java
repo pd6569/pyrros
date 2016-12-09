@@ -23,6 +23,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     public int sets;
     public int order;
     public String exerciseId;
+    public String equipment;
     public boolean isSelected;
 
     public Exercise(){
@@ -64,6 +65,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         result.put("sets", sets);
         result.put("order", order);
         result.put("exerciseId", exerciseId);
+        result.put("equipment", equipment);
         return result;
     }
 
@@ -125,6 +127,16 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     @Exclude
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    @Exclude
+    public String getEquipment() {
+        return equipment;
+    }
+
+    @Exclude
+    public void setEquipment(String equipment) {
+        this.equipment = equipment;
     }
 
     @Exclude

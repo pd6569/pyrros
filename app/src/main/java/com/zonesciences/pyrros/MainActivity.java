@@ -198,7 +198,8 @@ public class MainActivity extends BaseActivity {
                 exercises.add(RowData);
                 String exerciseName = RowData[0];
                 String muscleGroup = RowData[1];
-                Log.i (TAG, "Exercise Name: " + exerciseName + " Muscle group: " + muscleGroup);
+                String equipment = RowData[2];
+                Log.i (TAG, "Exercise Name: " + exerciseName + " Muscle group: " + muscleGroup + " Equipment: " + equipment);
             }
             fin.close();
             createExercises(exercises);
@@ -217,7 +218,9 @@ public class MainActivity extends BaseActivity {
             String exerciseKey = exerciseData.get(i)[0];
             childUpdates.put("/exercises/" + exerciseKey + "/name/", exerciseData.get(i)[0]);
             childUpdates.put("/exercises/" + exerciseKey + "/muscleGroup/", exerciseData.get(i)[1]);
+            childUpdates.put("/exercises/" + exerciseKey + "/equipment/", exerciseData.get(i)[2]);
         }
+        mDatabase.child("/exercises/").setValue(null);
         mDatabase.updateChildren(childUpdates);
     }
 
