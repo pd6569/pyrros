@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.MainActivity;
@@ -39,6 +40,7 @@ import com.zonesciences.pyrros.R;
 
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 import com.zonesciences.pyrros.viewholder.WorkoutViewHolder;
@@ -49,6 +51,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Peter on 26/10/2016.
@@ -230,7 +233,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                                 childUpdates.put("/workout-exercises/" + workoutKey, null);
                                 childUpdates.put("/user-workout-exercises/" + mUid + "/" + workoutKey, null);
 
-                                // Copy records before deleting
+                                // Copy records before deleting (only need to copy user data - can restore to both locations if required)
                                 moveFirebaseRecord(mDatabaseReference.child("user-workouts").child(mUid).child(workoutKey), mDatabaseReference.child("deleted").child("user-workouts").child(mUid).child(workoutKey), false);
                                 moveFirebaseRecord(mDatabaseReference.child("user-workout-exercises").child(mUid).child(workoutKey), mDatabaseReference.child("deleted").child("user-workout-exercises").child(mUid).child(workoutKey), false);
 
@@ -240,11 +243,14 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                                 Snackbar snackbar = Snackbar.make(view, R.string.workout_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
                                     @Override
                                     public void onClick(View view){
+
+                                        // Restore data to both user and normal locations
                                         moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workouts").child(mUid).child(workoutKey), mDatabaseReference.child("user-workouts").child(mUid).child(workoutKey), true);
                                         moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workout-exercises").child(mUid).child(workoutKey), mDatabaseReference.child("user-workout-exercises").child(mUid).child(workoutKey), true);
                                         moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workouts").child(mUid).child(workoutKey), mDatabaseReference.child("workouts").child(workoutKey), true);
                                         moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workout-exercises").child(mUid).child(workoutKey), mDatabaseReference.child("workout-exercises").child(workoutKey), true);
 
+                                        // Remove the data from "deleted" node
                                         Map<String, Object> childUpdates = new HashMap<String, Object>();
                                         childUpdates.put("/deleted/user-workout-exercises/" + mUid + "/" + workoutKey, null);
                                         childUpdates.put("/deleted/user-workouts/" + mUid + "/" + workoutKey, null);
@@ -257,10 +263,72 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                                     }
                                 });
                                 snackbar.show();
-
-                                break;
+                                return true;
                             case R.id.menu_popup_workout_do_workout:
-                                break;
+
+                                String newWorkoutKey = mDatabaseReference.child("workouts").push().getKey();
+                                String userName = workout.getCreator();
+                                String workoutName = workout.getName();
+
+                                List<Exercise> exercises = mWorkoutExercisesMap.get(workoutKey);
+                                List<Exercise> newExercises = new ArrayList<Exercise>();
+                                final List<String> exerciseKeysList = new ArrayList<String>();
+
+                                Workout newWorkout = new Workout(mUid, userName, Utils.getClientTimeStamp(true), workoutName, true);
+                                newWorkout.setNumExercises(exercises.size());
+
+                                // Write to database
+                                Map<String, Object> childUpdatesCopyWorkout = new HashMap<>();
+                                childUpdatesCopyWorkout.put("/workouts/" + newWorkoutKey, newWorkout);
+                                childUpdatesCopyWorkout.put("/user-workouts/" + mUid + "/" + newWorkoutKey, newWorkout);
+                                childUpdatesCopyWorkout.put("/timestamps/workouts/" + newWorkoutKey + "/created/", ServerValue.TIMESTAMP);
+                                for (Exercise exercise : newExercises){
+                                    String exerciseKey = exercise.getName();
+                                    exerciseKeysList.add(exerciseKey);
+
+                                }
+                                for (Exercise exerciseToCopy : exercises){
+                                    Log.i(TAG, "Exercise to load: " + exerciseToCopy.getName());
+                                    exerciseKeysList.add(exerciseToCopy.getName());
+                                    Exercise newExercise = new Exercise(exerciseToCopy, mUid);
+                                    newExercise.setExerciseId(UUID.randomUUID().toString());
+                                    newExercises.add(newExercise);
+
+                                    // write to database
+                                    childUpdatesCopyWorkout.put("/workout-exercises/" + newWorkoutKey + "/" + exerciseToCopy.getName(), newExercise.toMap());
+                                    childUpdatesCopyWorkout.put("/user-workout-exercises/" + mUid + "/" + newWorkoutKey + "/" + exerciseToCopy.getName(), newExercise.toMap());
+                                }
+
+                                mDatabaseReference.updateChildren(childUpdatesCopyWorkout);
+
+                                mDatabaseReference.child("records").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for (String exerciseKey : exerciseKeysList){
+                                            if (!dataSnapshot.hasChild(exerciseKey)){
+                                                Record record = new Record(exerciseKey, mUid);
+                                                mDatabaseReference.child("records").child(exerciseKey).child(mUid).setValue(record);
+                                                mDatabaseReference.child("user-records").child(mUid).child(exerciseKey).setValue(record);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                                Bundle extras = new Bundle();
+                                Log.i(TAG, "Exercises to pass to new activity " + exerciseKeysList);
+                                extras.putSerializable(WORKOUT_EXERCISES, (ArrayList) exerciseKeysList);
+                                extras.putString(WORKOUT_ID, newWorkoutKey);
+                                extras.putSerializable(WORKOUT_EXERCISES_OBJECTS, (ArrayList) newExercises);
+                                Intent i = new Intent (mContext, WorkoutActivity.class);
+                                i.putExtras(extras);
+                                mContext.startActivity(i);
+                                return true;
+
                             case R.id.menu_popup_workout_add_to_routine:
                                 break;
                         }

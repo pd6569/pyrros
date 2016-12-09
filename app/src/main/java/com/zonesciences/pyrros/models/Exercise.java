@@ -51,7 +51,10 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         this.sets = sets;
     }
 
-
+    public Exercise (Exercise oldExercise, String uid){
+        this.uid = uid;
+        this.name = oldExercise.getName();
+    }
 
     // [START post_to_map]
     @Exclude
