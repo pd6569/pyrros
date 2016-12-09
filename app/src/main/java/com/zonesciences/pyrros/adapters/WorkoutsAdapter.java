@@ -191,7 +191,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
 
         //Bind Workout to ViewHolder, setting OnClickListener for the users button
-        viewHolder.bindToWorkout(workout, workoutExercisesReference, new View.OnClickListener() {
+        viewHolder.bindToWorkout(mContext, workout, workoutExercisesReference, new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {

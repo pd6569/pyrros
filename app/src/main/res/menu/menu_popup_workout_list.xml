@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/delete_workout"
+          android:id="@+id/menu_popup_workout_delete"/>
+    <item android:title="@string/do_workout"
+          android:id="@+id/menu_popup_workout_do_workout"/>
+    <item android:title="@string/add_to_routine"
+          android:id="@+id/menu_popup_workout_add_to_routine"/>
+</menu>

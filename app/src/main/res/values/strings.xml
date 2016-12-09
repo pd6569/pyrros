@@ -97,5 +97,8 @@
     <string name="menu_exercises_filter_abs">Abs</string>
     <string name="menu_exercises_filter_full_body">Full Body</string>
     <string name="action_create_workout">CREATE WORKOUT</string>
+    <string name="delete_workout">Delete</string>
+    <string name="do_workout">Do workout</string>
+    <string name="add_to_routine">Add to routine</string>
 
 </resources>

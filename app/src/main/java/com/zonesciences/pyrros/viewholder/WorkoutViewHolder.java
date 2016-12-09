@@ -1,8 +1,12 @@
 package com.zonesciences.pyrros.viewholder;
 
+import android.content.Context;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,7 +35,7 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "WorkoutViewHolder";
     public TextView titleTextView;
     public TextView creatorTextView;
-
+    public ImageView optionsImageView;
     public ImageView usersImageView;
     public TextView numUsersTextView;
 
@@ -43,11 +47,11 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         creatorTextView = (TextView) itemView.findViewById(R.id.workout_creator);
         usersImageView = (ImageView) itemView.findViewById(R.id.workout_users);
         numUsersTextView = (TextView) itemView.findViewById(R.id.workout_num_users);
-
+        optionsImageView = (ImageView) itemView.findViewById(R.id.workout_options);
 
     }
 
-    public void bindToWorkout(Workout workout, String workoutExercisesReference,View.OnClickListener usersClickListener){
+    public void bindToWorkout(final Context context, Workout workout, String workoutExercisesReference, View.OnClickListener usersClickListener){
         Log.i(TAG, "bindToWorkout called");
 
         if (workout.getName().isEmpty()) {
@@ -58,6 +62,30 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         creatorTextView.setText(workout.creator);
         numUsersTextView.setText(String.valueOf(workout.userCount));
         usersImageView.setOnClickListener(usersClickListener);
+        optionsImageView.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view){
+                PopupMenu menu = new PopupMenu(context, view, Gravity.RIGHT);
+                menu.getMenuInflater().inflate(R.menu.menu_popup_workout_list, menu.getMenu());
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch(item.getItemId()){
+                            case R.id.menu_popup_workout_delete:
+                                break;
+                            case R.id.menu_popup_workout_do_workout:
+                                break;
+                            case R.id.menu_popup_workout_add_to_routine:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+
+                menu.show();
+            }
+        });
     }
 
 }
