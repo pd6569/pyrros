@@ -48,8 +48,8 @@ public class ActionModeCallback implements ActionMode.Callback {
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_delete:
-                Log.i(TAG, "Delete the exercise. get selected exercises: " + mSortWorkoutAdapter.getSelectedExerciseIds());
-                mSortWorkoutAdapter.deleteSelectedExercises();
+                Log.i(TAG, "Delete the exercise. get selected exercises: " + mSortWorkoutAdapter.getSelectedItemIds());
+                mSortWorkoutAdapter.deleteSelectedItems();
                 mActionModeFinishedListener.onActionModeFinished();
                 break;
         }
@@ -59,7 +59,7 @@ public class ActionModeCallback implements ActionMode.Callback {
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         Log.i(TAG, "onDestroyActionMode");
-        mSortWorkoutAdapter.clearSelectedExercises();
+        mSortWorkoutAdapter.clearSelectedItems();
         mActionModeFinishedListener.onActionModeFinished();
     }
 

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zonesciences.pyrros.ActionMode.ActionModeAdapterInterface;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperViewHolder;
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
@@ -30,7 +31,7 @@ import java.util.Collections;
 /**
  * Created by Peter on 03/12/2016.
  */
-public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.SortWorkoutViewHolder> implements ItemTouchHelperAdapter {
+public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.SortWorkoutViewHolder> implements ItemTouchHelperAdapter, ActionModeAdapterInterface {
 
     private static final String TAG = "SortWorkoutAdapter";
     Activity mActivity;
@@ -185,7 +186,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     // Toggle selection methods
     public void toggleSelection(int position) {
-        selectExercise(position, !mSelectedExerciseIds.get(position));
+        selectItem(position, !mSelectedExerciseIds.get(position));
     }
 
     // Remove selected selections
@@ -195,7 +196,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     }
 
     //Put or delete selected position into SparseBooleanArray
-    public void selectExercise(int position, boolean isSelected){
+    public void selectItem(int position, boolean isSelected){
         if (isSelected){
             mSelectedExerciseIds.put(position, isSelected);
         } else {
@@ -210,17 +211,17 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     }
 
     // Return all selected exercises
-    public SparseBooleanArray getSelectedExerciseIds(){
+    public SparseBooleanArray getSelectedItemIds(){
         return mSelectedExerciseIds;
     }
 
-    public void clearSelectedExercises(){
+    public void clearSelectedItems(){
         mSelectedExerciseIds.clear();
         allowReordering = true;
         notifyDataSetChanged();
     }
 
-    public void deleteSelectedExercises(){
+    public void deleteSelectedItems(){
 
         for (int i = (mSelectedExerciseIds.size()-1); i >= 0; i--){
             if (mSelectedExerciseIds.valueAt(i)){

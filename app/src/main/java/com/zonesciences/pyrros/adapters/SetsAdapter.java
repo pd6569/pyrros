@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.ActionMode.ActionModeAdapterInterface;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Record;
@@ -31,7 +33,7 @@ import java.util.Objects;
 /**
  * Created by Peter on 01/11/2016.
  */
-public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> implements ItemTouchHelperAdapter {
+public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> implements ItemTouchHelperAdapter, ActionModeAdapterInterface {
 
     //TODO: set number update after reorder
     private final static String TAG = "SetsAdapter";
@@ -310,6 +312,44 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     public void setSetsListener (SetsListener listener){
         this.mSetsListener = listener;
+    }
+
+
+    // Action mode interface methods
+
+    @Override
+    public void toggleSelection(int position) {
+
+    }
+
+    @Override
+    public void removeSelection() {
+
+    }
+
+    @Override
+    public void selectItem(int position, boolean isSelected) {
+
+    }
+
+    @Override
+    public int getSelectedCount() {
+        return 0;
+    }
+
+    @Override
+    public SparseBooleanArray getSelectedItemIds() {
+        return null;
+    }
+
+    @Override
+    public void clearSelectedItems() {
+
+    }
+
+    @Override
+    public void deleteSelectedItems() {
+
     }
 
 }

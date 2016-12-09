@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +26,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.ActionMode.ActionModeCallback;
+import com.zonesciences.pyrros.ActionMode.RecyclerClickListener;
+import com.zonesciences.pyrros.ActionMode.RecyclerTouchListener;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.SetsAdapter;
@@ -103,6 +108,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
     //Listener
     OnStatsDataLoaded mStatsDataLoadedListener;
+
+    // ActionMode
+    ActionMode mActionMode;
 
     public static ExerciseFragment newInstance(String exerciseKey, Exercise exercise, String workoutKey, String userId) {
         Bundle args = new Bundle();
@@ -274,6 +282,20 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mSetsRecycler.addItemDecoration(mDividerItemDecoration);
         mSetsRecycler.setHasFixedSize(true);
         mSetsRecycler.setAdapter(mSetsAdapter);
+        mSetsRecycler.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mSetsRecycler, new RecyclerClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                /*if (mActionMode != null){
+                    // select with single click if action mode is active
+                    onExerciseSelected(position);
+                }*/
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                /*onExerciseSelected(position);*/
+            }
+        }));
 
         mItemTouchHelperCallback = new ItemTouchHelperCallback(mSetsAdapter);
         mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
@@ -282,6 +304,48 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
 
         return view;
     }
+
+
+    /*private void onExerciseSelected(int position){
+        mSetsAdapter.toggleSelection(position);
+        boolean hasSelectedExercises = mSetsAdapter.getSelectedCount() > 0;
+
+        if (hasSelectedExercises && mActionMode == null){
+            // there are some selected items, start the action mode
+            Log.i(TAG, "Start action mode");
+            ActionModeCallback actionModeCallback = new ActionModeCallback(getActivity(), mSetsAdapter, mWorkoutExercises);
+            actionModeCallback.setOnFinishedActionModeListener(new ActionModeCallback.onFinishedActionMode() {
+                @Override
+                public void onActionModeFinished() {
+                    if (mActionMode != null){
+                        mActionMode.finish();
+                        setActionModeNull();
+                    }
+                }
+            });
+            mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
+        }
+        else if (!hasSelectedExercises && mActionMode != null){
+            // no selected items, finish action mode
+            Log.i(TAG, "End action mode");
+            mActionMode.finish();
+            setActionModeNull();
+            mSetsAdapter.notifyDataSetChanged();
+        }
+        if (mActionMode != null){
+            //set action mode title on item selection
+            mActionMode.setTitle(String.valueOf(mSetsAdapter.getSelectedCount()) + " selected");
+
+        }
+    }
+
+    //set action mode null after use
+    public void setActionModeNull(){
+        if (mActionMode != null){
+            mActionMode = null;
+        }
+    }*/
+
 
     @Override
     public void onStart(){
