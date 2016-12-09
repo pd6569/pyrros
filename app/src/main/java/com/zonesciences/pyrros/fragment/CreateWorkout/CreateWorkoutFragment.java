@@ -208,7 +208,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                 mFilterHistory.clear();
                 mCurrentBodyPartFilterIndex = pos;
                 Toast.makeText(getActivity(), "Filter selected: " + mBodyPartsArray[pos], Toast.LENGTH_SHORT).show();
-                if (pos == 0) {
+                /*if (pos == 0) {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase());
                     mFilteredExercises.clear();
                     mFilteredExercises.addAll(mAllExercises);
@@ -216,13 +216,18 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                 } else {
                     Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " mAllExercises size: " + mAllExercises.size());
 
-                    List<Exercise> list = getExercisesForFilter(pos);
+                    List<Exercise> list = getExercisesForFilter(true, pos);
 
                     Log.i(TAG, "mFilteredExercises SIZE: " + mFilteredExercises.size() + " list size: " + list.size() + " mAllExercises: " + mAllExercises.size());
 
                     mFilteredExercises.clear();
                     mFilteredExercises.addAll(list);
-                }
+                }*/
+
+                List<Exercise> list = getExercisesForBodypartFilter(pos);
+
+                mFilteredExercises.clear();
+                mFilteredExercises.addAll(list);
 
                 if (mAdapter != null) {
                     mAdapter.notifyDataSetChanged();
@@ -308,7 +313,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
             if (mCurrentBodyPartFilterIndex == 0) {
                 mFilterHistory.add(mAllExercises);
             } else {
-                mFilterHistory.add(getExercisesForFilter(mCurrentBodyPartFilterIndex));
+                mFilterHistory.add(getExercisesForFilter(true, mCurrentBodyPartFilterIndex));
             }
             mAdapter.notifyDataSetChanged();
         }
@@ -352,17 +357,66 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         mAdapter.notifyDataSetChanged();
     }
 
-    public List<Exercise> getExercisesForFilter(int index){
+    public List<Exercise> getExercisesForFilter(boolean bodypart, int index){
         List<Exercise> filteredList = new ArrayList<>();
-        for (Exercise e : mAllExercises) {
-            if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[index].toLowerCase())) {
-                Log.i(TAG, "Found exercises for " + mBodyPartsArray[index] + " Exercise: " + e.getName() + " Equipment: " + e.getEquipment() + " Is selected: "+ e.isSelected());
-                filteredList.add(e);
+
+        if (bodypart) {
+            for (Exercise e : mAllExercises) {
+                if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[index].toLowerCase())) {
+                    Log.i(TAG, "Found exercises for " + mBodyPartsArray[index] + " Exercise: " + e.getName() + " Equipment: " + e.getEquipment() + " Is selected: " + e.isSelected());
+                    filteredList.add(e);
+                }
+            }
+        } else {
+            for (Exercise e : mAllExercises) {
+                if (e.getEquipment().toLowerCase().equals(mEquipmentArray[index].toLowerCase())) {
+                    Log.i(TAG, "Found exercises for " + mEquipmentArray[index] + " Exercise: " + e.getName() + " Equipment: " + e.getEquipment() + " Is selected: " + e.isSelected());
+                    filteredList.add(e);
+                }
             }
         }
         return filteredList;
     }
 
+
+    public List<Exercise> getExercisesForBodypartFilter(int index){
+
+        List<Exercise> filteredList = new ArrayList<>();
+
+        if (mCurrentEquipmentFilterIndex == 0){
+
+            for (Exercise e : mAllExercises) {
+
+                if (index != 0) {
+
+                    if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[index].toLowerCase())) {
+                        Log.i(TAG, "Found exercises for " + mBodyPartsArray[index] + " Exercise: " + e.getName() + " Is selected: " + e.isSelected());
+                        filteredList.add(e);
+                    }
+                } else {
+                    // Filter "all" selected for both bodypart and equipment
+                    return mAllExercises;
+                }
+            }
+        } else {
+            Log.i(TAG, "equipment filter: " + mEquipmentArray[mCurrentEquipmentFilterIndex]);
+            List<Exercise> equipmentFilter = getExercisesForFilter(false, mCurrentEquipmentFilterIndex);
+            if (index != 0) {
+                for (Exercise e : equipmentFilter) {
+
+                    if (e.getMuscleGroup().toLowerCase().equals(mBodyPartsArray[index].toLowerCase())) {
+                        Log.i(TAG, "Found exercises for " + mBodyPartsArray[index] + " Exercise: " + e.getName() + " Is selected: " + e.isSelected());
+                        filteredList.add(e);
+                    }
+                }
+            } else {
+                // Return all exercises for just the equipment filter
+                return equipmentFilter;
+            }
+        }
+
+        return filteredList;
+    }
 
 
     public List<Exercise> getExercisesForEquipmentFilter(int index){
@@ -386,7 +440,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
             }
         } else {
             Log.i(TAG, "bodypart filter: " + mBodyPartsArray[mCurrentBodyPartFilterIndex]);
-            List<Exercise> bodyPartFilter = getExercisesForFilter(mCurrentBodyPartFilterIndex);
+            List<Exercise> bodyPartFilter = getExercisesForFilter(true, mCurrentBodyPartFilterIndex);
             if (index != 0) {
                 for (Exercise e : bodyPartFilter) {
 
