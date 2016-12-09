@@ -51,7 +51,7 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindToWorkout(final Context context, Workout workout, String workoutExercisesReference, View.OnClickListener usersClickListener){
+    public void bindToWorkout(Workout workout, String workoutExercisesReference, View.OnClickListener usersClickListener, View.OnClickListener optionsMenuClickLister){
         Log.i(TAG, "bindToWorkout called");
 
         if (workout.getName().isEmpty()) {
@@ -62,30 +62,7 @@ public class WorkoutViewHolder extends RecyclerView.ViewHolder {
         creatorTextView.setText(workout.creator);
         numUsersTextView.setText(String.valueOf(workout.userCount));
         usersImageView.setOnClickListener(usersClickListener);
-        optionsImageView.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View view){
-                PopupMenu menu = new PopupMenu(context, view, Gravity.RIGHT);
-                menu.getMenuInflater().inflate(R.menu.menu_popup_workout_list, menu.getMenu());
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch(item.getItemId()){
-                            case R.id.menu_popup_workout_delete:
-                                break;
-                            case R.id.menu_popup_workout_do_workout:
-                                break;
-                            case R.id.menu_popup_workout_add_to_routine:
-                                break;
-                        }
-                        return true;
-                    }
-                });
-
-                menu.show();
-            }
-        });
+        optionsImageView.setOnClickListener(optionsMenuClickLister);
     }
 
 }

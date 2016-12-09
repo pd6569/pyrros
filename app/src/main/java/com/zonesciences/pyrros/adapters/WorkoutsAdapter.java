@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntegerRes;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -191,7 +194,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
 
         //Bind Workout to ViewHolder, setting OnClickListener for the users button
-        viewHolder.bindToWorkout(mContext, workout, workoutExercisesReference, new View.OnClickListener() {
+        viewHolder.bindToWorkout(workout, workoutExercisesReference, new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
@@ -204,8 +207,44 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                 onUsersClicked(userPostRef);
 
             }
+        }, new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                PopupMenu menu = new PopupMenu(mContext, view, Gravity.RIGHT);
+                menu.getMenuInflater().inflate(R.menu.menu_popup_workout_list, menu.getMenu());
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch(item.getItemId()){
+                            case R.id.menu_popup_workout_delete:
+                                Log.i(TAG, "Workout to delete: " + workoutKey + " workout date: " + workout.getClientTimeStamp());
+                                Map<String, Object> childUpdates = new HashMap<String, Object>();
+                                childUpdates.put("/workouts/" + workoutKey, null);
+                                childUpdates.put("/user-workouts/" + mUid + "/" + workoutKey, null);
+                                childUpdates.put("/workout-exercises/" + workoutKey, null);
+                                childUpdates.put("/user-workout-exercises/" + mUid + "/" + workoutKey, null);
+                                mDatabaseReference.updateChildren(childUpdates);
+                                notifyItemRemoved(position);
+
+                                break;
+                            case R.id.menu_popup_workout_do_workout:
+                                break;
+                            case R.id.menu_popup_workout_add_to_routine:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+
+                menu.show();
+            }
         });
+
     }
+
+
+
+
 
     @Override
     public void onViewRecycled(WorkoutViewHolder viewHolder){
