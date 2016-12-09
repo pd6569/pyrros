@@ -64,6 +64,9 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                     notifyItemRemoved(position);
                     setExerciseOrder();
                     mExercisesListener.onExercisesChanged(mWorkoutExercises);
+                    if (mWorkoutExercises.isEmpty()){
+                        mExercisesListener.onExercisesEmpty();
+                    }
 
                 }
             });
@@ -231,7 +234,9 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         notifyDataSetChanged();
         mSelectedExerciseIds.clear();
 
-        if(mWorkoutExercises.size() == 0) mExercisesListener.onExercisesEmpty();
+        if(mWorkoutExercises.isEmpty()) {
+            mExercisesListener.onExercisesEmpty();
+        }
 
         // Notify fragment
         mExercisesListener.onExercisesChanged(mWorkoutExercises);

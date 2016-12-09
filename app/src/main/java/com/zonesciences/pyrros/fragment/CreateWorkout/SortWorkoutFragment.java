@@ -218,6 +218,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
 
                         @Override
                         public void onExercisesEmpty() {
+                            Log.i(TAG, "Exercises empty");
                             mStartWorkoutAction.setVisible(false);
                         }
 
