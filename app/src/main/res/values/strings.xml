@@ -100,5 +100,7 @@
     <string name="delete_workout">Delete</string>
     <string name="do_workout">Do workout</string>
     <string name="add_to_routine">Add to routine</string>
+    <string name="workout_deleted">Workout deleted</string>
+    <string name="workout_restored">Workout restored</string>
 
 </resources>

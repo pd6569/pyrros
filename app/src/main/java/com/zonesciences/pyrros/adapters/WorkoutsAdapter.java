@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntegerRes;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +29,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
@@ -69,6 +72,9 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
     String mUnit;
     double mConversionMultiple;
+
+    // Restore database
+    int movesCompleted;
 
     public WorkoutsAdapter(Class<Workout> modelClass, int modelLayout, Class<WorkoutViewHolder> viewHolderClass, Query ref, DatabaseReference databaseReference, String uid, Map<String, List<Exercise>> workoutExercisesMap, Context context) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -209,7 +215,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
             }
         }, new View.OnClickListener(){
             @Override
-            public void onClick(View view){
+            public void onClick(final View view){
                 PopupMenu menu = new PopupMenu(mContext, view, Gravity.RIGHT);
                 menu.getMenuInflater().inflate(R.menu.menu_popup_workout_list, menu.getMenu());
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -223,8 +229,34 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                                 childUpdates.put("/user-workouts/" + mUid + "/" + workoutKey, null);
                                 childUpdates.put("/workout-exercises/" + workoutKey, null);
                                 childUpdates.put("/user-workout-exercises/" + mUid + "/" + workoutKey, null);
+
+                                // Copy records before deleting
+                                moveFirebaseRecord(mDatabaseReference.child("user-workouts").child(mUid).child(workoutKey), mDatabaseReference.child("deleted").child("user-workouts").child(mUid).child(workoutKey), false);
+                                moveFirebaseRecord(mDatabaseReference.child("user-workout-exercises").child(mUid).child(workoutKey), mDatabaseReference.child("deleted").child("user-workout-exercises").child(mUid).child(workoutKey), false);
+
                                 mDatabaseReference.updateChildren(childUpdates);
                                 notifyItemRemoved(position);
+
+                                Snackbar snackbar = Snackbar.make(view, R.string.workout_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
+                                    @Override
+                                    public void onClick(View view){
+                                        moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workouts").child(mUid).child(workoutKey), mDatabaseReference.child("user-workouts").child(mUid).child(workoutKey), true);
+                                        moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workout-exercises").child(mUid).child(workoutKey), mDatabaseReference.child("user-workout-exercises").child(mUid).child(workoutKey), true);
+                                        moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workouts").child(mUid).child(workoutKey), mDatabaseReference.child("workouts").child(workoutKey), true);
+                                        moveFirebaseRecord(mDatabaseReference.child("deleted").child("user-workout-exercises").child(mUid).child(workoutKey), mDatabaseReference.child("workout-exercises").child(workoutKey), true);
+
+                                        Map<String, Object> childUpdates = new HashMap<String, Object>();
+                                        childUpdates.put("/deleted/user-workout-exercises/" + mUid + "/" + workoutKey, null);
+                                        childUpdates.put("/deleted/user-workouts/" + mUid + "/" + workoutKey, null);
+                                        mDatabaseReference.updateChildren(childUpdates);
+
+                                        Snackbar snackbar = Snackbar.make(view, R.string.workout_restored, Snackbar.LENGTH_SHORT);
+                                        View sbView = snackbar.getView();
+                                        sbView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.snackbarPositive));
+                                        snackbar.show();
+                                    }
+                                });
+                                snackbar.show();
 
                                 break;
                             case R.id.menu_popup_workout_do_workout:
@@ -284,6 +316,46 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                 Log.d(TAG, "workoutTransaction:onComplete:" + databaseError);
 
             }
+        });
+    }
+
+    public void moveFirebaseRecord(DatabaseReference fromPath, final DatabaseReference toPath, final boolean notifyDataSetChanged)
+    {
+        fromPath.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                toPath.setValue(dataSnapshot.getValue(), new DatabaseReference.CompletionListener()
+                {
+                    @Override
+                    public void onComplete(DatabaseError firebaseError, DatabaseReference databaseReference)
+                    {
+                        if (firebaseError != null)
+                        {
+                            Log.i(TAG,"Copy failed");
+                        }
+                        else
+                        {
+                            Log.i(TAG, "Success");
+                            if (notifyDataSetChanged){
+                                movesCompleted++;
+                                Log.i(TAG, "Moves completed: " + movesCompleted);
+                                if (movesCompleted == 4){
+                                    notifyDataSetChanged();
+                                }
+                            }
+
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.i(TAG, "Copy Failed");
+            }
+
         });
     }
 
