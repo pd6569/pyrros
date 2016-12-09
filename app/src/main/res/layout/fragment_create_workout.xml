@@ -24,41 +24,18 @@
             android:orientation="vertical"
             android:weightSum="2">
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:weightSum="2">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Body Part"
-                    android:gravity="center"
-                    android:textSize="@dimen/filter_spinner_text"
-                    android:layout_weight="1"/>
 
                 <android.support.v7.widget.AppCompatSpinner
                     android:id="@+id/spinner_bodypart_filter"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:layout_weight="1"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Equipment"
-                    android:gravity="center"
-                    android:textSize="@dimen/filter_spinner_text"
                     android:layout_weight="1"/>
 
                 <android.support.v7.widget.AppCompatSpinner

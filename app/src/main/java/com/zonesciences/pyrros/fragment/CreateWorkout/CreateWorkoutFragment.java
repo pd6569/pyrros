@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -197,32 +198,17 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         });
 
 
+        String defaultTextBodyPart = "Body part";
+        String defaultTextEquipment = "Equipment";
 
         mBodypartSpinner = (Spinner) rootView.findViewById(R.id.spinner_bodypart_filter);
-        ArrayAdapter<CharSequence> bodypartAdapter = ArrayAdapter.createFromResource(getContext(), R.array.bodyparts, R.layout.simple_spinner_item);
-        bodypartAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mBodypartSpinner.setAdapter(bodypartAdapter);
+        mBodypartSpinner.setAdapter(new FilterSpinnerAdapter(mContext, R.layout.spinner_row, mBodyPartsArray, defaultTextBodyPart));
         mBodypartSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 mFilterHistory.clear();
                 mCurrentBodyPartFilterIndex = pos;
                 Toast.makeText(getActivity(), "Filter selected: " + mBodyPartsArray[pos], Toast.LENGTH_SHORT).show();
-                /*if (pos == 0) {
-                    Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase());
-                    mFilteredExercises.clear();
-                    mFilteredExercises.addAll(mAllExercises);
-
-                } else {
-                    Log.i(TAG, "Filter: " + mBodyPartsArray[pos].toLowerCase() + " mAllExercises size: " + mAllExercises.size());
-
-                    List<Exercise> list = getExercisesForFilter(true, pos);
-
-                    Log.i(TAG, "mFilteredExercises SIZE: " + mFilteredExercises.size() + " list size: " + list.size() + " mAllExercises: " + mAllExercises.size());
-
-                    mFilteredExercises.clear();
-                    mFilteredExercises.addAll(list);
-                }*/
 
                 List<Exercise> list = getExercisesForBodypartFilter(pos);
 
@@ -243,9 +229,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         });
 
         mEquipmentSpinner = (Spinner) rootView.findViewById(R.id.spinner_equipment_filter);
-        ArrayAdapter<CharSequence> equipmentAdapter = ArrayAdapter.createFromResource(getContext(), R.array.equipment, R.layout.simple_spinner_item);
-        equipmentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mEquipmentSpinner.setAdapter(equipmentAdapter);
+        mEquipmentSpinner.setAdapter(new FilterSpinnerAdapter(mContext, R.layout.spinner_row, mEquipmentArray, defaultTextEquipment));
         mEquipmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
@@ -579,5 +563,52 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     public void setUsername(String username) {
         mUsername = username;
+    }
+
+    public class FilterSpinnerAdapter extends ArrayAdapter<String>{
+
+        Context context;
+        String[] objects;
+        String firstElement;
+        boolean isFirstTime;
+
+        public FilterSpinnerAdapter(Context context, int resource, String[] objects, String defaultText) {
+            super(context, resource, objects);
+            this.context = context;
+            this.objects = objects;
+            this.isFirstTime = true;
+            setDefaultText(defaultText);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            if(isFirstTime) {
+                objects[0] = firstElement;
+                isFirstTime = false;
+            }
+            return getCustomView(position, convertView, parent);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            notifyDataSetChanged();
+            return getCustomView(position, convertView, parent);
+        }
+
+        public void setDefaultText(String defaultText) {
+            this.firstElement = objects[0];
+            objects[0] = defaultText;
+        }
+
+        public View getCustomView(int position, View convertView, ViewGroup parent) {
+
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View row = inflater.inflate(R.layout.spinner_row, parent, false);
+            TextView label = (TextView) row.findViewById(R.id.spinner_text);
+            label.setText(objects[position]);
+
+            return row;
+        }
+
     }
 }
