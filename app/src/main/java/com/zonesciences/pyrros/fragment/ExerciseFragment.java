@@ -544,8 +544,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         mDatabase.updateChildren(childUpdates);
         mSetsAdapter.setSetBeingEdited(setIndex); // makes sure set is still highlighted after dataset refreshed
 
-        Toast.makeText(getContext(), "Set updated", Toast.LENGTH_SHORT).show();
-
         Snackbar snackbar = Snackbar.make(view, "Set updated", Snackbar.LENGTH_SHORT);
         snackbar.show();
     }
