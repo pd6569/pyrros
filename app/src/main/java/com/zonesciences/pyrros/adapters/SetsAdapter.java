@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -20,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.ActionMode.ActionModeAdapterInterface;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperViewHolder;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.utils.Utils;
@@ -51,15 +55,15 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     String mUnit;
     double mConversionMultiple;
 
-
     SetsListener mSetsListener;
-    boolean mMoved;
 
     // Action Mode
     SparseBooleanArray mSelectedSetsIds = new SparseBooleanArray();
 
-    public static class SetsViewHolder extends RecyclerView.ViewHolder {
 
+    public class SetsViewHolder extends RecyclerView.ViewHolder {
+
+        LinearLayout mSetContainer;
         TextView mSetNumber;
         TextView mSetWeight;
         TextView mSetReps;
@@ -69,7 +73,17 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             mSetNumber = (TextView) itemView.findViewById(R.id.textview_set_number);
             mSetWeight = (TextView) itemView.findViewById(R.id.textview_set_weight);
             mSetReps = (TextView) itemView.findViewById(R.id.textview_set_reps);
+            mSetContainer = (LinearLayout) itemView.findViewById(R.id.linear_layout_sets);
+            mSetContainer.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view){
+                    mSetsListener.onSetSelected(getAdapterPosition());
+                }
+            });
         }
+
+
     }
 
     public SetsAdapter(final Context context, DatabaseReference exerciseReference, String workoutKey, String user){
@@ -322,9 +336,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     }
 
-
     //listener to update fragment which contains exercise object with working sets
     public interface SetsListener{
+        void onSetSelected(int setIndex);
         void onSetsChanged();
         void onRecordChanged();
     }

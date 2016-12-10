@@ -231,7 +231,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
                         }
                     });
                     mRecyclerView.setAdapter(mAdapter);
-                    mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter);
+                    mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
                     mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
                     mItemTouchHelper.attachToRecyclerView(mRecyclerView);
                 }

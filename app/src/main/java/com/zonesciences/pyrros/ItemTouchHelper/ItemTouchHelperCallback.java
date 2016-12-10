@@ -14,8 +14,19 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private final ItemTouchHelperAdapter mAdapter;
 
+    private boolean moveEnabled;
+    private boolean swipeEnabled;
+
     public ItemTouchHelperCallback(ItemTouchHelperAdapter adapter){
         mAdapter = adapter;
+        moveEnabled = true;
+        swipeEnabled = true;
+    }
+
+    public ItemTouchHelperCallback(ItemTouchHelperAdapter adapter, boolean moveEnabled, boolean swipeEnabled){
+        mAdapter = adapter;
+        this.moveEnabled = moveEnabled;
+        this.swipeEnabled = swipeEnabled;
     }
 
     @Override
@@ -25,7 +36,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean isItemViewSwipeEnabled(){
-        return true;
+        return swipeEnabled;
     }
 
     @Override
@@ -38,15 +49,19 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-        mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-        Log.i(TAG, "adapter position: " + viewHolder.getAdapterPosition());
+        if (moveEnabled) {
+            mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            Log.i(TAG, "adapter position: " + viewHolder.getAdapterPosition());
+        }
         return true;
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        Log.i(TAG, "onSwiped");
-        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+        if (swipeEnabled) {
+            Log.i(TAG, "onSwiped");
+            mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+        }
     }
 
     @Override
@@ -58,7 +73,9 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
         Log.i(TAG, "clearView");
-        mAdapter.onMoveCompleted();
+        if (moveEnabled) {
+            mAdapter.onMoveCompleted();
+        }
         if (viewHolder instanceof ItemTouchHelperViewHolder){
             ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
             itemViewHolder.onItemClear();

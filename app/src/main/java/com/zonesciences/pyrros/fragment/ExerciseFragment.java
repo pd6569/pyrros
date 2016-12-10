@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
@@ -109,6 +110,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     // ActionMode
     ActionMode mActionMode;
 
+    // Edit sets mode
+    int mSetSelected = -1;
+    int mPreviousSetSelected = -1;
+
     public static ExerciseFragment newInstance(String exerciseKey, Exercise exercise, String workoutKey, String userId) {
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE_KEY, exerciseKey);
@@ -199,6 +204,21 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         //adapter created here
         mSetsAdapter = new SetsAdapter(this.getContext(), mExerciseReference, mWorkoutKey, mUser);
         mSetsAdapter.setSetsListener(new SetsAdapter.SetsListener() {
+
+            @Override
+            public void onSetSelected(int setIndex){
+                Log.i(TAG, "Set has been clicked. Weight: " + mExercise.getWeight().get(setIndex) + " Reps: " + mExercise.getReps().get(setIndex));
+                mWeightField.setText(mExercise.getWeight().get(setIndex).toString());
+                mRepsField.setText(mExercise.getReps().get(setIndex).toString());
+
+                mSetSelected = setIndex;
+                mLayoutManager.findViewByPosition(mSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                if (mPreviousSetSelected > -1){
+                    mLayoutManager.findViewByPosition(mPreviousSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                }
+                mPreviousSetSelected = mSetSelected;
+            }
+
             @Override
             public void onSetsChanged() {
                 Log.i(TAG, "Set changed in adapter. Exercise Fragment received callback");
