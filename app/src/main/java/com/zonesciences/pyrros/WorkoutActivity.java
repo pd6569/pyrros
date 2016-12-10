@@ -374,4 +374,16 @@ public class WorkoutActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.i(TAG, "onPause");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.i(TAG, "onResume");
+    }
+
 }

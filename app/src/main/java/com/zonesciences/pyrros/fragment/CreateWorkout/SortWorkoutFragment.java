@@ -136,7 +136,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
             public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
                 Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
                 mWorkoutExercises = exerciseList;
-                if (!mInEditWorkout) mExercisesListener.onExercisesChanged(mWorkoutExercises);
+                mExercisesListener.onExercisesChanged(mWorkoutExercises);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -332,10 +332,11 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
             if (mWorkoutExercises.size() > 0) {
                 mStartWorkoutAction.setVisible(true);
             }
-
-            MenuItem search = menu.findItem(R.id.action_search);
-            search.setVisible(false);
         }
+
+        MenuItem search = menu.findItem(R.id.action_search);
+        search.setVisible(false);
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.fragment.EditWorkout.WorkoutOrderFragment;
 import com.zonesciences.pyrros.fragment.EditWorkout.WorkoutPropertiesFragment;
@@ -72,11 +73,6 @@ public class EditWorkoutActivity extends BaseActivity {
 
     class EditWorkoutAdapter extends FragmentPagerAdapter {
 
-        Fragment [] mFragments = new Fragment[]{
-                SortWorkoutFragment.newInstance(mExercises, true),
-                WorkoutPropertiesFragment.newInstance(mUserId, mWorkoutKey)
-        };
-
         String [] mTitles = new String[] {
                 "Order",
                 "Properties"
@@ -88,12 +84,45 @@ public class EditWorkoutActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return mFragments[position];
+            Fragment fragment = new Fragment();
+            if (position == 0){
+                SortWorkoutFragment sortWorkoutFragment = SortWorkoutFragment.newInstance(mExercises, true);
+                sortWorkoutFragment.setExercisesListener(new ExercisesListener() {
+                    @Override
+                    public void onExerciseAdded(Exercise exercise) {
+
+                    }
+
+                    @Override
+                    public void onExercisesEmpty() {
+
+                    }
+
+                    @Override
+                    public void onExerciseRemoved(Exercise exercise) {
+
+                    }
+
+                    @Override
+                    public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                        mExercises = exerciseList;
+                        for (Exercise e : mExercises){
+                            Log.i(TAG, "Exercise: " + e.getName() + " Order: " + e.getOrder());
+                        }
+
+                    }
+                });
+                fragment = sortWorkoutFragment;
+            } else if (position == 1){
+                WorkoutPropertiesFragment workoutPropertiesFragment = WorkoutPropertiesFragment.newInstance(mUserId, mWorkoutKey);
+                fragment = workoutPropertiesFragment;
+            }
+            return fragment;
         }
 
         @Override
         public int getCount() {
-            return mFragments.length;
+            return mTitles.length;
         }
 
         @Override
