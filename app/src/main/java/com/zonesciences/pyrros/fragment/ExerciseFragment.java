@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.ActionMode.ActionModeCallback;
+import com.zonesciences.pyrros.ActionMode.ActionModeInterface;
 import com.zonesciences.pyrros.ActionMode.RecyclerClickListener;
 import com.zonesciences.pyrros.ActionMode.RecyclerTouchListener;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ExerciseFragment extends Fragment implements View.OnClickListener {
+public class ExerciseFragment extends Fragment implements View.OnClickListener, ActionModeInterface {
 
     public static final String TAG = "ExerciseFragment";
     public static final String ARG_EXERCISE_KEY = "ExerciseKey";
@@ -204,6 +205,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mSetsAdapter.setSetsListener(new SetsAdapter.SetsListener() {
             @Override
             public void onSetsChanged() {
+                Log.i(TAG, "Set changed in adapter. Exercise Fragment received callback");
                 getExercise();
             }
 
@@ -285,15 +287,15 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         mSetsRecycler.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mSetsRecycler, new RecyclerClickListener() {
             @Override
             public void onClick(View view, int position) {
-                /*if (mActionMode != null){
+                if (mActionMode != null){
                     // select with single click if action mode is active
-                    onExerciseSelected(position);
-                }*/
+                    onItemSelected(position);
+                }
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                /*onExerciseSelected(position);*/
+                onItemSelected(position);
             }
         }));
 
@@ -306,14 +308,18 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    /*private void onExerciseSelected(int position){
-        mSetsAdapter.toggleSelection(position);
-        boolean hasSelectedExercises = mSetsAdapter.getSelectedCount() > 0;
+    /****** START ACTION MODE METHODS ******/
 
-        if (hasSelectedExercises && mActionMode == null){
+    @Override
+    public void onItemSelected(int position) {
+        mSetsAdapter.toggleSelection(position);
+        boolean hasSelectedSets = mSetsAdapter.getSelectedCount() > 0;
+
+        if (hasSelectedSets && mActionMode == null){
             // there are some selected items, start the action mode
             Log.i(TAG, "Start action mode");
-            ActionModeCallback actionModeCallback = new ActionModeCallback(getActivity(), mSetsAdapter, mWorkoutExercises);
+            ActionModeCallback actionModeCallback = new ActionModeCallback();
+            actionModeCallback.setSetsAdapter(mSetsAdapter);
             actionModeCallback.setOnFinishedActionModeListener(new ActionModeCallback.onFinishedActionMode() {
                 @Override
                 public void onActionModeFinished() {
@@ -325,7 +331,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
             });
             mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
         }
-        else if (!hasSelectedExercises && mActionMode != null){
+        else if (!hasSelectedSets && mActionMode != null){
             // no selected items, finish action mode
             Log.i(TAG, "End action mode");
             mActionMode.finish();
@@ -339,13 +345,14 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    //set action mode null after use
-    public void setActionModeNull(){
+    @Override
+    public void setActionModeNull() {
         if (mActionMode != null){
             mActionMode = null;
         }
-    }*/
+    }
 
+    /****** END ACTION MODE ******/
 
     @Override
     public void onStart(){
@@ -537,6 +544,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener {
     public String getWorkoutKey() {
         return mWorkoutKey;
     }
+
+
 
     // Listener
 

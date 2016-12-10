@@ -4,13 +4,10 @@ package com.zonesciences.pyrros.fragment.CreateWorkout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -20,23 +17,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.zonesciences.pyrros.ActionMode.ActionModeCallback;
+import com.zonesciences.pyrros.ActionMode.ActionModeInterface;
 import com.zonesciences.pyrros.ActionMode.RecyclerClickListener;
 import com.zonesciences.pyrros.ActionMode.RecyclerTouchListener;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.adapters.ExercisesFilterAdapter;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SortWorkoutFragment extends Fragment implements OnDragListener {
+public class SortWorkoutFragment extends Fragment implements OnDragListener, ActionModeInterface {
 
     private static final String TAG = "SortWorkoutFrag";
 
@@ -109,7 +105,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
             public void onClick(View view, int position) {
                 if (mActionMode != null){
                     // select with single click if action mode is active
-                    onExerciseSelected(position);
+                    onItemSelected(position);
                 }
             }
 
@@ -118,7 +114,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
                 if (!isBeingDragged) {
                     mAdapter.setAllowReordering(false);
                     mAdapter.notifyDataSetChanged();
-                    onExerciseSelected(position);
+                    onItemSelected(position);
                 }
             }
         }));
@@ -126,7 +122,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener {
         return rootView;
     }
 
-    private void onExerciseSelected(int position){
+    public void onItemSelected(int position){
         mAdapter.toggleSelection(position);
         boolean hasSelectedExercises = mAdapter.getSelectedCount() > 0;
 

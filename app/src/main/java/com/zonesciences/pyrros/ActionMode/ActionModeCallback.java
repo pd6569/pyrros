@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.SetsAdapter;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 
@@ -20,15 +21,22 @@ public class ActionModeCallback implements ActionMode.Callback {
     private static final String TAG = "ActionModeCallback";
     private Context mContext;
     private SortWorkoutAdapter mSortWorkoutAdapter;
+    private SetsAdapter mSetsAdapter;
     private ArrayList<Exercise> mWorkoutExercises;
+    boolean mIsSortWorkout;
 
     // Exercises changed listener
     onFinishedActionMode mActionModeFinishedListener;
+
+    public ActionModeCallback(){
+
+    }
 
     public ActionModeCallback(Context context, SortWorkoutAdapter sortWorkoutAdapter, ArrayList<Exercise> workoutExercise){
         this.mContext = context;
         this.mSortWorkoutAdapter = sortWorkoutAdapter;
         this.mWorkoutExercises = workoutExercise;
+        mIsSortWorkout = true;
     }
 
     @Override
@@ -48,8 +56,11 @@ public class ActionModeCallback implements ActionMode.Callback {
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_delete:
-                Log.i(TAG, "Delete the exercise. get selected exercises: " + mSortWorkoutAdapter.getSelectedItemIds());
-                mSortWorkoutAdapter.deleteSelectedItems();
+                if (mIsSortWorkout) {
+                    mSortWorkoutAdapter.deleteSelectedItems();
+                } else {
+                    mSetsAdapter.deleteSelectedItems();
+                }
                 mActionModeFinishedListener.onActionModeFinished();
                 break;
         }
@@ -59,7 +70,11 @@ public class ActionModeCallback implements ActionMode.Callback {
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         Log.i(TAG, "onDestroyActionMode");
-        mSortWorkoutAdapter.clearSelectedItems();
+        if (mIsSortWorkout) {
+            mSortWorkoutAdapter.clearSelectedItems();
+        } else {
+            mSetsAdapter.clearSelectedItems();
+        }
         mActionModeFinishedListener.onActionModeFinished();
     }
 
@@ -69,5 +84,9 @@ public class ActionModeCallback implements ActionMode.Callback {
 
     public void setOnFinishedActionModeListener(onFinishedActionMode listener){
         this.mActionModeFinishedListener = listener;
+    }
+
+    public void setSetsAdapter(SetsAdapter setsAdapter) {
+        mSetsAdapter = setsAdapter;
     }
 }

@@ -2,7 +2,9 @@ package com.zonesciences.pyrros.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -52,6 +54,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     SetsListener mSetsListener;
     boolean mMoved;
+
+    // Action Mode
+    SparseBooleanArray mSelectedSetsIds = new SparseBooleanArray();
 
     public static class SetsViewHolder extends RecyclerView.ViewHolder {
 
@@ -170,6 +175,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         String s = Utils.formatWeight(weight);
         holder.mSetWeight.setText(s + mUnit);
         holder.mSetReps.setText(Long.toString(mRepsList.get(position)) + " reps");
+
+        /** Change background color of the selected items in recycler view  **/
+        holder.itemView.setBackgroundColor(mSelectedSetsIds.get(position) ? ResourcesCompat.getColor(mContext.getResources(), R.color.colorAccent, null) : Color.WHITE);
     }
 
     @Override
@@ -304,6 +312,81 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         }
     }
 
+
+
+    /***
+     * Methods for selecting exercises
+     */
+
+    // Toggle selection methods
+    public void toggleSelection(int position) {
+        selectItem(position, !mSelectedSetsIds.get(position));
+    }
+
+    // Remove selected selections
+    public void removeSelection(){
+        mSelectedSetsIds = new SparseBooleanArray();
+        notifyDataSetChanged();
+    }
+
+    //Put or delete selected position into SparseBooleanArray
+    public void selectItem(int position, boolean isSelected){
+        if (isSelected){
+            mSelectedSetsIds.put(position, isSelected);
+        } else {
+            mSelectedSetsIds.delete(position);
+        }
+        notifyDataSetChanged();
+    }
+
+    // Get total selected count
+    public int getSelectedCount(){
+        return mSelectedSetsIds.size();
+    }
+
+    // Return all selected sets
+    public SparseBooleanArray getSelectedItemIds(){
+        return mSelectedSetsIds;
+    }
+
+    public void clearSelectedItems(){
+        mSelectedSetsIds.clear();
+        notifyDataSetChanged();
+    }
+
+    public void deleteSelectedItems(){
+
+        for (int i = (mSelectedSetsIds.size()-1); i >= 0; i--){
+            if (mSelectedSetsIds.valueAt(i)){
+
+                removeFromRecords(mWeightList.get(mSelectedSetsIds.keyAt(i)), mRepsList.get(mSelectedSetsIds.keyAt(i))); // check if the set thats being dismissed is a record
+
+                mWeightList.remove(mSelectedSetsIds.keyAt(i));
+                mRepsList.remove(mSelectedSetsIds.keyAt(i));
+
+            }
+        }
+
+        notifyDataSetChanged();
+        mSelectedSetsIds.clear();
+
+        // Push updates to workout-exercises and to user-workout-exercises
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/sets/", mWeightList.size());
+        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
+        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
+        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/sets/", mWeightList.size());
+        mExerciseReference.getRoot().updateChildren(childUpdates);
+
+        // Notify fragment
+        mSetsListener.onSetsChanged();
+
+        Log.i(TAG, mSelectedSetsIds.size() + " items deleted" + " Selected now: " + mSelectedSetsIds);
+    }
+
+
     //listener to update fragment which contains exercise object with working sets
     public interface SetsListener{
         public void onSetsChanged();
@@ -312,44 +395,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     public void setSetsListener (SetsListener listener){
         this.mSetsListener = listener;
-    }
-
-
-    // Action mode interface methods
-
-    @Override
-    public void toggleSelection(int position) {
-
-    }
-
-    @Override
-    public void removeSelection() {
-
-    }
-
-    @Override
-    public void selectItem(int position, boolean isSelected) {
-
-    }
-
-    @Override
-    public int getSelectedCount() {
-        return 0;
-    }
-
-    @Override
-    public SparseBooleanArray getSelectedItemIds() {
-        return null;
-    }
-
-    @Override
-    public void clearSelectedItems() {
-
-    }
-
-    @Override
-    public void deleteSelectedItems() {
-
     }
 
 }
