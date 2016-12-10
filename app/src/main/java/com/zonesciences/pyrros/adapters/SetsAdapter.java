@@ -35,7 +35,7 @@ import java.util.Objects;
 /**
  * Created by Peter on 01/11/2016.
  */
-public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> implements ItemTouchHelperAdapter, ActionModeAdapterInterface {
+public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> implements ActionModeAdapterInterface {
 
     //TODO: set number update after reorder
     private final static String TAG = "SetsAdapter";
@@ -185,60 +185,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         return mWeightList.size();
     }
 
-    @Override
-    public boolean onItemMove(int fromPosition, int toPosition) {
-        // the position of the data is changed every time the view is shifted to a new index,
-        // NOT at the end of the drop event.
-
-        mMoved = true;
-        if (fromPosition < toPosition){
-            for (int i = fromPosition; i < toPosition; i++){
-                Collections.swap(mWeightList, i, i + 1);
-                Collections.swap(mRepsList, i, i + 1);
-            }
-        } else {
-            for (int i = fromPosition; i > toPosition; i--){
-                Collections.swap(mWeightList, i, i - 1);
-                Collections.swap(mRepsList, i, i - 1);
-            }
-        }
-
-        //Push updates to workout-exercises and to user-workout-exercises
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
-        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
-        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
-        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
-        mExerciseReference.getRoot().updateChildren(childUpdates);
-
-        notifyItemMoved(fromPosition, toPosition);
-        mSetsListener.onSetsChanged();
-        return true;
-    }
-
-    @Override
-    public void onItemDismiss(int position) {
-
-        mMoved = false;
-
-        removeFromRecords(mWeightList.get(position), mRepsList.get(position)); // check if the set thats being dismissed is a record
-
-        mWeightList.remove(position);
-        mRepsList.remove(position);
-
-        //Push updates to workout-exercises and to user-workout-exercises
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
-        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
-        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/sets/", mWeightList.size());
-        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/weight/", mWeightList);
-        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/reps/", mRepsList);
-        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseReference.getKey() + "/sets/", mWeightList.size());
-        mExerciseReference.getRoot().updateChildren(childUpdates);
-
-        notifyItemRemoved(position);
-        mSetsListener.onSetsChanged();
-    }
 
     //if the set is a record, remove it from records
     private void removeFromRecords(final Double weight, final Long reps) {
@@ -303,15 +249,6 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         }
         return matches;
     }
-
-    @Override
-    public void onMoveCompleted() {
-        if (mMoved) {
-            notifyDataSetChanged();
-        } else { // do nothing }
-        }
-    }
-
 
 
     /***
@@ -383,14 +320,13 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         // Notify fragment
         mSetsListener.onSetsChanged();
 
-        Log.i(TAG, mSelectedSetsIds.size() + " items deleted" + " Selected now: " + mSelectedSetsIds);
     }
 
 
     //listener to update fragment which contains exercise object with working sets
     public interface SetsListener{
-        public void onSetsChanged();
-        public void onRecordChanged();
+        void onSetsChanged();
+        void onRecordChanged();
     }
 
     public void setSetsListener (SetsListener listener){

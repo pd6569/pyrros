@@ -68,10 +68,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     LinearLayoutManager mLayoutManager;
     DividerItemDecoration mDividerItemDecoration;
 
-    //Touch Helper
-    ItemTouchHelper mItemTouchHelper;
-    ItemTouchHelper.Callback mItemTouchHelperCallback;
-
     //Variables
     String mExerciseKey;
     String mWorkoutKey;
@@ -298,11 +294,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                 onItemSelected(position);
             }
         }));
-
-        mItemTouchHelperCallback = new ItemTouchHelperCallback(mSetsAdapter);
-        mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
-        mItemTouchHelper.attachToRecyclerView(mSetsRecycler);
-
 
         return view;
     }

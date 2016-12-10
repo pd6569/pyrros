@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--used for layout of sets within an active workout and for display in workout list-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+              android:id="@+id/linear_layout_sets"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
               android:background="#ffffff"
               android:weightSum="3.5"
-            android:padding="5dp">
+              android:clickable="true"
+              android:focusable="true"
+              android:foreground="?selectableItemBackground"
+              android:padding="5dp">
     <TextView
         android:id="@+id/textview_set_number"
         android:layout_width="0dp"

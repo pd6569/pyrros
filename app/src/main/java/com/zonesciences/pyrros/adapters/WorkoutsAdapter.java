@@ -139,10 +139,13 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
                     Log.i(TAG, "GETTING SETS FOR: currentExercise = " + currentExercise.getName());
                     View setsView = LayoutInflater.from(viewHolder.itemView.getContext()).inflate(R.layout.item_sets, null);
+                    LinearLayout setsLayout = (LinearLayout) setsView.findViewById(R.id.linear_layout_sets);
                     TextView setNumber = (TextView) setsView.findViewById(R.id.textview_set_number);
                     TextView setWeight = (TextView) setsView.findViewById(R.id.textview_set_weight);
                     TextView setReps = (TextView) setsView.findViewById(R.id.textview_set_reps);
 
+                    setsLayout.setFocusable(false);
+                    setsLayout.setClickable(false);
                     setNumber.setVisibility(View.GONE);
 
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.5f);
