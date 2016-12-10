@@ -294,6 +294,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                                     Log.i(TAG, "Exercise to load: " + exerciseToCopy.getName());
                                     exerciseKeysList.add(exerciseToCopy.getName());
                                     Exercise newExercise = new Exercise(exerciseToCopy, mUid);
+                                    newExercise.setOrder(exerciseToCopy.getOrder());
                                     newExercise.setExerciseId(UUID.randomUUID().toString());
                                     newExercises.add(newExercise);
 
@@ -304,7 +305,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
 
                                 mDatabaseReference.updateChildren(childUpdatesCopyWorkout);
 
-                                mDatabaseReference.child("records").addListenerForSingleValueEvent(new ValueEventListener() {
+                                /*mDatabaseReference.child("records").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         for (String exerciseKey : exerciseKeysList){
@@ -320,7 +321,7 @@ public class WorkoutsAdapter extends FirebaseRecyclerAdapter<Workout, WorkoutVie
                                     public void onCancelled(DatabaseError databaseError) {
 
                                     }
-                                });
+                                });*/
 
                                 Bundle extras = new Bundle();
                                 Log.i(TAG, "Exercises to pass to new activity " + exerciseKeysList);
