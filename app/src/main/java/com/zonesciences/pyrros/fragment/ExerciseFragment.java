@@ -111,6 +111,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     ActionMode mActionMode;
 
     // Edit sets mode
+    boolean mEditSetMode;
     int mSetSelected = -1;
     int mPreviousSetSelected = -1;
 
@@ -210,12 +211,28 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                 Log.i(TAG, "Set has been clicked. Weight: " + mExercise.getWeight().get(setIndex) + " Reps: " + mExercise.getReps().get(setIndex));
                 mWeightField.setText(mExercise.getWeight().get(setIndex).toString());
                 mRepsField.setText(mExercise.getReps().get(setIndex).toString());
-
                 mSetSelected = setIndex;
+
                 mLayoutManager.findViewByPosition(mSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-                if (mPreviousSetSelected > -1){
+
+                if (mEditSetMode == true && mPreviousSetSelected == mSetSelected){
+                    // we are in edit mode, and user has clicked on the highlighted set. Turn edit mode OFF
+                    mEditSetMode = false;
                     mLayoutManager.findViewByPosition(mPreviousSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                } else if (mEditSetMode == false && mPreviousSetSelected == mSetSelected){
+                    // edit mode is off, but set that is selected is the same as the last set that was selected, set edit mode true and highlight the set
+                    mEditSetMode = true;
+                    mLayoutManager.findViewByPosition(mPreviousSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                } else if (mPreviousSetSelected > -1){
+                    // turn edit mode on and deselect the previous set
+                    mEditSetMode = true;
+
+                    // if sets are deleted then previous set selected may no longer exist and will throw null pointer exception, therefore check
+                    if (mPreviousSetSelected < mExercise.getReps().size()) {
+                        mLayoutManager.findViewByPosition(mPreviousSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                    }
                 }
+
                 mPreviousSetSelected = mSetSelected;
             }
 
