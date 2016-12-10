@@ -17,6 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
@@ -60,6 +65,9 @@ public class WorkoutActivity extends BaseActivity {
 
     FragmentManager mFragmentManager;
 
+    // Firebase
+    DatabaseReference mDatabase;
+
     //Track exercise fragments
     Map<Integer, ExerciseFragment> mExerciseReferenceMap = new HashMap<>();
 
@@ -98,6 +106,7 @@ public class WorkoutActivity extends BaseActivity {
         mExerciseObjects = (ArrayList<Exercise>) i.getSerializableExtra(WORKOUT_EXERCISE_OBJECTS);
         mWorkoutKey = i.getStringExtra(WORKOUT_ID);
         mUserId = getUid();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         Log.i(TAG, "Exercises : " + mExercisesList + " WorkoutKey: " + mWorkoutKey);
         for (Exercise e : mExerciseObjects){
@@ -380,10 +389,33 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "onPause");
     }
 
-    @Override
+    /*@Override
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
-    }
+        final List<Exercise> exercises = new ArrayList<>();
+        mDatabase.child("/workout-exercises/").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot exercise : dataSnapshot.getChildren()){
+                    Exercise e = exercise.getValue(Exercise.class);
+                    exercises.add(e);
+                }
+
+                Log.i(TAG, "exercises: " + exercises.size());
+                mExerciseObjects.clear();
+                mExerciseObjects.addAll(exercises);
+                mWorkoutExercisesAdapter = null;
+                mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
+                mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }*/
 
 }
