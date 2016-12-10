@@ -72,7 +72,8 @@
                             android:id="@+id/button_increase_weight"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:text="+"/>
+                            android:text="+"
+                            />
 
                     </LinearLayout>
 
