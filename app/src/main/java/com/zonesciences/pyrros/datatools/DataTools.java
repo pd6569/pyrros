@@ -340,101 +340,6 @@ public class DataTools {
     }
 
 
-    //checks if weight lifted is a record, if so, updates the database with the new record
-    public boolean isRecord(double weight, String reps, String workoutKey){
-        boolean recordSet = false;
-        String key = reps + " rep-max";
-        Map<String, List<Double>> records = mExerciseRecord.getRecords();
-
-        // Set record date to same date as workout and set time of record to current time of adding
-        // This is to ensure that if a record is back dated on an EARLIER date, it is not recorded with the current date
-
-        String workoutDate = mExerciseDates.get(mWorkoutKeys.indexOf(workoutKey));
-        LocalTime timeNow = new LocalTime();
-        String format = "yyyy-MM-dd, HH:mm:ss";
-        DateTime recordDate = DateTime.parse((workoutDate), DateTimeFormat.forPattern(format)).withHourOfDay(timeNow.getHourOfDay()).withMinuteOfHour(timeNow.getMinuteOfHour()).withSecondOfMinute(timeNow.getSecondOfMinute());
-        String date = recordDate.toString(format);
-
-        if (records == null){
-            Log.i(TAG, "sets map not yet created");
-        } else {
-            if (records.containsKey(key)) {
-                int index = records.get(key).size() - 1;
-                double oldWeight = records.get(key).get(index);
-                Log.i(TAG, "This number of reps has been recorded before, and the weight lifted was: " + records.get(key).get(index));
-                if(weight > oldWeight){
-                    Log.i(TAG, "New " + reps + " rep-max set");
-
-                   /* removePreviousRecordFromSameWorkout(key, workoutKey);*/
-                    //update record
-                    mExerciseRecord.getRecords().get(key).add(weight);
-
-                    //update record date
-
-
-
-                    mExerciseRecord.getDate().get(key).add(date);
-
-                    //update workout key
-                    mExerciseRecord.getWorkoutKey().get(key).add(workoutKey);
-
-                    recordSet = true;
-                } else {
-                    Log.i(TAG, "No record set");
-                }
-            } else {
-                Log.i(TAG, "This number of reps has never been done before, add to record. New " + reps + " rep-max set");
-                List<Double> weightList = new ArrayList<>();
-                weightList.add(weight);
-
-                List<String> dateList = new ArrayList<>();
-                dateList.add(date);
-
-                List<String> workoutKeyList = new ArrayList<>();
-                workoutKeyList.add(workoutKey);
-
-                mExerciseRecord.getRecords().put(key, weightList);
-                mExerciseRecord.getDate().put(key, dateList);
-                mExerciseRecord.getWorkoutKey().put(key, workoutKeyList);
-
-                recordSet = true;
-            }
-        }
-        return recordSet;
-    }
-
-   /* private void removePreviousRecordFromSameWorkout(String key, String workoutKey) {
-        List<String> workoutKeys = mExerciseRecord.getWorkoutKey().get(key);
-        List<Double> records = mExerciseRecord.getRecords().get(key);
-        List<String> workoutDate = mExerciseRecord.getDate().get(key);
-
-        if (workoutKeys.contains(workoutKey)){
-            Log.i(TAG, "A record for this rep range has already been recorded in this workout.");
-            ArrayList<Integer> indexList = new ArrayList<>();
-            for (int i = 0; i < workoutKeys.size(); i++) {
-                if (workoutKey.equals(workoutKeys.get(i))) {
-                    indexList.add(i);
-                }
-                Log.i(TAG, "indexList = " + indexList);
-            }
-            Collections.sort(indexList, Collections.<Integer>reverseOrder());
-            for (int j : indexList){
-                workoutKeys.remove(j);
-                records.remove(j);
-                workoutDate.remove(j);
-            }
-
-            mExerciseRecord.getWorkoutKey().remove(key);
-            mExerciseRecord.getDate().remove(key);
-            mExerciseRecord.getRecords().remove(key);
-
-            mExerciseRecord.getWorkoutKey().put(key, workoutKeys);
-            mExerciseRecord.getRecords().put(key, records);
-            mExerciseRecord.getDate().put(key, workoutDate);
-
-        }
-    }*/
-
     //TODO: bug - does not return most reps for heaviest lift if less reps lifted on same weight in same session
     public Map<String, Object> heaviestWeightLifted(){
         Map<String, Object> heaviestWeightMap = new HashMap<>();
@@ -804,5 +709,105 @@ public class DataTools {
         return repMaxMap;
 
     }
+
+
+    /****** METHODS FOR RECORDS ******/
+
+    //checks if weight lifted is a record, if so, updates the database with the new record
+    public boolean isRecord(double weight, String reps, String workoutKey){
+        boolean recordSet = false;
+        String key = reps + " rep-max";
+        Map<String, List<Double>> records = mExerciseRecord.getRecords();
+
+        // Set record date to same date as workout and set time of record to current time of adding
+        // This is to ensure that if a record is back dated on an EARLIER date, it is not recorded with the current date
+
+        String workoutDate = mExerciseDates.get(mWorkoutKeys.indexOf(workoutKey));
+        LocalTime timeNow = new LocalTime();
+        String format = "yyyy-MM-dd, HH:mm:ss";
+        DateTime recordDate = DateTime.parse((workoutDate), DateTimeFormat.forPattern(format)).withHourOfDay(timeNow.getHourOfDay()).withMinuteOfHour(timeNow.getMinuteOfHour()).withSecondOfMinute(timeNow.getSecondOfMinute());
+        String date = recordDate.toString(format);
+
+        if (records == null){
+            Log.i(TAG, "sets map not yet created");
+        } else {
+            if (records.containsKey(key)) {
+                int index = records.get(key).size() - 1;
+                double oldWeight = records.get(key).get(index);
+                Log.i(TAG, "This number of reps has been recorded before, and the weight lifted was: " + records.get(key).get(index));
+                if(weight > oldWeight){
+                    Log.i(TAG, "New " + reps + " rep-max set");
+
+                   /* removePreviousRecordFromSameWorkout(key, workoutKey);*/
+                    //update record
+                    mExerciseRecord.getRecords().get(key).add(weight);
+
+                    //update record date
+
+
+
+                    mExerciseRecord.getDate().get(key).add(date);
+
+                    //update workout key
+                    mExerciseRecord.getWorkoutKey().get(key).add(workoutKey);
+
+                    recordSet = true;
+                } else {
+                    Log.i(TAG, "No record set");
+                }
+            } else {
+                Log.i(TAG, "This number of reps has never been done before, add to record. New " + reps + " rep-max set");
+                List<Double> weightList = new ArrayList<>();
+                weightList.add(weight);
+
+                List<String> dateList = new ArrayList<>();
+                dateList.add(date);
+
+                List<String> workoutKeyList = new ArrayList<>();
+                workoutKeyList.add(workoutKey);
+
+                mExerciseRecord.getRecords().put(key, weightList);
+                mExerciseRecord.getDate().put(key, dateList);
+                mExerciseRecord.getWorkoutKey().put(key, workoutKeyList);
+
+                recordSet = true;
+            }
+        }
+        return recordSet;
+    }
+
+   /* private void removePreviousRecordFromSameWorkout(String key, String workoutKey) {
+        List<String> workoutKeys = mExerciseRecord.getWorkoutKey().get(key);
+        List<Double> records = mExerciseRecord.getRecords().get(key);
+        List<String> workoutDate = mExerciseRecord.getDate().get(key);
+
+        if (workoutKeys.contains(workoutKey)){
+            Log.i(TAG, "A record for this rep range has already been recorded in this workout.");
+            ArrayList<Integer> indexList = new ArrayList<>();
+            for (int i = 0; i < workoutKeys.size(); i++) {
+                if (workoutKey.equals(workoutKeys.get(i))) {
+                    indexList.add(i);
+                }
+                Log.i(TAG, "indexList = " + indexList);
+            }
+            Collections.sort(indexList, Collections.<Integer>reverseOrder());
+            for (int j : indexList){
+                workoutKeys.remove(j);
+                records.remove(j);
+                workoutDate.remove(j);
+            }
+
+            mExerciseRecord.getWorkoutKey().remove(key);
+            mExerciseRecord.getDate().remove(key);
+            mExerciseRecord.getRecords().remove(key);
+
+            mExerciseRecord.getWorkoutKey().put(key, workoutKeys);
+            mExerciseRecord.getRecords().put(key, records);
+            mExerciseRecord.getDate().put(key, workoutDate);
+
+        }
+    }*/
+
+    /****** END METHODS FOR RECORDS ******/
 
 }

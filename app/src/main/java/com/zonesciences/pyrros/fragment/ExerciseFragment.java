@@ -492,22 +492,22 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         mExercise.addWeight(convertedWeight);
         mExercise.addReps(mReps);
 
-        boolean record = false;
+        /*boolean record = false;
        if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps), mWorkoutKey)){
            mRecord = mDataTools.getExerciseRecord();
            record = true;
-        }
+        }*/
 
         Log.i(TAG, "Exercise object updated with sets. Sets: " + mExercise.getSets() + " Weights: " + mExercise.getWeight() + " Reps: " + mExercise.getReps());
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
         childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
-        if (record){
+        /*if (record){
             Log.i(TAG, "Record set, write to database");
             childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mRecord);
             childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mRecord);
-        }
+        }*/
         mDatabase.updateChildren(childUpdates);
     }
 
@@ -524,20 +524,20 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         mExercise.getReps().set(setIndex, mReps);
 
 
-        boolean record = false;
+        /*boolean record = false;
         if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps), mWorkoutKey)){
             mRecord = mDataTools.getExerciseRecord();
             record = true;
-        }
+        }*/
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
         childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
-        if (record){
+        /*if (record){
             Log.i(TAG, "Record set, write to database");
             childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mRecord);
             childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mRecord);
-        }
+        }*/
         mDatabase.updateChildren(childUpdates);
         mSetsAdapter.setSetBeingEdited(setIndex);
     }

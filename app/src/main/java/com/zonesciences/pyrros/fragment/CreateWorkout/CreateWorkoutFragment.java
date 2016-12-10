@@ -502,7 +502,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         }
         mDatabase.updateChildren(childUpdates);
 
-        mDatabase.child("records").addListenerForSingleValueEvent(new ValueEventListener() {
+        /*mDatabase.child("records").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (String exerciseKey : exerciseKeysList){
@@ -518,7 +518,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
 
         Bundle extras = new Bundle();
