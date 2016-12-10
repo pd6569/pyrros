@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/activityBackground"
-    tools:context="com.zonesciences.pyrros.NewWorkoutActivity">
+    tools:context="com.zonesciences.pyrros.WorkoutActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -26,12 +27,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.roughike.bottombar.BottomBar;
 import com.zonesciences.pyrros.ActionMode.ActionModeCallback;
 import com.zonesciences.pyrros.ActionMode.ActionModeInterface;
 import com.zonesciences.pyrros.ActionMode.RecyclerClickListener;
@@ -67,9 +70,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     Button mDecreaseRepsButton;
     Button mAddSet;
     Button mSaveSet;
-
     EditText mWeightField;
     EditText mRepsField;
+
 
     //Recycler view components
     RecyclerView mSetsRecycler;
@@ -476,7 +479,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                 addSet();
                 break;
             case R.id.button_save_set:
-                replaceSet(mSetSelected);
+                replaceSet(mSetSelected, view);
         }
     }
 
@@ -514,7 +517,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
     // EDIT METHOD TO REPLACE SET WHEN SAVE SET IS CLICKED
 
-    private void replaceSet(int setIndex) {
+    private void replaceSet(int setIndex, View view) {
         setWeight();
         setReps();
 
@@ -539,7 +542,12 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mRecord);
         }*/
         mDatabase.updateChildren(childUpdates);
-        mSetsAdapter.setSetBeingEdited(setIndex);
+        mSetsAdapter.setSetBeingEdited(setIndex); // makes sure set is still highlighted after dataset refreshed
+
+        Toast.makeText(getContext(), "Set updated", Toast.LENGTH_SHORT).show();
+
+        Snackbar snackbar = Snackbar.make(view, "Set updated", Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 
 
