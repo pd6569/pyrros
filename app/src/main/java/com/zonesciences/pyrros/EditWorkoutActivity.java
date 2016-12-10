@@ -2,6 +2,7 @@ package com.zonesciences.pyrros;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +16,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.fragment.EditWorkout.WorkoutOrderFragment;
@@ -23,6 +26,8 @@ import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EditWorkoutActivity extends BaseActivity {
 
@@ -31,17 +36,21 @@ public class EditWorkoutActivity extends BaseActivity {
     private static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
     private static final String WORKOUT_ID = "Workout ID";
 
+    // Viewpager
     ViewPager mViewPager;
     EditWorkoutAdapter mAdapter;
 
-
+    // View
     public Toolbar mToolbar;
     TabLayout mTabLayout;
 
-
+    // Data
     ArrayList<Exercise> mExercises;
     String mWorkoutKey;
     String mUserId;
+
+    // Firebase
+    DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +62,7 @@ public class EditWorkoutActivity extends BaseActivity {
         mExercises= (ArrayList<Exercise>) i.getSerializableExtra(WORKOUT_EXERCISE_OBJECTS);
         mWorkoutKey = i.getStringExtra(WORKOUT_ID);
         mUserId = getUid();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_edit_workout);
         setSupportActionBar(mToolbar);
@@ -106,10 +116,12 @@ public class EditWorkoutActivity extends BaseActivity {
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
                         mExercises = exerciseList;
+                        Map<String, Object> childUpdates = new HashMap<String, Object>();
                         for (Exercise e : mExercises){
-                            Log.i(TAG, "Exercise: " + e.getName() + " Order: " + e.getOrder());
+                            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + e.getName() + "/order/", e.getOrder());
+                            childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + e.getName() + "/order/", e.getOrder());
                         }
-
+                        mDatabase.updateChildren(childUpdates);
                     }
                 });
                 fragment = sortWorkoutFragment;
