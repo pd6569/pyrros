@@ -177,7 +177,7 @@ public class CreateWorkoutActivity extends BaseActivity {
                 mFragmentReferenceMap.put(position, frag);
                 return frag;
             } else {
-                SortWorkoutFragment frag = SortWorkoutFragment.newInstance();
+                SortWorkoutFragment frag = new SortWorkoutFragment();
                 frag.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {

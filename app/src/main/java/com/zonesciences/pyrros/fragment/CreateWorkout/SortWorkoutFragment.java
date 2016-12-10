@@ -2,6 +2,7 @@ package com.zonesciences.pyrros.fragment.CreateWorkout;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -65,8 +66,15 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
     // Menu
     private MenuItem mStartWorkoutAction;
 
-    public static SortWorkoutFragment newInstance(){
+    // Where is fragment being displayed
+    boolean mInEditWorkout;
+
+    public static SortWorkoutFragment newInstance(List<Exercise> workoutExercises, boolean inEditWorkout){
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_EXERCISES, (ArrayList) workoutExercises);
         SortWorkoutFragment fragment = new SortWorkoutFragment();
+        fragment.setArguments(bundle);
+        fragment.setInEditWorkout(inEditWorkout);
         return fragment;
     }
 
@@ -79,6 +87,14 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
+
+        Bundle bundle = getArguments();
+
+        try {
+            mWorkoutExercises = (ArrayList) bundle.getSerializable(ARG_EXERCISES);
+        } catch(Exception e){
+            Log.i(TAG, "Unable to set workout exercises: " + e.toString());
+        };
 
         mContext = getContext();
 
@@ -99,6 +115,30 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
+        mAdapter.setExercisesListener(new ExercisesListener() {
+            @Override
+            public void onExerciseAdded(Exercise exercise) {
+
+            }
+
+            @Override
+            public void onExercisesEmpty() {
+                Log.i(TAG, "Exercises empty");
+                if (!mInEditWorkout) mStartWorkoutAction.setVisible(false);
+            }
+
+            @Override
+            public void onExerciseRemoved(Exercise exercise) {
+
+            }
+
+            @Override
+            public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
+                mWorkoutExercises = exerciseList;
+                if (!mInEditWorkout) mExercisesListener.onExercisesChanged(mWorkoutExercises);
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerView, new RecyclerClickListener() {
             @Override
@@ -118,6 +158,12 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
                 }
             }
         }));
+
+        if (mInEditWorkout) {
+            mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
+            mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+            mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        }
 
         return rootView;
     }
@@ -200,40 +246,42 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser){
-        if (isVisibleToUser) {
+        if (!mInEditWorkout) {
+            if (isVisibleToUser) {
 
-            if (!mExercisesAdded) {
-                if (!mWorkoutExercises.isEmpty()) {
-                    mExercisesAdded = true;
-                    mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
-                    mAdapter.setExercisesListener(new ExercisesListener() {
-                        @Override
-                        public void onExerciseAdded(Exercise exercise) {
+                if (!mExercisesAdded) {
+                    if (!mWorkoutExercises.isEmpty()) {
+                        mExercisesAdded = true;
+                        mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
+                        mAdapter.setExercisesListener(new ExercisesListener() {
+                            @Override
+                            public void onExerciseAdded(Exercise exercise) {
 
-                        }
+                            }
 
-                        @Override
-                        public void onExercisesEmpty() {
-                            Log.i(TAG, "Exercises empty");
-                            mStartWorkoutAction.setVisible(false);
-                        }
+                            @Override
+                            public void onExercisesEmpty() {
+                                Log.i(TAG, "Exercises empty");
+                                mStartWorkoutAction.setVisible(false);
+                            }
 
-                        @Override
-                        public void onExerciseRemoved(Exercise exercise) {
+                            @Override
+                            public void onExerciseRemoved(Exercise exercise) {
 
-                        }
+                            }
 
-                        @Override
-                        public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
-                            Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
-                            mWorkoutExercises = exerciseList;
-                            mExercisesListener.onExercisesChanged(mWorkoutExercises);
-                        }
-                    });
-                    mRecyclerView.setAdapter(mAdapter);
-                    mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
-                    mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
-                    mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+                            @Override
+                            public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                                Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
+                                mWorkoutExercises = exerciseList;
+                                mExercisesListener.onExercisesChanged(mWorkoutExercises);
+                            }
+                        });
+                        mRecyclerView.setAdapter(mAdapter);
+                        mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
+                        mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+                        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+                    }
                 }
             }
         }
@@ -279,13 +327,15 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
         inflater.inflate(R.menu.menu_create_workout, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
-        if (mWorkoutExercises.size() > 0){
-            mStartWorkoutAction.setVisible(true);
-        }
+        if (!mInEditWorkout) {
+            mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
+            if (mWorkoutExercises.size() > 0) {
+                mStartWorkoutAction.setVisible(true);
+            }
 
-        MenuItem search = menu.findItem(R.id.action_search);
-        search.setVisible(false);
+            MenuItem search = menu.findItem(R.id.action_search);
+            search.setVisible(false);
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -304,5 +354,9 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    public void setInEditWorkout(boolean inEditWorkout) {
+        mInEditWorkout = inEditWorkout;
     }
 }

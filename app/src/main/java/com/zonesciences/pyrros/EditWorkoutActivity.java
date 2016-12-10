@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.fragment.EditWorkout.WorkoutOrderFragment;
 import com.zonesciences.pyrros.fragment.EditWorkout.WorkoutPropertiesFragment;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
@@ -72,7 +73,7 @@ public class EditWorkoutActivity extends BaseActivity {
     class EditWorkoutAdapter extends FragmentPagerAdapter {
 
         Fragment [] mFragments = new Fragment[]{
-                new WorkoutOrderFragment(),
+                SortWorkoutFragment.newInstance(mExercises, true),
                 WorkoutPropertiesFragment.newInstance(mUserId, mWorkoutKey)
         };
 
