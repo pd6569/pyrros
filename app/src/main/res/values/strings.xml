@@ -51,7 +51,7 @@
 
     <string name="weight">Weight</string>
     <string name="reps">Reps</string>
-    <string name="save_set">Add Set</string>
+    <string name="save_set">Save Set</string>
     <string name="no_sets_recorded">No sets recorded</string>
     <string name="action_start">Start</string>
 
@@ -102,5 +102,6 @@
     <string name="add_to_routine">Add to routine</string>
     <string name="workout_deleted">Workout deleted</string>
     <string name="workout_restored">Workout restored</string>
+    <string name="add_set">add set</string>
 
 </resources>

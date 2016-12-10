@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +19,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -52,6 +57,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     private static final String ARG_EXERCISE_OBJECT = "ExerciseObject";
 
     //Views
+    LinearLayout mAddSetsContainerLinearLayout;
+    ImageView mCloseEditSetImageView;
     TextView mSetNumberTitle;
     TextView mWeightTextView;
     Button mIncreaseWeightButton;
@@ -59,6 +66,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     Button mIncreaseRepsButton;
     Button mDecreaseRepsButton;
     Button mAddSet;
+    Button mSaveSet;
 
     EditText mWeightField;
     EditText mRepsField;
@@ -207,7 +215,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         mSetsAdapter.setSetsListener(new SetsAdapter.SetsListener() {
 
             @Override
-            public void onSetSelected(int setIndex){
+            public void onSetSelected(final int setIndex){
                 Log.i(TAG, "Set has been clicked. Weight: " + mExercise.getWeight().get(setIndex) + " Reps: " + mExercise.getReps().get(setIndex));
                 mWeightField.setText(mExercise.getWeight().get(setIndex).toString());
                 mRepsField.setText(mExercise.getReps().get(setIndex).toString());
@@ -218,6 +226,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                 if (mEditSetMode == true && mPreviousSetSelected == mSetSelected){
                     // we are in edit mode, and user has clicked on the highlighted set. Turn edit mode OFF
                     mEditSetMode = false;
+                    mSetsAdapter.setSetBeingEdited(-1); // next time recycler is adapter it will NOT highlight the set
                     mLayoutManager.findViewByPosition(mPreviousSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.white));
                 } else if (mEditSetMode == false && mPreviousSetSelected == mSetSelected){
                     // edit mode is off, but set that is selected is the same as the last set that was selected, set edit mode true and highlight the set
@@ -231,10 +240,31 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                     if (mPreviousSetSelected < mExercise.getReps().size()) {
                         mLayoutManager.findViewByPosition(mPreviousSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.white));
                     }
+                } else {
+                    mEditSetMode = true;
+                }
+
+
+                if (mEditSetMode){
+
+                    mSetNumberTitle.setText("Edit set " + (setIndex + 1));
+                    mCloseEditSetImageView.setVisibility(View.VISIBLE);
+                    mCloseEditSetImageView.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            closeEditMode();
+                        }
+                    });
+
+                    mAddSet.setVisibility(View.GONE);
+                    mSaveSet.setVisibility(View.VISIBLE);
+                } else {
+                    closeEditMode();
                 }
 
                 mPreviousSetSelected = mSetSelected;
             }
+
 
             @Override
             public void onSetsChanged() {
@@ -274,6 +304,14 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
     }
 
+    public void closeEditMode(){
+        mEditSetMode = false;
+        mSetNumberTitle.setText("Set " + (mExercise.getReps().size() + 1));
+        mAddSet.setVisibility(View.VISIBLE);
+        mSaveSet.setVisibility(View.GONE);
+        mCloseEditSetImageView.setVisibility(View.INVISIBLE);
+        mLayoutManager.findViewByPosition(mPreviousSetSelected).setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.white));
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -282,6 +320,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         Log.i(TAG, "onCreateView()");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
+
+        mAddSetsContainerLinearLayout = (LinearLayout) view.findViewById(R.id.linear_layout_add_set_container);
+        mCloseEditSetImageView = (ImageView) view.findViewById(R.id.imagview_edit_set_close);
 
         mSetNumberTitle = (TextView) view.findViewById(R.id.textview_set_number_title);
 
@@ -300,8 +341,12 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         mIncreaseRepsButton = (Button) view.findViewById(R.id.button_increase_reps);
         mIncreaseRepsButton.setOnClickListener(this);
 
+        mSaveSet = (Button) view.findViewById(R.id.button_save_set);
+        mSaveSet.setOnClickListener(this);
+
         mAddSet = (Button) view.findViewById(R.id.button_add_set);
         mAddSet.setOnClickListener(this);
+
 
         mWeightField = (EditText) view.findViewById(R.id.field_weight);
         mRepsField = (EditText) view.findViewById(R.id.field_reps);
@@ -341,6 +386,11 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onItemSelected(int position) {
         mSetsAdapter.toggleSelection(position);
+
+        if (mEditSetMode){
+            closeEditMode();
+        }
+
         boolean hasSelectedSets = mSetsAdapter.getSelectedCount() > 0;
 
         if (hasSelectedSets && mActionMode == null){
@@ -425,6 +475,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             case R.id.button_add_set:
                 addSet();
                 break;
+            case R.id.button_save_set:
+                replaceSet(mSetSelected);
         }
     }
 
@@ -457,9 +509,38 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mRecord);
         }
         mDatabase.updateChildren(childUpdates);
-
     }
 
+
+    // EDIT METHOD TO REPLACE SET WHEN SAVE SET IS CLICKED
+
+    private void replaceSet(int setIndex) {
+        setWeight();
+        setReps();
+
+        double convertedWeight = mWeight * mConversionMultiple;
+
+        mExercise.getWeight().set(setIndex, convertedWeight);
+        mExercise.getReps().set(setIndex, mReps);
+
+
+        boolean record = false;
+        if (mDataTools.isRecord(convertedWeight, Integer.toString(mReps), mWorkoutKey)){
+            mRecord = mDataTools.getExerciseRecord();
+            record = true;
+        }
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
+        childUpdates.put("/user-workout-exercises/" + mUser + "/" + mWorkoutKey + "/" + mExerciseKey + "/", mExercise);
+        if (record){
+            Log.i(TAG, "Record set, write to database");
+            childUpdates.put("/user-records/" + mUser + "/" + mExerciseKey, mRecord);
+            childUpdates.put("/records/" + mExerciseKey + "/" + mUser, mRecord);
+        }
+        mDatabase.updateChildren(childUpdates);
+        mSetsAdapter.setSetBeingEdited(setIndex);
+    }
 
 
     private void adjustWeight(int id) {

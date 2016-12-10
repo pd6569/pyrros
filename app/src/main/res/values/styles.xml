@@ -17,6 +17,10 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
+    <style name="AppTheme.Positive">
+        <item name="colorButtonNormal">@color/snackbarPositive</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
     </style>
 
@@ -32,5 +36,7 @@
     <style name="AppTheme.Button" parent="Widget.AppCompat.Button">
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+
 
 </resources>

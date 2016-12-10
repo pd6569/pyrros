@@ -60,6 +60,8 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     // Action Mode
     SparseBooleanArray mSelectedSetsIds = new SparseBooleanArray();
 
+    // Edit Mode
+    int setBeingEdited = -1;
 
     public class SetsViewHolder extends RecyclerView.ViewHolder {
 
@@ -130,24 +132,17 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
+                Log.i(TAG, "Sets data changed");
                 //Check if the change being made is removal/addition of set. If set is simply being reorder, then do nothing.
                     if (dataSnapshot.getKey() == "weight") {
 
-                        if (mWeightList.size() != dataSnapshot.getChildrenCount()) {
-                            mWeightList = (List) dataSnapshot.getValue();
+                        mWeightList = (List) dataSnapshot.getValue();
+                        notifyDataSetChanged();
 
-                            notifyDataSetChanged();
-                        } else {
-                            //do nothing
-                        }
                     } else if (dataSnapshot.getKey() == "reps") {
-                        if (mRepsList.size() != dataSnapshot.getChildrenCount()) {
-                            mRepsList = (List) dataSnapshot.getValue();
 
-                            notifyDataSetChanged();
-                        } else {
-                            // do nothing
-                        }
+                        mRepsList = (List) dataSnapshot.getValue();
+                        notifyDataSetChanged();
                     }
             }
 
@@ -192,6 +187,10 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
         /** Change background color of the selected items in recycler view  **/
         holder.itemView.setBackgroundColor(mSelectedSetsIds.get(position) ? ResourcesCompat.getColor(mContext.getResources(), R.color.colorAccent, null) : Color.WHITE);
+
+        if (position == setBeingEdited){
+            holder.itemView.setBackgroundColor(ResourcesCompat.getColor(mContext.getResources(), R.color.colorAccent, null));
+        }
     }
 
     @Override
@@ -347,4 +346,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         this.mSetsListener = listener;
     }
 
+    public void setSetBeingEdited(int setBeingEdited) {
+        this.setBeingEdited = setBeingEdited;
+    }
 }
