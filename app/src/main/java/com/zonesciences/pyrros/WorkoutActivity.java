@@ -279,7 +279,7 @@ public class WorkoutActivity extends BaseActivity {
     }
 
 
-    class WorkoutExercisesAdapter extends FragmentStatePagerAdapter {
+    class WorkoutExercisesAdapter extends FragmentPagerAdapter {
 
         public WorkoutExercisesAdapter(FragmentManager fm) {
             super(fm);
@@ -405,6 +405,7 @@ public class WorkoutActivity extends BaseActivity {
                     mWorkoutExercisesAdapter = null;
                     mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
                     mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
+
                 }
 
                 @Override
@@ -431,6 +432,41 @@ public class WorkoutActivity extends BaseActivity {
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
+
+        final List<Exercise> exercises = new ArrayList<>();
+        mDatabase.child("/workout-exercises/").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot exercise : dataSnapshot.getChildren()){
+                    Exercise e = exercise.getValue(Exercise.class);
+                    exercises.add(e);
+                }
+
+                Log.i(TAG, "exercises: " + exercises.size());
+                Collections.sort(exercises);
+
+                List<String> tabTitles = new ArrayList<String>();
+                for (Exercise e : exercises){
+                    tabTitles.add(e.getName());
+                }
+
+                mExerciseObjects.clear();
+                mExerciseObjects.addAll(exercises);
+
+                mExercisesList.clear();
+                mExercisesList.addAll(tabTitles);
+
+                mWorkoutExercisesAdapter = null;
+                mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
+                mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
