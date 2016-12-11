@@ -11,6 +11,7 @@ public class BugList {
     //TODO: Opening workout from within workout (i.e. from stats) cannot navigate back to previous workout
     //TODO: Deleting workout does not delete record
     //TODO: If all exercises deleted in edit workout, workout is fucked
+    //TODO: fragment state pager adapter for workoutactivity is SLOW. try switch to normal adapter, but need to ensure it refreshes after edit workout - could move datatools processes to ASYNC TASK
 
     // Things for improvement
 

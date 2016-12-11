@@ -93,10 +93,13 @@ public class EditWorkoutActivity extends BaseActivity {
             public void onClick (View view){
                 FragmentManager fm = getSupportFragmentManager();
 
+                mToolbar.setTitle("Add/Remove Exercises");
                 mViewPager.setVisibility(View.GONE);
                 mTabLayout.setVisibility(View.GONE);
+                mFab.setVisibility(View.GONE);
 
                 final CreateWorkoutFragment createWorkoutFragment = CreateWorkoutFragment.newInstance(mUserId);
+                createWorkoutFragment.setInEditWorkout(true);
                 createWorkoutFragment.setExercisesListener(new ExercisesListener() {
 
 
@@ -113,8 +116,7 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExerciseRemoved(Exercise exercise) {
-                        Log.i(TAG, "Exercise removed");
-                        mExercises.remove(exercise);
+                        Log.i(TAG, "Remove exercise: " + exercise.getName());
                         int indexRemove = 0;
                         for (int i = 0; i < mExercises.size(); i++){
                             if (mExercises.get(i).getName().equals(exercise.getName())){
@@ -147,6 +149,7 @@ public class EditWorkoutActivity extends BaseActivity {
                                 }
                             }
                         }
+
                         createWorkoutFragment.setAllExercises(allExercises);
 
                     }
@@ -234,7 +237,12 @@ public class EditWorkoutActivity extends BaseActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                writeWorkoutChanges();
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0){
+                    Log.i(TAG, "In add exercise view");
+                    onBackPressed();
+                } else {
+                    writeWorkoutChanges();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -268,6 +276,7 @@ public class EditWorkoutActivity extends BaseActivity {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0){
             mTabLayout.setVisibility(View.VISIBLE);
             mViewPager.setVisibility(View.VISIBLE);
+            mFab.setVisibility(View.VISIBLE);
 
             SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentMap.get(0);
             sortWorkoutFragment.setWorkoutExercises(mExercises);

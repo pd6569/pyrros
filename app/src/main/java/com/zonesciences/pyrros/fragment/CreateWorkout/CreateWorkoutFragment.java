@@ -120,6 +120,9 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     // Exercise listener
     ExercisesListener mExercisesListener;
 
+    // Where is fragment being displayed
+    boolean mInEditWorkout;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -154,9 +157,12 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         mDatabase.child("exercises").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot exercise : dataSnapshot.getChildren()){
-                    Exercise e = exercise.getValue(Exercise.class);
-                    mAllExercises.add(e);
+                // mAllExercises may be set externally before fragment is loaded e.g. from edit workout
+                if (mAllExercises.isEmpty()) {
+                    for (DataSnapshot exercise : dataSnapshot.getChildren()) {
+                        Exercise e = exercise.getValue(Exercise.class);
+                        mAllExercises.add(e);
+                    }
                 }
                 mFilteredExercises.addAll(mAllExercises);
                 mAdapter = new ExercisesFilterAdapter(mContext, (ArrayList) mFilteredExercises);
@@ -164,7 +170,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
                         mExercisesListener.onExerciseAdded(exercise);
-                        if (!mStartWorkoutAction.isVisible()){
+                        if (!mStartWorkoutAction.isVisible() && !mInEditWorkout){
                             mStartWorkoutAction.setVisible(true);
                         }
                     }
@@ -270,6 +276,8 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         if (mWorkoutExercises.size() > 0){
             mStartWorkoutAction.setVisible(true);
         }
+
+        if (mInEditWorkout) mStartWorkoutAction.setVisible(false);
 
         MenuItem menuItem = menu.findItem(R.id.action_search);
 
@@ -468,6 +476,9 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         return mAdapter;
     }
 
+    public void setInEditWorkout(boolean inEditWorkout) {
+        mInEditWorkout = inEditWorkout;
+    }
 
     public void setExercisesListener(ExercisesListener listener){
         this.mExercisesListener = listener;
@@ -571,6 +582,10 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     public void setAllExercises(List<Exercise> allExercises) {
         mAllExercises = allExercises;
+    }
+
+    public void clearAllExercises(){
+        mAllExercises.clear();
     }
 
     public class FilterSpinnerAdapter extends ArrayAdapter<String>{

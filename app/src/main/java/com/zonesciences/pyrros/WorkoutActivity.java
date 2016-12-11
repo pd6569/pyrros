@@ -279,7 +279,7 @@ public class WorkoutActivity extends BaseActivity {
     }
 
 
-    class WorkoutExercisesAdapter extends FragmentPagerAdapter {
+    class WorkoutExercisesAdapter extends FragmentStatePagerAdapter {
 
         public WorkoutExercisesAdapter(FragmentManager fm) {
             super(fm);
