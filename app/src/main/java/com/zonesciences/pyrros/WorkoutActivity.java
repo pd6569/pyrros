@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Record;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,7 +279,7 @@ public class WorkoutActivity extends BaseActivity {
     }
 
 
-    class WorkoutExercisesAdapter extends FragmentPagerAdapter {
+    class WorkoutExercisesAdapter extends FragmentStatePagerAdapter {
 
         public WorkoutExercisesAdapter(FragmentManager fm) {
             super(fm);
@@ -376,6 +378,42 @@ public class WorkoutActivity extends BaseActivity {
             return true;
         }
 
+        if (i == R.id.sync_view_pager){
+            final List<Exercise> exercises = new ArrayList<>();
+            mDatabase.child("/workout-exercises/").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot exercise : dataSnapshot.getChildren()){
+                        Exercise e = exercise.getValue(Exercise.class);
+                        exercises.add(e);
+                    }
+
+                    Log.i(TAG, "exercises: " + exercises.size());
+                    Collections.sort(exercises);
+
+                    List<String> tabTitles = new ArrayList<String>();
+                    for (Exercise e : exercises){
+                        tabTitles.add(e.getName());
+                    }
+
+                    mExerciseObjects.clear();
+                    mExerciseObjects.addAll(exercises);
+
+                    mExercisesList.clear();
+                    mExercisesList.addAll(tabTitles);
+
+                    mWorkoutExercisesAdapter = null;
+                    mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
+                    mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
         if (i == android.R.id.home){
             finish();
         }
@@ -389,33 +427,11 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "onPause");
     }
 
-    /*@Override
+    @Override
     public void onResume(){
         super.onResume();
         Log.i(TAG, "onResume");
-        final List<Exercise> exercises = new ArrayList<>();
-        mDatabase.child("/workout-exercises/").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot exercise : dataSnapshot.getChildren()){
-                    Exercise e = exercise.getValue(Exercise.class);
-                    exercises.add(e);
-                }
 
-                Log.i(TAG, "exercises: " + exercises.size());
-                mExerciseObjects.clear();
-                mExerciseObjects.addAll(exercises);
-                mWorkoutExercisesAdapter = null;
-                mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
-                mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }*/
+    }
 
 }
