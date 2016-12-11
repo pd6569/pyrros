@@ -84,12 +84,36 @@ public class EditWorkoutActivity extends BaseActivity {
                 FragmentManager fm = getSupportFragmentManager();
 
                 mViewPager.setVisibility(View.GONE);
+                mTabLayout.setVisibility(View.GONE);
 
                 CreateWorkoutFragment createWorkoutFragment = CreateWorkoutFragment.newInstance(mUserId);
+                createWorkoutFragment.setExercisesListener(new ExercisesListener() {
+                    @Override
+                    public void onExerciseAdded(Exercise exercise) {
+
+                    }
+
+                    @Override
+                    public void onExercisesEmpty() {
+
+                    }
+
+                    @Override
+                    public void onExerciseRemoved(Exercise exercise) {
+
+                    }
+
+                    @Override
+                    public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                        mExercises.addAll(exerciseList);
+                        SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mAdapter.getItem(0);
+                        sortWorkoutFragment.setWorkoutExercises(mExercises);
+                    }
+                });
 
 
                 FragmentTransaction ft = fm.beginTransaction();
-                ft.replace(R.id.edit_workout_fragment_container, createWorkoutFragment, null);
+                ft.replace(R.id.edit_workout_fragment_container, createWorkoutFragment, null).addToBackStack(null);
                 ft.commit();
 
             }
@@ -189,5 +213,13 @@ public class EditWorkoutActivity extends BaseActivity {
         finish();
     }
 
+    @Override
+    public void onBackPressed(){
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0){
+            mTabLayout.setVisibility(View.VISIBLE);
+            mViewPager.setVisibility(View.VISIBLE);
+        }
+        super.onBackPressed();
+    }
 
 }
