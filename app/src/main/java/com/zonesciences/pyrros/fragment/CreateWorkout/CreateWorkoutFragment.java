@@ -163,6 +163,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                 mAdapter.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
+                        mExercisesListener.onExerciseAdded(exercise);
                         if (!mStartWorkoutAction.isVisible()){
                             mStartWorkoutAction.setVisible(true);
                         }
@@ -177,6 +178,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
                     @Override
                     public void onExerciseRemoved(Exercise exercise) {
+                        mExercisesListener.onExerciseRemoved(exercise);
                     }
 
                     @Override

@@ -55,6 +55,9 @@ public class EditWorkoutActivity extends BaseActivity {
     // Firebase
     DatabaseReference mDatabase;
 
+    // Fragment reference
+    Map<Integer, Fragment> mFragmentMap = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,9 +98,12 @@ public class EditWorkoutActivity extends BaseActivity {
 
                 final CreateWorkoutFragment createWorkoutFragment = CreateWorkoutFragment.newInstance(mUserId);
                 createWorkoutFragment.setExercisesListener(new ExercisesListener() {
+
+
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
-
+                        Log.i(TAG, "Exercise added");
+                        mExercises.add(exercise);
                     }
 
                     @Override
@@ -107,14 +113,21 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExerciseRemoved(Exercise exercise) {
-
+                        Log.i(TAG, "Exercise removed");
+                        mExercises.remove(exercise);
+                        int indexRemove = 0;
+                        for (int i = 0; i < mExercises.size(); i++){
+                            if (mExercises.get(i).getName().equals(exercise.getName())){
+                                indexRemove = i;
+                                break;
+                            }
+                        }
+                        mExercises.remove(indexRemove);
                     }
 
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
-                        mExercises.addAll(exerciseList);
-                        SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mAdapter.getItem(0);
-                        sortWorkoutFragment.setWorkoutExercises(mExercises);
+
                     }
                 });
 
@@ -195,6 +208,7 @@ public class EditWorkoutActivity extends BaseActivity {
                 WorkoutPropertiesFragment workoutPropertiesFragment = WorkoutPropertiesFragment.newInstance(mUserId, mWorkoutKey);
                 fragment = workoutPropertiesFragment;
             }
+            mFragmentMap.put(position, fragment);
             return fragment;
         }
 
@@ -206,6 +220,10 @@ public class EditWorkoutActivity extends BaseActivity {
         @Override
         public CharSequence getPageTitle(int position){
             return mTitles[position];
+        }
+
+        public Fragment getFragment(int position){
+            return mFragmentMap.get(position);
         }
 
     }
@@ -250,6 +268,10 @@ public class EditWorkoutActivity extends BaseActivity {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0){
             mTabLayout.setVisibility(View.VISIBLE);
             mViewPager.setVisibility(View.VISIBLE);
+
+            SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentMap.get(0);
+            sortWorkoutFragment.setWorkoutExercises(mExercises);
+            sortWorkoutFragment.getAdapter().notifyDataSetChanged();
         }
         super.onBackPressed();
     }
