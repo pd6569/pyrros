@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class EditWorkoutActivity extends BaseActivity {
 
@@ -252,6 +253,11 @@ public class EditWorkoutActivity extends BaseActivity {
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause called. Write workout changes");
+        for (Exercise e: mExercises){
+            if (!e.hasExerciseId()){
+                e.setExerciseId(UUID.randomUUID().toString());
+            }
+        }
         writeWorkoutChanges();
     }
 

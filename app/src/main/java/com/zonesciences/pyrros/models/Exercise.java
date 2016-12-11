@@ -143,6 +143,15 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     }
 
     @Exclude
+    public boolean hasExerciseId(){
+        if (exerciseId != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Exclude
     public void addWeight(Double newWeight){
         if(weight == null){
             weight = new ArrayList<>();
