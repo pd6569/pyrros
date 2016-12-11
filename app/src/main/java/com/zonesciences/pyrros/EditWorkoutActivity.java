@@ -15,8 +15,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
@@ -25,6 +28,7 @@ import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EditWorkoutActivity extends BaseActivity {
@@ -58,7 +62,10 @@ public class EditWorkoutActivity extends BaseActivity {
 
         Intent i = getIntent();
 
-        mExercises= (ArrayList<Exercise>) i.getSerializableExtra(WORKOUT_EXERCISE_OBJECTS);
+        mExercises = (ArrayList<Exercise>) i.getSerializableExtra(WORKOUT_EXERCISE_OBJECTS);
+        for (Exercise e : mExercises){
+            e.setSelected(true);
+        }
         mWorkoutKey = i.getStringExtra(WORKOUT_ID);
         mUserId = getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -86,7 +93,7 @@ public class EditWorkoutActivity extends BaseActivity {
                 mViewPager.setVisibility(View.GONE);
                 mTabLayout.setVisibility(View.GONE);
 
-                CreateWorkoutFragment createWorkoutFragment = CreateWorkoutFragment.newInstance(mUserId);
+                final CreateWorkoutFragment createWorkoutFragment = CreateWorkoutFragment.newInstance(mUserId);
                 createWorkoutFragment.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
@@ -111,6 +118,31 @@ public class EditWorkoutActivity extends BaseActivity {
                     }
                 });
 
+                mDatabase.child("exercises").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<Exercise> allExercises = new ArrayList<Exercise>();
+                        for (DataSnapshot exercise : dataSnapshot.getChildren()){
+                            Exercise e = exercise.getValue(Exercise.class);
+                            allExercises.add(e);
+                        }
+                        for (Exercise e : allExercises){
+                            for (Exercise exercise : mExercises){
+                                if (exercise.getName().equals(e.getName())){
+                                    e.setSelected(true);
+                                    Log.i(TAG, "Found exercise: " + e.getName() + " selected: " + e.isSelected);
+                                }
+                            }
+                        }
+                        createWorkoutFragment.setAllExercises(allExercises);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 FragmentTransaction ft = fm.beginTransaction();
                 ft.replace(R.id.edit_workout_fragment_container, createWorkoutFragment, null).addToBackStack(null);

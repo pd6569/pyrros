@@ -9,7 +9,8 @@ public class BugList {
 
     //TODO: records not updated if workout date is changed for a workout in which a record is set - date remains
     //TODO: Opening workout from within workout (i.e. from stats) cannot navigate back to previous workout
-    //TODO: Deleting workout does not delete record#
+    //TODO: Deleting workout does not delete record
+    //TODO: If all exercises deleted in edit workout, workout is fucked
 
     // Things for improvement
 

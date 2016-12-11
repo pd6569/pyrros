@@ -563,6 +563,14 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         mUsername = username;
     }
 
+    public List<Exercise> getAllExercises() {
+        return mAllExercises;
+    }
+
+    public void setAllExercises(List<Exercise> allExercises) {
+        mAllExercises = allExercises;
+    }
+
     public class FilterSpinnerAdapter extends ArrayAdapter<String>{
 
         Context context;
@@ -609,4 +617,6 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         }
 
     }
+
+
 }
