@@ -98,7 +98,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
         mContext = getContext();
 
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(!mInEditWorkout);
     }
 
 

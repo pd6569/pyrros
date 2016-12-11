@@ -2,14 +2,13 @@ package com.zonesciences.pyrros;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.provider.ContactsContract;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,11 +17,10 @@ import android.view.View;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
-import com.zonesciences.pyrros.fragment.EditWorkout.WorkoutOrderFragment;
 import com.zonesciences.pyrros.fragment.EditWorkout.WorkoutPropertiesFragment;
-import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
@@ -43,6 +41,7 @@ public class EditWorkoutActivity extends BaseActivity {
     // View
     public Toolbar mToolbar;
     TabLayout mTabLayout;
+    FloatingActionButton mFab;
 
     // Data
     ArrayList<Exercise> mExercises;
@@ -78,6 +77,23 @@ public class EditWorkoutActivity extends BaseActivity {
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs_edit_workout);
         mTabLayout.setupWithViewPager(mViewPager, false);
 
+        mFab = (FloatingActionButton) findViewById(R.id.fab_add_exercise);
+        mFab.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick (View view){
+                FragmentManager fm = getSupportFragmentManager();
+
+                mViewPager.setVisibility(View.GONE);
+
+                CreateWorkoutFragment createWorkoutFragment = CreateWorkoutFragment.newInstance(mUserId);
+
+
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.replace(R.id.edit_workout_fragment_container, createWorkoutFragment, null);
+                ft.commit();
+
+            }
+        });
 
     }
 
@@ -116,20 +132,6 @@ public class EditWorkoutActivity extends BaseActivity {
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
                         mExercises = exerciseList;
-
-                        // too many mother fucking data base writes
-
-                        /*// Clear workout information
-                        mDatabase.child("workout-exercises").child(mWorkoutKey).setValue(null);
-                        mDatabase.child("user-workout-exercises").child(mUserId).child(mWorkoutKey).setValue(null);
-
-                        // Write new values
-                        Map<String, Object> childUpdates = new HashMap<String, Object>();
-                        for (Exercise e : mExercises){
-                            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + e.getName(), e.toMap());
-                            childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + e.getName(), e.toMap());
-                        }
-                        mDatabase.updateChildren(childUpdates);*/
                     }
                 });
                 fragment = sortWorkoutFragment;
@@ -151,6 +153,7 @@ public class EditWorkoutActivity extends BaseActivity {
         }
 
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -185,4 +188,6 @@ public class EditWorkoutActivity extends BaseActivity {
 
         finish();
     }
+
+
 }

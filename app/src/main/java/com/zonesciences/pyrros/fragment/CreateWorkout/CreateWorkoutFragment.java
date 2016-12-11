@@ -133,8 +133,6 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mUserId = bundle.getString(ARG_USER_ID);
 
-        mWorkoutDate = ((CreateWorkoutActivity) getActivity()).getWorkoutDate();
-
         setHasOptionsMenu(true);
 
     }
@@ -475,7 +473,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     public void startWorkout(){
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
-
+        mWorkoutDate = ((CreateWorkoutActivity) getActivity()).getWorkoutDate();
         ArrayList<Exercise> exercisesToLoad = (ArrayList) mAdapter.getWorkoutExercises();
         final ArrayList<String> exerciseKeysList = new ArrayList<>();
 
