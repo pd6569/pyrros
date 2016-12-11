@@ -116,12 +116,20 @@ public class EditWorkoutActivity extends BaseActivity {
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
                         mExercises = exerciseList;
+
+                        // too many mother fucking data base writes
+
+                        /*// Clear workout information
+                        mDatabase.child("workout-exercises").child(mWorkoutKey).setValue(null);
+                        mDatabase.child("user-workout-exercises").child(mUserId).child(mWorkoutKey).setValue(null);
+
+                        // Write new values
                         Map<String, Object> childUpdates = new HashMap<String, Object>();
                         for (Exercise e : mExercises){
-                            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + e.getName() + "/order/", e.getOrder());
-                            childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + e.getName() + "/order/", e.getOrder());
+                            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + e.getName(), e.toMap());
+                            childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + e.getName(), e.toMap());
                         }
-                        mDatabase.updateChildren(childUpdates);
+                        mDatabase.updateChildren(childUpdates);*/
                     }
                 });
                 fragment = sortWorkoutFragment;
@@ -149,8 +157,32 @@ public class EditWorkoutActivity extends BaseActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                finish();
+                writeWorkoutChanges();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.i(TAG, "onPause called. Write workout changes");
+        writeWorkoutChanges();
+    }
+
+    private void writeWorkoutChanges(){
+        // Clear workout information
+        mDatabase.child("workout-exercises").child(mWorkoutKey).setValue(null);
+        mDatabase.child("user-workout-exercises").child(mUserId).child(mWorkoutKey).setValue(null);
+
+        // Write new values
+        Map<String, Object> childUpdates = new HashMap<String, Object>();
+        for (Exercise e : mExercises){
+            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + e.getName(), e.toMap());
+            childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + e.getName(), e.toMap());
+        }
+        mDatabase.updateChildren(childUpdates);
+
+        finish();
     }
 }

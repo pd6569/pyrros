@@ -9,10 +9,4 @@
         android:visible="true"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/sync_view_pager"
-        android:title="Sync ViewPager"
-        android:visible="true"
-        app:showAsAction="never" />
-
 </menu>

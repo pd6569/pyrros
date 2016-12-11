@@ -378,42 +378,6 @@ public class WorkoutActivity extends BaseActivity {
             return true;
         }
 
-        if (i == R.id.sync_view_pager){
-            final List<Exercise> exercises = new ArrayList<>();
-            mDatabase.child("/workout-exercises/").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot exercise : dataSnapshot.getChildren()){
-                        Exercise e = exercise.getValue(Exercise.class);
-                        exercises.add(e);
-                    }
-
-                    Log.i(TAG, "exercises: " + exercises.size());
-                    Collections.sort(exercises);
-
-                    List<String> tabTitles = new ArrayList<String>();
-                    for (Exercise e : exercises){
-                        tabTitles.add(e.getName());
-                    }
-
-                    mExerciseObjects.clear();
-                    mExerciseObjects.addAll(exercises);
-
-                    mExercisesList.clear();
-                    mExercisesList.addAll(tabTitles);
-
-                    mWorkoutExercisesAdapter = null;
-                    mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
-                    mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
 
         if (i == android.R.id.home){
             finish();
