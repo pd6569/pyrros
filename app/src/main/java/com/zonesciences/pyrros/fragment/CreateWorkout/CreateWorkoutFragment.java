@@ -165,7 +165,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     }
                 }
                 mFilteredExercises.addAll(mAllExercises);
-                mAdapter = new ExercisesFilterAdapter(mContext, (ArrayList) mFilteredExercises);
+                mAdapter = new ExercisesFilterAdapter(mContext, (ArrayList) mFilteredExercises, mInEditWorkout);
                 mAdapter.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {

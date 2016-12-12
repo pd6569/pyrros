@@ -2,6 +2,7 @@ package com.zonesciences.pyrros.adapters;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MotionEventCompat;
@@ -21,6 +22,7 @@ import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperViewHolder;
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
+import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
 
 
@@ -59,14 +61,20 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
                 @Override
                 public void onClick(View view){
-                    int position = getAdapterPosition();
-                    mWorkoutExercises.get(position).setSelected(false);
-                    mWorkoutExercises.remove(position);
-                    notifyItemRemoved(position);
-                    setExerciseOrder();
-                    mExercisesListener.onExercisesChanged(mWorkoutExercises);
-                    if (mWorkoutExercises.isEmpty()){
-                        mExercisesListener.onExercisesEmpty();
+                    final int position = getAdapterPosition();
+                    if (!mWorkoutExercises.get(position).hasSets()) {
+                        removeExercise(position);
+                    } else {
+                        Snackbar snackbar = Snackbar.make(deleteExercise, R.string.delete_exercise_warning, Snackbar.LENGTH_LONG).setAction(R.string.action_delete, new View.OnClickListener(){
+                            @Override
+                            public void onClick(View view){
+                                removeExercise(position);
+
+                            }
+                        });
+                        View sbView = snackbar.getView();
+                        sbView.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.snackbarNegative));
+                        snackbar.show();
                     }
 
                 }
@@ -179,6 +187,21 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         mDragListener.onStopDrag();
         setExerciseOrder();
         mExercisesListener.onExercisesChanged(mWorkoutExercises);
+    }
+
+    /***
+     * Remove exercise
+     */
+
+    private void removeExercise(final int position){
+        mWorkoutExercises.get(position).setSelected(false);
+        mWorkoutExercises.remove(position);
+        notifyItemRemoved(position);
+        setExerciseOrder();
+        mExercisesListener.onExercisesChanged(mWorkoutExercises);
+        if (mWorkoutExercises.isEmpty()) {
+            mExercisesListener.onExercisesEmpty();
+        }
     }
 
     /***

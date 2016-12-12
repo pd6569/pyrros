@@ -156,12 +156,29 @@ public class EditWorkoutActivity extends BaseActivity {
 
                         Log.i(TAG, "Remove exercise: " + exercise.getName());
                         int indexRemove = 0;
-                        for (int i = 0; i < mExercises.size(); i++){
-                            if (mExercises.get(i).getName().equals(exercise.getName())){
+                        for (int i = 0; i < mExercises.size(); i++) {
+                            if (mExercises.get(i).getName().equals(exercise.getName())) {
                                 indexRemove = i;
                                 break;
                             }
                         }
+
+
+                        /*if (mExercises.get(index).hasSets()) {
+                            Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.delete_exercise_warning, Snackbar.LENGTH_LONG).setAction(R.string.action_delete, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    mExercises.remove(index);
+                                    mChangesMade++;
+                                    mNumExercises--;
+
+                                }
+                            });
+                            View sbView = snackbar.getView();
+                            sbView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.snackbarNegative));
+                            snackbar.show();*/
+
+
                         mExercises.remove(indexRemove);
                         mChangesMade++;
                         mNumExercises--;
@@ -170,12 +187,12 @@ public class EditWorkoutActivity extends BaseActivity {
                         newList.addAll(mExercises);
                         mWorkoutChangesHistoryMap.put(mChangesMade, newList);
 
-                        Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.exercise_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
+                        Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.exercise_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener() {
                             @Override
-                            public void onClick(View view){
+                            public void onClick(View view) {
                                 undoWorkoutChanges((SortWorkoutFragment) mAdapter.getFragment(0));
-                                for (Exercise e : createWorkoutFragment.getAllExercises()){
-                                    if (e.getName().contains(exercise.getName())){
+                                for (Exercise e : createWorkoutFragment.getAllExercises()) {
+                                    if (e.getName().contains(exercise.getName())) {
                                         e.setSelected(true);
                                         createWorkoutFragment.getAdapter().notifyDataSetChanged();
                                         break;
@@ -184,6 +201,7 @@ public class EditWorkoutActivity extends BaseActivity {
                             }
                         });
                         snackbar.show();
+
                     }
 
                     @Override

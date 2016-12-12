@@ -25,7 +25,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="center"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_weight="1"
+            android:padding="5dp"
             android:src="@drawable/ic_close_gray_24dp"/>
 
         <TextView
@@ -45,6 +48,7 @@
             android:layout_height="wrap_content"
             android:scaleType="center"
             android:layout_weight="1"
+            android:padding="5dp"
             android:src="@drawable/ic_reorder_gray_24dp"/>
 
     </LinearLayout>
