@@ -79,10 +79,10 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
                         mWorkoutExercises.add(exercise);
                         mExercisesListener.onExerciseAdded(exercise);
                         mExercisesListener.onExercisesChanged(mWorkoutExercises);
-                        Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " added to workout", Snackbar.LENGTH_SHORT);
+                        /*Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " added to workout", Snackbar.LENGTH_SHORT);
                         View sbView = snackbar.getView();
                         sbView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.snackbarPositive));
-                        snackbar.show();
+                        snackbar.show();*/
                         Log.i(TAG, "Exercise added to mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
                     }
                 } else {
@@ -92,10 +92,10 @@ public class ExercisesFilterAdapter extends RecyclerView.Adapter<ExercisesFilter
                     if (mWorkoutExercises.size() == 0){
                         mExercisesListener.onExercisesEmpty();
                     }
-                    Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " removed from workout", Snackbar.LENGTH_SHORT);
+                    /*Snackbar snackbar = Snackbar.make(holder.itemView, exercise.getName() + " removed from workout", Snackbar.LENGTH_SHORT);
                     View sbView = snackbar.getView();
                     sbView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.snackbarNegative));
-                    snackbar.show();
+                    snackbar.show();*/
                     Log.i(TAG, "Exercise removed from mWorkoutExercise" + exercise.getName() + " mWorkoutExercises: " + mWorkoutExercises.size());
                 }
             }

@@ -117,10 +117,26 @@ public class EditWorkoutActivity extends BaseActivity {
                 createWorkoutFragment.setExercisesListener(new ExercisesListener() {
 
 
+
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
                         Log.i(TAG, "Exercise added");
                         mExercises.add(exercise);
+                        mChangesMade++;
+                        mNumExercises++;
+
+                        List<Exercise> newList = new ArrayList<>();
+                        newList.addAll(mExercises);
+                        mWorkoutChangesHistoryMap.put(mChangesMade, newList);
+
+
+                        Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.exercise_added, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
+                            @Override
+                            public void onClick(View view){
+                                undoWorkoutChanges((SortWorkoutFragment) mAdapter.getFragment(0));
+                            }
+                        });
+                        snackbar.show();
                     }
 
                     @Override
@@ -130,6 +146,7 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExerciseRemoved(Exercise exercise) {
+
                         Log.i(TAG, "Remove exercise: " + exercise.getName());
                         int indexRemove = 0;
                         for (int i = 0; i < mExercises.size(); i++){
@@ -139,6 +156,20 @@ public class EditWorkoutActivity extends BaseActivity {
                             }
                         }
                         mExercises.remove(indexRemove);
+                        mChangesMade++;
+                        mNumExercises--;
+
+                        List<Exercise> newList = new ArrayList<>();
+                        newList.addAll(mExercises);
+                        mWorkoutChangesHistoryMap.put(mChangesMade, newList);
+
+                        Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.exercise_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
+                            @Override
+                            public void onClick(View view){
+                                undoWorkoutChanges((SortWorkoutFragment) mAdapter.getFragment(0));
+                            }
+                        });
+                        snackbar.show();
                     }
 
                     @Override
@@ -218,8 +249,7 @@ public class EditWorkoutActivity extends BaseActivity {
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
                         mChangesMade ++;
-                        for (Exercise e : mExercises){
-                            Log.i(TAG, "Exercises changed. Exercise: " + e.getName() + " order: " + e.getOrder());
+
                         List<Exercise> newList = new ArrayList<>();
                         newList.addAll(mExercises);
                         mWorkoutChangesHistoryMap.put(mChangesMade, newList);
@@ -231,18 +261,7 @@ public class EditWorkoutActivity extends BaseActivity {
                             Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.exercise_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
                                 @Override
                                 public void onClick(View view){
-                                    if (mChangesMade > 1){
-                                        mExercises.clear();
-                                        mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangesMade-1));
-                                    } else {
-                                        mExercises.clear();
-                                        mExercises.addAll(mInitialExercises);
-                                    }
-                                    sortWorkoutFragment.setWorkoutExercises(mExercises);
-                                    sortWorkoutFragment.getAdapter().setExerciseOrder();
-                                    sortWorkoutFragment.getAdapter().notifyDataSetChanged();
-                                    mNumExercises = mExercises.size();
-                                    mChangesMade--;
+                                    undoWorkoutChanges(sortWorkoutFragment);
                                 }
                             });
                             snackbar.show();
@@ -254,25 +273,11 @@ public class EditWorkoutActivity extends BaseActivity {
                             Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.exercises_changed, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
                                 @Override
                                 public void onClick(View view){
-
-                                    if (mChangesMade > 1){
-                                        mExercises.clear();
-                                        mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangesMade-1));
-                                    } else {
-                                        mExercises.clear();
-                                        mExercises.addAll(mInitialExercises);
-                                    }
-
-                                    sortWorkoutFragment.setWorkoutExercises(mExercises);
-                                    sortWorkoutFragment.getAdapter().setExerciseOrder();
-                                    sortWorkoutFragment.getAdapter().notifyDataSetChanged();
-                                    mNumExercises = mExercises.size();
-                                    mChangesMade--;
+                                    undoWorkoutChanges(sortWorkoutFragment);
                                 }
                             });
                             snackbar.show();
                             mNumExercises = mExercises.size();
-                        }
 
                         mExercises = exerciseList;
 
@@ -301,8 +306,23 @@ public class EditWorkoutActivity extends BaseActivity {
             return mFragmentMap.get(position);
         }
 
+
+
     }
 
+    private void undoWorkoutChanges(SortWorkoutFragment sortWorkoutFragment){
+        if (mChangesMade > 1){
+            mExercises.clear();
+            mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangesMade-1));
+        } else {
+            mExercises.clear();
+            mExercises.addAll(mInitialExercises);
+        }
+        sortWorkoutFragment.setWorkoutExercises(mExercises);
+        sortWorkoutFragment.getAdapter().notifyDataSetChanged();
+        mNumExercises = mExercises.size();
+        mChangesMade--;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
