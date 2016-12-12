@@ -344,45 +344,6 @@ public class EditWorkoutActivity extends BaseActivity {
     }
 
 
-
-
-
-   /* @Override
-    public boolean onMenuItemClick(MenuItem menuItem) {
-        switch (menuItem.getItemId()){
-
-            case R.id.action_undo:
-
-                if (mChangeHisoryIndex == 0){
-                    Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_undone, Snackbar.LENGTH_SHORT);
-                    snackbar.show();
-                    return true;
-                } else {
-                    undoWorkoutChanges(sortWorkoutFragment);
-                    if (!mRedoAction.isVisible()) {
-                        mRedoAction.setVisible(true);
-                        mRedoAction.setOnMenuItemClickListener(this);
-                        return true;
-                    }
-                    return true;
-                }
-
-            case R.id.action_redo:
-                if (mChangeHisoryIndex == mWorkoutChangesHistoryMap.size()) {
-                    Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_redone, Snackbar.LENGTH_SHORT);
-                    snackbar.show();
-                    return true;
-                } else {
-                    redoWorkoutChanges(sortWorkoutFragment);
-                    return true;
-                }
-
-            default:
-                break;
-        }
-        return true;
-    }*/
-
     private void undoWorkoutChanges(SortWorkoutFragment sortWorkoutFragment){
         if (mChangeHisoryIndex > 1){
             Log.i(TAG, "Not the first change. Step backwards. Map contains changes: " + mWorkoutChangesHistoryMap.size());
@@ -392,6 +353,10 @@ public class EditWorkoutActivity extends BaseActivity {
             Log.i(TAG, "First change. Reset exercises. Map contains changes: " + mWorkoutChangesHistoryMap.size());
             mExercises.clear();
             mExercises.addAll(mInitialExercises);
+        }
+        if (!mRedoAction.isVisible()){
+            mRedoAction.setVisible(true);
+            mRedoAction.setOnMenuItemClickListener(mRedoListener);
         }
         sortWorkoutFragment.setWorkoutExercises(mExercises);
         sortWorkoutFragment.getAdapter().notifyDataSetChanged();
