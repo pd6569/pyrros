@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -168,6 +169,7 @@ public class EditWorkoutActivity extends BaseActivity {
                         List<Exercise> newList = new ArrayList<>();
                         newList.addAll(mExercises);
                         mWorkoutChangesHistoryMap.put(mChangeHisoryIndex, newList);
+                        mExercisesEmpty = false;
 
                     }
 
@@ -266,7 +268,7 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExercisesEmpty() {
-                        mExercisesEmpty = true;
+                        Log.i(TAG, "Exercises empty: " + mExercises);
                     }
 
                     @Override
@@ -313,7 +315,12 @@ public class EditWorkoutActivity extends BaseActivity {
 
 
                         mExercises = exerciseList;
-                        if (mExercises.size() > 0) mExercisesEmpty = false;
+                        if (mExercises.size() == 0) {
+                            mExercisesEmpty = true;
+                        } else {
+                            mExercisesEmpty = false;
+                        }
+                        Log.i(TAG, "Exercise empty: " + mExercisesEmpty);
                     }
                 });
                 fragment = sortWorkoutFragment;
@@ -405,12 +412,13 @@ public class EditWorkoutActivity extends BaseActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0){
+                onBackPressed();
+                /*if (getSupportFragmentManager().getBackStackEntryCount() > 0){
                     Log.i(TAG, "In add exercise view");
                     onBackPressed();
                 } else {
                     writeWorkoutChanges();
-                }
+                }*/
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -433,19 +441,28 @@ public class EditWorkoutActivity extends BaseActivity {
 
         sortWorkoutFragment.getAdapter().setExerciseOrder();
 
+
         // Clear workout information
         mDatabase.child("workout-exercises").child(mWorkoutKey).setValue(null);
         mDatabase.child("user-workout-exercises").child(mUserId).child(mWorkoutKey).setValue(null);
 
+
         // Write new values
+
         Map<String, Object> childUpdates = new HashMap<String, Object>();
-        for (Exercise e : mExercises){
-            childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + e.getName(), e.toMap());
-            childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + e.getName(), e.toMap());
+        if (!mExercisesEmpty) {
+            // Write new exercise changes
+            for (Exercise e : mExercises) {
+                childUpdates.put("/workout-exercises/" + mWorkoutKey + "/" + e.getName(), e.toMap());
+                childUpdates.put("/user-workout-exercises/" + mUserId + "/" + mWorkoutKey + "/" + e.getName(), e.toMap());
+            }
+        } else {
+            // Remove workout from database
+            childUpdates.put("/workouts/" + mWorkoutKey, null);
+            childUpdates.put("/user-workouts/" + mUserId + "/" + mWorkoutKey, null);
         }
         mDatabase.updateChildren(childUpdates);
 
-        finish();
     }
 
     @Override
@@ -460,6 +477,15 @@ public class EditWorkoutActivity extends BaseActivity {
             SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentMap.get(0);
             sortWorkoutFragment.setWorkoutExercises(mExercises);
             sortWorkoutFragment.getAdapter().notifyDataSetChanged();
+        } else {
+            if (!mExercisesEmpty) {
+                finish();
+            } else {
+                Toast.makeText(getApplicationContext(), "All exercises removed, workout deleted", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
         }
         super.onBackPressed();
     }
