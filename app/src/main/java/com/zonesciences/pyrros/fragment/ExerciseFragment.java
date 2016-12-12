@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -250,7 +251,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
                 if (mEditSetMode){
 
-                    mSetNumberTitle.setText("Edit set " + (setIndex + 1));
+                    mSetNumberTitle.setText("Set " + (setIndex + 1));
+                    mSetNumberTitle.setTypeface(null, Typeface.BOLD_ITALIC);
                     mCloseEditSetImageView.setVisibility(View.VISIBLE);
                     mCloseEditSetImageView.setOnClickListener(new View.OnClickListener(){
                         @Override
@@ -310,6 +312,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     public void closeEditMode(){
         mEditSetMode = false;
         mSetNumberTitle.setText("Set " + (mExercise.getReps().size() + 1));
+        mSetNumberTitle.setTypeface(null, Typeface.BOLD);
         mAddSet.setVisibility(View.VISIBLE);
         mSaveSet.setVisibility(View.GONE);
         mCloseEditSetImageView.setVisibility(View.INVISIBLE);
