@@ -59,6 +59,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
     // Action Mode
     ActionMode mActionMode;
+    boolean isMultiSelectDisabled;
 
     // Exercise Listener
     ExercisesListener mExercisesListener;
@@ -151,7 +152,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
             @Override
             public void onLongClick(View view, int position) {
-                if (!isBeingDragged) {
+                if (!isBeingDragged && !isMultiSelectDisabled) {
                     mAdapter.setAllowReordering(false);
                     mAdapter.notifyDataSetChanged();
                     onItemSelected(position);
@@ -359,5 +360,9 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
     public void setInEditWorkout(boolean inEditWorkout) {
         mInEditWorkout = inEditWorkout;
+    }
+
+    public void setMultiSelectDisabled(boolean multiSelectDisabled) {
+        isMultiSelectDisabled = multiSelectDisabled;
     }
 }

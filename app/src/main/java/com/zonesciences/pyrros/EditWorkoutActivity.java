@@ -157,7 +157,6 @@ public class EditWorkoutActivity extends BaseActivity {
                 createWorkoutFragment.setExercisesListener(new ExercisesListener() {
 
 
-
                     @Override
                     public void onExerciseAdded(final Exercise exercise) {
                         Log.i(TAG, "Exercise added");
@@ -258,6 +257,7 @@ public class EditWorkoutActivity extends BaseActivity {
             Fragment fragment = new Fragment();
             if (position == 0){
                 sortWorkoutFragment = SortWorkoutFragment.newInstance(mExercises, true);
+                sortWorkoutFragment.setMultiSelectDisabled(true);
                 sortWorkoutFragment.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
