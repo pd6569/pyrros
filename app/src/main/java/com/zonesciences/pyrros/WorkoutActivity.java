@@ -140,20 +140,23 @@ public class WorkoutActivity extends BaseActivity {
                     case R.id.tab_history:
                         mFragmentTag = "EXERCISE_HISTORY";
                         changeFragment(mFragmentTag);
-
+                        mToolbar.setTitle(mExerciseKey);
                         break;
 
                     case R.id.tab_stats:
                         mFragmentTag = "STATS";
+                        mToolbar.setTitle("Stats: " + mExerciseKey);
                         changeFragment(mFragmentTag);
                         break;
 
                     case R.id.tab_feedback:
                         mFragmentTag = "FEEDBACK";
+                        mToolbar.setTitle("Feedback");
                         changeFragment(mFragmentTag);
                         break;
 
                     case R.id.tab_workout:
+                        mToolbar.setTitle("Workout");
                         returnToWorkout();
                         Log.i(TAG, "Backstack entry count: " + mFragmentManager.getBackStackEntryCount());
                         break;
@@ -263,6 +266,7 @@ public class WorkoutActivity extends BaseActivity {
         mExercisesViewPager.setVisibility(View.VISIBLE);
         mTabLayout.setVisibility(View.VISIBLE);
 
+
         // backstack will be 1 if any bottom nav frag has been previously selected. If it is 0, then the
         // workout tab will be displayed, therefore do nothing.
         if (mFragmentManager.getBackStackEntryCount() > 0) {
@@ -324,6 +328,8 @@ public class WorkoutActivity extends BaseActivity {
 
         // Get the currentExercise with up to date number of sets - this may be an old workout that is being viewed, or the latest workout
         // Replace this specific exercise in the exercise list with the up to date information
+
+
 
         Exercise currentExercise = currentFragment.getCurrentExercise();
         ArrayList<Exercise> exercises = (ArrayList)currentFragment.getStatsExercises();

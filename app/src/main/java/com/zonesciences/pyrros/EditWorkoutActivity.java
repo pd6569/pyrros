@@ -283,6 +283,7 @@ public class EditWorkoutActivity extends BaseActivity {
             mTabLayout.setVisibility(View.VISIBLE);
             mViewPager.setVisibility(View.VISIBLE);
             mFab.setVisibility(View.VISIBLE);
+            mToolbar.setTitle("Edit Workout");
 
             SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentMap.get(0);
             sortWorkoutFragment.setWorkoutExercises(mExercises);

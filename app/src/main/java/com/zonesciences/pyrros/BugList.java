@@ -14,6 +14,7 @@ public class BugList {
     //TODO: fragment state pager adapter for workoutactivity is SLOW. try switch to normal adapter, but need to ensure it refreshes after edit workout - could move datatools processes to ASYNC TASK
     //TODO: edit mode appears during actionbar mode when deleting sets sometimes
     //TODO: actionmode appears when swiping between exercises
+    //TODO: arrange exercises alphabetically in create workout
 
     // Things for improvement
 
