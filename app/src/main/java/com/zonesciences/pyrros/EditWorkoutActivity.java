@@ -119,7 +119,7 @@ public class EditWorkoutActivity extends BaseActivity {
 
 
                     @Override
-                    public void onExerciseAdded(Exercise exercise) {
+                    public void onExerciseAdded(final Exercise exercise) {
                         Log.i(TAG, "Exercise added");
                         mExercises.add(exercise);
                         mChangesMade++;
@@ -134,6 +134,13 @@ public class EditWorkoutActivity extends BaseActivity {
                             @Override
                             public void onClick(View view){
                                 undoWorkoutChanges((SortWorkoutFragment) mAdapter.getFragment(0));
+                                for (Exercise e : createWorkoutFragment.getAllExercises()){
+                                    if (e.getName().contains(exercise.getName())){
+                                        e.setSelected(false);
+                                        createWorkoutFragment.getAdapter().notifyDataSetChanged();
+                                        break;
+                                    }
+                                }
                             }
                         });
                         snackbar.show();
@@ -145,7 +152,7 @@ public class EditWorkoutActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onExerciseRemoved(Exercise exercise) {
+                    public void onExerciseRemoved(final Exercise exercise) {
 
                         Log.i(TAG, "Remove exercise: " + exercise.getName());
                         int indexRemove = 0;
@@ -167,6 +174,13 @@ public class EditWorkoutActivity extends BaseActivity {
                             @Override
                             public void onClick(View view){
                                 undoWorkoutChanges((SortWorkoutFragment) mAdapter.getFragment(0));
+                                for (Exercise e : createWorkoutFragment.getAllExercises()){
+                                    if (e.getName().contains(exercise.getName())){
+                                        e.setSelected(true);
+                                        createWorkoutFragment.getAdapter().notifyDataSetChanged();
+                                        break;
+                                    }
+                                }
                             }
                         });
                         snackbar.show();
