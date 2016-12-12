@@ -245,16 +245,31 @@ public class EditWorkoutActivity extends BaseActivity {
                             mUndoAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                 @Override
                                 public boolean onMenuItemClick(MenuItem menuItem) {
-                                    undoWorkoutChanges(sortWorkoutFragment);
-                                    mRedoAction.setVisible(true);
-                                    mRedoAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                                        @Override
-                                        public boolean onMenuItemClick(MenuItem menuItem) {
-                                            redoWorkoutChanges(sortWorkoutFragment);
-                                            return false;
+                                    if (mChangeHisoryIndex == 0){
+                                        Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_undone, Snackbar.LENGTH_SHORT);
+                                        snackbar.show();
+                                        return true;
+                                    } else {
+                                        undoWorkoutChanges(sortWorkoutFragment);
+                                        if (!mRedoAction.isVisible()) {
+                                            mRedoAction.setVisible(true);
+                                            mRedoAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                                                @Override
+                                                public boolean onMenuItemClick(MenuItem menuItem) {
+                                                    if (mChangeHisoryIndex == mWorkoutChangesHistoryMap.size()) {
+                                                        Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_redone, Snackbar.LENGTH_SHORT);
+                                                        snackbar.show();
+                                                        return true;
+                                                    } else {
+                                                        redoWorkoutChanges(sortWorkoutFragment);
+                                                        return true;
+                                                    }
+                                                }
+                                            });
+                                            return true;
                                         }
-                                    });
-                                    return true;
+                                        return true;
+                                    }
                                 }
                             });
                         }

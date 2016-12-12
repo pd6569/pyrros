@@ -16,4 +16,11 @@
         android:icon="@drawable/ic_redo_white_24dp"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/action_redo"
+        android:title="@string/action_redo"
+        android:visible="false"
+        android:icon="@drawable/ic_redo_white_24dp"
+        app:showAsAction="always"/>
+
 </menu>

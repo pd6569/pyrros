@@ -109,5 +109,7 @@
     <string name="delete_exercise_warning">All recorded sets will be deleted.</string>
     <string name="action_delete">Delete</string>
     <string name="action_redo">Redo</string>
+    <string name="all_changes_undone">No more changes to undo</string>
+    <string name="all_changes_redone">No more changes to redo</string>
 
 </resources>
