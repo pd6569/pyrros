@@ -12,6 +12,8 @@ public class BugList {
     //TODO: Deleting workout does not delete record
     //TODO: If all exercises deleted in edit workout, workout is fucked
     //TODO: fragment state pager adapter for workoutactivity is SLOW. try switch to normal adapter, but need to ensure it refreshes after edit workout - could move datatools processes to ASYNC TASK
+    //TODO: edit mode appears during actionbar mode when deleting sets sometimes
+    //TODO: actionmode appears when swiping between exercises
 
     // Things for improvement
 

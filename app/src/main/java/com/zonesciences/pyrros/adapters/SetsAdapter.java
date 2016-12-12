@@ -199,7 +199,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     }
 
 
-    //if the set is a record, remove it from records
+    /*//if the set is a record, remove it from records
     private void removeFromRecords(final Double weight, final Long reps) {
         Log.i(TAG, "removeFromRecords called");
         mExerciseReference.getRoot().child("user-records").child(mUser).child(mExerciseReference.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -244,7 +244,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
             }
         });
-    }
+    }*/
 
     private int getMatchingSets(Double weight, Long reps) {
         int matches = 0;
@@ -309,7 +309,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         for (int i = (mSelectedSetsIds.size()-1); i >= 0; i--){
             if (mSelectedSetsIds.valueAt(i)){
 
-                removeFromRecords(mWeightList.get(mSelectedSetsIds.keyAt(i)), mRepsList.get(mSelectedSetsIds.keyAt(i))); // check if the set thats being dismissed is a record
+                /*removeFromRecords(mWeightList.get(mSelectedSetsIds.keyAt(i)), mRepsList.get(mSelectedSetsIds.keyAt(i))); // check if the set thats being dismissed is a record*/
 
                 mWeightList.remove(mSelectedSetsIds.keyAt(i));
                 mRepsList.remove(mSelectedSetsIds.keyAt(i));
