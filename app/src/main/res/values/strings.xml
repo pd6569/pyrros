@@ -106,7 +106,7 @@
     <string name="exercise_deleted">Exercise deleted</string>
     <string name="exercises_changed">Exercise order updated</string>
     <string name="exercise_added">Exercise added</string>
-    <string name="delete_exercise_warning">Warning: all recorded sets for this exercise will be deleted.</string>
+    <string name="delete_exercise_warning">All recorded sets will be deleted.</string>
     <string name="action_delete">Delete</string>
 
 </resources>

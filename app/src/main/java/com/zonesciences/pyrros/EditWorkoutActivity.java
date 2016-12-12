@@ -129,21 +129,6 @@ public class EditWorkoutActivity extends BaseActivity {
                         newList.addAll(mExercises);
                         mWorkoutChangesHistoryMap.put(mChangesMade, newList);
 
-
-                        Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.exercise_added, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
-                            @Override
-                            public void onClick(View view){
-                                undoWorkoutChanges((SortWorkoutFragment) mAdapter.getFragment(0));
-                                for (Exercise e : createWorkoutFragment.getAllExercises()){
-                                    if (e.getName().contains(exercise.getName())){
-                                        e.setSelected(false);
-                                        createWorkoutFragment.getAdapter().notifyDataSetChanged();
-                                        break;
-                                    }
-                                }
-                            }
-                        });
-                        snackbar.show();
                     }
 
                     @Override
@@ -163,22 +148,6 @@ public class EditWorkoutActivity extends BaseActivity {
                             }
                         }
 
-
-                        /*if (mExercises.get(index).hasSets()) {
-                            Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.delete_exercise_warning, Snackbar.LENGTH_LONG).setAction(R.string.action_delete, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    mExercises.remove(index);
-                                    mChangesMade++;
-                                    mNumExercises--;
-
-                                }
-                            });
-                            View sbView = snackbar.getView();
-                            sbView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.snackbarNegative));
-                            snackbar.show();*/
-
-
                         mExercises.remove(indexRemove);
                         mChangesMade++;
                         mNumExercises--;
@@ -186,21 +155,6 @@ public class EditWorkoutActivity extends BaseActivity {
                         List<Exercise> newList = new ArrayList<>();
                         newList.addAll(mExercises);
                         mWorkoutChangesHistoryMap.put(mChangesMade, newList);
-
-                        Snackbar snackbar = Snackbar.make(createWorkoutFragment.getView(), R.string.exercise_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                undoWorkoutChanges((SortWorkoutFragment) mAdapter.getFragment(0));
-                                for (Exercise e : createWorkoutFragment.getAllExercises()) {
-                                    if (e.getName().contains(exercise.getName())) {
-                                        e.setSelected(true);
-                                        createWorkoutFragment.getAdapter().notifyDataSetChanged();
-                                        break;
-                                    }
-                                }
-                            }
-                        });
-                        snackbar.show();
 
                     }
 
