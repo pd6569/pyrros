@@ -9,11 +9,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -46,9 +46,14 @@ public class EditWorkoutActivity extends BaseActivity {
     EditWorkoutAdapter mAdapter;
 
     // View
-    public Toolbar mToolbar;
+
     TabLayout mTabLayout;
     FloatingActionButton mFab;
+
+    // Toolbar
+    public Toolbar mToolbar;
+    MenuItem mUndoAction;
+    MenuItem mRedoAction;
 
     // Data
     ArrayList<Exercise> mExercises;
@@ -63,7 +68,7 @@ public class EditWorkoutActivity extends BaseActivity {
 
     // Track workout changes map, store change history
     int mNumExercises;
-    int mChangesMade = 0;
+    int mChangeHisoryIndex = 0;
     List<Exercise> mInitialExercises = new ArrayList<>();
     Map<Integer, List<Exercise>> mWorkoutChangesHistoryMap = new HashMap<>();
 
@@ -122,12 +127,12 @@ public class EditWorkoutActivity extends BaseActivity {
                     public void onExerciseAdded(final Exercise exercise) {
                         Log.i(TAG, "Exercise added");
                         mExercises.add(exercise);
-                        mChangesMade++;
+                        mChangeHisoryIndex++;
                         mNumExercises++;
 
                         List<Exercise> newList = new ArrayList<>();
                         newList.addAll(mExercises);
-                        mWorkoutChangesHistoryMap.put(mChangesMade, newList);
+                        mWorkoutChangesHistoryMap.put(mChangeHisoryIndex, newList);
 
                     }
 
@@ -149,12 +154,12 @@ public class EditWorkoutActivity extends BaseActivity {
                         }
 
                         mExercises.remove(indexRemove);
-                        mChangesMade++;
+                        mChangeHisoryIndex++;
                         mNumExercises--;
 
                         List<Exercise> newList = new ArrayList<>();
                         newList.addAll(mExercises);
-                        mWorkoutChangesHistoryMap.put(mChangesMade, newList);
+                        mWorkoutChangesHistoryMap.put(mChangeHisoryIndex, newList);
 
                     }
 
@@ -234,11 +239,28 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
-                        mChangesMade ++;
-
+                        mChangeHisoryIndex++;
+                        if (!mUndoAction.isVisible()) {
+                            mUndoAction.setVisible(true);
+                            mUndoAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem menuItem) {
+                                    undoWorkoutChanges(sortWorkoutFragment);
+                                    mRedoAction.setVisible(true);
+                                    mRedoAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                                        @Override
+                                        public boolean onMenuItemClick(MenuItem menuItem) {
+                                            redoWorkoutChanges(sortWorkoutFragment);
+                                            return false;
+                                        }
+                                    });
+                                    return true;
+                                }
+                            });
+                        }
                         List<Exercise> newList = new ArrayList<>();
                         newList.addAll(mExercises);
-                        mWorkoutChangesHistoryMap.put(mChangesMade, newList);
+                        mWorkoutChangesHistoryMap.put(mChangeHisoryIndex, newList);
 
 
                         if (mNumExercises > exerciseList.size()){
@@ -255,7 +277,6 @@ public class EditWorkoutActivity extends BaseActivity {
                         } else if (mNumExercises == exerciseList.size()){
                             Log.i(TAG, "Exercises reordered");
 
-                            }
                             Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.exercises_changed, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
                                 @Override
                                 public void onClick(View view){
@@ -264,6 +285,9 @@ public class EditWorkoutActivity extends BaseActivity {
                             });
                             snackbar.show();
                             mNumExercises = mExercises.size();
+
+                            }
+
 
                         mExercises = exerciseList;
 
@@ -297,17 +321,47 @@ public class EditWorkoutActivity extends BaseActivity {
     }
 
     private void undoWorkoutChanges(SortWorkoutFragment sortWorkoutFragment){
-        if (mChangesMade > 1){
+        if (mChangeHisoryIndex > 1){
+            Log.i(TAG, "Not the first change. Step backwards. Map contains changes: " + mWorkoutChangesHistoryMap.size());
             mExercises.clear();
-            mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangesMade-1));
+            mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangeHisoryIndex - 1));
         } else {
+            Log.i(TAG, "First change. Reset exercises. Map contains changes: " + mWorkoutChangesHistoryMap.size());
             mExercises.clear();
             mExercises.addAll(mInitialExercises);
         }
         sortWorkoutFragment.setWorkoutExercises(mExercises);
         sortWorkoutFragment.getAdapter().notifyDataSetChanged();
         mNumExercises = mExercises.size();
-        mChangesMade--;
+        if (mChangeHisoryIndex > 0) {
+            mChangeHisoryIndex--;
+        }
+    }
+
+    private void redoWorkoutChanges (SortWorkoutFragment sortWorkoutFragment){
+
+        Log.i(TAG, "Step forwards. Map contains changes: " + mWorkoutChangesHistoryMap.size());
+        if (mChangeHisoryIndex == mWorkoutChangesHistoryMap.size()){
+            Log.i(TAG, "Cannot go further, reached limit");
+            return;
+        }
+        mExercises.clear();
+        mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangeHisoryIndex + 1));
+
+        sortWorkoutFragment.setWorkoutExercises(mExercises);
+        sortWorkoutFragment.getAdapter().notifyDataSetChanged();
+        mNumExercises = mExercises.size();
+        mChangeHisoryIndex++;
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_edit_workout, menu);
+
+        mUndoAction = menu.findItem(R.id.action_undo);
+        mRedoAction = menu.findItem(R.id.action_redo);
+        return true;
     }
 
     @Override
