@@ -107,7 +107,7 @@ public class EditWorkoutActivity extends BaseActivity {
             public void onClick (View view){
                 FragmentManager fm = getSupportFragmentManager();
 
-                mToolbar.setTitle("Add/Remove Exercises");
+                mToolbar.setTitle("Add Exercises");
                 mViewPager.setVisibility(View.GONE);
                 mTabLayout.setVisibility(View.GONE);
                 mFab.setVisibility(View.GONE);

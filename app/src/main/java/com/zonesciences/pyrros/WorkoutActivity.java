@@ -145,13 +145,13 @@ public class WorkoutActivity extends BaseActivity {
 
                     case R.id.tab_stats:
                         mFragmentTag = "STATS";
-                        mToolbar.setTitle("Stats: " + mExerciseKey);
+                        mToolbar.setTitle(mExerciseKey);
                         changeFragment(mFragmentTag);
                         break;
 
                     case R.id.tab_feedback:
                         mFragmentTag = "FEEDBACK";
-                        mToolbar.setTitle("Feedback");
+                        mToolbar.setTitle(mExerciseKey);
                         changeFragment(mFragmentTag);
                         break;
 
