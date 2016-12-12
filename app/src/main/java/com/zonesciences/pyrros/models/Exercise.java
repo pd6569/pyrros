@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Peter on 18/10/2016.
@@ -120,6 +121,11 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     @Exclude
     public void setExerciseId(String exerciseId) {
         this.exerciseId = exerciseId;
+    }
+
+    @Exclude
+    public void setExerciseId(){
+        this.exerciseId = UUID.randomUUID().toString();
     }
 
     @Exclude

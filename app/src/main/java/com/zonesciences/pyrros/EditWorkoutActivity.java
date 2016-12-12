@@ -46,7 +46,6 @@ public class EditWorkoutActivity extends BaseActivity {
     EditWorkoutAdapter mAdapter;
 
     // View
-
     TabLayout mTabLayout;
     FloatingActionButton mFab;
 
@@ -59,6 +58,7 @@ public class EditWorkoutActivity extends BaseActivity {
     ArrayList<Exercise> mExercises;
     String mWorkoutKey;
     String mUserId;
+    boolean mExercisesEmpty;
 
     // Firebase
     DatabaseReference mDatabase;
@@ -160,6 +160,7 @@ public class EditWorkoutActivity extends BaseActivity {
                     @Override
                     public void onExerciseAdded(final Exercise exercise) {
                         Log.i(TAG, "Exercise added");
+                        exercise.setExerciseId();
                         mExercises.add(exercise);
                         mChangeHisoryIndex++;
                         mNumExercises++;
@@ -172,7 +173,6 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExercisesEmpty() {
-
                     }
 
                     @Override
@@ -266,7 +266,7 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExercisesEmpty() {
-
+                        mExercisesEmpty = true;
                     }
 
                     @Override
@@ -313,7 +313,7 @@ public class EditWorkoutActivity extends BaseActivity {
 
 
                         mExercises = exerciseList;
-
+                        if (mExercises.size() > 0) mExercisesEmpty = false;
                     }
                 });
                 fragment = sortWorkoutFragment;
@@ -420,15 +420,19 @@ public class EditWorkoutActivity extends BaseActivity {
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause called. Write workout changes");
-        for (Exercise e: mExercises){
+
+        /*for (Exercise e: mExercises){
             if (!e.hasExerciseId()){
                 e.setExerciseId(UUID.randomUUID().toString());
             }
-        }
+        }*/
         writeWorkoutChanges();
     }
 
     private void writeWorkoutChanges(){
+
+        sortWorkoutFragment.getAdapter().setExerciseOrder();
+
         // Clear workout information
         mDatabase.child("workout-exercises").child(mWorkoutKey).setValue(null);
         mDatabase.child("user-workout-exercises").child(mUserId).child(mWorkoutKey).setValue(null);
