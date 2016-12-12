@@ -103,5 +103,7 @@
     <string name="workout_deleted">Workout deleted</string>
     <string name="workout_restored">Workout restored</string>
     <string name="add_set">add set</string>
+    <string name="exercise_deleted">Exercise deleted</string>
+    <string name="exercises_changed">Exercise order updated</string>
 
 </resources>

@@ -3,11 +3,13 @@ package com.zonesciences.pyrros;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -59,6 +61,12 @@ public class EditWorkoutActivity extends BaseActivity {
     // Fragment reference
     Map<Integer, Fragment> mFragmentMap = new HashMap<>();
 
+    // Track workout changes map, store change history
+    int mNumExercises;
+    int mChangesMade = 0;
+    List<Exercise> mInitialExercises = new ArrayList<>();
+    Map<Integer, List<Exercise>> mWorkoutChangesHistoryMap = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +77,12 @@ public class EditWorkoutActivity extends BaseActivity {
         mExercises = (ArrayList<Exercise>) i.getSerializableExtra(WORKOUT_EXERCISE_OBJECTS);
         for (Exercise e : mExercises){
             e.setSelected(true);
+            mInitialExercises.add(e);
         }
+
+        // Variables to track/store exercise history
+        mNumExercises = mExercises.size();
+
         mWorkoutKey = i.getStringExtra(WORKOUT_ID);
         mUserId = getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -185,7 +198,7 @@ public class EditWorkoutActivity extends BaseActivity {
         public Fragment getItem(int position) {
             Fragment fragment = new Fragment();
             if (position == 0){
-                SortWorkoutFragment sortWorkoutFragment = SortWorkoutFragment.newInstance(mExercises, true);
+                final SortWorkoutFragment sortWorkoutFragment = SortWorkoutFragment.newInstance(mExercises, true);
                 sortWorkoutFragment.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
@@ -204,7 +217,65 @@ public class EditWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                        mChangesMade ++;
+                        for (Exercise e : mExercises){
+                            Log.i(TAG, "Exercises changed. Exercise: " + e.getName() + " order: " + e.getOrder());
+                        List<Exercise> newList = new ArrayList<>();
+                        newList.addAll(mExercises);
+                        mWorkoutChangesHistoryMap.put(mChangesMade, newList);
+
+
+                        if (mNumExercises > exerciseList.size()){
+                            Log.i(TAG, "Exercise(s) removed. Store new exercise list in map");
+
+                            Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.exercise_deleted, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
+                                @Override
+                                public void onClick(View view){
+                                    if (mChangesMade > 1){
+                                        mExercises.clear();
+                                        mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangesMade-1));
+                                    } else {
+                                        mExercises.clear();
+                                        mExercises.addAll(mInitialExercises);
+                                    }
+                                    sortWorkoutFragment.setWorkoutExercises(mExercises);
+                                    sortWorkoutFragment.getAdapter().setExerciseOrder();
+                                    sortWorkoutFragment.getAdapter().notifyDataSetChanged();
+                                    mNumExercises = mExercises.size();
+                                    mChangesMade--;
+                                }
+                            });
+                            snackbar.show();
+                            mNumExercises = mExercises.size();
+                        } else if (mNumExercises == exerciseList.size()){
+                            Log.i(TAG, "Exercises reordered");
+
+                            }
+                            Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.exercises_changed, Snackbar.LENGTH_LONG).setAction(R.string.action_undo, new View.OnClickListener(){
+                                @Override
+                                public void onClick(View view){
+
+                                    if (mChangesMade > 1){
+                                        mExercises.clear();
+                                        mExercises.addAll(mWorkoutChangesHistoryMap.get(mChangesMade-1));
+                                    } else {
+                                        mExercises.clear();
+                                        mExercises.addAll(mInitialExercises);
+                                    }
+
+                                    sortWorkoutFragment.setWorkoutExercises(mExercises);
+                                    sortWorkoutFragment.getAdapter().setExerciseOrder();
+                                    sortWorkoutFragment.getAdapter().notifyDataSetChanged();
+                                    mNumExercises = mExercises.size();
+                                    mChangesMade--;
+                                }
+                            });
+                            snackbar.show();
+                            mNumExercises = mExercises.size();
+                        }
+
                         mExercises = exerciseList;
+
                     }
                 });
                 fragment = sortWorkoutFragment;

@@ -139,7 +139,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
 
     // Update exercise order
-    private void setExerciseOrder() {
+    public void setExerciseOrder() {
         for (int i = 0; i < mWorkoutExercises.size(); i++){
             mWorkoutExercises.get(i).setOrder(i);
             Log.i(TAG, "Setting exercise order. Exercise: " + mWorkoutExercises.get(i).getName() + " order: " + mWorkoutExercises.get(i).getOrder());
@@ -165,8 +165,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         }
 
         notifyItemMoved(fromPosition, toPosition);
-        setExerciseOrder();
-        mExercisesListener.onExercisesChanged(mWorkoutExercises);
+
         return true;
     }
 
@@ -178,6 +177,8 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
     @Override
     public void onMoveCompleted() {
         mDragListener.onStopDrag();
+        setExerciseOrder();
+        mExercisesListener.onExercisesChanged(mWorkoutExercises);
     }
 
     /***
