@@ -63,7 +63,8 @@ public class EditWorkoutActivity extends BaseActivity {
     // Firebase
     DatabaseReference mDatabase;
 
-    // Fragment reference
+    // Fragment/fragment reference
+    SortWorkoutFragment sortWorkoutFragment;
     Map<Integer, Fragment> mFragmentMap = new HashMap<>();
 
     // Track workout changes map, store change history
@@ -72,9 +73,43 @@ public class EditWorkoutActivity extends BaseActivity {
     List<Exercise> mInitialExercises = new ArrayList<>();
     Map<Integer, List<Exercise>> mWorkoutChangesHistoryMap = new HashMap<>();
 
+    // MenuItem listeners
+    MenuItem.OnMenuItemClickListener mUndoListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            if (mChangeHisoryIndex == 0){
+                Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_undone, Snackbar.LENGTH_SHORT);
+                snackbar.show();
+                return true;
+            } else {
+                undoWorkoutChanges(sortWorkoutFragment);
+                if (!mRedoAction.isVisible()) {
+                    mRedoAction.setVisible(true);
+                    mRedoAction.setOnMenuItemClickListener(mRedoListener);
+                    return true;
+                }
+                return true;
+            }
+        }
+    };
+    MenuItem.OnMenuItemClickListener mRedoListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            if (mChangeHisoryIndex == mWorkoutChangesHistoryMap.size()) {
+                Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_redone, Snackbar.LENGTH_SHORT);
+                snackbar.show();
+                return true;
+            } else {
+                redoWorkoutChanges(sortWorkoutFragment);
+                return true;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_edit_workout);
 
         Intent i = getIntent();
@@ -205,6 +240,8 @@ public class EditWorkoutActivity extends BaseActivity {
 
     }
 
+
+
     class EditWorkoutAdapter extends FragmentPagerAdapter {
 
         String [] mTitles = new String[] {
@@ -220,7 +257,7 @@ public class EditWorkoutActivity extends BaseActivity {
         public Fragment getItem(int position) {
             Fragment fragment = new Fragment();
             if (position == 0){
-                final SortWorkoutFragment sortWorkoutFragment = SortWorkoutFragment.newInstance(mExercises, true);
+                sortWorkoutFragment = SortWorkoutFragment.newInstance(mExercises, true);
                 sortWorkoutFragment.setExercisesListener(new ExercisesListener() {
                     @Override
                     public void onExerciseAdded(Exercise exercise) {
@@ -242,36 +279,7 @@ public class EditWorkoutActivity extends BaseActivity {
                         mChangeHisoryIndex++;
                         if (!mUndoAction.isVisible()) {
                             mUndoAction.setVisible(true);
-                            mUndoAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem menuItem) {
-                                    if (mChangeHisoryIndex == 0){
-                                        Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_undone, Snackbar.LENGTH_SHORT);
-                                        snackbar.show();
-                                        return true;
-                                    } else {
-                                        undoWorkoutChanges(sortWorkoutFragment);
-                                        if (!mRedoAction.isVisible()) {
-                                            mRedoAction.setVisible(true);
-                                            mRedoAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                                                @Override
-                                                public boolean onMenuItemClick(MenuItem menuItem) {
-                                                    if (mChangeHisoryIndex == mWorkoutChangesHistoryMap.size()) {
-                                                        Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_redone, Snackbar.LENGTH_SHORT);
-                                                        snackbar.show();
-                                                        return true;
-                                                    } else {
-                                                        redoWorkoutChanges(sortWorkoutFragment);
-                                                        return true;
-                                                    }
-                                                }
-                                            });
-                                            return true;
-                                        }
-                                        return true;
-                                    }
-                                }
-                            });
+                            mUndoAction.setOnMenuItemClickListener(mUndoListener);
                         }
                         List<Exercise> newList = new ArrayList<>();
                         newList.addAll(mExercises);
@@ -335,6 +343,46 @@ public class EditWorkoutActivity extends BaseActivity {
 
     }
 
+
+
+
+
+   /* @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+
+            case R.id.action_undo:
+
+                if (mChangeHisoryIndex == 0){
+                    Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_undone, Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                    return true;
+                } else {
+                    undoWorkoutChanges(sortWorkoutFragment);
+                    if (!mRedoAction.isVisible()) {
+                        mRedoAction.setVisible(true);
+                        mRedoAction.setOnMenuItemClickListener(this);
+                        return true;
+                    }
+                    return true;
+                }
+
+            case R.id.action_redo:
+                if (mChangeHisoryIndex == mWorkoutChangesHistoryMap.size()) {
+                    Snackbar snackbar = Snackbar.make(sortWorkoutFragment.getView(), R.string.all_changes_redone, Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                    return true;
+                } else {
+                    redoWorkoutChanges(sortWorkoutFragment);
+                    return true;
+                }
+
+            default:
+                break;
+        }
+        return true;
+    }*/
+
     private void undoWorkoutChanges(SortWorkoutFragment sortWorkoutFragment){
         if (mChangeHisoryIndex > 1){
             Log.i(TAG, "Not the first change. Step backwards. Map contains changes: " + mWorkoutChangesHistoryMap.size());
@@ -372,10 +420,18 @@ public class EditWorkoutActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_edit_workout, menu);
 
+        Log.i(TAG, "onCreateOptionsMenu");
+        getMenuInflater().inflate(R.menu.menu_edit_workout, menu);
         mUndoAction = menu.findItem(R.id.action_undo);
         mRedoAction = menu.findItem(R.id.action_redo);
+        if (mWorkoutChangesHistoryMap.size() > 0 && getSupportFragmentManager().getBackStackEntryCount() < 1){
+            mUndoAction.setVisible(true);
+            mUndoAction.setOnMenuItemClickListener(mUndoListener);
+
+            mRedoAction.setVisible(true);
+            mRedoAction.setOnMenuItemClickListener(mRedoListener);
+        }
         return true;
     }
 
@@ -429,6 +485,7 @@ public class EditWorkoutActivity extends BaseActivity {
             mTabLayout.setVisibility(View.VISIBLE);
             mViewPager.setVisibility(View.VISIBLE);
             mFab.setVisibility(View.VISIBLE);
+
             mToolbar.setTitle("Edit Workout");
 
             SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentMap.get(0);
