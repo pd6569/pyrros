@@ -115,9 +115,6 @@ public class ExerciseHistoryFragment extends Fragment {
 
         View rootView =  inflater.inflate(R.layout.fragment_exercise_history, container, false);
 
-        TextView tv = (TextView) rootView.findViewById(R.id.textview_exercise_history);
-        tv.setText("Exercise history for: " + mExerciseKey);
-
         mExerciseHistoryRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_exercise_history);
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mExerciseHistoryRecycler.setLayoutManager(mLinearLayoutManager);

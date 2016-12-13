@@ -150,23 +150,36 @@
 
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/button_add_set"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/add_set"/>
+                <RelativeLayout
+                    android:id="@+id/layout_add_save_set_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <Button
-                    android:id="@+id/button_save_set"
-                    android:theme="@style/AppTheme.Positive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/save_set"
-                    android:visibility="gone"/>
+                    <Button
+                        android:id="@+id/button_add_set"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/add_set"/>
+
+                    <Button
+                        android:id="@+id/button_save_set"
+                        android:theme="@style/AppTheme.Positive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/save_set"
+                        android:visibility="gone"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scaleType="center"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_timer_gray_24dp"/>
+
+                </RelativeLayout>
 
             </LinearLayout>
 
