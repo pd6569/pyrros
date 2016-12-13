@@ -292,7 +292,28 @@ public class WorkoutActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(mExercisesList.get(position), mExerciseObjects.get(position), mWorkoutKey, mUserId);
+            final ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(mExercisesList.get(position), mExerciseObjects.get(position), mWorkoutKey, mUserId);
+            exerciseFragment.setExerciseTimerListener(new ExerciseFragment.ExerciseTimerListener() {
+                @Override
+                public void onExerciseTimerCreated() {
+                    Log.i(TAG, "Exercise timer created for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
+                }
+
+                @Override
+                public void onExerciseTimerResumed() {
+                    Log.i(TAG, "Exercise timer resumed for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
+                }
+
+                @Override
+                public void onExerciseTimerPaused() {
+                    Log.i(TAG, "Exercise timer paused for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
+                }
+
+                @Override
+                public void onExerciseTimerFinished() {
+                    Log.i(TAG, "Exercise timer finished for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
+                }
+            });
             mExerciseReferenceMap.put(position, exerciseFragment); // map exercise fragments so that variables can be obtained when switching fragments.
             return exerciseFragment;
         }

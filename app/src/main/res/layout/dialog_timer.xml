@@ -26,23 +26,26 @@
             android:layout_centerInParent="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:hint="00000"
+            android:textSize="28dp"
+            android:hint="000"
             android:textColorHint="#00FFFFFF"
-            android:maxLength="6"
+            android:maxLength="3"
             android:inputType="number" />
 
         <Button
             android:id="@+id/timer_decrease_time_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_toLeftOf="@id/timer_edit_text"
+            android:layout_centerVertical="true"
             android:text="-"/>
 
         <Button
             android:id="@+id/timer_increase_time_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_toRightOf="@id/timer_edit_text"
+            android:layout_centerVertical="true"
             android:text="+"/>
 
     </RelativeLayout>

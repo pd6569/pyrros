@@ -26,6 +26,8 @@ import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -149,6 +151,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
     //Listener
     OnStatsDataLoaded mStatsDataLoadedListener;
+    ExerciseTimerListener mExerciseTimerListener;
 
     // ActionMode
     ActionMode mActionMode;
@@ -524,12 +527,20 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+
+    /***
+     * TODO:// Sort out this shit (but working) code
+     *
+     * TIMER FUNCTIONALITY HERE. VERY MESSY SHIT CODE. NEEDS NEATENING UP.
+     */
+
     long timeRemaining;
     int timeRemainingToDisplay;
     boolean timerFirstStart = true;
     boolean timerRunning;
     int currentProgress;
     int currentProgressMax;
+    boolean hasActiveTimer;
 
 
     private void setTimer(){
@@ -543,12 +554,43 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         mCountDownText = (TextView) dialogView.findViewById(R.id.timer_countdown_text);
         mCountDownProgressBar = (ProgressBar) dialogView.findViewById(R.id.timer_progress_bar);
 
+        mIncreaseTimeButton = (Button) dialogView.findViewById(R.id.timer_increase_time_button);
+        mIncreaseTimeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                int timeToSet;
+                if(mSetTimerField.getText().toString().equals("")) {
+                    timeToSet = 0;
+                } else {
+                    timeToSet = Integer.parseInt(mSetTimerField.getText().toString());
+                }
+                timeToSet++;
+                mSetTimerField.setText("" + timeToSet);
+            }
+        });
+
+        mDecreaseTimeButton = (Button) dialogView.findViewById(R.id.timer_decrease_time_button);
+        mDecreaseTimeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                int timeToSet;
+                if(mSetTimerField.getText().toString().equals("")) {
+                    timeToSet = 0;
+                } else {
+                    timeToSet = Integer.parseInt(mSetTimerField.getText().toString());
+                }
+                if (timeToSet > 0) timeToSet--;
+
+                mSetTimerField.setText("" + timeToSet);
+            }
+        });
+
         mLayoutTimerSetTimer = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_set_timer);
         mLayoutTimerOptions = (LinearLayout) dialogView.findViewById(R.id.timer_layout_set_options);
         mLayoutTimerProgress = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_circular_timer);
 
         if (!timerFirstStart){
-            // timer has been started before, timer has been resumed
+            // timer has been started before, timer has been resumed to progress view
 
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(currentProgressMax);
@@ -558,6 +600,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             mPauseTimerImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    // Notify activity
+                    mExerciseTimerListener.onExerciseTimerPaused();
+
                     timerRunning = false;
                     mCountDownTimer.cancel();
                     mSetTimerField.setEnabled(true);
@@ -584,8 +630,14 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                 Log.i(TAG, "Start timer. Timer already started: " + !timerFirstStart);
 
                 timerRunning = true;
+                hasActiveTimer = true;
+
+
 
                 if (timerFirstStart) {
+
+                    // Notify activity of timer creation
+                    mExerciseTimerListener.onExerciseTimerCreated();
 
                     if (!mSetTimerField.getText().toString().isEmpty()) {
 
@@ -596,6 +648,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                         mPauseTimerImageView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+                                // Notify activity
+                                mExerciseTimerListener.onExerciseTimerPaused();
+
                                 timerRunning = false;
                                 mCountDownTimer.cancel();
                                 mSetTimerField.setEnabled(true);
@@ -619,11 +674,15 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                         timerFirstStart = false;
                     } else {
                         Log.i(TAG, "Error: Enter number, dickhead");
+                        Toast.makeText(getContext(), "Enter a number for rest timer", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                 } else {
                     // There is an existing timer active, destroy old timer and create new one, to resume where left off.
+
+                    // notify activity that timer has been resumed:
+                    mExerciseTimerListener.onExerciseTimerResumed();
 
                     mCountDownTimer = null;
                     mCountDownTimer = new CustomCountDownTimer(timeRemaining, 10);
@@ -644,10 +703,12 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
-                timeRemaining = mCountDownTimer.getTimeRemaining();
-                timeRemainingToDisplay = mCountDownTimer.getProgress() + 1;
-                currentProgress = mCountDownProgressBar.getProgress();
-                currentProgressMax = mCountDownProgressBar.getMax();
+                if (mCountDownTimer != null) {
+                    timeRemaining = mCountDownTimer.getTimeRemaining();
+                    timeRemainingToDisplay = mCountDownTimer.getProgress() + 1;
+                    currentProgress = mCountDownProgressBar.getProgress();
+                    currentProgressMax = mCountDownProgressBar.getMax();
+                }
 
             }
         });
@@ -701,6 +762,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         public void onFinish() {
             timerFirstStart = true;
             timerRunning = false;
+            hasActiveTimer = false;
             Log.i(TAG, "Timer finished");
             mSetTimerField.setText("");
             mSetTimerField.setEnabled(true);
@@ -708,6 +770,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             mStartTimerImageView.setVisibility(View.VISIBLE);
             mPauseTimerImageView.setVisibility(View.GONE);
 
+            mExerciseTimerListener.onExerciseTimerFinished();
         }
 
         public long getTimeRemaining (){
@@ -718,6 +781,8 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             return progress;
         }
     }
+
+    /*********** END TIMER FUNCTIONS ***********/
 
 
     private void addSet() {
@@ -907,5 +972,16 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
     public void setOnStatsDataLoadedListener (OnStatsDataLoaded listener){
         this.mStatsDataLoadedListener = listener;
+    }
+
+    public interface ExerciseTimerListener {
+        void onExerciseTimerCreated();
+        void onExerciseTimerResumed();
+        void onExerciseTimerPaused();
+        void onExerciseTimerFinished();
+    }
+
+    public void setExerciseTimerListener (ExerciseTimerListener listener){
+        this.mExerciseTimerListener = listener;
     }
 }
