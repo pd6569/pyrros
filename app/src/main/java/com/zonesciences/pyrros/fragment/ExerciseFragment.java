@@ -1,6 +1,7 @@
 package com.zonesciences.pyrros.fragment;
 
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -29,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -514,11 +516,15 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    int currentTimerMax;
+    boolean timerFirstStart = true;
+
     private void setTimer(){
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View dialogView = inflater.inflate(R.layout.dialog_timer, null);
 
         int timer;
+
 
         mSetTimerField = (EditText) dialogView.findViewById(R.id.timer_edit_text);
 
@@ -528,53 +534,57 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         mLayoutTimerOptions = (LinearLayout) dialogView.findViewById(R.id.timer_layout_set_options);
         mLayoutTimerProgress = (LinearLayout) dialogView.findViewById(R.id.timer_layout_circular_timer);
 
+
         mStartTimerImageView.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 Log.i(TAG, "Start timer");
-                mStartTimerImageView.setVisibility(View.GONE);
-                mPauseTimerImageView.setVisibility(View.VISIBLE);
-                mLayoutTimerOptions.setVisibility(View.GONE);
-                mLayoutTimerProgress.setVisibility(View.VISIBLE);
 
 
-                mPauseTimerImageView.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        mCountDownTimer.cancel();
-                        mSetTimerField.setEnabled(true);
-                        mStartTimerImageView.setVisibility(View.VISIBLE);
-                        mPauseTimerImageView.setVisibility(View.GONE);
-                        mLayoutTimerOptions.setVisibility(View.VISIBLE);
-                        mLayoutTimerProgress.setVisibility(View.GONE);
-                    }
-                });
+                if (timerFirstStart) {
 
-                int timer = Integer.parseInt(mSetTimerField.getText().toString());
-                final int milliseconds = timer * 1000;
-                mCountDownProgressBar.setMax(timer);
 
-                mCountDownTimer = new CountDownTimer(milliseconds, 1000){
+                    mStartTimerImageView.setVisibility(View.GONE);
+                    mPauseTimerImageView.setVisibility(View.VISIBLE);
+                    mLayoutTimerOptions.setVisibility(View.GONE);
+                    mLayoutTimerProgress.setVisibility(View.VISIBLE);
 
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        int progress = (int) (millisUntilFinished / 1000);
-                        mSetTimerField.setText("" + progress);
-                        mSetTimerField.setEnabled(false);
-                        mCountDownProgressBar.setProgress(mCountDownProgressBar.getMax()-progress);
-                    }
 
-                    @Override
-                    public void onFinish() {
-                        Log.i(TAG, "Timer finished");
-                        mSetTimerField.setText("");
-                        mSetTimerField.setEnabled(true);
-                        mStartTimerImageView.setVisibility(View.VISIBLE);
-                        mPauseTimerImageView.setVisibility(View.GONE);
-                        mLayoutTimerOptions.setVisibility(View.VISIBLE);
-                        mLayoutTimerProgress.setVisibility(View.GONE);
-                    }
-                }.start();
+                    mPauseTimerImageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mCountDownTimer.cancel();
+                            mSetTimerField.setEnabled(true);
+                            mStartTimerImageView.setVisibility(View.VISIBLE);
+                            mPauseTimerImageView.setVisibility(View.GONE);
+
+                            currentTimerMax = mCountDownProgressBar.getMax();
+                        }
+                    });
+
+
+
+                /*ObjectAnimator animation = ObjectAnimator.ofInt(mCountDownProgressBar, "progress", milliseconds);
+                animation.setDuration(milliseconds);
+                animation.setInterpolator(new DecelerateInterpolator());
+                animation.start();*/
+
+                    final int timer = Integer.parseInt(mSetTimerField.getText().toString());
+                    final int milliseconds = timer * 1000;
+
+                    mSetTimerField.setEnabled(false);
+
+                    mCountDownProgressBar.setMax(timer * 100);
+
+                    mCountDownTimer = new CustomCountDownTimer(milliseconds, 10);
+                    mCountDownTimer.start();
+
+
+                    timerFirstStart = false;
+
+                } else {
+                    mCountDownTimer.start();
+                }
             }
         });
 
@@ -584,6 +594,45 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    class CustomCountDownTimer extends CountDownTimer {
+
+        int progress;
+
+        public CustomCountDownTimer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+            progress = (int) millisInFuture / 1000;
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+
+
+
+            int i = (int) (millisUntilFinished / 1000);
+            if (i != progress) {
+                progress = i;
+                mSetTimerField.setText("" + progress);
+            }
+
+            int progressBarUpdate = (int) (millisUntilFinished / 10);
+            mCountDownProgressBar.setProgress(mCountDownProgressBar.getMax() - progressBarUpdate);
+
+        }
+
+        @Override
+        public void onFinish() {
+
+            Log.i(TAG, "Timer finished");
+            mSetTimerField.setText("");
+            mSetTimerField.setEnabled(true);
+            mStartTimerImageView.setVisibility(View.VISIBLE);
+            mPauseTimerImageView.setVisibility(View.GONE);
+            mLayoutTimerOptions.setVisibility(View.VISIBLE);
+            mLayoutTimerProgress.setVisibility(View.GONE);
+
+        }
     }
 
 
