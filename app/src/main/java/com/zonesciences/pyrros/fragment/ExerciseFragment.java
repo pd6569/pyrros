@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,10 +22,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +41,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,12 +94,15 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     CustomCountDownTimer mCountDownTimer;
     ProgressBar mCountDownProgressBar;
     EditText mSetTimerField;
+    TextView mCountDownText;
     Button mIncreaseTimeButton;
     Button mDecreaseTimeButton;
     ImageView mStartTimerImageView;
     ImageView mPauseTimerImageView;
+    RelativeLayout mLayoutTimerSetTimer;
     LinearLayout mLayoutTimerOptions;
-    LinearLayout mLayoutTimerProgress;
+    RelativeLayout mLayoutTimerProgress;
+
 
 
 
@@ -525,16 +533,16 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View dialogView = inflater.inflate(R.layout.dialog_timer, null);
 
-        int timer;
-
-
         mSetTimerField = (EditText) dialogView.findViewById(R.id.timer_edit_text);
 
         mStartTimerImageView = (ImageView) dialogView.findViewById(R.id.timer_start);
         mPauseTimerImageView = (ImageView) dialogView.findViewById(R.id.timer_pause);
+        mCountDownText = (TextView) dialogView.findViewById(R.id.timer_countdown_text);
         mCountDownProgressBar = (ProgressBar) dialogView.findViewById(R.id.timer_progress_bar);
+
+        mLayoutTimerSetTimer = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_set_timer);
         mLayoutTimerOptions = (LinearLayout) dialogView.findViewById(R.id.timer_layout_set_options);
-        mLayoutTimerProgress = (LinearLayout) dialogView.findViewById(R.id.timer_layout_circular_timer);
+        mLayoutTimerProgress = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_circular_timer);
 
 
         mStartTimerImageView.setOnClickListener(new View.OnClickListener(){
@@ -545,12 +553,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
                 if (timerFirstStart) {
 
-
+                    setTimerOptionsVisible(false);
                     mStartTimerImageView.setVisibility(View.GONE);
                     mPauseTimerImageView.setVisibility(View.VISIBLE);
-                    mLayoutTimerOptions.setVisibility(View.GONE);
-                    mLayoutTimerProgress.setVisibility(View.VISIBLE);
-
 
                     mPauseTimerImageView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -564,20 +569,18 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                         }
                     });
 
-                    final int timer = Integer.parseInt(mSetTimerField.getText().toString());
-                    final int milliseconds = timer * 1000;
+                    int timer = Integer.parseInt(mSetTimerField.getText().toString());
+                    int milliseconds = timer * 1000;
 
                     mSetTimerField.setEnabled(false);
 
                     mCountDownProgressBar.setMax(timer * 100);
-
                     mCountDownTimer = new CustomCountDownTimer(milliseconds, 10);
                     mCountDownTimer.start();
 
                     timerFirstStart = false;
                 } else {
-                    /*mCountDownProgressBar.setMax(currentTimerMax);
-                    mCountDownProgressBar.setProgress(currentProgress);*/
+                    // There is an existing timer active, destroy old timer and create new one, to resume where left off.
                     mCountDownTimer = null;
                     mCountDownTimer = new CustomCountDownTimer(timeRemaining, 10);
                     mCountDownTimer.start();
@@ -595,6 +598,24 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    public void setTimerOptionsVisible (boolean visible){
+        if (visible){
+            mLayoutTimerOptions.setVisibility(View.VISIBLE);
+            mLayoutTimerSetTimer.setVisibility(View.VISIBLE);
+
+            mLayoutTimerProgress.setVisibility(View.GONE);
+            mStartTimerImageView.setVisibility(View.GONE);
+            mStartTimerImageView.setVisibility(View.GONE);
+
+        } else {
+            mLayoutTimerOptions.setVisibility(View.GONE);
+            mLayoutTimerSetTimer.setVisibility(View.GONE);
+
+            mLayoutTimerProgress.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     public class CustomCountDownTimer extends CountDownTimer {
 
@@ -614,7 +635,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             int i = (int) (millisUntilFinished / 1000);
             if (i != progress) {
                 progress = i;
-                mSetTimerField.setText("" + progress);
+                mCountDownText.setText("" + progress);
             }
 
             int progressBarUpdate = (int) (millisUntilFinished / 10);

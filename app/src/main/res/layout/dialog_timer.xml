@@ -14,6 +14,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <RelativeLayout
+        android:id="@+id/timer_layout_set_timer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp">
@@ -131,26 +132,31 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/timer_layout_circular_timer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:visibility="gone">
 
         <ProgressBar
             android:id="@+id/timer_progress_bar"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
             android:indeterminate="false"
             android:progress="0"
-            android:layout_gravity="center"
+            android:layout_centerInParent="true"
             android:progressDrawable="@drawable/progressbar_circular"
             android:background="@drawable/progressbar_circular_background"/>
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/timer_countdown_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="40dp"/>
 
+    </RelativeLayout>
 
     <ImageView
         android:id="@+id/timer_start"
