@@ -32,19 +32,21 @@
 
         <Button
             android:id="@+id/timer_decrease_time_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_toLeftOf="@id/timer_edit_text"
             android:text="-"/>
 
         <Button
             android:id="@+id/timer_increase_time_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_toRightOf="@id/timer_edit_text"
             android:text="+"/>
 
     </RelativeLayout>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -55,15 +57,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_margin="5dp"
-            android:weightSum="2">
+            android:layout_margin="5dp">
 
             <CheckBox
                 android:id="@+id/timer_sound_checkbox"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="1"
+                android:gravity="right"
                 android:buttonTint="@color/colorPrimary"
                 android:checked="false"/>
 
@@ -71,9 +71,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/timer_sound"
-                android:layout_gravity="left"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
-                android:layout_weight="1"/>
+                android:textSize="@dimen/timer_options"/>
 
 
         </LinearLayout>
@@ -82,15 +82,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_margin="5dp"
-            android:weightSum="2">
+            android:layout_margin="5dp">
 
             <CheckBox
                 android:id="@+id/timer_vibrate_checkbox"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="1"
+                android:gravity="right"
                 android:buttonTint="@color/colorPrimary"
                 android:checked="false"/>
 
@@ -98,9 +96,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/timer_vibrate"
-                android:layout_gravity="left"
+                android:layout_gravity="center_vertical"
+                android:gravity="left"
                 android:layout_marginLeft="5dp"
-                android:layout_weight="1"/>
+                android:textSize="@dimen/timer_options"/>
 
         </LinearLayout>
 
@@ -108,15 +107,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_margin="5dp"
-            android:weightSum="2">
+            android:layout_margin="5dp">
 
             <CheckBox
                 android:id="@+id/timer_autostart_checkbox"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="1"
+                android:gravity="right"
                 android:buttonTint="@color/colorPrimary"
                 android:checked="false"/>
 
@@ -124,12 +121,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/timer_autostart"
-                android:layout_gravity="left"
+                android:layout_gravity="center_vertical"
+                android:gravity="left"
                 android:layout_marginLeft="5dp"
-                android:layout_weight="1"/>
+                android:textSize="@dimen/timer_options"/>
 
         </LinearLayout>
 
     </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/timer_start"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:elevation="5dp"
+        android:src="@drawable/ic_play_circle_filled_green_500_48dp"
+        />
+
+    <ImageView
+        android:id="@+id/timer_pause"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_pause_circle_filled_red_500_48dp"
+        android:elevation="5dp"
+        android:visibility="gone"
+        />
 
 </LinearLayout>

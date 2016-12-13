@@ -501,19 +501,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         View dialogView = inflater.inflate(R.layout.dialog_timer, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(dialogView);
-        builder.setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogBox, int id) {
-                        Log.i(TAG, "Set timer...");
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogBox, int id) {
-                        dialogBox.cancel();
-                    }
-                });
+        builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
