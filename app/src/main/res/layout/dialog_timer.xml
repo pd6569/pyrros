@@ -18,13 +18,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp">
 
-        <Button
-            android:id="@+id/timer_decrease_time_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_toLeftOf="@id/timer_edit_text"
-            android:text="-"/>
-
         <EditText
             android:id="@+id/timer_edit_text"
             android:layout_width="wrap_content"
@@ -36,6 +29,13 @@
             android:textColorHint="#00FFFFFF"
             android:maxLength="6"
             android:inputType="number" />
+
+        <Button
+            android:id="@+id/timer_decrease_time_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_toLeftOf="@id/timer_edit_text"
+            android:text="-"/>
 
         <Button
             android:id="@+id/timer_increase_time_button"
