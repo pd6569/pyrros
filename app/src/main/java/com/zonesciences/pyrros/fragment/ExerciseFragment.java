@@ -86,7 +86,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     ImageView mTimer;
 
     // Timer
-    CountDownTimer mCountDownTimer;
+    CustomCountDownTimer mCountDownTimer;
     ProgressBar mCountDownProgressBar;
     EditText mSetTimerField;
     Button mIncreaseTimeButton;
@@ -516,7 +516,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
-    int currentTimerMax;
+    /*int currentTimerMax;
+    int currentProgress;*/
+    long timeRemaining;
     boolean timerFirstStart = true;
 
     private void setTimer(){
@@ -558,16 +560,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                             mStartTimerImageView.setVisibility(View.VISIBLE);
                             mPauseTimerImageView.setVisibility(View.GONE);
 
-                            currentTimerMax = mCountDownProgressBar.getMax();
+                            timeRemaining = mCountDownTimer.getTimeRemaining();
                         }
                     });
-
-
-
-                /*ObjectAnimator animation = ObjectAnimator.ofInt(mCountDownProgressBar, "progress", milliseconds);
-                animation.setDuration(milliseconds);
-                animation.setInterpolator(new DecelerateInterpolator());
-                animation.start();*/
 
                     final int timer = Integer.parseInt(mSetTimerField.getText().toString());
                     final int milliseconds = timer * 1000;
@@ -579,11 +574,16 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                     mCountDownTimer = new CustomCountDownTimer(milliseconds, 10);
                     mCountDownTimer.start();
 
-
                     timerFirstStart = false;
-
                 } else {
+                    /*mCountDownProgressBar.setMax(currentTimerMax);
+                    mCountDownProgressBar.setProgress(currentProgress);*/
+                    mCountDownTimer = null;
+                    mCountDownTimer = new CustomCountDownTimer(timeRemaining, 10);
                     mCountDownTimer.start();
+
+                    mStartTimerImageView.setVisibility(View.GONE);
+                    mPauseTimerImageView.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -596,9 +596,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         alertDialog.show();
     }
 
-    class CustomCountDownTimer extends CountDownTimer {
+    public class CustomCountDownTimer extends CountDownTimer {
 
         int progress;
+        long timeRemaining;
 
         public CustomCountDownTimer(long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
@@ -608,7 +609,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         @Override
         public void onTick(long millisUntilFinished) {
 
-
+            timeRemaining = millisUntilFinished;
 
             int i = (int) (millisUntilFinished / 1000);
             if (i != progress) {
@@ -632,6 +633,10 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             mLayoutTimerOptions.setVisibility(View.VISIBLE);
             mLayoutTimerProgress.setVisibility(View.GONE);
 
+        }
+
+        public long getTimeRemaining (){
+            return timeRemaining;
         }
     }
 
