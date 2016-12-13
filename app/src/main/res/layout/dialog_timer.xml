@@ -137,7 +137,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:elevation="5dp"
         android:src="@drawable/ic_play_circle_filled_green_500_48dp"
         />
 
@@ -148,7 +147,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:src="@drawable/ic_pause_circle_filled_red_500_48dp"
-        android:elevation="5dp"
         android:visibility="gone"
         />
 

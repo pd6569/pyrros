@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
@@ -76,6 +77,14 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     EditText mWeightField;
     EditText mRepsField;
     ImageView mTimer;
+
+    // Timer
+    EditText mSetTimerField;
+    Button mIncreaseTimeButton;
+    Button mDecreaseTimeButton;
+    ImageView mStartTimerImageView;
+    ImageView mPauseTimerImageView;
+
 
 
     //Recycler view components
@@ -499,6 +508,35 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     private void setTimer(){
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View dialogView = inflater.inflate(R.layout.dialog_timer, null);
+
+        int timer;
+
+        mSetTimerField = (EditText) dialogView.findViewById(R.id.timer_edit_text);
+
+        mStartTimerImageView = (ImageView) dialogView.findViewById(R.id.timer_start);
+        mStartTimerImageView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Log.i(TAG, "Start timer");
+                int timer = Integer.parseInt(mSetTimerField.getText().toString());
+                int milliseconds = timer * 1000;
+                new CountDownTimer(milliseconds, 1000){
+
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        mSetTimerField.setText("" + millisUntilFinished / 1000);
+                        mSetTimerField.setEnabled(false);
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        Log.i(TAG, "Timer finished");
+                    }
+                }.start();
+            }
+        });
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(dialogView);
         builder.setCancelable(true);
