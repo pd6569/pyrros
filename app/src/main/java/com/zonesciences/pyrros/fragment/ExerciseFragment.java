@@ -73,6 +73,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     Button mSaveSet;
     EditText mWeightField;
     EditText mRepsField;
+    ImageView mTimer;
 
 
     //Recycler view components
@@ -359,6 +360,9 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
         mSetNumberTitle.setText("Set " + mCurrentSet);
 
+        mTimer = (ImageView) view.findViewById(R.id.image_timer);
+        mTimer.setOnClickListener(this);
+
 
         mSetsAdapter.notifyDataSetChanged(); // this ensures that data is reloaded when recreating the view after swiping from other exercises
         mSetsRecycler = (RecyclerView) view.findViewById(R.id.recycler_sets);
@@ -483,8 +487,17 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                 break;
             case R.id.button_save_set:
                 replaceSet(mSetSelected, view);
+                break;
+            case R.id.image_timer:
+                setTimer();
+                break;
         }
     }
+
+    private void setTimer(){
+
+    }
+
 
     private void addSet() {
         setWeight();

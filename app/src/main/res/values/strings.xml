@@ -111,5 +111,8 @@
     <string name="action_redo">Redo</string>
     <string name="all_changes_undone">No more changes to undo</string>
     <string name="all_changes_redone">No more changes to redo</string>
+    <string name="timer_sound">Sound</string>
+    <string name="timer_vibrate">Vibrate</string>
+    <string name="timer_autostart">Auto-start</string>
 
 </resources>
