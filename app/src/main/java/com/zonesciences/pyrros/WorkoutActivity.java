@@ -551,6 +551,7 @@ public class WorkoutActivity extends BaseActivity {
         timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
     }
 
+
     @Override
     public void onPause(){
         super.onPause();
@@ -563,6 +564,7 @@ public class WorkoutActivity extends BaseActivity {
             mPrefEditor.putString(PREF_WORKOUT_TIMER_STATE, json);
             mPrefEditor.apply();
         }
+
     }
 
     @Override
