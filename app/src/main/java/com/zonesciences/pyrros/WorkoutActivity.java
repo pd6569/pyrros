@@ -465,25 +465,14 @@ public class WorkoutActivity extends BaseActivity {
 
                     }
 
-                    timerDialog.setExistingTimer(mWorkoutTimer);
-                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
-                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
-                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
-                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
-                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
-                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+                    setTimerProperties(timerDialog);
+
 
 
                 } else {
                     Log.i(TAG, "Timer is active and paused");
 
-                    timerDialog.setExistingTimer(mWorkoutTimer);
-                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
-                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
-                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
-                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
-                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
-                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+                    setTimerProperties(timerDialog);
                 }
             }
 
@@ -504,9 +493,11 @@ public class WorkoutActivity extends BaseActivity {
 
                 @Override
                 public void onExerciseTimerResumed(TimerDialog.WorkoutTimer newWorkoutTimer) {
-                    Log.i(TAG, "Timer resumed");
+                    Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + newWorkoutTimer.getTimerDurationSecs());
                     mWorkoutTimer = null;
                     mWorkoutTimer = newWorkoutTimer;
+                    mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
+                    mTimerState.setTimerDuration(mWorkoutTimer.getTimerDurationSecs());
                 }
 
                 @Override
@@ -551,7 +542,13 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     private void setTimerProperties(TimerDialog timerDialog){
-
+        timerDialog.setExistingTimer(mWorkoutTimer);
+        timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
+        timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
+        timerDialog.setTimerRunning(mTimerState.isTimerRunning());
+        timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
+        timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
+        timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
     }
 
     @Override
