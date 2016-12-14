@@ -5,9 +5,9 @@ package com.zonesciences.pyrros.Timer;
  */
 public interface ExerciseTimerListener {
 
-    void onExerciseTimerCreated();
-    void onExerciseTimerResumed();
-    void onExerciseTimerPaused();
+    void onExerciseTimerCreated(TimerDialog.WorkoutTimer workoutTimer);
+    void onExerciseTimerResumed(TimerDialog.WorkoutTimer newWorkoutTimer);
+    void onExerciseTimerPaused(long timeRemaining);
     void onExerciseTimerFinished();
-
+    void onExerciseTimerDismissed(boolean timerRunning, TimerDialog.WorkoutTimer workoutTimer, int currentProgress, int currentProgressMax);
 }

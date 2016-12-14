@@ -99,6 +99,16 @@ public class WorkoutActivity extends BaseActivity {
 
     String mFragmentTag;
 
+    // Timer tracking
+    TimerDialog.WorkoutTimer mWorkoutTimer;
+    long mTimeRemaining;
+    int mTimeRemainingToDisplay;
+    boolean mTimerFirstStart = true;
+    boolean mTimerRunning;
+    int mCurrentProgress;
+    int mCurrentProgressMax;
+    boolean mHasActiveTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -408,27 +418,60 @@ public class WorkoutActivity extends BaseActivity {
         }
 
         if (i == R.id.action_timer){
+
             TimerDialog timerDialog = new TimerDialog(this);
+            if (mHasActiveTimer){
+                timerDialog.setExistingTimer(mWorkoutTimer);
+                timerDialog.setHasActiveTimer(mHasActiveTimer);
+                timerDialog.setTimerFirstStart(mTimerFirstStart);
+                timerDialog.setTimerRunning(mTimerRunning);
+                timerDialog.setTimeRemaining(mWorkoutTimer.getTimeRemaining());
+                timerDialog.setCurrentProgress(mCurrentProgress);
+                timerDialog.setCurrentProgressMax(mCurrentProgressMax);
+            }
+
             timerDialog.createDialog();
             timerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
                 @Override
-                public void onExerciseTimerCreated() {
-
+                public void onExerciseTimerCreated(TimerDialog.WorkoutTimer workoutTimer) {
+                    Log.i(TAG, "Timer created");
+                    mWorkoutTimer = workoutTimer;
+                    mTimerFirstStart = false;
+                    mHasActiveTimer = true;
                 }
 
                 @Override
-                public void onExerciseTimerResumed() {
-
+                public void onExerciseTimerResumed(TimerDialog.WorkoutTimer newWorkoutTimer) {
+                    Log.i(TAG, "Timer resumed");
+                    mWorkoutTimer = null;
+                    mWorkoutTimer = newWorkoutTimer;
                 }
 
                 @Override
-                public void onExerciseTimerPaused() {
-
+                public void onExerciseTimerPaused(long timeRemaining) {
+                    Log.i(TAG, "Timer paused");
+                    mWorkoutTimer.cancel();
+                    mTimerRunning = false;
+                    mTimeRemaining = timeRemaining;
                 }
 
                 @Override
                 public void onExerciseTimerFinished() {
+                    Log.i(TAG, "Timer finished");
+                    mWorkoutTimer = null;
+                    mTimerFirstStart = true;
+                    mHasActiveTimer = false;
+                    mTimerRunning = false;
+                }
 
+                @Override
+                public void onExerciseTimerDismissed(boolean timerRunning, TimerDialog.WorkoutTimer workoutTimer, int currentProgress, int currentProgressMax){
+                    Log.i(TAG, "Timer dismissed");
+
+                    mTimerRunning = timerRunning;
+                    mWorkoutTimer = workoutTimer;
+                    mCurrentProgress = currentProgress;
+                    mCurrentProgressMax = currentProgressMax;
                 }
             });
         }
