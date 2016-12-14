@@ -89,7 +89,7 @@ public class TimerDialog implements View.OnClickListener {
         if (!mTimerFirstStart) {
 
             // timer has been started before, timer has been resumed to progress view
-
+            Log.i(TAG, "Timer has been started before");
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(mCurrentProgressMax);
             mCountDownText.setText("" + (int)((mExistingTimer.timeRemaining/1000) + 1));
@@ -192,7 +192,6 @@ public class TimerDialog implements View.OnClickListener {
                 } else {
                     // There is an existing timer active, destroy old timer and create new one, to resume where left off.
 
-                    // notify activity that timer has been resumed:
                     mCountDownTimer = null;
                     mCountDownTimer = new WorkoutTimer(mTimeRemaining, 10);
                     mCountDownTimer.start();
@@ -200,6 +199,7 @@ public class TimerDialog implements View.OnClickListener {
                     mStartTimerImageView.setVisibility(View.GONE);
                     mPauseTimerImageView.setVisibility(View.VISIBLE);
 
+                    // notify activity that timer has been resumed:
                     mExerciseTimerListener.onExerciseTimerResumed(mCountDownTimer);
                 }
                 break;
@@ -290,6 +290,7 @@ public class TimerDialog implements View.OnClickListener {
 
         int progress;
         long timeRemaining;
+        long timeRemainingOnPause;
 
 
         public WorkoutTimer(long millisInFuture, long countDownInterval) {
@@ -331,6 +332,10 @@ public class TimerDialog implements View.OnClickListener {
 
         public long getTimeRemaining() {
             return timeRemaining;
+        }
+
+        public void setTimeRemaining(long timeRemaining){
+            this.timeRemaining = timeRemaining;
         }
 
     }

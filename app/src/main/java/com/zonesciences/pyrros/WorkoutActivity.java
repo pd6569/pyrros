@@ -1,7 +1,9 @@
 package com.zonesciences.pyrros;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -23,10 +25,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.Timer.ExerciseTimerListener;
+import com.zonesciences.pyrros.Timer.TimeReceiver;
 import com.zonesciences.pyrros.Timer.TimerDialog;
+import com.zonesciences.pyrros.Timer.TimerState;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
@@ -35,6 +40,7 @@ import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Record;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +59,9 @@ public class WorkoutActivity extends BaseActivity {
     private static final String WORKOUT_EXERCISES = "Workout Exercises";
     private static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
     private static final String WORKOUT_ID = "Workout ID";
+
+    // Workout Timer
+    private static final String PREF_WORKOUT_TIMER_STATE = "WorkoutTimerState";
 
     ViewPager mExercisesViewPager;
     WorkoutExercisesAdapter mWorkoutExercisesAdapter;
@@ -97,6 +106,8 @@ public class WorkoutActivity extends BaseActivity {
     //Map for storing all exercises for passing to exercise stats
     Map<Integer, List<Exercise>> mAllExercisesMap = new HashMap<>();
 
+
+
     String mFragmentTag;
 
     // Timer tracking
@@ -108,6 +119,12 @@ public class WorkoutActivity extends BaseActivity {
     int mCurrentProgress;
     int mCurrentProgressMax;
     boolean mHasActiveTimer;
+
+    int mStartTime;
+
+    // Preferences
+    SharedPreferences mSharedPreferences;
+    SharedPreferences.Editor mPrefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,10 +139,28 @@ public class WorkoutActivity extends BaseActivity {
         mUserId = getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        Log.i(TAG, "Exercises : " + mExercisesList + " WorkoutKey: " + mWorkoutKey);
-        for (Exercise e : mExerciseObjects){
-            Log.i(TAG, "exercise " + e.getName() + " order " + e.getOrder());
+        // Get preferences
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        // Set timer state
+        Gson gson = new Gson();
+        String json = mSharedPreferences.getString(PREF_WORKOUT_TIMER_STATE, null);
+        TimerState timerState = gson.fromJson(json, TimerState.class);
+        if (timerState != null){
+            Log.i(TAG, "Timer state information available");
+            mHasActiveTimer = timerState.isHasActiveTimer();
+            mTimerRunning = timerState.isTimerRunning();
+            mTimerFirstStart = timerState.isTimerFirstStart();
+            mTimeRemaining = timerState.getTimeRemaining();
+            mCurrentProgress = timerState.getCurrentProgress();
+            mCurrentProgressMax = timerState.getCurrentProgressMax();
+
+            Log.i(TAG, "has active timer: " + mHasActiveTimer + " timer running: " + mTimerRunning + " timer first start: " + mTimerFirstStart + " TIME REMAINING: " + mTimeRemaining + " current progress: " + mCurrentProgress + " progress max " + mCurrentProgressMax);
+
+            mWorkoutTimer = new TimerDialog(this).new WorkoutTimer(mTimeRemaining, 10);
+            mWorkoutTimer.setTimeRemaining(mTimeRemaining);
         }
+
 
         mExercisesViewPager = (ViewPager) findViewById(R.id.viewpager_exercises);
 
@@ -421,16 +456,16 @@ public class WorkoutActivity extends BaseActivity {
 
             TimerDialog timerDialog = new TimerDialog(this);
             if (mHasActiveTimer){
+                Log.i(TAG, "has active timer, so set variables");
                 timerDialog.setExistingTimer(mWorkoutTimer);
                 timerDialog.setHasActiveTimer(mHasActiveTimer);
                 timerDialog.setTimerFirstStart(mTimerFirstStart);
                 timerDialog.setTimerRunning(mTimerRunning);
-                timerDialog.setTimeRemaining(mWorkoutTimer.getTimeRemaining());
+                timerDialog.setTimeRemaining(mTimeRemaining);
                 timerDialog.setCurrentProgress(mCurrentProgress);
                 timerDialog.setCurrentProgressMax(mCurrentProgressMax);
             }
 
-            timerDialog.createDialog();
             timerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
                 @Override
                 public void onExerciseTimerCreated(TimerDialog.WorkoutTimer workoutTimer) {
@@ -438,6 +473,7 @@ public class WorkoutActivity extends BaseActivity {
                     mWorkoutTimer = workoutTimer;
                     mTimerFirstStart = false;
                     mHasActiveTimer = true;
+
                 }
 
                 @Override
@@ -462,6 +498,10 @@ public class WorkoutActivity extends BaseActivity {
                     mTimerFirstStart = true;
                     mHasActiveTimer = false;
                     mTimerRunning = false;
+
+                    mPrefEditor = mSharedPreferences.edit();
+                    mPrefEditor.putStringSet(PREF_WORKOUT_TIMER_STATE, null);
+                    mPrefEditor.apply();
                 }
 
                 @Override
@@ -474,6 +514,7 @@ public class WorkoutActivity extends BaseActivity {
                     mCurrentProgressMax = currentProgressMax;
                 }
             });
+            timerDialog.createDialog();
         }
 
 
@@ -488,6 +529,22 @@ public class WorkoutActivity extends BaseActivity {
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
+        if (mHasActiveTimer){
+            TimerState timerState = new TimerState();
+
+            timerState.setTimerRunning(mTimerRunning);
+            timerState.setTimeRemaining(mWorkoutTimer.getTimeRemaining());
+            timerState.setTimerFirstStart(mTimerFirstStart);
+            timerState.setCurrentProgress(mCurrentProgress);
+            timerState.setCurrentProgressMax(mCurrentProgressMax);
+            timerState.setHasActiveTimer(mHasActiveTimer);
+
+            mPrefEditor = mSharedPreferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(timerState);
+            mPrefEditor.putString(PREF_WORKOUT_TIMER_STATE, json);
+            mPrefEditor.apply();
+        }
     }
 
     @Override
