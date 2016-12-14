@@ -732,7 +732,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     }
 
 
-    public class CustomCountDownTimer extends CountDownTimer {
+    public  class CustomCountDownTimer extends CountDownTimer {
 
         int progress;
         long timeRemaining;
