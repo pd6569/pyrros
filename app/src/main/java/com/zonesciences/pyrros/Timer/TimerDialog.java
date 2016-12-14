@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.fragment.ExerciseFragment;
 
 /**
  * Created by Peter on 14/12/2016.
@@ -27,8 +27,9 @@ public class TimerDialog implements View.OnClickListener {
 
     public static final String TAG = "TimerDialog";
 
-    Context mContext;
+    AppCompatActivity mActivity;
 
+    // View
     WorkoutTimer mCountDownTimer;
     ProgressBar mCountDownProgressBar;
     EditText mSetTimerField;
@@ -41,7 +42,7 @@ public class TimerDialog implements View.OnClickListener {
     LinearLayout mLayoutTimerOptions;
     RelativeLayout mLayoutTimerProgress;
 
-
+    // Timer variables
     long mTimeRemaining;
     int mTimeRemainingToDisplay;
     boolean mTimerFirstStart = true;
@@ -49,70 +50,50 @@ public class TimerDialog implements View.OnClickListener {
     int mCurrentProgress;
     int mCurrentProgressMax;
     boolean mHasActiveTimer;
+    int mTimeToSet;
 
     // Listener
     ExerciseTimerListener mExerciseTimerListener;
 
 
-    public TimerDialog(Context context) {
-        this.mContext = context;
+    public TimerDialog(AppCompatActivity activity) {
+        this.mActivity = activity;
     }
 
-    private void createDialog() {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+    public void createDialog() {
+        LayoutInflater inflater = LayoutInflater.from(mActivity);
         View dialogView = inflater.inflate(R.layout.dialog_timer, null);
 
         mSetTimerField = (EditText) dialogView.findViewById(R.id.timer_edit_text);
 
         mStartTimerImageView = (ImageView) dialogView.findViewById(R.id.timer_start);
+        mStartTimerImageView.setOnClickListener(this);
+
         mPauseTimerImageView = (ImageView) dialogView.findViewById(R.id.timer_pause);
+        mPauseTimerImageView.setOnClickListener(this);
+
         mCountDownText = (TextView) dialogView.findViewById(R.id.timer_countdown_text);
         mCountDownProgressBar = (ProgressBar) dialogView.findViewById(R.id.timer_progress_bar);
 
         mIncreaseTimeButton = (Button) dialogView.findViewById(R.id.timer_increase_time_button);
-        mIncreaseTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int timeToSet;
-                if (mSetTimerField.getText().toString().equals("")) {
-                    timeToSet = 0;
-                } else {
-                    timeToSet = Integer.parseInt(mSetTimerField.getText().toString());
-                }
-                timeToSet++;
-                mSetTimerField.setText("" + timeToSet);
-            }
-        });
+        mIncreaseTimeButton.setOnClickListener(this);
 
         mDecreaseTimeButton = (Button) dialogView.findViewById(R.id.timer_decrease_time_button);
-        mDecreaseTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int timeToSet;
-                if (mSetTimerField.getText().toString().equals("")) {
-                    timeToSet = 0;
-                } else {
-                    timeToSet = Integer.parseInt(mSetTimerField.getText().toString());
-                }
-                if (timeToSet > 0) timeToSet--;
-
-                mSetTimerField.setText("" + timeToSet);
-            }
-        });
+        mDecreaseTimeButton.setOnClickListener(this);
 
         mLayoutTimerSetTimer = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_set_timer);
         mLayoutTimerOptions = (LinearLayout) dialogView.findViewById(R.id.timer_layout_set_options);
         mLayoutTimerProgress = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_circular_timer);
 
         if (!mTimerFirstStart) {
-            // timer has been started before, timer has been resumed to progress view
 
+            // timer has been started before, timer has been resumed to progress view
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(mCurrentProgressMax);
             mCountDownProgressBar.setProgress(mCurrentProgress);
             mCountDownText.setText("" + mTimeRemainingToDisplay);
 
-            mPauseTimerImageView.setOnClickListener(this);
+            /*mPauseTimerImageView.setOnClickListener(this);*/
 
             if (mTimerRunning) {
                 mStartTimerImageView.setVisibility(View.GONE);
@@ -124,10 +105,10 @@ public class TimerDialog implements View.OnClickListener {
         }
 
 
-        mStartTimerImageView.setOnClickListener(this);
+        /*mStartTimerImageView.setOnClickListener(this);*/
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setView(dialogView);
         builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
@@ -163,6 +144,10 @@ public class TimerDialog implements View.OnClickListener {
         }
     }
 
+    /**
+     * Click listener methods
+     */
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -184,7 +169,7 @@ public class TimerDialog implements View.OnClickListener {
                         mStartTimerImageView.setVisibility(View.GONE);
                         mPauseTimerImageView.setVisibility(View.VISIBLE);
 
-                        mPauseTimerImageView.setOnClickListener(new View.OnClickListener() {
+                        /*mPauseTimerImageView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 // Notify activity
@@ -198,7 +183,7 @@ public class TimerDialog implements View.OnClickListener {
 
                                 mTimeRemaining = mCountDownTimer.getTimeRemaining();
                             }
-                        });
+                        });*/
 
 
                         int timer = Integer.parseInt(mSetTimerField.getText().toString());
@@ -213,7 +198,7 @@ public class TimerDialog implements View.OnClickListener {
                         mTimerFirstStart = false;
                     } else {
                         Log.i(TAG, "Error: Enter number, dickhead");
-                        Toast.makeText(mContext, "Enter a number for rest timer", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mActivity, "Enter a number for rest timer", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -231,6 +216,7 @@ public class TimerDialog implements View.OnClickListener {
                     mPauseTimerImageView.setVisibility(View.VISIBLE);
                 }
                 break;
+
             case R.id.timer_pause:
                 // Notify activity
                 mExerciseTimerListener.onExerciseTimerPaused();
@@ -242,6 +228,25 @@ public class TimerDialog implements View.OnClickListener {
                 mPauseTimerImageView.setVisibility(View.GONE);
 
                 mTimeRemaining = mCountDownTimer.getTimeRemaining();
+                break;
+            case R.id.timer_increase_time_button:
+                if (mSetTimerField.getText().toString().equals("")) {
+                    mTimeToSet = 0;
+                } else {
+                    mTimeToSet = Integer.parseInt(mSetTimerField.getText().toString());
+                }
+                mTimeToSet++;
+                mSetTimerField.setText("" + mTimeToSet);
+                break;
+            case R.id.timer_decrease_time_button:
+                if (mSetTimerField.getText().toString().equals("")) {
+                    mTimeToSet = 0;
+                } else {
+                    mTimeToSet = Integer.parseInt(mSetTimerField.getText().toString());
+                }
+                if (mTimeToSet > 0) mTimeToSet--;
+
+                mSetTimerField.setText("" + mTimeToSet);
                 break;
             default:
                 break;

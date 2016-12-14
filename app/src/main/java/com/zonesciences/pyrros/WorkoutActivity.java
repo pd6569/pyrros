@@ -25,6 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
+import com.zonesciences.pyrros.Timer.ExerciseTimerListener;
+import com.zonesciences.pyrros.Timer.TimerDialog;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
@@ -403,6 +405,32 @@ public class WorkoutActivity extends BaseActivity {
             intent.putExtra(WORKOUT_ID, mWorkoutKey);
             startActivity(intent);
             return true;
+        }
+
+        if (i == R.id.action_timer){
+            TimerDialog timerDialog = new TimerDialog(this);
+            timerDialog.createDialog();
+            timerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
+                @Override
+                public void onExerciseTimerCreated() {
+
+                }
+
+                @Override
+                public void onExerciseTimerResumed() {
+
+                }
+
+                @Override
+                public void onExerciseTimerPaused() {
+
+                }
+
+                @Override
+                public void onExerciseTimerFinished() {
+
+                }
+            });
         }
 
 
