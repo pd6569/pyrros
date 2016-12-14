@@ -15,7 +15,7 @@ public class TimerState {
     int mCurrentProgressMax;
 
     public TimerState(){
-
+        mTimerFirstStart = true;
     }
 
 

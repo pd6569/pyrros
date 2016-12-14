@@ -95,12 +95,14 @@ public class TimerDialog implements View.OnClickListener {
             mCountDownText.setText("" + (int)((mExistingTimer.timeRemaining/1000) + 1));
 
             if (mTimerRunning) {
+                Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mExistingTimer.getTimeRemaining());
                 mCountDownTimer = new WorkoutTimer(mExistingTimer.getTimeRemaining(), 10);
                 mCountDownTimer.start();
                 mExistingTimer = null;
                 mStartTimerImageView.setVisibility(View.GONE);
                 mPauseTimerImageView.setVisibility(View.VISIBLE);
             } else {
+                Log.i(TAG, "Timer resumed, timer paused");
                 mCountDownProgressBar.setProgress(mCurrentProgress);
                 mStartTimerImageView.setVisibility(View.VISIBLE);
                 mPauseTimerImageView.setVisibility(View.GONE);

@@ -147,10 +147,11 @@ public class WorkoutActivity extends BaseActivity {
         if (mTimerState == null){
             mTimerState = new TimerState();
         } else {
-            Log.i(TAG, "has active timer: " + mTimerState.hasActiveTimer() + " timer running: " + mTimerState.isTimerRunning() + " timer first start: " + mTimerState.isTimerFirstStart() + " TIME REMAINING: " + mTimerState.getTimeRemaining() + " current progress: " + mTimerState.getCurrentProgress() + " progress max " + mTimerState.getCurrentProgressMax());
             mWorkoutTimer = new TimerDialog(this).new WorkoutTimer(mTimerState.getTimeRemaining(), 10);
             mWorkoutTimer.setTimeRemaining(mTimerState.getTimeRemaining());
         }
+
+        Log.i(TAG, "timer start time: " + mTimerState.getTimerStartTime() + " timer duration: " + mTimerState.getTimerDuration() + "has active timer: " + mTimerState.hasActiveTimer() + " timer running: " + mTimerState.isTimerRunning() + " timer first start: " + mTimerState.isTimerFirstStart() + " TIME REMAINING: " + mTimerState.getTimeRemaining() + " current progress: " + mTimerState.getCurrentProgress() + " progress max " + mTimerState.getCurrentProgressMax());
 
 
         mExercisesViewPager = (ViewPager) findViewById(R.id.viewpager_exercises);
@@ -447,14 +448,32 @@ public class WorkoutActivity extends BaseActivity {
 
             TimerDialog timerDialog = new TimerDialog(this);
             if (mTimerState.hasActiveTimer()){
-                Log.i(TAG, "has active timer, so set variables");
-                timerDialog.setExistingTimer(mWorkoutTimer);
-                timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
-                timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
-                timerDialog.setTimerRunning(mTimerState.isTimerRunning());
-                timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
-                timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
-                timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+
+
+                if (mTimerState.isTimerRunning()){
+                    Log.i(TAG, "Timer is active and running");
+                    int timeNow = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
+                    int timeToStart = mTimerState.getTimerDuration() - (timeNow - (mTimerState.getTimerStartTime()));
+                    Log.i(TAG, "time now:  " + timeNow + "timer duration: " + mTimerState.getTimerDuration() + "timer started at :" + mTimerState.getTimerStartTime() + " TIME TO START: " + timeToStart);
+
+                    timerDialog.setExistingTimer(mWorkoutTimer);
+                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
+                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
+                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
+                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
+                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
+                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+
+                } else {
+                    Log.i(TAG, "Timer is active and paused");
+                    timerDialog.setExistingTimer(mWorkoutTimer);
+                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
+                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
+                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
+                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
+                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
+                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+                }
             }
 
             timerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
@@ -466,7 +485,9 @@ public class WorkoutActivity extends BaseActivity {
                     mTimerState.setHasActiveTimer(true);
 
                     // set start time for timer and max duration
-                    mTimerState.setTimerStartTime((int) (Calendar.getInstance().getTimeInMillis() / 1000));
+                    int startTime = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
+                    mTimerState.setTimerStartTime(startTime);
+                    Log.i(TAG, "TIMER CREATED TIME: " + startTime);
                     mTimerState.setTimerDuration(mWorkoutTimer.getTimerDurationSecs());
                 }
 
