@@ -6,6 +6,8 @@ package com.zonesciences.pyrros.Timer;
 public class TimerState {
 
     long mTimeRemaining;
+    int mTimerDuration;
+    int mTimerStartTime;
     boolean mHasActiveTimer;
     boolean mTimerFirstStart;
     boolean mTimerRunning;
@@ -14,6 +16,15 @@ public class TimerState {
 
     public TimerState(){
 
+    }
+
+
+    public void setTimerDuration(int timerDuration) {
+        mTimerDuration = timerDuration;
+    }
+
+    public void setTimerStartTime(int timerStartTime) {
+        mTimerStartTime = timerStartTime;
     }
 
     public void setTimeRemaining(long timeRemaining) {
@@ -40,11 +51,24 @@ public class TimerState {
         mCurrentProgressMax = currentProgressMax;
     }
 
+
+    public int getTimerDuration() {
+        return mTimerDuration;
+    }
+
+    public boolean isHasActiveTimer() {
+        return mHasActiveTimer;
+    }
+
+    public int getTimerStartTime() {
+        return mTimerStartTime;
+    }
+
     public long getTimeRemaining() {
         return mTimeRemaining;
     }
 
-    public boolean isHasActiveTimer() {
+    public boolean hasActiveTimer() {
         return mHasActiveTimer;
     }
 
@@ -62,5 +86,19 @@ public class TimerState {
 
     public int getCurrentProgressMax() {
         return mCurrentProgressMax;
+    }
+
+    // RESET TIMER STATE
+
+    public void reset() {
+
+         mTimeRemaining = 0;
+         mTimerDuration = 0;
+         mTimerStartTime = 0;
+         mHasActiveTimer = false;
+         mTimerFirstStart = true;
+         mTimerRunning = false;
+         mCurrentProgress = 0;
+         mCurrentProgressMax = 0;
     }
 }

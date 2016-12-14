@@ -8,7 +8,6 @@ import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -19,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +27,6 @@ import com.google.gson.Gson;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.Timer.ExerciseTimerListener;
-import com.zonesciences.pyrros.Timer.TimeReceiver;
 import com.zonesciences.pyrros.Timer.TimerDialog;
 import com.zonesciences.pyrros.Timer.TimerState;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
@@ -112,6 +109,8 @@ public class WorkoutActivity extends BaseActivity {
 
     // Timer tracking
     TimerDialog.WorkoutTimer mWorkoutTimer;
+    TimerState mTimerState;
+
     long mTimeRemaining;
     int mTimeRemainingToDisplay;
     boolean mTimerFirstStart = true;
@@ -119,8 +118,7 @@ public class WorkoutActivity extends BaseActivity {
     int mCurrentProgress;
     int mCurrentProgressMax;
     boolean mHasActiveTimer;
-
-    int mStartTime;
+    int mTimerStartTime;
 
     // Preferences
     SharedPreferences mSharedPreferences;
@@ -145,20 +143,13 @@ public class WorkoutActivity extends BaseActivity {
         // Set timer state
         Gson gson = new Gson();
         String json = mSharedPreferences.getString(PREF_WORKOUT_TIMER_STATE, null);
-        TimerState timerState = gson.fromJson(json, TimerState.class);
-        if (timerState != null){
-            Log.i(TAG, "Timer state information available");
-            mHasActiveTimer = timerState.isHasActiveTimer();
-            mTimerRunning = timerState.isTimerRunning();
-            mTimerFirstStart = timerState.isTimerFirstStart();
-            mTimeRemaining = timerState.getTimeRemaining();
-            mCurrentProgress = timerState.getCurrentProgress();
-            mCurrentProgressMax = timerState.getCurrentProgressMax();
-
-            Log.i(TAG, "has active timer: " + mHasActiveTimer + " timer running: " + mTimerRunning + " timer first start: " + mTimerFirstStart + " TIME REMAINING: " + mTimeRemaining + " current progress: " + mCurrentProgress + " progress max " + mCurrentProgressMax);
-
-            mWorkoutTimer = new TimerDialog(this).new WorkoutTimer(mTimeRemaining, 10);
-            mWorkoutTimer.setTimeRemaining(mTimeRemaining);
+        mTimerState = gson.fromJson(json, TimerState.class);
+        if (mTimerState == null){
+            mTimerState = new TimerState();
+        } else {
+            Log.i(TAG, "has active timer: " + mTimerState.hasActiveTimer() + " timer running: " + mTimerState.isTimerRunning() + " timer first start: " + mTimerState.isTimerFirstStart() + " TIME REMAINING: " + mTimerState.getTimeRemaining() + " current progress: " + mTimerState.getCurrentProgress() + " progress max " + mTimerState.getCurrentProgressMax());
+            mWorkoutTimer = new TimerDialog(this).new WorkoutTimer(mTimerState.getTimeRemaining(), 10);
+            mWorkoutTimer.setTimeRemaining(mTimerState.getTimeRemaining());
         }
 
 
@@ -455,15 +446,15 @@ public class WorkoutActivity extends BaseActivity {
         if (i == R.id.action_timer){
 
             TimerDialog timerDialog = new TimerDialog(this);
-            if (mHasActiveTimer){
+            if (mTimerState.hasActiveTimer()){
                 Log.i(TAG, "has active timer, so set variables");
                 timerDialog.setExistingTimer(mWorkoutTimer);
-                timerDialog.setHasActiveTimer(mHasActiveTimer);
-                timerDialog.setTimerFirstStart(mTimerFirstStart);
-                timerDialog.setTimerRunning(mTimerRunning);
-                timerDialog.setTimeRemaining(mTimeRemaining);
-                timerDialog.setCurrentProgress(mCurrentProgress);
-                timerDialog.setCurrentProgressMax(mCurrentProgressMax);
+                timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
+                timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
+                timerDialog.setTimerRunning(mTimerState.isTimerRunning());
+                timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
+                timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
+                timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
             }
 
             timerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
@@ -471,9 +462,12 @@ public class WorkoutActivity extends BaseActivity {
                 public void onExerciseTimerCreated(TimerDialog.WorkoutTimer workoutTimer) {
                     Log.i(TAG, "Timer created");
                     mWorkoutTimer = workoutTimer;
-                    mTimerFirstStart = false;
-                    mHasActiveTimer = true;
+                    mTimerState.setTimerFirstStart(false);
+                    mTimerState.setHasActiveTimer(true);
 
+                    // set start time for timer and max duration
+                    mTimerState.setTimerStartTime((int) (Calendar.getInstance().getTimeInMillis() / 1000));
+                    mTimerState.setTimerDuration(mWorkoutTimer.getTimerDurationSecs());
                 }
 
                 @Override
@@ -487,17 +481,15 @@ public class WorkoutActivity extends BaseActivity {
                 public void onExerciseTimerPaused(long timeRemaining) {
                     Log.i(TAG, "Timer paused");
                     mWorkoutTimer.cancel();
-                    mTimerRunning = false;
-                    mTimeRemaining = timeRemaining;
+                    mTimerState.setTimerRunning(false);
+                    mTimerState.setTimeRemaining(timeRemaining);;
                 }
 
                 @Override
                 public void onExerciseTimerFinished() {
                     Log.i(TAG, "Timer finished");
                     mWorkoutTimer = null;
-                    mTimerFirstStart = true;
-                    mHasActiveTimer = false;
-                    mTimerRunning = false;
+                    mTimerState.reset();
 
                     mPrefEditor = mSharedPreferences.edit();
                     mPrefEditor.putStringSet(PREF_WORKOUT_TIMER_STATE, null);
@@ -508,10 +500,11 @@ public class WorkoutActivity extends BaseActivity {
                 public void onExerciseTimerDismissed(boolean timerRunning, TimerDialog.WorkoutTimer workoutTimer, int currentProgress, int currentProgressMax){
                     Log.i(TAG, "Timer dismissed");
 
-                    mTimerRunning = timerRunning;
                     mWorkoutTimer = workoutTimer;
-                    mCurrentProgress = currentProgress;
-                    mCurrentProgressMax = currentProgressMax;
+                    mTimerState.setTimerRunning(timerRunning);
+                    mTimerState.setCurrentProgress(currentProgress);
+                    mTimerState.setCurrentProgressMax(currentProgressMax);
+
                 }
             });
             timerDialog.createDialog();
@@ -529,19 +522,11 @@ public class WorkoutActivity extends BaseActivity {
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
-        if (mHasActiveTimer){
-            TimerState timerState = new TimerState();
-
-            timerState.setTimerRunning(mTimerRunning);
-            timerState.setTimeRemaining(mWorkoutTimer.getTimeRemaining());
-            timerState.setTimerFirstStart(mTimerFirstStart);
-            timerState.setCurrentProgress(mCurrentProgress);
-            timerState.setCurrentProgressMax(mCurrentProgressMax);
-            timerState.setHasActiveTimer(mHasActiveTimer);
+        if (mTimerState.hasActiveTimer()){
 
             mPrefEditor = mSharedPreferences.edit();
             Gson gson = new Gson();
-            String json = gson.toJson(timerState);
+            String json = gson.toJson(mTimerState);
             mPrefEditor.putString(PREF_WORKOUT_TIMER_STATE, json);
             mPrefEditor.apply();
         }

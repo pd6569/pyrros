@@ -290,12 +290,14 @@ public class TimerDialog implements View.OnClickListener {
 
         int progress;
         long timeRemaining;
+        int timerDurationSecs;
         long timeRemainingOnPause;
 
 
         public WorkoutTimer(long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
             progress = (int) millisInFuture / 1000;
+            timerDurationSecs = (int)millisInFuture / 1000;
         }
 
 
@@ -338,6 +340,9 @@ public class TimerDialog implements View.OnClickListener {
             this.timeRemaining = timeRemaining;
         }
 
+        public int getTimerDurationSecs() {
+            return timerDurationSecs;
+        }
     }
 }
 
