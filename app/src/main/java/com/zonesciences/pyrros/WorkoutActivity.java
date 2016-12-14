@@ -465,12 +465,25 @@ public class WorkoutActivity extends BaseActivity {
 
                     }
 
-                    setTimerProperties(timerDialog);
+                    timerDialog.setExistingTimer(mWorkoutTimer);
+                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
+                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
+                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
+                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
+                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
+                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
 
 
                 } else {
                     Log.i(TAG, "Timer is active and paused");
-                    setTimerProperties(timerDialog);
+
+                    timerDialog.setExistingTimer(mWorkoutTimer);
+                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
+                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
+                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
+                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
+                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
+                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
                 }
             }
 
@@ -517,7 +530,7 @@ public class WorkoutActivity extends BaseActivity {
 
                 @Override
                 public void onExerciseTimerDismissed(boolean timerRunning, TimerDialog.WorkoutTimer workoutTimer, int currentProgress, int currentProgressMax){
-                    Log.i(TAG, "Timer dismissed");
+                    Log.i(TAG, "Timer dismissed. Current Progress: " + currentProgress);
 
                     mWorkoutTimer = workoutTimer;
                     mTimerState.setTimerRunning(timerRunning);
@@ -538,13 +551,7 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     private void setTimerProperties(TimerDialog timerDialog){
-        timerDialog.setExistingTimer(mWorkoutTimer);
-        timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
-        timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
-        timerDialog.setTimerRunning(mTimerState.isTimerRunning());
-        timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
-        timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
-        timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+
     }
 
     @Override
@@ -566,6 +573,9 @@ public class WorkoutActivity extends BaseActivity {
         super.onResume();
         Log.i(TAG, "onResume");
 
+        /**
+         * REFRESH WORKOUT EXERCISES - LOOK TO SEE IF CHANGES MADE FROM EDIT WORKOUT ACTIVITY AND WRITE NEW TABS AND EXERCISES
+         */
         final List<Exercise> exercises = new ArrayList<>();
         mDatabase.child("/workout-exercises/").child(mWorkoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

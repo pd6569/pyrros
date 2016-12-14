@@ -102,7 +102,7 @@ public class TimerDialog implements View.OnClickListener {
                 mStartTimerImageView.setVisibility(View.GONE);
                 mPauseTimerImageView.setVisibility(View.VISIBLE);
             } else {
-                Log.i(TAG, "Timer resumed, timer paused");
+                Log.i(TAG, "Timer resumed, timer paused. Current Progress: " + mCurrentProgress);
                 mCountDownProgressBar.setProgress(mCurrentProgress);
                 mStartTimerImageView.setVisibility(View.VISIBLE);
                 mPauseTimerImageView.setVisibility(View.GONE);
@@ -118,6 +118,7 @@ public class TimerDialog implements View.OnClickListener {
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
+                Log.i(TAG, "count down timer" + mCountDownTimer);
                 if (mCountDownTimer != null) {
                     mTimeRemaining = mCountDownTimer.getTimeRemaining();
                     mCurrentProgress = mCountDownProgressBar.getProgress();
@@ -127,6 +128,7 @@ public class TimerDialog implements View.OnClickListener {
                     /*mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mTimeRemaining, mTimeRemainingToDisplay, mCurrentProgress, mCurrentProgressMax);*/
                     mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mCountDownTimer, mCurrentProgress, mCurrentProgressMax);
 
+                    // Cancel timer otherwise will get multiple onFinish notifications from multiple timer objects.
                     mCountDownTimer.cancel();
                 }
 
@@ -216,8 +218,6 @@ public class TimerDialog implements View.OnClickListener {
                 mPauseTimerImageView.setVisibility(View.GONE);
 
                 mTimeRemaining = mCountDownTimer.getTimeRemaining();
-
-                mCountDownTimer = null;
 
                 // Notify activity
                 mExerciseTimerListener.onExerciseTimerPaused(mTimeRemaining);
