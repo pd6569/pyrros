@@ -456,23 +456,20 @@ public class WorkoutActivity extends BaseActivity {
                     int timeToStart = mTimerState.getTimerDuration() - (timeNow - (mTimerState.getTimerStartTime()));
                     Log.i(TAG, "time now:  " + timeNow + "timer duration: " + mTimerState.getTimerDuration() + "timer started at :" + mTimerState.getTimerStartTime() + " TIME TO START: " + timeToStart);
 
-                    timerDialog.setExistingTimer(mWorkoutTimer);
-                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
-                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
-                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
-                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
-                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
-                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+                    if (timeToStart <= 0){
+                        Log.i(TAG, "Timer has expired");
+                        mTimerState.reset();
+                    } else {
+                        Log.i(TAG, "Timer is still going, so set time remaining");
+                        mWorkoutTimer.setTimeRemaining(timeToStart * 1000);
+                    }
+
+                    setTimerProperties(timerDialog);
+
 
                 } else {
                     Log.i(TAG, "Timer is active and paused");
-                    timerDialog.setExistingTimer(mWorkoutTimer);
-                    timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
-                    timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
-                    timerDialog.setTimerRunning(mTimerState.isTimerRunning());
-                    timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
-                    timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
-                    timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
+                    setTimerProperties(timerDialog);
                 }
             }
 
@@ -537,6 +534,16 @@ public class WorkoutActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setTimerProperties(TimerDialog timerDialog){
+        timerDialog.setExistingTimer(mWorkoutTimer);
+        timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
+        timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
+        timerDialog.setTimerRunning(mTimerState.isTimerRunning());
+        timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
+        timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
+        timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
     }
 
     @Override
