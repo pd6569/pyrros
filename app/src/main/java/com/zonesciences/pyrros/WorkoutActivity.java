@@ -462,6 +462,7 @@ public class WorkoutActivity extends BaseActivity {
                     } else {
                         Log.i(TAG, "Timer is still going, so set time remaining");
                         mWorkoutTimer.setTimeRemaining(timeToStart * 1000);
+
                     }
 
                     setTimerProperties(timerDialog);
@@ -497,7 +498,7 @@ public class WorkoutActivity extends BaseActivity {
 
                 @Override
                 public void onExerciseTimerPaused(long timeRemaining) {
-                    Log.i(TAG, "Timer paused");
+                    Log.i(TAG, "Timer paused. Time remaining: " + timeRemaining);
                     mWorkoutTimer.cancel();
                     mTimerState.setTimerRunning(false);
                     mTimerState.setTimeRemaining(timeRemaining);;

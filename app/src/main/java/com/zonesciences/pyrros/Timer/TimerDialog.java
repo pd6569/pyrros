@@ -126,6 +126,7 @@ public class TimerDialog implements View.OnClickListener {
                     // Notify activity and update with variables to store when timer is resumed.
                     /*mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mTimeRemaining, mTimeRemainingToDisplay, mCurrentProgress, mCurrentProgressMax);*/
                     mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mCountDownTimer, mCurrentProgress, mCurrentProgressMax);
+
                     mCountDownTimer.cancel();
                 }
 
