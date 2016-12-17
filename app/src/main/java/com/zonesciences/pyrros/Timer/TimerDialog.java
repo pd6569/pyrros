@@ -89,16 +89,15 @@ public class TimerDialog implements View.OnClickListener {
         if (!mTimerFirstStart) {
 
             // timer has been started before, timer has been resumed to progress view
-            Log.i(TAG, "Timer has been started before");
+            Log.i(TAG, "Timer has been started before. Time remaining: " + mTimeRemaining);
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(mCurrentProgressMax);
-            mCountDownText.setText("" + (int)((mExistingTimer.timeRemaining/1000) + 1));
+            mCountDownText.setText("" + (int)((mTimeRemaining / 1000) + 1));
 
             if (mTimerRunning) {
-                Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mExistingTimer.getTimeRemaining());
-                mCountDownTimer = new WorkoutTimer(mExistingTimer.getTimeRemaining(), 10);
+                Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mTimeRemaining);
+                mCountDownTimer = new WorkoutTimer(mTimeRemaining, 10);
                 mCountDownTimer.start();
-                mExistingTimer = null;
                 mStartTimerImageView.setVisibility(View.GONE);
                 mPauseTimerImageView.setVisibility(View.VISIBLE);
             } else {
@@ -126,7 +125,7 @@ public class TimerDialog implements View.OnClickListener {
 
                     // Notify activity and update with variables to store when timer is resumed.
                     /*mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mTimeRemaining, mTimeRemainingToDisplay, mCurrentProgress, mCurrentProgressMax);*/
-                    mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mCountDownTimer, mCurrentProgress, mCurrentProgressMax);
+                    mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mCountDownTimer, mTimeRemaining, mCurrentProgress, mCurrentProgressMax);
 
                     // Cancel timer otherwise will get multiple onFinish notifications from multiple timer objects.
                     mCountDownTimer.cancel();
@@ -175,19 +174,19 @@ public class TimerDialog implements View.OnClickListener {
                         mStartTimerImageView.setVisibility(View.GONE);
                         mPauseTimerImageView.setVisibility(View.VISIBLE);
 
-                        int timer = Integer.parseInt(mSetTimerField.getText().toString());
-                        int milliseconds = timer * 1000;
+                        int timerDuration = Integer.parseInt(mSetTimerField.getText().toString());
+                        int milliseconds = timerDuration * 1000;
 
                         mSetTimerField.setEnabled(false);
 
-                        mCountDownProgressBar.setMax(timer * 100);
+                        mCountDownProgressBar.setMax(timerDuration * 100);
                         mCountDownTimer = new WorkoutTimer(milliseconds, 10);
                         mCountDownTimer.start();
 
                         mTimerFirstStart = false;
 
                         // Notify activity of timer creation and pass timer instance to activity
-                        mExerciseTimerListener.onExerciseTimerCreated(mCountDownTimer);
+                        mExerciseTimerListener.onExerciseTimerCreated(timerDuration);
 
                     } else {
                         Log.i(TAG, "Error: Enter number, dickhead");
@@ -206,7 +205,8 @@ public class TimerDialog implements View.OnClickListener {
                     mPauseTimerImageView.setVisibility(View.VISIBLE);
 
                     // notify activity that timer has been resumed:
-                    mExerciseTimerListener.onExerciseTimerResumed(mCountDownTimer);
+                    int newTimerDuration = (int) (mTimeRemaining / 1000);
+                    mExerciseTimerListener.onExerciseTimerResumed(newTimerDuration);
                 }
                 break;
 
