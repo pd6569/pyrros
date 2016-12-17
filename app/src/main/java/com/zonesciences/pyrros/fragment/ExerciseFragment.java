@@ -90,23 +90,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
     Button mSaveSet;
     EditText mWeightField;
     EditText mRepsField;
-    ImageView mTimer;
-
-    // Timer
-    CustomCountDownTimer mCountDownTimer;
-    ProgressBar mCountDownProgressBar;
-    EditText mSetTimerField;
-    TextView mCountDownText;
-    Button mIncreaseTimeButton;
-    Button mDecreaseTimeButton;
-    ImageView mStartTimerImageView;
-    ImageView mPauseTimerImageView;
-    RelativeLayout mLayoutTimerSetTimer;
-    LinearLayout mLayoutTimerOptions;
-    RelativeLayout mLayoutTimerProgress;
-
-
-
 
     //Recycler view components
     RecyclerView mSetsRecycler;
@@ -151,7 +134,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
     //Listener
     OnStatsDataLoaded mStatsDataLoadedListener;
-    ExerciseTimerListener mExerciseTimerListener;
 
     // ActionMode
     ActionMode mActionMode;
@@ -393,10 +375,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
 
         mSetNumberTitle.setText("Set " + mCurrentSet);
 
-        mTimer = (ImageView) view.findViewById(R.id.image_timer);
-        mTimer.setOnClickListener(this);
-
-
         mSetsAdapter.notifyDataSetChanged(); // this ensures that data is reloaded when recreating the view after swiping from other exercises
         mSetsRecycler = (RecyclerView) view.findViewById(R.id.recycler_sets);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -521,20 +499,11 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             case R.id.button_save_set:
                 replaceSet(mSetSelected, view);
                 break;
-            case R.id.image_timer:
-                setTimer();
-                break;
         }
     }
 
 
-    /***
-     * TODO:// Sort out this shit (but working) code
-     *
-     * TIMER FUNCTIONALITY HERE. VERY MESSY SHIT CODE. NEEDS NEATENING UP.
-     */
-
-    long timeRemaining;
+   /* long timeRemaining;
     int timeRemainingToDisplay;
     boolean timerFirstStart = true;
     boolean timerRunning;
@@ -648,8 +617,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                         mPauseTimerImageView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                // Notify activity
-                                mExerciseTimerListener.onExerciseTimerPaused();
 
                                 timerRunning = false;
                                 mCountDownTimer.cancel();
@@ -682,7 +649,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
                     // There is an existing timer active, destroy old timer and create new one, to resume where left off.
 
                     // notify activity that timer has been resumed:
-                    mExerciseTimerListener.onExerciseTimerResumed();
 
                     mCountDownTimer = null;
                     mCountDownTimer = new CustomCountDownTimer(timeRemaining, 10);
@@ -769,8 +735,6 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
             setTimerOptionsVisible(true);
             mStartTimerImageView.setVisibility(View.VISIBLE);
             mPauseTimerImageView.setVisibility(View.GONE);
-
-            mExerciseTimerListener.onExerciseTimerFinished();
         }
 
         public long getTimeRemaining (){
@@ -782,8 +746,7 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
-    /*********** END TIMER FUNCTIONS ***********/
-
+*/
 
     private void addSet() {
         setWeight();
@@ -974,14 +937,4 @@ public class ExerciseFragment extends Fragment implements View.OnClickListener, 
         this.mStatsDataLoadedListener = listener;
     }
 
-    public interface ExerciseTimerListener {
-        void onExerciseTimerCreated();
-        void onExerciseTimerResumed();
-        void onExerciseTimerPaused();
-        void onExerciseTimerFinished();
-    }
-
-    public void setExerciseTimerListener (ExerciseTimerListener listener){
-        this.mExerciseTimerListener = listener;
-    }
 }

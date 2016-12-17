@@ -89,7 +89,7 @@ public class WorkoutActivity extends BaseActivity {
     //Fragment temporary reference
     Fragment mFragment;
 
-    //Exercise History
+    /*//Exercise History
     List<String> mExerciseHistoryDates;
     List<Exercise> mExerciseHistory; //exercise history for specific exercise
 
@@ -101,7 +101,7 @@ public class WorkoutActivity extends BaseActivity {
     Map<Integer, List<Exercise>> mExerciseHistoryMap = new HashMap<>();
 
     //Map for storing all exercises for passing to exercise stats
-    Map<Integer, List<Exercise>> mAllExercisesMap = new HashMap<>();
+    Map<Integer, List<Exercise>> mAllExercisesMap = new HashMap<>();*/
 
 
 
@@ -110,15 +110,6 @@ public class WorkoutActivity extends BaseActivity {
     // Timer tracking
     TimerDialog.WorkoutTimer mWorkoutTimer;
     TimerState mTimerState;
-
-    long mTimeRemaining;
-    int mTimeRemainingToDisplay;
-    boolean mTimerFirstStart = true;
-    boolean mTimerRunning;
-    int mCurrentProgress;
-    int mCurrentProgressMax;
-    boolean mHasActiveTimer;
-    int mTimerStartTime;
 
     // Preferences
     SharedPreferences mSharedPreferences;
@@ -332,27 +323,7 @@ public class WorkoutActivity extends BaseActivity {
         @Override
         public Fragment getItem(int position) {
             final ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(mExercisesList.get(position), mExerciseObjects.get(position), mWorkoutKey, mUserId);
-            exerciseFragment.setExerciseTimerListener(new ExerciseFragment.ExerciseTimerListener() {
-                @Override
-                public void onExerciseTimerCreated() {
-                    Log.i(TAG, "Exercise timer created for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
-                }
 
-                @Override
-                public void onExerciseTimerResumed() {
-                    Log.i(TAG, "Exercise timer resumed for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
-                }
-
-                @Override
-                public void onExerciseTimerPaused() {
-                    Log.i(TAG, "Exercise timer paused for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
-                }
-
-                @Override
-                public void onExerciseTimerFinished() {
-                    Log.i(TAG, "Exercise timer finished for exercise fragment: " + exerciseFragment.getCurrentExercise().getName());
-                }
-            });
             mExerciseReferenceMap.put(position, exerciseFragment); // map exercise fragments so that variables can be obtained when switching fragments.
             return exerciseFragment;
         }
