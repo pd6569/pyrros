@@ -3,6 +3,7 @@ package com.zonesciences.pyrros;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
@@ -30,6 +31,8 @@ import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.Timer.ExerciseTimerListener;
 import com.zonesciences.pyrros.Timer.TimerDialog;
 import com.zonesciences.pyrros.Timer.TimerState;
+import com.zonesciences.pyrros.Timer.WorkoutTimer;
+import com.zonesciences.pyrros.Timer.WorkoutTimerReference;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
 import com.zonesciences.pyrros.fragment.FeedbackFragment;
@@ -109,7 +112,8 @@ public class WorkoutActivity extends BaseActivity {
     String mFragmentTag;
 
     // Timer tracking
-    TimerDialog.WorkoutTimer mWorkoutTimer;
+    WorkoutTimer mWorkoutTimer;
+    WorkoutTimerReference mWorkoutTimerReference;
     TimerState mTimerState;
 
     // Preferences
@@ -136,8 +140,19 @@ public class WorkoutActivity extends BaseActivity {
         Gson gson = new Gson();
         String json = mSharedPreferences.getString(PREF_WORKOUT_TIMER_STATE, null);
         mTimerState = gson.fromJson(json, TimerState.class);
+        mWorkoutTimerReference = WorkoutTimerReference.getWorkoutTimerReference();
         if (mTimerState == null){
+            Log.i(TAG, "No timer state info available");
             mTimerState = new TimerState();
+        } else {
+            Log.i(TAG, "Timer state info available");
+            if (mTimerState.hasActiveTimer() && !mTimerState.isTimerRunning()){
+                // Has timer and it is paused
+                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 1);
+            } else {
+                // Has running timer, so get reference to this timer
+                mWorkoutTimer = mWorkoutTimerReference.getWorkoutTimer();
+            }
         }
 
         Log.i(TAG, "timer start time: " + mTimerState.getTimerStartTime() + " timer duration: " + mTimerState.getTimerDuration() + "has active timer: " + mTimerState.hasActiveTimer() + " timer running: " + mTimerState.isTimerRunning() + " timer first start: " + mTimerState.isTimerFirstStart() + " TIME REMAINING: " + mTimerState.getTimeRemaining() + " current progress: " + mTimerState.getCurrentProgress() + " progress max " + mTimerState.getCurrentProgressMax());
@@ -453,6 +468,12 @@ public class WorkoutActivity extends BaseActivity {
                 @Override
                 public void onExerciseTimerCreated(int timerDuration) {
                     Log.i(TAG, "Timer created");
+                    mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 1000);
+                    mWorkoutTimer.start();
+                    if (mWorkoutTimerReference == null){
+                        mWorkoutTimerReference = WorkoutTimerReference.getWorkoutTimerReference();
+                    }
+                    mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
                     mTimerState.setTimerDuration(timerDuration);
                     mTimerState.setTimerFirstStart(false);
@@ -467,6 +488,10 @@ public class WorkoutActivity extends BaseActivity {
                 @Override
                 public void onExerciseTimerResumed(int timerDuration) {
                     Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + timerDuration);
+                    mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 1000);
+                    mWorkoutTimer.start();
+                    mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
+
                     mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
                     mTimerState.setTimerDuration(timerDuration);
                 }
@@ -474,6 +499,10 @@ public class WorkoutActivity extends BaseActivity {
                 @Override
                 public void onExerciseTimerPaused(long timeRemaining) {
                     Log.i(TAG, "Timer paused. Time remaining: " + timeRemaining);
+                    mWorkoutTimer.cancel();
+                    mWorkoutTimer = null;
+                    mWorkoutTimerReference.setWorkoutTimer(null);
+
                     mTimerState.setTimerRunning(false);
                     mTimerState.setTimeRemaining(timeRemaining);;
                 }
@@ -481,6 +510,9 @@ public class WorkoutActivity extends BaseActivity {
                 @Override
                 public void onExerciseTimerFinished() {
                     Log.i(TAG, "Timer finished");
+                    mWorkoutTimer = null;
+                    mWorkoutTimerReference.setWorkoutTimer(null);
+
                     mTimerState.reset();
 
                     mPrefEditor = mSharedPreferences.edit();
