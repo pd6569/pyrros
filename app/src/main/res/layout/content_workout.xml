@@ -23,6 +23,17 @@
         android:layout_marginBottom="55dp"
         tools:context=".activity_workout"/>
 
+    <TextView
+        android:id="@+id/timer_overlay_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="60dp"
+        android:layout_marginRight="5dp"
+        android:textSize="@dimen/timer_overlay"
+        android:visibility="gone"/>
+
 </RelativeLayout>
 
 

@@ -8,4 +8,5 @@
     <dimen name="filter_spinner_text">16dp</dimen>
     <dimen name="toolbar_title">20dp</dimen>
     <dimen name="timer_options">16dp</dimen>
+    <dimen name="timer_overlay">24dp</dimen>
 </resources>

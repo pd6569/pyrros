@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -33,7 +34,6 @@ import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.Timer.ExerciseTimerListener;
 import com.zonesciences.pyrros.Timer.TimerDialog;
 import com.zonesciences.pyrros.Timer.TimerState;
-import com.zonesciences.pyrros.Timer.WorkoutTimer;
 import com.zonesciences.pyrros.Timer.WorkoutTimerReference;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
@@ -69,6 +69,7 @@ public class WorkoutActivity extends BaseActivity {
 
     ViewPager mExercisesViewPager;
     WorkoutExercisesAdapter mWorkoutExercisesAdapter;
+    TextView mTimerOverlayTextView;
 
     public Toolbar mToolbar;
     TabLayout mTabLayout;
@@ -152,7 +153,7 @@ public class WorkoutActivity extends BaseActivity {
             Log.i(TAG, "Timer state info available");
             if (mTimerState.hasActiveTimer() && !mTimerState.isTimerRunning()){
                 // Has timer and it is paused, set timer state.
-                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 1, getApplicationContext());
+                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext());
             } else {
                 // Has running timer, so get reference to this timer
                 mWorkoutTimer = mWorkoutTimerReference.getWorkoutTimer();
@@ -167,6 +168,11 @@ public class WorkoutActivity extends BaseActivity {
         mFragmentManager = getSupportFragmentManager();
         mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
         mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
+
+        mTimerOverlayTextView = (TextView) findViewById(R.id.timer_overlay_textview);
+        if (mWorkoutTimer != null) {
+            mWorkoutTimer.setTimerOverlay(mTimerOverlayTextView);
+        }
 
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_workout);
@@ -473,8 +479,11 @@ public class WorkoutActivity extends BaseActivity {
                 @Override
                 public void onExerciseTimerCreated(int timerDuration) {
                     Log.i(TAG, "Timer created");
-                    mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 1000, getApplicationContext());
+                    mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
+                    mWorkoutTimer.setTimerOverlay(mTimerOverlayTextView);
+
                     mWorkoutTimer.start();
+
                     mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
                     mTimerState.setTimerDuration(timerDuration);
@@ -490,7 +499,8 @@ public class WorkoutActivity extends BaseActivity {
                 @Override
                 public void onExerciseTimerResumed(int timerDuration) {
                     Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + timerDuration);
-                    mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 1000, getApplicationContext());
+                    mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
+                    mWorkoutTimer.setTimerOverlay(mTimerOverlayTextView);
                     mWorkoutTimer.start();
                     mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
@@ -634,6 +644,59 @@ public class WorkoutActivity extends BaseActivity {
         mPrefEditor.putBoolean(PREF_WORKOUT_ACTIVITY_STATE, false);
         mPrefEditor.apply();
 
+    }
+
+    public class WorkoutTimer extends CountDownTimer {
+
+        private static final String TAG = "WorkoutTimer";
+
+        private Context mContext;
+
+        TextView timerOverlay;
+
+        // Preferences
+        private SharedPreferences mSharedPreferences;
+
+    /*public WorkoutTimer(long millisInFuture, long countDownInterval) {
+        super(millisInFuture, countDownInterval);
+    }*/
+
+        public WorkoutTimer(long millisInFuture, long countDownInterval, Context context) {
+            super(millisInFuture, countDownInterval);
+            this.mContext = context;
+        }
+
+        @Override
+        public void onTick(long millisRemaining) {
+            int timeRemaining = (int) (millisRemaining / 1000);
+
+            if (timerOverlay != null) {
+                timerOverlay.setVisibility(View.VISIBLE);
+                timerOverlay.setText("" + (timeRemaining + 1));
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            Log.i(TAG, "Workout Timer finished");
+
+            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+            if (!mSharedPreferences.getBoolean(WorkoutActivity.PREF_WORKOUT_ACTIVITY_STATE, false)){
+                Toast.makeText(mContext, "Workout Timer has finished", Toast.LENGTH_SHORT).show();
+            } else {
+                timerOverlay.setVisibility(View.GONE);
+            }
+
+            long[] pattern = {0, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000};
+
+            Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(pattern, -1);
+
+        }
+
+        public void setTimerOverlay(TextView timerOverlay) {
+            this.timerOverlay = timerOverlay;
+        }
     }
 
 }
