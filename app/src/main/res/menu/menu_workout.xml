@@ -10,6 +10,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_check_time_remaining"
+        android:title="Time remaining"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_timer"
         android:title="@string/menu_timer"
         android:visible="true"

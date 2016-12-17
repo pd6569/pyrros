@@ -315,6 +315,7 @@ public class TimerDialog implements View.OnClickListener {
             if (i != progress) {
                 progress = i;
                 mCountDownText.setText("" + (progress + 1));
+                Log.i(TAG, "Countdown progress: " + progress);
             }
 
             int progressBarUpdate = (int) (millisUntilFinished / 10);

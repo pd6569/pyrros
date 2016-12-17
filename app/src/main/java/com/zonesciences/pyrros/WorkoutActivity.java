@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -415,6 +416,14 @@ public class WorkoutActivity extends BaseActivity {
             return true;
         }
 
+        if (i == R.id.action_check_time_remaining){
+            if (mWorkoutTimer != null) {
+                Toast.makeText(getApplicationContext(), "Time remaining: " + (mWorkoutTimer.getTimeRemaining() / 1000), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Timer is paused or has not been started", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         if (i == R.id.action_timer){
 
             TimerDialog timerDialog = new TimerDialog(this);
@@ -467,6 +476,7 @@ public class WorkoutActivity extends BaseActivity {
                     Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + newWorkoutTimer.getTimerDurationSecs());
                     mWorkoutTimer = null;
                     mWorkoutTimer = newWorkoutTimer;
+                    mWorkoutTimer.start();
                     mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
                     mTimerState.setTimerDuration(mWorkoutTimer.getTimerDurationSecs());
                 }
