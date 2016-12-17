@@ -5,6 +5,12 @@ import com.zonesciences.pyrros.models.Workout;
 /**
  * Created by Peter on 17/12/2016.
  */
+
+/**
+ * Timer reference is singleton and holds reference to active timer
+ */
+
+
 public class WorkoutTimerReference {
 
     private WorkoutTimer mWorkoutTimer;

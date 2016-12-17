@@ -9,5 +9,5 @@ public interface ExerciseTimerListener {
     void onExerciseTimerResumed(int timerDuration);
     void onExerciseTimerPaused(long timeRemaining);
     void onExerciseTimerFinished();
-    void onExerciseTimerDismissed(boolean timerRunning, TimerDialog.WorkoutTimer workoutTimer, long timeRemaining, int currentProgress, int currentProgressMax);
+    void onExerciseTimerDismissed(boolean timerRunning, long timeRemaining, int currentProgress, int currentProgressMax);
 }

@@ -161,23 +161,42 @@
 
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/timer_start"
-        android:padding="5dp"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_play_circle_filled_green_500_48dp"
-        />
+        android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/timer_pause"
-        android:padding="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_pause_circle_filled_red_500_48dp"
-        android:visibility="gone"
-        />
+        <ImageView
+            android:id="@+id/timer_delete"
+            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_delete_gray_24dp"
+            android:visibility="gone"
+            />
+
+        <ImageView
+            android:id="@+id/timer_start"
+            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_play_circle_filled_green_500_48dp"
+            />
+
+        <ImageView
+            android:id="@+id/timer_pause"
+            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_pause_circle_filled_red_500_48dp"
+            android:visibility="gone"
+            />
+
+    </RelativeLayout>
 
 </LinearLayout>

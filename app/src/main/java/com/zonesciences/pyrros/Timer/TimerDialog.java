@@ -1,6 +1,5 @@
 package com.zonesciences.pyrros.Timer;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
@@ -43,6 +42,7 @@ public class TimerDialog implements View.OnClickListener {
     RelativeLayout mLayoutTimerSetTimer;
     LinearLayout mLayoutTimerOptions;
     RelativeLayout mLayoutTimerProgress;
+    ImageView mDeleteTimerImageView;
 
     // Timer variables
     long mTimeRemaining;
@@ -81,6 +81,9 @@ public class TimerDialog implements View.OnClickListener {
 
         mDecreaseTimeButton = (Button) dialogView.findViewById(R.id.timer_decrease_time_button);
         mDecreaseTimeButton.setOnClickListener(this);
+
+        mDeleteTimerImageView = (ImageView) dialogView.findViewById(R.id.timer_delete);
+        mDeleteTimerImageView.setOnClickListener(this);
 
         mLayoutTimerSetTimer = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_set_timer);
         mLayoutTimerOptions = (LinearLayout) dialogView.findViewById(R.id.timer_layout_set_options);
@@ -124,8 +127,7 @@ public class TimerDialog implements View.OnClickListener {
                     mCurrentProgressMax = mCountDownProgressBar.getMax();
 
                     // Notify activity and update with variables to store when timer is resumed.
-                    /*mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mTimeRemaining, mTimeRemainingToDisplay, mCurrentProgress, mCurrentProgressMax);*/
-                    mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mCountDownTimer, mTimeRemaining, mCurrentProgress, mCurrentProgressMax);
+                    mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mTimeRemaining, mCurrentProgress, mCurrentProgressMax);
 
                     // Cancel timer otherwise will get multiple onFinish notifications from multiple timer objects.
                     mCountDownTimer.cancel();
@@ -142,13 +144,15 @@ public class TimerDialog implements View.OnClickListener {
 
             mLayoutTimerProgress.setVisibility(View.GONE);
             mStartTimerImageView.setVisibility(View.GONE);
-            mStartTimerImageView.setVisibility(View.GONE);
+            mPauseTimerImageView.setVisibility(View.GONE);
+            mDeleteTimerImageView.setVisibility(View.GONE);
 
         } else {
             mLayoutTimerOptions.setVisibility(View.GONE);
             mLayoutTimerSetTimer.setVisibility(View.GONE);
 
             mLayoutTimerProgress.setVisibility(View.VISIBLE);
+            mDeleteTimerImageView.setVisibility(View.VISIBLE);
         }
     }
 
