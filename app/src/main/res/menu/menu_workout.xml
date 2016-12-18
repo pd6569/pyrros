@@ -10,8 +10,14 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_check_time_remaining"
-        android:title="Time remaining"
+        android:id="@+id/action_pause_timer"
+        android:title="Pause Timer"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_reset_timer"
+        android:title="Reset Timer"
         android:visible="true"
         app:showAsAction="never" />
 

@@ -108,7 +108,12 @@ public class TimerDialog implements View.OnClickListener {
                 mPauseTimerImageView.setVisibility(View.VISIBLE);
             } else {
                 Log.i(TAG, "Timer resumed, timer paused. Current Progress: " + mCurrentProgress);
-                mCountDownProgressBar.setProgress(mCurrentProgress);
+
+                // set correct progress bar value to display progress in paused state
+                int progressBarUpdate = (int) (mTimeRemaining / 10);
+                mCountDownProgressBar.setProgress(mCountDownProgressBar.getMax() - progressBarUpdate);
+
+                /*mCountDownProgressBar.setProgress(mCurrentProgress);*/
                 mStartTimerImageView.setVisibility(View.VISIBLE);
                 mPauseTimerImageView.setVisibility(View.GONE);
             }

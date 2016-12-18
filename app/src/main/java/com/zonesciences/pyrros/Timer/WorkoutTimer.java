@@ -2,7 +2,9 @@ package com.zonesciences.pyrros.Timer;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
@@ -41,6 +43,9 @@ public class WorkoutTimer extends CountDownTimer {
     // Is dialog open
     boolean mIsDialogOpen;
 
+    // timer variables
+    long mTimeRemaining;
+
     // Preferences
     private SharedPreferences mSharedPreferences;
 
@@ -55,7 +60,7 @@ public class WorkoutTimer extends CountDownTimer {
 
     @Override
     public void onTick(long millisRemaining) {
-        int timeRemaining = (int) (millisRemaining / 1000) + 1;
+        mTimeRemaining = millisRemaining;
 
         if (timerActionBarText != null && timerAction != null) {
 
@@ -86,18 +91,30 @@ public class WorkoutTimer extends CountDownTimer {
         /*Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         v.vibrate(pattern, -1);*/
 
+        Intent dismissAlarm = new Intent(mContext, WorkoutActivity.class);
+        dismissAlarm.setAction("DismissAction");
+        PendingIntent pendingIntentDismissAlarm = PendingIntent.getService(mContext, 0, dismissAlarm, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
         builder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
                 .setContentTitle("Workout Timer")
                 .setContentText("Workout timer has now finished. Start your next set now")
                 .setPriority(Notification.PRIORITY_HIGH)
-                .setVibrate(pattern);
+                .setVibrate(pattern)
+                .addAction(R.drawable.ic_close_gray_24dp, "disimss", pendingIntentDismissAlarm);
+
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, builder.build());
 
     }
 
 
+    // getters
+    public long getTimeRemaining() {
+        return mTimeRemaining;
+    }
+
+    // setters
     public void setTimerActionBarText(MenuItem timerActionBarText) {
         this.timerActionBarText = timerActionBarText;
     }
