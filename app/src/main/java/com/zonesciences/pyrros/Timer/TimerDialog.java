@@ -18,6 +18,11 @@ import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
 
+import org.joda.time.LocalTime;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Peter on 14/12/2016.
  */
@@ -30,7 +35,6 @@ public class TimerDialog implements View.OnClickListener {
 
     // View
     WorkoutTimer mCountDownTimer;
-    WorkoutTimer mExistingTimer;
 
     ProgressBar mCountDownProgressBar;
     EditText mSetTimerField;
@@ -95,7 +99,10 @@ public class TimerDialog implements View.OnClickListener {
             Log.i(TAG, "Timer has been started before. Time remaining: " + mTimeRemaining);
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(mCurrentProgressMax);
-            mCountDownText.setText("" + (int)((mTimeRemaining / 1000) + 1));
+
+            mCountDownText.setText(timeToDisplay(mTimeRemaining).get("minutes") + ":" + timeToDisplay(mTimeRemaining).get("seconds"));
+
+            /*mCountDownText.setText("" + (int)((mTimeRemaining / 1000) + 1));*/
 
             if (mTimerRunning) {
                 Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mTimeRemaining);
@@ -259,14 +266,6 @@ public class TimerDialog implements View.OnClickListener {
     // Setters
 
 
-    public void setCountDownTimer(WorkoutTimer countDownTimer) {
-        mCountDownTimer = countDownTimer;
-    }
-
-    public void setExistingTimer(WorkoutTimer existingTimer) {
-        mExistingTimer = existingTimer;
-    }
-
     public void setHasActiveTimer(boolean hasActiveTimer) {
         mHasActiveTimer = hasActiveTimer;
     }
@@ -289,6 +288,44 @@ public class TimerDialog implements View.OnClickListener {
 
     public void setTimeRemaining(long timeRemaining) {
         mTimeRemaining = timeRemaining;
+    }
+
+
+    public Map<String, String> timeToDisplay (long timeRemainingMillis){
+
+        Map<String, String> timeToDisplay = new HashMap<>();
+
+        int timeRemainingSecs = (int) (timeRemainingMillis / 1000) + 1;
+
+        int secondsRemaining;
+
+        double minutesRemaining = timeRemainingSecs / 60;
+
+        if (minutesRemaining >= 1){
+            secondsRemaining = (timeRemainingSecs - ((int) minutesRemaining * 60));
+        } else {
+            secondsRemaining = timeRemainingSecs;
+        }
+
+        String minsToDisplay = new String();
+        String secsToDisplay = new String();
+
+        if (minutesRemaining < 10){
+            minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
+        } else {
+            minsToDisplay = Integer.toString((int) minutesRemaining);
+        }
+        if (secondsRemaining < 10){
+            secsToDisplay = 0 + Integer.toString(secondsRemaining);
+        } else {
+            secsToDisplay = Integer.toString(secondsRemaining);
+        }
+
+        timeToDisplay.put("minutes", minsToDisplay);
+        timeToDisplay.put("seconds", secsToDisplay);
+
+        return timeToDisplay;
+
     }
 
     /**
@@ -314,11 +351,39 @@ public class TimerDialog implements View.OnClickListener {
         public void onTick(long millisUntilFinished) {
 
             timeRemaining = millisUntilFinished;
+            int timeRemainingSecs = (int) (millisUntilFinished / 1000) + 1;
 
             int i = (int) (millisUntilFinished / 1000);
             if (i != progress) {
                 progress = i;
-                mCountDownText.setText("" + (progress + 1));
+
+                int secondsRemaining;
+
+                double minutesRemaining = timeRemainingSecs / 60;
+
+                if (minutesRemaining >= 1){
+                    secondsRemaining = (timeRemainingSecs - ((int) minutesRemaining * 60));
+                } else {
+                    secondsRemaining = timeRemainingSecs;
+                }
+
+                String minsToDisplay = new String();
+                String secsToDisplay = new String();
+
+                if (minutesRemaining < 10){
+                    minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
+                } else {
+                    minsToDisplay = Integer.toString((int) minutesRemaining);
+                }
+                if (secondsRemaining < 10){
+                    secsToDisplay = 0 + Integer.toString(secondsRemaining);
+                } else {
+                    secsToDisplay = Integer.toString(secondsRemaining);
+                }
+
+                mCountDownText.setText(minsToDisplay + ":" + secsToDisplay);
+
+                /*mCountDownText.setText("" + (progress + 1));*/
                 Log.i(TAG, "Countdown progress: " + progress);
             }
 
@@ -353,6 +418,9 @@ public class TimerDialog implements View.OnClickListener {
         public int getTimerDurationSecs() {
             return timerDurationSecs;
         }
+
+
+
     }
 }
 

@@ -44,7 +44,7 @@ public class WorkoutTimer extends CountDownTimer {
 
     @Override
     public void onTick(long millisRemaining) {
-        int timeRemaining = (int) (millisRemaining / 1000);
+        int timeRemaining = (int) (millisRemaining / 1000) + 1;
 
         if (timerActionBarText != null && timerAction != null) {
 
