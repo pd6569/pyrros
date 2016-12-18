@@ -51,6 +51,7 @@ public class TimerDialog implements View.OnClickListener {
     int mCurrentProgressMax;
     boolean mHasActiveTimer;
     int mTimeToSet;
+    TimerState mTimerState;
 
     // Listener
     ExerciseTimerListener mExerciseTimerListener;
@@ -258,8 +259,21 @@ public class TimerDialog implements View.OnClickListener {
         this.mExerciseTimerListener = listener;
     }
 
-    // Setters
+    // Getters
 
+    public int getCurrentProgress() {
+        return mCountDownProgressBar.getProgress();
+    }
+
+    public int getCurrentProgressMax() {
+        return mCountDownProgressBar.getMax();
+    }
+
+    public boolean isTimerRunning() {
+        return mTimerRunning;
+    }
+
+    // Setters
 
     public void setHasActiveTimer(boolean hasActiveTimer) {
         mHasActiveTimer = hasActiveTimer;
@@ -352,8 +366,9 @@ public class TimerDialog implements View.OnClickListener {
             return timerDurationSecs;
         }
 
-
-
+        public int getProgress() {
+            return progress;
+        }
     }
 }
 

@@ -55,7 +55,11 @@ public class WorkoutTimer extends CountDownTimer {
 
         if (timerActionBarText != null && timerAction != null) {
 
+            Log.i(TAG, "mIsDialogOpen = " + mIsDialogOpen);
+
             if (!mIsDialogOpen) {
+
+                Log.i(TAG, "Timer dialog closed. Set timer icon invisible and timer toolbar text visible");
                 timerAction.setVisible(false);
                 timerActionBarText.setVisible(true);
 

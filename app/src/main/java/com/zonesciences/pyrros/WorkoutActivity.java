@@ -43,6 +43,7 @@ import com.zonesciences.pyrros.fragment.stats.StatsFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Record;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -120,10 +121,12 @@ public class WorkoutActivity extends BaseActivity {
 
     String mFragmentTag;
 
-    // Timer tracking
+    // Timer
+    TimerDialog mTimerDialog;
     WorkoutTimer mWorkoutTimer;
     WorkoutTimerReference mWorkoutTimerReference; // reference to single timer
     TimerState mTimerState;
+    boolean mTimerDialogOpen;
 
     // Preferences
     SharedPreferences mSharedPreferences;
@@ -132,6 +135,8 @@ public class WorkoutActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.i(TAG, "onCreate");
         setContentView(R.layout.activity_workout);
 
 
@@ -160,8 +165,20 @@ public class WorkoutActivity extends BaseActivity {
                 // Has timer and it is paused, set timer state.
                 mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext());
             } else {
-                // Has running timer, so get reference to this timer
-                mWorkoutTimer = mWorkoutTimerReference.getWorkoutTimer();
+                // Has running timer. Check if timer has expired or not, if not get reference to active running timer.
+
+                int timeNow = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
+                int timeToStart = mTimerState.getTimerDuration() - (timeNow - (mTimerState.getTimerStartTime()));
+                Log.i(TAG, "time now:  " + timeNow + "timer duration: " + mTimerState.getTimerDuration() + "timer started at :" + mTimerState.getTimerStartTime() + " TIME TO START: " + timeToStart);
+
+                if (timeToStart <= 0){
+                    Log.i(TAG, "Timer has expired. Reset timer state");
+                    mTimerState.reset();
+                } else {
+                    Log.i(TAG, "Timer is still going, so get reference to timer");
+                    mTimerState.setTimeRemaining(timeToStart * 1000);
+                    mWorkoutTimer = mWorkoutTimerReference.getWorkoutTimer();
+                }
             }
         }
 
@@ -223,10 +240,14 @@ public class WorkoutActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_workout, menu);
 
+        Log.i(TAG, "onCreateOptionsMenu");
+
         mTimerAction = menu.findItem(R.id.action_timer);
         mActiveTimerToolbarText = menu.findItem(R.id.action_active_timer);
 
-        if (mWorkoutTimer != null && mTimerState.isTimerRunning()){
+        if (mTimerState.isTimerRunning()){
+            Log.i(TAG, "Timer is running");
+            mWorkoutTimer.setDialogOpen(mTimerDialogOpen);
             mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
             mWorkoutTimer.setTimerAction(mTimerAction);
         } else {
@@ -454,7 +475,9 @@ public class WorkoutActivity extends BaseActivity {
 
         if (i == R.id.action_timer || i == R.id.action_active_timer){
 
-            TimerDialog timerDialog = new TimerDialog(this);
+            mTimerDialogOpen = true;
+
+            mTimerDialog = new TimerDialog(this);
             if (mTimerState.hasActiveTimer()){
 
 
@@ -473,19 +496,19 @@ public class WorkoutActivity extends BaseActivity {
 
                     }
 
-                    setTimerProperties(timerDialog);
+                    setTimerProperties(mTimerDialog);
 
 
 
                 } else {
                     Log.i(TAG, "Timer is active and paused");
 
-                    setTimerProperties(timerDialog);
+                    setTimerProperties(mTimerDialog);
                 }
             }
 
 
-            timerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
+            mTimerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
                 @Override
                 public void onExerciseTimerCreated(int timerDuration) {
                     Log.i(TAG, "Timer created");
@@ -553,6 +576,8 @@ public class WorkoutActivity extends BaseActivity {
                 public void onExerciseTimerDismissed(boolean timerRunning, long timeRemaining, int currentProgress, int currentProgressMax){
                     Log.i(TAG, "Timer dismissed. Current Progress: " + currentProgress);
 
+                    mTimerDialogOpen = false;
+
                     if (mWorkoutTimer != null) {
                         mWorkoutTimer.setDialogOpen(false);
                     }
@@ -564,7 +589,7 @@ public class WorkoutActivity extends BaseActivity {
 
                 }
             });
-            timerDialog.createDialog();
+            mTimerDialog.createDialog();
 
             if (mWorkoutTimer != null){
                 mWorkoutTimer.setDialogOpen(true);
@@ -596,6 +621,12 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "onPause");
         if (mTimerState.hasActiveTimer()){
 
+            if (mTimerDialogOpen) {
+                Log.i(TAG, "activity stopped while dialog open, get values from timer");
+                mTimerState.setTimerRunning(mTimerDialog.isTimerRunning());
+                mTimerState.setCurrentProgress(mTimerDialog.getCurrentProgress());
+                mTimerState.setCurrentProgressMax(mTimerDialog.getCurrentProgressMax());
+            }
             mPrefEditor = mSharedPreferences.edit();
             Gson gson = new Gson();
             String json = gson.toJson(mTimerState);
@@ -654,6 +685,7 @@ public class WorkoutActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "onStart");
 
         // Store state of activity for timer
         mPrefEditor = mSharedPreferences.edit();
@@ -664,12 +696,20 @@ public class WorkoutActivity extends BaseActivity {
     @Override
     public void onStop() {
         super.onStop();
+        Log.i(TAG, "onStop");
 
         // Store state of activity for timer
         mPrefEditor = mSharedPreferences.edit();
         mPrefEditor.putBoolean(PREF_WORKOUT_ACTIVITY_STATE, false);
         mPrefEditor.apply();
 
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+
+        Log.i(TAG, "onDestroy");
     }
 
     /*public class WorkoutTimer extends CountDownTimer {
