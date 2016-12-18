@@ -632,7 +632,7 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "onPause");
         if (mTimerState.hasActiveTimer()){
 
-            // if activity is paused while dialog open, need to get current information and store it to timerstate.
+            // if activity is paused while dialog open, need to get current timer state and store it.
             if (mTimerDialogOpen) {
                 Log.i(TAG, "activity stopped while dialog open, get values from timer");
                 mTimerState.setTimerRunning(mTimerDialog.isTimerRunning());

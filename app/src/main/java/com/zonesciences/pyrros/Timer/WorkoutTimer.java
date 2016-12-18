@@ -1,16 +1,20 @@
 package com.zonesciences.pyrros.Timer;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 
 import java.util.HashMap;
@@ -77,10 +81,19 @@ public class WorkoutTimer extends CountDownTimer {
             timerAction.setVisible(true);
         }
 
-        long[] pattern = {0, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000};
+        long[] pattern = {500, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000};
 
-        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(pattern, -1);
+        /*Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(pattern, -1);*/
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+        builder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
+                .setContentTitle("Workout Timer")
+                .setContentText("Workout timer has now finished. Start your next set now")
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setVibrate(pattern);
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, builder.build());
 
     }
 
