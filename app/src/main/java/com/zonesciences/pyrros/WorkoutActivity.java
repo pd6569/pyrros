@@ -225,6 +225,7 @@ public class WorkoutActivity extends BaseActivity {
 
         mTimerAction = menu.findItem(R.id.action_timer);
         mActiveTimerToolbarText = menu.findItem(R.id.action_active_timer);
+
         if (mWorkoutTimer != null && mTimerState.isTimerRunning()){
             mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
             mWorkoutTimer.setTimerAction(mTimerAction);

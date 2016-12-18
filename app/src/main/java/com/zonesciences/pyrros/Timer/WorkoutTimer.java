@@ -51,7 +51,32 @@ public class WorkoutTimer extends CountDownTimer {
             if (!mIsDialogOpen) {
                 timerAction.setVisible(false);
                 timerActionBarText.setVisible(true);
-                timerActionBarText.setTitle("" + (timeRemaining + 1));
+
+                int secondsRemaining;
+
+                double minutesRemaining = timeRemaining / 60;
+
+                if (minutesRemaining >= 1){
+                    secondsRemaining = (timeRemaining - ((int) minutesRemaining * 60));
+                } else {
+                    secondsRemaining = timeRemaining;
+                }
+
+                String minsToDisplay = new String();
+                String secsToDisplay = new String();
+
+                if (minutesRemaining < 10){
+                    minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
+                } else {
+                    minsToDisplay = Integer.toString((int) minutesRemaining);
+                }
+                if (secondsRemaining < 10){
+                    secsToDisplay = 0 + Integer.toString(secondsRemaining);
+                } else {
+                    secsToDisplay = Integer.toString(secondsRemaining);
+                }
+
+                timerActionBarText.setTitle(minsToDisplay + ":" + secsToDisplay);
             } else {
                 timerActionBarText.setVisible(false);
             }
