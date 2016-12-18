@@ -482,6 +482,10 @@ public class WorkoutActivity extends BaseActivity {
             pauseTimer(mWorkoutTimer.getTimeRemaining());
         }
 
+        if (i == R.id.action_resume_timer){
+            resumeTimer((int) mTimerState.getTimeRemaining() / 1000);
+        }
+
         if (i == R.id.action_reset_timer){
             resetTimer();
         }
@@ -564,15 +568,7 @@ public class WorkoutActivity extends BaseActivity {
             @Override
             public void onExerciseTimerResumed(int timerDuration) {
                 Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + timerDuration);
-                mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
-                mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
-                mWorkoutTimer.setTimerAction(mTimerAction);
-                mWorkoutTimer.setDialogOpen(true);
-                mWorkoutTimer.start();
-                mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
-
-                mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
-                mTimerState.setTimerDuration(timerDuration);
+                resumeTimer(timerDuration);
             }
 
             @Override
@@ -611,12 +607,7 @@ public class WorkoutActivity extends BaseActivity {
             @Override
             public void onExerciseTimerReset(){
                 Log.i(TAG, "Timer reset.");
-                mTimerState.reset();
-                if (mWorkoutTimer != null) {
-                    mWorkoutTimer.cancel();
-                    mWorkoutTimer = null;
-                    mWorkoutTimerReference.setWorkoutTimer(null);
-                }
+                resetTimer();
             }
         });
         mTimerDialog.createDialog();
@@ -638,19 +629,59 @@ public class WorkoutActivity extends BaseActivity {
     /****** TIMER CONTROLS ******/
     private void pauseTimer(long timeRemaining){
         Log.i(TAG, "Pause Timer");
-        mTimerAction.setVisible(true);
+
+        // update timer and reference
         mWorkoutTimer.cancel();
         mWorkoutTimer = null;
         mWorkoutTimerReference.setWorkoutTimer(null);
 
+        // update timer state
         mTimerState.setTimerRunning(false);
         mTimerState.setTimeRemaining(timeRemaining);
+
+        // update toolbar
+        mTimerAction.setVisible(true);
+        mActiveTimerToolbarText.setVisible(false);
+    }
+
+    // timerDuration is duration of new timer in seconds
+    private void resumeTimer(int timerDuration){
+        Log.i(TAG, "Resume Timer");
+
+        // update timer and reference
+        mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
+        mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+        mWorkoutTimer.setTimerAction(mTimerAction);
+        mWorkoutTimer.setDialogOpen(mTimerDialogOpen);
+        mWorkoutTimer.start();
+        mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
+
+        // update timer state
+        mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
+        mTimerState.setTimerDuration(timerDuration);
+        mTimerState.setTimerRunning(true);
 
     }
 
     private void resetTimer(){
         Log.i(TAG, "Reset Timer");
+
+        // remove timer
+        if (mWorkoutTimer != null) {
+            mWorkoutTimer.cancel();
+            mWorkoutTimer = null;
+            mWorkoutTimerReference.setWorkoutTimer(null);
+        }
+
+        // update timer state
+        mTimerState.reset();
+
+        // update toolbar
+        mTimerAction.setVisible(true);
+        mActiveTimerToolbarText.setVisible(false);
     }
+
+    /****** END TIMER CONTROLS ******/
 
 
     @Override
