@@ -10,4 +10,5 @@ public interface ExerciseTimerListener {
     void onExerciseTimerPaused(long timeRemaining);
     void onExerciseTimerFinished();
     void onExerciseTimerDismissed(boolean timerRunning, long timeRemaining, int currentProgress, int currentProgressMax);
+    void onExerciseTimerReset();
 }

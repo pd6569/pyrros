@@ -55,11 +55,7 @@ public class WorkoutTimer extends CountDownTimer {
 
         if (timerActionBarText != null && timerAction != null) {
 
-            Log.i(TAG, "mIsDialogOpen = " + mIsDialogOpen);
-
             if (!mIsDialogOpen) {
-
-                Log.i(TAG, "Timer dialog closed. Set timer icon invisible and timer toolbar text visible");
                 timerAction.setVisible(false);
                 timerActionBarText.setVisible(true);
 
@@ -73,7 +69,6 @@ public class WorkoutTimer extends CountDownTimer {
     @Override
     public void onFinish() {
         Log.i(TAG, "Workout Timer finished");
-
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         if (!mSharedPreferences.getBoolean(WorkoutActivity.PREF_WORKOUT_ACTIVITY_STATE, false)){
             Toast.makeText(mContext, "Workout Timer has finished", Toast.LENGTH_SHORT).show();

@@ -531,6 +531,18 @@ public class WorkoutActivity extends BaseActivity {
                 }
 
                 @Override
+                public void onExerciseTimerPaused(long timeRemaining) {
+                    Log.i(TAG, "Timer paused. Time remaining: " + timeRemaining);
+                    mTimerAction.setVisible(true);
+                    mWorkoutTimer.cancel();
+                    mWorkoutTimer = null;
+                    mWorkoutTimerReference.setWorkoutTimer(null);
+
+                    mTimerState.setTimerRunning(false);
+                    mTimerState.setTimeRemaining(timeRemaining);;
+                }
+
+                @Override
                 public void onExerciseTimerResumed(int timerDuration) {
                     Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + timerDuration);
                     mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
@@ -545,22 +557,10 @@ public class WorkoutActivity extends BaseActivity {
                 }
 
                 @Override
-                public void onExerciseTimerPaused(long timeRemaining) {
-                    Log.i(TAG, "Timer paused. Time remaining: " + timeRemaining);
-                    mTimerAction.setVisible(true);
-                    mWorkoutTimer.cancel();
-                    mWorkoutTimer = null;
-                    mWorkoutTimerReference.setWorkoutTimer(null);
-
-                    mTimerState.setTimerRunning(false);
-                    mTimerState.setTimeRemaining(timeRemaining);;
-                }
-
-                @Override
                 public void onExerciseTimerFinished() {
                     Log.i(TAG, "Timer finished");
-                    /*mWorkoutTimer = null;
-                    mWorkoutTimerReference.setWorkoutTimer(null);*/
+                    mWorkoutTimer = null;
+                    mWorkoutTimerReference.setWorkoutTimer(null);
 
                     mTimerAction.setVisible(true);
 
@@ -587,6 +587,17 @@ public class WorkoutActivity extends BaseActivity {
                     mTimerState.setCurrentProgress(currentProgress);
                     mTimerState.setCurrentProgressMax(currentProgressMax);
 
+                }
+
+                @Override
+                public void onExerciseTimerReset(){
+                    Log.i(TAG, "Timer reset.");
+                    mTimerState.reset();
+                    if (mWorkoutTimer != null) {
+                        mWorkoutTimer.cancel();
+                        mWorkoutTimer = null;
+                        mWorkoutTimerReference.setWorkoutTimer(null);
+                    }
                 }
             });
             mTimerDialog.createDialog();
@@ -621,6 +632,7 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "onPause");
         if (mTimerState.hasActiveTimer()){
 
+            // if activity is paused while dialog open, need to get current information and store it to timerstate.
             if (mTimerDialogOpen) {
                 Log.i(TAG, "activity stopped while dialog open, get values from timer");
                 mTimerState.setTimerRunning(mTimerDialog.isTimerRunning());

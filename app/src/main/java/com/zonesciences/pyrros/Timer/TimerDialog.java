@@ -51,7 +51,7 @@ public class TimerDialog implements View.OnClickListener {
     int mCurrentProgressMax;
     boolean mHasActiveTimer;
     int mTimeToSet;
-    TimerState mTimerState;
+
 
     // Listener
     ExerciseTimerListener mExerciseTimerListener;
@@ -250,6 +250,33 @@ public class TimerDialog implements View.OnClickListener {
                 break;
             default:
                 break;
+
+            case R.id.timer_delete:
+
+                // Reset timer variables
+                mTimeRemaining = 0;
+                mTimerFirstStart = true;
+                mTimerRunning = false;
+                mCurrentProgress = 0;
+                mCurrentProgressMax = 0;
+                mHasActiveTimer = false;
+
+                // Destroy timer.
+                if (mCountDownTimer != null) {
+                    mCountDownTimer.cancel();
+                    mCountDownTimer = null;
+                }
+
+                // Notify activity
+                mExerciseTimerListener.onExerciseTimerReset();
+
+                // Update View
+                setTimerOptionsVisible(true);
+                mSetTimerField.setEnabled(true);
+                mStartTimerImageView.setVisibility(View.VISIBLE);
+
+
+                break;
         }
     }
 
@@ -297,6 +324,12 @@ public class TimerDialog implements View.OnClickListener {
 
     public void setTimeRemaining(long timeRemaining) {
         mTimeRemaining = timeRemaining;
+    }
+
+    // other methods
+
+    private void resetTimer(){
+
     }
 
 
