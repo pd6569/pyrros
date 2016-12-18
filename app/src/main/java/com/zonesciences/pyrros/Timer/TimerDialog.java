@@ -18,11 +18,6 @@ import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
 
-import org.joda.time.LocalTime;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by Peter on 14/12/2016.
  */
@@ -34,7 +29,7 @@ public class TimerDialog implements View.OnClickListener {
     AppCompatActivity mActivity;
 
     // View
-    WorkoutTimer mCountDownTimer;
+    WorkoutTimerDialog mCountDownTimer;
 
     ProgressBar mCountDownProgressBar;
     EditText mSetTimerField;
@@ -100,13 +95,13 @@ public class TimerDialog implements View.OnClickListener {
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(mCurrentProgressMax);
 
-            mCountDownText.setText(timeToDisplay(mTimeRemaining).get("minutes") + ":" + timeToDisplay(mTimeRemaining).get("seconds"));
+            mCountDownText.setText(WorkoutTimer.timeToDisplay(mTimeRemaining).get("minutes") + ":" + WorkoutTimer.timeToDisplay(mTimeRemaining).get("seconds"));
 
             /*mCountDownText.setText("" + (int)((mTimeRemaining / 1000) + 1));*/
 
             if (mTimerRunning) {
                 Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mTimeRemaining);
-                mCountDownTimer = new WorkoutTimer(mTimeRemaining, 10);
+                mCountDownTimer = new WorkoutTimerDialog(mTimeRemaining, 10);
                 mCountDownTimer.start();
                 mStartTimerImageView.setVisibility(View.GONE);
                 mPauseTimerImageView.setVisibility(View.VISIBLE);
@@ -191,7 +186,7 @@ public class TimerDialog implements View.OnClickListener {
                         mSetTimerField.setEnabled(false);
 
                         mCountDownProgressBar.setMax(timerDuration * 100);
-                        mCountDownTimer = new WorkoutTimer(milliseconds, 10);
+                        mCountDownTimer = new WorkoutTimerDialog(milliseconds, 10);
                         mCountDownTimer.start();
 
                         mTimerFirstStart = false;
@@ -209,7 +204,7 @@ public class TimerDialog implements View.OnClickListener {
                     // There is an existing timer active, destroy old timer and create new one, to resume where left off.
 
                     mCountDownTimer = null;
-                    mCountDownTimer = new WorkoutTimer(mTimeRemaining, 10);
+                    mCountDownTimer = new WorkoutTimerDialog(mTimeRemaining, 10);
                     mCountDownTimer.start();
 
                     mStartTimerImageView.setVisibility(View.GONE);
@@ -291,48 +286,11 @@ public class TimerDialog implements View.OnClickListener {
     }
 
 
-    public Map<String, String> timeToDisplay (long timeRemainingMillis){
-
-        Map<String, String> timeToDisplay = new HashMap<>();
-
-        int timeRemainingSecs = (int) (timeRemainingMillis / 1000) + 1;
-
-        int secondsRemaining;
-
-        double minutesRemaining = timeRemainingSecs / 60;
-
-        if (minutesRemaining >= 1){
-            secondsRemaining = (timeRemainingSecs - ((int) minutesRemaining * 60));
-        } else {
-            secondsRemaining = timeRemainingSecs;
-        }
-
-        String minsToDisplay = new String();
-        String secsToDisplay = new String();
-
-        if (minutesRemaining < 10){
-            minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
-        } else {
-            minsToDisplay = Integer.toString((int) minutesRemaining);
-        }
-        if (secondsRemaining < 10){
-            secsToDisplay = 0 + Integer.toString(secondsRemaining);
-        } else {
-            secsToDisplay = Integer.toString(secondsRemaining);
-        }
-
-        timeToDisplay.put("minutes", minsToDisplay);
-        timeToDisplay.put("seconds", secsToDisplay);
-
-        return timeToDisplay;
-
-    }
-
     /**
      * Workout Timer Class
      */
 
-    public class WorkoutTimer extends CountDownTimer {
+    public class WorkoutTimerDialog extends CountDownTimer {
 
 
         int progress;
@@ -340,7 +298,7 @@ public class TimerDialog implements View.OnClickListener {
         int timerDurationSecs;
 
 
-        public WorkoutTimer(long millisInFuture, long countDownInterval) {
+        public WorkoutTimerDialog(long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
             progress = (int) millisInFuture / 1000;
             timerDurationSecs = (int)millisInFuture / 1000;
@@ -356,32 +314,7 @@ public class TimerDialog implements View.OnClickListener {
             int i = (int) (millisUntilFinished / 1000);
             if (i != progress) {
                 progress = i;
-
-                int secondsRemaining;
-
-                double minutesRemaining = timeRemainingSecs / 60;
-
-                if (minutesRemaining >= 1){
-                    secondsRemaining = (timeRemainingSecs - ((int) minutesRemaining * 60));
-                } else {
-                    secondsRemaining = timeRemainingSecs;
-                }
-
-                String minsToDisplay = new String();
-                String secsToDisplay = new String();
-
-                if (minutesRemaining < 10){
-                    minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
-                } else {
-                    minsToDisplay = Integer.toString((int) minutesRemaining);
-                }
-                if (secondsRemaining < 10){
-                    secsToDisplay = 0 + Integer.toString(secondsRemaining);
-                } else {
-                    secsToDisplay = Integer.toString(secondsRemaining);
-                }
-
-                mCountDownText.setText(minsToDisplay + ":" + secsToDisplay);
+                mCountDownText.setText(WorkoutTimer.timeToDisplay(millisUntilFinished).get("minutes") + ":" + WorkoutTimer.timeToDisplay(millisUntilFinished).get("seconds"));
 
                 /*mCountDownText.setText("" + (progress + 1));*/
                 Log.i(TAG, "Countdown progress: " + progress);

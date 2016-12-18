@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import com.zonesciences.pyrros.WorkoutActivity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Peter on 18/12/2016.
  */
@@ -52,31 +55,7 @@ public class WorkoutTimer extends CountDownTimer {
                 timerAction.setVisible(false);
                 timerActionBarText.setVisible(true);
 
-                int secondsRemaining;
-
-                double minutesRemaining = timeRemaining / 60;
-
-                if (minutesRemaining >= 1){
-                    secondsRemaining = (timeRemaining - ((int) minutesRemaining * 60));
-                } else {
-                    secondsRemaining = timeRemaining;
-                }
-
-                String minsToDisplay = new String();
-                String secsToDisplay = new String();
-
-                if (minutesRemaining < 10){
-                    minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
-                } else {
-                    minsToDisplay = Integer.toString((int) minutesRemaining);
-                }
-                if (secondsRemaining < 10){
-                    secsToDisplay = 0 + Integer.toString(secondsRemaining);
-                } else {
-                    secsToDisplay = Integer.toString(secondsRemaining);
-                }
-
-                timerActionBarText.setTitle(minsToDisplay + ":" + secsToDisplay);
+                timerActionBarText.setTitle(timeToDisplay(millisRemaining).get("minutes") + ":" + timeToDisplay(millisRemaining).get("seconds"));
             } else {
                 timerActionBarText.setVisible(false);
             }
@@ -113,5 +92,43 @@ public class WorkoutTimer extends CountDownTimer {
 
     public void setDialogOpen(boolean dialogOpen) {
         mIsDialogOpen = dialogOpen;
+    }
+
+
+    public static Map<String, String> timeToDisplay (long timeRemainingMillis){
+
+        Map<String, String> timeToDisplay = new HashMap<>();
+
+        int timeRemainingSecs = (int) (timeRemainingMillis / 1000) + 1;
+
+        int secondsRemaining;
+
+        double minutesRemaining = timeRemainingSecs / 60;
+
+        if (minutesRemaining >= 1){
+            secondsRemaining = (timeRemainingSecs - ((int) minutesRemaining * 60));
+        } else {
+            secondsRemaining = timeRemainingSecs;
+        }
+
+        String minsToDisplay = new String();
+        String secsToDisplay = new String();
+
+        if (minutesRemaining < 10){
+            minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
+        } else {
+            minsToDisplay = Integer.toString((int) minutesRemaining);
+        }
+        if (secondsRemaining < 10){
+            secsToDisplay = 0 + Integer.toString(secondsRemaining);
+        } else {
+            secsToDisplay = Integer.toString(secondsRemaining);
+        }
+
+        timeToDisplay.put("minutes", minsToDisplay);
+        timeToDisplay.put("seconds", secsToDisplay);
+
+        return timeToDisplay;
+
     }
 }
