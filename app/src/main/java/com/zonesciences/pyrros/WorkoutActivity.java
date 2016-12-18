@@ -34,6 +34,7 @@ import com.roughike.bottombar.OnTabSelectListener;
 import com.zonesciences.pyrros.Timer.ExerciseTimerListener;
 import com.zonesciences.pyrros.Timer.TimerDialog;
 import com.zonesciences.pyrros.Timer.TimerState;
+import com.zonesciences.pyrros.Timer.WorkoutTimer;
 import com.zonesciences.pyrros.Timer.WorkoutTimerReference;
 import com.zonesciences.pyrros.fragment.ExerciseFragment;
 import com.zonesciences.pyrros.fragment.ExerciseHistoryFragment;
@@ -646,7 +647,7 @@ public class WorkoutActivity extends BaseActivity {
 
     }
 
-    public class WorkoutTimer extends CountDownTimer {
+    /*public class WorkoutTimer extends CountDownTimer {
 
         private static final String TAG = "WorkoutTimer";
 
@@ -657,9 +658,9 @@ public class WorkoutActivity extends BaseActivity {
         // Preferences
         private SharedPreferences mSharedPreferences;
 
-    /*public WorkoutTimer(long millisInFuture, long countDownInterval) {
+    *//*public WorkoutTimer(long millisInFuture, long countDownInterval) {
         super(millisInFuture, countDownInterval);
-    }*/
+    }*//*
 
         public WorkoutTimer(long millisInFuture, long countDownInterval, Context context) {
             super(millisInFuture, countDownInterval);
@@ -697,6 +698,6 @@ public class WorkoutActivity extends BaseActivity {
         public void setTimerOverlay(TextView timerOverlay) {
             this.timerOverlay = timerOverlay;
         }
-    }
+    }*/
 
 }

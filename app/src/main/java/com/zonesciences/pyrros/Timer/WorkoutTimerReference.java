@@ -1,7 +1,7 @@
 package com.zonesciences.pyrros.Timer;
 
 import com.zonesciences.pyrros.WorkoutActivity;
-import com.zonesciences.pyrros.WorkoutActivity.WorkoutTimer;
+import com.zonesciences.pyrros.Timer.WorkoutTimer;
 import com.zonesciences.pyrros.models.Workout;
 
 /**
@@ -15,7 +15,7 @@ import com.zonesciences.pyrros.models.Workout;
 
 public class WorkoutTimerReference {
 
-    private WorkoutActivity.WorkoutTimer mWorkoutTimer;
+    private WorkoutTimer mWorkoutTimer;
 
     private static WorkoutTimerReference workoutTimerReference = null;
 
