@@ -95,7 +95,7 @@ public class TimerDialog implements View.OnClickListener {
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(mCurrentProgressMax);
 
-            mCountDownText.setText(WorkoutTimer.timeToDisplay(mTimeRemaining).get("minutes") + ":" + WorkoutTimer.timeToDisplay(mTimeRemaining).get("seconds"));
+            mCountDownText.setText(WorkoutTimer.timeToDisplay(mTimeRemaining).get(WorkoutTimer.MINUTES) + ":" + WorkoutTimer.timeToDisplay(mTimeRemaining).get(WorkoutTimer.SECONDS));
 
             /*mCountDownText.setText("" + (int)((mTimeRemaining / 1000) + 1));*/
 
@@ -314,7 +314,7 @@ public class TimerDialog implements View.OnClickListener {
             int i = (int) (millisUntilFinished / 1000);
             if (i != progress) {
                 progress = i;
-                mCountDownText.setText(WorkoutTimer.timeToDisplay(millisUntilFinished).get("minutes") + ":" + WorkoutTimer.timeToDisplay(millisUntilFinished).get("seconds"));
+                mCountDownText.setText(WorkoutTimer.timeToDisplay(millisUntilFinished).get(WorkoutTimer.MINUTES) + ":" + WorkoutTimer.timeToDisplay(millisUntilFinished).get(WorkoutTimer.SECONDS));
 
                 /*mCountDownText.setText("" + (progress + 1));*/
                 Log.i(TAG, "Countdown progress: " + progress);

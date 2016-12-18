@@ -24,6 +24,10 @@ public class WorkoutTimer extends CountDownTimer {
 
     private static final String TAG = "WorkoutTimer";
 
+    // timer format constants
+    public static final String MINUTES = "MinutesDisplay";
+    public static final String SECONDS = "SecondsDisplay";
+
     private Context mContext;
 
     // Need to change menu item view in any activity
@@ -55,7 +59,7 @@ public class WorkoutTimer extends CountDownTimer {
                 timerAction.setVisible(false);
                 timerActionBarText.setVisible(true);
 
-                timerActionBarText.setTitle(timeToDisplay(millisRemaining).get("minutes") + ":" + timeToDisplay(millisRemaining).get("seconds"));
+                timerActionBarText.setTitle(timeToDisplay(millisRemaining).get(MINUTES) + ":" + timeToDisplay(millisRemaining).get(SECONDS));
             } else {
                 timerActionBarText.setVisible(false);
             }
@@ -95,6 +99,7 @@ public class WorkoutTimer extends CountDownTimer {
     }
 
 
+    // Method for formatting countdown display
     public static Map<String, String> timeToDisplay (long timeRemainingMillis){
 
         Map<String, String> timeToDisplay = new HashMap<>();
@@ -125,8 +130,8 @@ public class WorkoutTimer extends CountDownTimer {
             secsToDisplay = Integer.toString(secondsRemaining);
         }
 
-        timeToDisplay.put("minutes", minsToDisplay);
-        timeToDisplay.put("seconds", secsToDisplay);
+        timeToDisplay.put(MINUTES, minsToDisplay);
+        timeToDisplay.put(SECONDS, secsToDisplay);
 
         return timeToDisplay;
 
