@@ -6,6 +6,7 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +23,12 @@ public class WorkoutTimer extends CountDownTimer {
 
     private Context mContext;
 
-    TextView timerOverlay;
+    // Need to change menu item view in any activity
+    MenuItem timerActionBarText;
+    MenuItem timerAction;
+
+    // Is dialog open
+    boolean mIsDialogOpen;
 
     // Preferences
     private SharedPreferences mSharedPreferences;
@@ -40,9 +46,15 @@ public class WorkoutTimer extends CountDownTimer {
     public void onTick(long millisRemaining) {
         int timeRemaining = (int) (millisRemaining / 1000);
 
-        if (timerOverlay != null) {
-            timerOverlay.setVisibility(View.VISIBLE);
-            timerOverlay.setText("" + (timeRemaining + 1));
+        if (timerActionBarText != null && timerAction != null) {
+
+            if (!mIsDialogOpen) {
+                timerAction.setVisible(false);
+                timerActionBarText.setVisible(true);
+                timerActionBarText.setTitle("" + (timeRemaining + 1));
+            } else {
+                timerActionBarText.setVisible(false);
+            }
         }
     }
 
@@ -54,7 +66,8 @@ public class WorkoutTimer extends CountDownTimer {
         if (!mSharedPreferences.getBoolean(WorkoutActivity.PREF_WORKOUT_ACTIVITY_STATE, false)){
             Toast.makeText(mContext, "Workout Timer has finished", Toast.LENGTH_SHORT).show();
         } else {
-            timerOverlay.setVisibility(View.GONE);
+            timerActionBarText.setVisible(false);
+            timerAction.setVisible(true);
         }
 
         long[] pattern = {0, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000};
@@ -64,7 +77,16 @@ public class WorkoutTimer extends CountDownTimer {
 
     }
 
-    public void setTimerOverlay(TextView timerOverlay) {
-        this.timerOverlay = timerOverlay;
+
+    public void setTimerActionBarText(MenuItem timerActionBarText) {
+        this.timerActionBarText = timerActionBarText;
+    }
+
+    public void setTimerAction(MenuItem timerAction) {
+        this.timerAction = timerAction;
+    }
+
+    public void setDialogOpen(boolean dialogOpen) {
+        mIsDialogOpen = dialogOpen;
     }
 }

@@ -75,6 +75,10 @@ public class WorkoutActivity extends BaseActivity {
     public Toolbar mToolbar;
     TabLayout mTabLayout;
 
+    // Timer actions
+    MenuItem mActiveTimerToolbarText;
+    MenuItem mTimerAction;
+
     ArrayList<String> mExercisesList;
     ArrayList<Exercise> mExerciseObjects;
 
@@ -170,12 +174,6 @@ public class WorkoutActivity extends BaseActivity {
         mWorkoutExercisesAdapter = new WorkoutExercisesAdapter(mFragmentManager);
         mExercisesViewPager.setAdapter(mWorkoutExercisesAdapter);
 
-        mTimerOverlayTextView = (TextView) findViewById(R.id.timer_overlay_textview);
-        if (mWorkoutTimer != null) {
-            mWorkoutTimer.setTimerOverlay(mTimerOverlayTextView);
-        }
-
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar_workout);
         setSupportActionBar(mToolbar);
         mToolbar.setTitleTextColor(Color.WHITE);
@@ -224,6 +222,16 @@ public class WorkoutActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_workout, menu);
+
+        mTimerAction = menu.findItem(R.id.action_timer);
+        mActiveTimerToolbarText = menu.findItem(R.id.action_active_timer);
+        if (mWorkoutTimer != null && mTimerState.isTimerRunning()){
+            mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+            mWorkoutTimer.setTimerAction(mTimerAction);
+        } else {
+            mTimerAction.setVisible(true);
+        }
+
         return true;
     }
 
@@ -443,7 +451,7 @@ public class WorkoutActivity extends BaseActivity {
 
         }
 
-        if (i == R.id.action_timer){
+        if (i == R.id.action_timer || i == R.id.action_active_timer){
 
             TimerDialog timerDialog = new TimerDialog(this);
             if (mTimerState.hasActiveTimer()){
@@ -481,8 +489,9 @@ public class WorkoutActivity extends BaseActivity {
                 public void onExerciseTimerCreated(int timerDuration) {
                     Log.i(TAG, "Timer created");
                     mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
-                    mWorkoutTimer.setTimerOverlay(mTimerOverlayTextView);
-
+                    mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+                    mWorkoutTimer.setTimerAction(mTimerAction);
+                    mWorkoutTimer.setDialogOpen(true);
                     mWorkoutTimer.start();
 
                     mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
@@ -501,7 +510,9 @@ public class WorkoutActivity extends BaseActivity {
                 public void onExerciseTimerResumed(int timerDuration) {
                     Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + timerDuration);
                     mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
-                    mWorkoutTimer.setTimerOverlay(mTimerOverlayTextView);
+                    mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+                    mWorkoutTimer.setTimerAction(mTimerAction);
+                    mWorkoutTimer.setDialogOpen(true);
                     mWorkoutTimer.start();
                     mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
@@ -512,6 +523,7 @@ public class WorkoutActivity extends BaseActivity {
                 @Override
                 public void onExerciseTimerPaused(long timeRemaining) {
                     Log.i(TAG, "Timer paused. Time remaining: " + timeRemaining);
+                    mTimerAction.setVisible(true);
                     mWorkoutTimer.cancel();
                     mWorkoutTimer = null;
                     mWorkoutTimerReference.setWorkoutTimer(null);
@@ -526,16 +538,23 @@ public class WorkoutActivity extends BaseActivity {
                     /*mWorkoutTimer = null;
                     mWorkoutTimerReference.setWorkoutTimer(null);*/
 
+                    mTimerAction.setVisible(true);
+
                     mTimerState.reset();
 
+                    // remove time state info
                     mPrefEditor = mSharedPreferences.edit();
-                    mPrefEditor.putStringSet(PREF_WORKOUT_TIMER_STATE, null);
-                    mPrefEditor.apply();
+                    mPrefEditor.remove(PREF_WORKOUT_TIMER_STATE);
+                    mPrefEditor.commit();
                 }
 
                 @Override
                 public void onExerciseTimerDismissed(boolean timerRunning, long timeRemaining, int currentProgress, int currentProgressMax){
                     Log.i(TAG, "Timer dismissed. Current Progress: " + currentProgress);
+
+                    if (mWorkoutTimer != null) {
+                        mWorkoutTimer.setDialogOpen(false);
+                    }
 
                     mTimerState.setTimerRunning(timerRunning);
                     mTimerState.setTimeRemaining(timeRemaining);
@@ -545,6 +564,11 @@ public class WorkoutActivity extends BaseActivity {
                 }
             });
             timerDialog.createDialog();
+
+            if (mWorkoutTimer != null){
+                mWorkoutTimer.setDialogOpen(true);
+            }
+
         }
 
 

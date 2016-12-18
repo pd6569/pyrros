@@ -18,8 +18,14 @@
     <item
         android:id="@+id/action_timer"
         android:title="@string/menu_timer"
-        android:visible="true"
+        android:visible="false"
         android:icon="@drawable/ic_timer_white_24dp"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_active_timer"
+        android:title="@string/menu_active_timer"
+        android:visible="false"
         app:showAsAction="always" />
 
 </menu>
