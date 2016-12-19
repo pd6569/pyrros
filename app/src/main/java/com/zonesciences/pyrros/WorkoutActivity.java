@@ -651,6 +651,9 @@ public class WorkoutActivity extends BaseActivity {
         // update toolbar
         mTimerAction.setVisible(true);
         mActiveTimerToolbarText.setVisible(false);
+
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(WorkoutTimer.NOTIFICATION_ID);
     }
 
     /****** END TIMER CONTROLS ******/
