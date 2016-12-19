@@ -40,13 +40,14 @@ public class WorkoutTimer extends CountDownTimer {
     public static final String MINUTES = "MinutesDisplay";
     public static final String SECONDS = "SecondsDisplay";
 
-    // notifications
+    // notifications extras
     public static final int NOTIFICATION_ID = 123;
     public static final String EXTRA_PAUSE_TIMER = "PauseTimer";
     public static final String EXTRA_RESUME_TIMER = "ResumeTimer";
     public static final String EXTRA_DISMISS_NOTIFICATION = "DismissNotification";
 
 
+    //Context
     private Context mContext;
 
     // Need to change menu item view in any activity
@@ -66,6 +67,11 @@ public class WorkoutTimer extends CountDownTimer {
     String mWorkoutKey;
     List<String> mExerciseList;
     List<Exercise> mExerciseObjects;
+
+    // alarm/notification settings
+    boolean mVibrate;
+    boolean mSound;
+    boolean mAutoStart;
 
     // Notifications
     NotificationCompat.Builder mNotificationBuilder;
@@ -208,6 +214,18 @@ public class WorkoutTimer extends CountDownTimer {
         return mTimeRemaining;
     }
 
+    public boolean isVibrate() {
+        return mVibrate;
+    }
+
+    public boolean isSound() {
+        return mSound;
+    }
+
+    public boolean isAutoStart() {
+        return mAutoStart;
+    }
+
     // setters
     public void setTimerActionBarText(MenuItem timerActionBarText) {
         this.timerActionBarText = timerActionBarText;
@@ -221,6 +239,17 @@ public class WorkoutTimer extends CountDownTimer {
         mIsDialogOpen = dialogOpen;
     }
 
+    public void setVibrate(boolean vibrate) {
+        mVibrate = vibrate;
+    }
+
+    public void setSound(boolean sound) {
+        mSound = sound;
+    }
+
+    public void setAutoStart(boolean autoStart) {
+        mAutoStart = autoStart;
+    }
 
     // Method for formatting countdown display
     public static Map<String, String> timeToDisplay (long timeRemainingMillis){
