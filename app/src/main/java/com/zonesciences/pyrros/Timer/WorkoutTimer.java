@@ -73,22 +73,8 @@ public class WorkoutTimer extends CountDownTimer {
         this.mExerciseList = exerciseList;
         this.mExerciseObjects = exerciseObjects;
         mNotificationBuilder = new NotificationCompat.Builder(mContext);
-        onStart(millisInFuture);
 
         Log.i(TAG, "exercise list : " + mExerciseList + " mWorkoutKey: " + mWorkoutKey + " Exercises: " + mExerciseObjects);
-    }
-
-    public void onStart(long millisInFuture){
-        Log.i(TAG, "Workout timer started");
-
-        mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
-                    .setContentTitle("Workout Timer")
-                    .setContentText("Workout timer started. You have " + millisInFuture / 1000 + " seconds remaining")
-                    .setPriority(Notification.PRIORITY_LOW);
-
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
-
     }
 
     @Override
@@ -121,9 +107,10 @@ public class WorkoutTimer extends CountDownTimer {
         PendingIntent intent = PendingIntent.getActivity(mContext, 0, resumeWorkoutIntent, 0);
 
 
+        String timeRemaining = timeToDisplay(millisRemaining).get(MINUTES) + ":" + timeToDisplay(millisRemaining).get(SECONDS);
         mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
                 .setContentTitle("Workout Timer")
-                .setContentText(millisRemaining / 1000 + " seconds remaining")
+                .setContentText(timeRemaining)
                 .setContentIntent(intent)
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_LOW);
