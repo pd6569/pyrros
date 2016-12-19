@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,7 +24,7 @@ import com.zonesciences.pyrros.R;
  * Created by Peter on 14/12/2016.
  */
 
-public class TimerDialog implements View.OnClickListener {
+public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     public static final String TAG = "TimerDialog";
 
@@ -42,6 +44,11 @@ public class TimerDialog implements View.OnClickListener {
     LinearLayout mLayoutTimerOptions;
     RelativeLayout mLayoutTimerProgress;
     ImageView mDeleteTimerImageView;
+
+    //Check box
+    CheckBox mSoundCheckBox;
+    CheckBox mVibrateCheckBox;
+    CheckBox mAutoStartCheckBox;
 
     // Timer variables
     long mTimeRemaining;
@@ -91,6 +98,15 @@ public class TimerDialog implements View.OnClickListener {
         mLayoutTimerSetTimer = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_set_timer);
         mLayoutTimerOptions = (LinearLayout) dialogView.findViewById(R.id.timer_layout_set_options);
         mLayoutTimerProgress = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_circular_timer);
+
+        mSoundCheckBox = (CheckBox) dialogView.findViewById(R.id.timer_sound_checkbox);
+        mSoundCheckBox.setOnCheckedChangeListener(this);
+
+        mVibrateCheckBox = (CheckBox) dialogView.findViewById(R.id.timer_vibrate_checkbox);
+        mVibrateCheckBox.setOnCheckedChangeListener(this);
+
+        mAutoStartCheckBox = (CheckBox) dialogView.findViewById(R.id.timer_autostart_checkbox);
+        mAutoStartCheckBox.setOnCheckedChangeListener(this);
 
         if (!mTimerFirstStart) {
 
@@ -272,6 +288,31 @@ public class TimerDialog implements View.OnClickListener {
         }
     }
 
+    /*
+     * Checkbox listener actions
+     */
+
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+        String onOff = new String();
+        if (isChecked){
+            onOff = "on";
+        } else {
+            onOff = "off";
+        }
+        switch (compoundButton.getId()){
+            case R.id.timer_sound_checkbox:
+                Toast.makeText(mActivity, "Sound is " + onOff, Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.timer_vibrate_checkbox:
+                Toast.makeText(mActivity, "Vibrate is " + onOff, Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.timer_autostart_checkbox:
+                Toast.makeText(mActivity, "Autostart is " + onOff, Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
     // Timer actions:
 
     public void pauseTimer(){
@@ -357,6 +398,8 @@ public class TimerDialog implements View.OnClickListener {
     }
 
 
+
+
     /**
      * Workout Timer Class
      */
@@ -428,5 +471,6 @@ public class TimerDialog implements View.OnClickListener {
         }
     }
 }
+
 
 
