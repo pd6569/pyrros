@@ -17,6 +17,7 @@ public class PyrrosApp extends Application {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
 
+    //TODO: Change this to use ActivityLifeCycleCallbacks instead
     private BaseActivity mCurrentActivity = null;
 
     public BaseActivity getCurrentActivity(){

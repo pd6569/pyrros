@@ -106,22 +106,6 @@ public class WorkoutActivity extends BaseActivity {
     //Fragment temporary reference
     Fragment mFragment;
 
-    /*//Exercise History
-    List<String> mExerciseHistoryDates;
-    List<Exercise> mExerciseHistory; //exercise history for specific exercise
-
-    //Exercise Stats
-    List<Exercise> mAllExercises;
-
-    //Maps for storing exercise history for each exercise in the workout after initial loaded from firebase
-    Map<Integer, List<String>> mExerciseHistoryDatesMap = new HashMap<>();
-    Map<Integer, List<Exercise>> mExerciseHistoryMap = new HashMap<>();
-
-    //Map for storing all exercises for passing to exercise stats
-    Map<Integer, List<Exercise>> mAllExercisesMap = new HashMap<>();*/
-
-
-
     String mFragmentTag;
 
     // Timer
@@ -135,7 +119,7 @@ public class WorkoutActivity extends BaseActivity {
     SharedPreferences mSharedPreferences;
     SharedPreferences.Editor mPrefEditor;
 
-    // App referece
+    // App reference
     protected PyrrosApp mPyrrosApp;
 
     @Override
@@ -160,48 +144,10 @@ public class WorkoutActivity extends BaseActivity {
 
         setTimerState();
 
+
+        //TODO: THINK ABOUT CHANGING THIS
         mPyrrosApp = (PyrrosApp) this.getApplicationContext();
 
-        /*// Set timer state
-        Gson gson = new Gson();
-        String json = mSharedPreferences.getString(PREF_WORKOUT_TIMER_STATE, null);
-        mTimerState = gson.fromJson(json, TimerState.class);
-        mWorkoutTimerReference = WorkoutTimerReference.getWorkoutTimerReference();
-
-        if (mTimerState == null){
-            Log.i(TAG, "No timer state info available");
-            mTimerState = new TimerState();
-        } else {
-            Log.i(TAG, "Timer state info available");
-            if (mTimerState.hasActiveTimer() && !mTimerState.isTimerRunning()){
-                // Has timer and it is paused, set timer state.
-                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
-            } else {
-                // Has running timer. Check if timer has expired or not, if not get reference to active running timer.
-
-                int timeNow = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
-                int timeToStart = mTimerState.getTimerDuration() - (timeNow - (mTimerState.getTimerStartTime()));
-
-                if (timeToStart <= 0){
-                    // timer expired, reset timer state variables
-                    mTimerState.reset();
-                } else {
-                    // timer is still going, update timerstate time remaining and get reference to the running timer if not destroyed
-                    mTimerState.setTimeRemaining(timeToStart * 1000);
-                    mWorkoutTimer = mWorkoutTimerReference.getWorkoutTimer();
-
-                    // mWorkoutReference may be null if app is destroyed and restarted
-                    if (mWorkoutTimer == null){
-                        // workout reference does not exist, so create new workout timer and set it as reference
-                        mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
-                        mWorkoutTimer.start();
-                        mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
-                    }
-
-                    Log.i(TAG, "mWorkoutTimer: " + mWorkoutTimer);
-                }
-            }
-        }*/
 
         Log.i(TAG, "timer start time: " + mTimerState.getTimerStartTime() + " timer duration: " + mTimerState.getTimerDuration() + "has active timer: " + mTimerState.hasActiveTimer() + " timer running: " + mTimerState.isTimerRunning() + " timer first start: " + mTimerState.isTimerFirstStart() + " TIME REMAINING: " + mTimerState.getTimeRemaining() + " current progress: " + mTimerState.getCurrentProgress() + " progress max " + mTimerState.getCurrentProgressMax());
 
@@ -495,7 +441,7 @@ public class WorkoutActivity extends BaseActivity {
         }
 
         if (i == R.id.action_resume_timer){
-            resumeTimer((int) mTimerState.getTimeRemaining() / 1000);
+            resumeTimer((int) mTimerState.getTimeRemaining() / 1000, false);
         }
 
         if (i == R.id.action_reset_timer){
@@ -579,9 +525,9 @@ public class WorkoutActivity extends BaseActivity {
             }
 
             @Override
-            public void onExerciseTimerResumed(int timerDuration) {
+            public void onExerciseTimerResumed(int timerDuration, boolean pausedFromDialog) {
                 Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + timerDuration);
-                resumeTimer(timerDuration);
+                resumeTimer(timerDuration, pausedFromDialog);
             }
 
             @Override
@@ -651,8 +597,8 @@ public class WorkoutActivity extends BaseActivity {
 
             // update timer and reference
             mWorkoutTimer.cancel();
-            mWorkoutTimer = null;
-            mWorkoutTimerReference.setWorkoutTimer(null);
+            /*mWorkoutTimer = null;
+            mWorkoutTimerReference.setWorkoutTimer(null);*/
 
             // update timer state
             mTimerState.setTimerRunning(false);
@@ -665,22 +611,28 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     // timerDuration is duration of new timer in seconds
-    public void resumeTimer(int timerDuration){
+    public void resumeTimer(int timerDuration, boolean pausedFromDialog){
         Log.i(TAG, "Resume Timer");
 
-        // update timer and reference
-        mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
-        mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
-        mWorkoutTimer.setTimerAction(mTimerAction);
-        mWorkoutTimer.setDialogOpen(mTimerDialogOpen);
-        mWorkoutTimer.start();
-        mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
+        if (mTimerDialogOpen && !pausedFromDialog) {
+            Log.i(TAG, "Resumed via notification. Dialog window open");
+            // Update dialog view
+            mTimerDialog.resumeTimer();
+        } else {
 
-        // update timer state
-        mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
-        mTimerState.setTimerDuration(timerDuration);
-        mTimerState.setTimerRunning(true);
+            // update timer and reference
+            mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
+            mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+            mWorkoutTimer.setTimerAction(mTimerAction);
+            mWorkoutTimer.setDialogOpen(mTimerDialogOpen);
+            mWorkoutTimer.start();
+            mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
+            // update timer state
+            mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
+            mTimerState.setTimerDuration(timerDuration);
+            mTimerState.setTimerRunning(true);
+        }
     }
 
     public void resetTimer(){
@@ -741,6 +693,12 @@ public class WorkoutActivity extends BaseActivity {
                         mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
                     }
 
+                    if (mActiveTimerToolbarText != null && mTimerAction != null){
+                        Log.i(TAG, "set action and text for timer");
+                        mWorkoutTimer.setTimerAction(mTimerAction);
+                        mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+                    }
+
                     Log.i(TAG, "mWorkoutTimer: " + mWorkoutTimer);
                 }
             }
@@ -768,8 +726,9 @@ public class WorkoutActivity extends BaseActivity {
                 mTimerState.setCurrentProgress(mTimerDialog.getCurrentProgress());
                 mTimerState.setCurrentProgressMax(mTimerDialog.getCurrentProgressMax());
 
-                // Dismiss the dialog
-                mTimerDialog.getAlertDialog().dismiss();
+                // Dismiss the dialog and stop timer
+
+                mTimerDialog.getAlertDialog().cancel();
             }
             mPrefEditor = mSharedPreferences.edit();
             Gson gson = new Gson();
@@ -788,7 +747,6 @@ public class WorkoutActivity extends BaseActivity {
         mPyrrosApp.setCurrentActivity(this);
 
         setTimerState();
-
 
         /**
          * REFRESH WORKOUT EXERCISES - LOOK TO SEE IF CHANGES MADE FROM EDIT WORKOUT ACTIVITY AND WRITE NEW TABS AND EXERCISES
@@ -862,5 +820,11 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "onDestroy");
     }
 
+
+    /********* static methods ***********/
+
+    public static int getTimerStartTime(){
+        return (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
+    }
 
 }

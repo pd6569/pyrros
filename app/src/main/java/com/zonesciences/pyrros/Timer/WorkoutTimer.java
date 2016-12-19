@@ -33,15 +33,18 @@ import java.util.Map;
 public class WorkoutTimer extends CountDownTimer {
 
     private static final String TAG = "WorkoutTimer";
-    private static final int NOTIFICATION_ID = 123;
+
 
     // timer format constants
     public static final String MINUTES = "MinutesDisplay";
     public static final String SECONDS = "SecondsDisplay";
 
-    // notification extras
+    // notifications
+    public static final int NOTIFICATION_ID = 123;
     public static final String EXTRA_PAUSE_TIMER = "PauseTimer";
+    public static final String EXTRA_RESUME_TIMER = "ResumeTimer";
     public static final String EXTRA_DISMISS_NOTIFICATION = "DismissNotification";
+
 
     private Context mContext;
 
@@ -69,6 +72,7 @@ public class WorkoutTimer extends CountDownTimer {
     /*public WorkoutTimer(long millisInFuture, long countDownInterval) {
         super(millisInFuture, countDownInterval);
     }*/
+
 
     public WorkoutTimer(long millisInFuture, long countDownInterval, Context context, String workoutKey, List<String> exerciseList, List<Exercise> exerciseObjects) {
         super(millisInFuture, countDownInterval);
@@ -99,6 +103,7 @@ public class WorkoutTimer extends CountDownTimer {
         // Intent to pause timer
         Intent buttonIntent = new Intent (mContext, ButtonReceiver.class);
         buttonIntent.putExtra(EXTRA_PAUSE_TIMER, true);
+        buttonIntent.putExtras(extras);
         buttonIntent.setAction("com.zonesciences.pyrros.intent.ACTION_PAUSE_TIMER");
         PendingIntent btPendingIntent = PendingIntent.getBroadcast(mContext, 0, buttonIntent, 0);
 

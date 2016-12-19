@@ -212,16 +212,8 @@ public class TimerDialog implements View.OnClickListener {
                 } else {
                     // There is an existing timer active, destroy old timer and create new one, to resume where left off.
 
-                    mCountDownTimer = null;
-                    mCountDownTimer = new WorkoutTimerDialog(mTimeRemaining, 10);
-                    mCountDownTimer.start();
+                    resumeTimer();
 
-                    mStartTimerImageView.setVisibility(View.GONE);
-                    mPauseTimerImageView.setVisibility(View.VISIBLE);
-
-                    // notify activity that timer has been resumed:
-                    int newTimerDuration = (int) (mTimeRemaining / 1000);
-                    mExerciseTimerListener.onExerciseTimerResumed(newTimerDuration);
                 }
                 break;
 
@@ -293,6 +285,19 @@ public class TimerDialog implements View.OnClickListener {
 
         // Notify activity
         mExerciseTimerListener.onExerciseTimerPaused(mTimeRemaining, true);
+    }
+
+    public void resumeTimer(){
+        mCountDownTimer = null;
+        mCountDownTimer = new WorkoutTimerDialog(mTimeRemaining, 10);
+        mCountDownTimer.start();
+
+        mStartTimerImageView.setVisibility(View.GONE);
+        mPauseTimerImageView.setVisibility(View.VISIBLE);
+
+        // notify activity that timer has been resumed:
+        int newTimerDuration = (int) (mTimeRemaining / 1000);
+        mExerciseTimerListener.onExerciseTimerResumed(newTimerDuration, true);
     }
 
     // Listener

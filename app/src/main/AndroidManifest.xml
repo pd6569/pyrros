@@ -44,6 +44,7 @@
             <intent-filter>
                 <action android:name="com.zonesciences.pyrros.intent.ACTION_DISMISS_TIMER"></action>
                 <action android:name="com.zonesciences.pyrros.intent.ACTION_PAUSE_TIMER"></action>
+                <action android:name="com.zonesciences.pyrros.intent.ACTION_RESUME_TIMER"></action>
             </intent-filter>
         </receiver>
 

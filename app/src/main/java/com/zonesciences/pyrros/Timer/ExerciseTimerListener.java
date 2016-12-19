@@ -6,7 +6,7 @@ package com.zonesciences.pyrros.Timer;
 public interface ExerciseTimerListener {
 
     void onExerciseTimerCreated(int timerDuration);
-    void onExerciseTimerResumed(int timerDuration);
+    void onExerciseTimerResumed(int timerDuration, boolean pausedFromDialog);
     void onExerciseTimerPaused(long timeRemaining, boolean pausedFromDialog);
     void onExerciseTimerFinished();
     void onExerciseTimerDismissed(boolean timerRunning, long timeRemaining, int currentProgress, int currentProgressMax);
