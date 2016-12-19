@@ -61,9 +61,10 @@ public class WorkoutActivity extends BaseActivity {
 
     private static String TAG = "WorkoutActivity";
 
-    private static final String WORKOUT_EXERCISES = "Workout Exercises";
-    private static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
-    private static final String WORKOUT_ID = "Workout ID";
+    // Required data for starting a workout activity
+    public static final String WORKOUT_EXERCISES = "Workout Exercises";
+    public static final String WORKOUT_EXERCISE_OBJECTS = "WorkoutExerciseObjects";
+    public static final String WORKOUT_ID = "Workout ID";
 
     // Workout Timer
     public static final String PREF_WORKOUT_TIMER_STATE = "WorkoutTimerState";
@@ -147,6 +148,8 @@ public class WorkoutActivity extends BaseActivity {
         mUserId = getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        Log.i(TAG, "Workout activity created. mExerciseList: " + mExercisesList.size());
+
         // Get preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -163,7 +166,7 @@ public class WorkoutActivity extends BaseActivity {
             Log.i(TAG, "Timer state info available");
             if (mTimerState.hasActiveTimer() && !mTimerState.isTimerRunning()){
                 // Has timer and it is paused, set timer state.
-                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext());
+                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
             } else {
                 // Has running timer. Check if timer has expired or not, if not get reference to active running timer.
 
@@ -181,7 +184,7 @@ public class WorkoutActivity extends BaseActivity {
                     // mWorkoutReference may be null if app is destroyed and restarted
                     if (mWorkoutTimer == null){
                         // workout reference does not exist, so create new workout timer and set it as reference
-                        mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext());
+                        mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
                         mWorkoutTimer.start();
                         mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
                     }
@@ -541,7 +544,7 @@ public class WorkoutActivity extends BaseActivity {
             @Override
             public void onExerciseTimerCreated(int timerDuration) {
                 Log.i(TAG, "Timer created");
-                mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
+                mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
                 mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
                 mWorkoutTimer.setTimerAction(mTimerAction);
                 mWorkoutTimer.setDialogOpen(true);
@@ -649,7 +652,7 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "Resume Timer");
 
         // update timer and reference
-        mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext());
+        mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
         mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
         mWorkoutTimer.setTimerAction(mTimerAction);
         mWorkoutTimer.setDialogOpen(mTimerDialogOpen);

@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -18,8 +19,11 @@ import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
+import com.zonesciences.pyrros.models.Exercise;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,13 +33,11 @@ import java.util.Map;
 public class WorkoutTimer extends CountDownTimer {
 
     private static final String TAG = "WorkoutTimer";
+    private static final int NOTIFICATION_ID = 123;
 
     // timer format constants
     public static final String MINUTES = "MinutesDisplay";
     public static final String SECONDS = "SecondsDisplay";
-
-    // notification intent
-    public static final String NOTIFICATION_ID = "NotificationId";
 
     private Context mContext;
 
@@ -52,13 +54,41 @@ public class WorkoutTimer extends CountDownTimer {
     // Preferences
     private SharedPreferences mSharedPreferences;
 
+    // Workout data
+    String mWorkoutKey;
+    List<String> mExerciseList;
+    List<Exercise> mExerciseObjects;
+
+    // Notifications
+    NotificationCompat.Builder mNotificationBuilder;
+
     /*public WorkoutTimer(long millisInFuture, long countDownInterval) {
         super(millisInFuture, countDownInterval);
     }*/
 
-    public WorkoutTimer(long millisInFuture, long countDownInterval, Context context) {
+    public WorkoutTimer(long millisInFuture, long countDownInterval, Context context, String workoutKey, List<String> exerciseList, List<Exercise> exerciseObjects) {
         super(millisInFuture, countDownInterval);
         this.mContext = context;
+        this.mWorkoutKey = workoutKey;
+        this.mExerciseList = exerciseList;
+        this.mExerciseObjects = exerciseObjects;
+        mNotificationBuilder = new NotificationCompat.Builder(mContext);
+        onStart(millisInFuture);
+
+        Log.i(TAG, "exercise list : " + mExerciseList + " mWorkoutKey: " + mWorkoutKey + " Exercises: " + mExerciseObjects);
+    }
+
+    public void onStart(long millisInFuture){
+        Log.i(TAG, "Workout timer started");
+
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
+                    .setContentTitle("Workout Timer")
+                    .setContentText("Workout timer started. You have " + millisInFuture / 1000 + " seconds remaining")
+                    .setPriority(Notification.PRIORITY_LOW);
+
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+
     }
 
     @Override
@@ -76,6 +106,30 @@ public class WorkoutTimer extends CountDownTimer {
                 timerActionBarText.setVisible(false);
             }
         }
+
+
+        Bundle extras = new Bundle();
+        extras.putString(WorkoutActivity.WORKOUT_ID, mWorkoutKey);
+        extras.putSerializable(WorkoutActivity.WORKOUT_EXERCISES, (ArrayList) mExerciseList);
+        extras.putSerializable(WorkoutActivity.WORKOUT_EXERCISE_OBJECTS, (ArrayList) mExerciseObjects);
+        Intent resumeWorkoutIntent = new Intent(mContext, WorkoutActivity.class);
+        resumeWorkoutIntent.putExtras(extras);
+        resumeWorkoutIntent.setAction("com.zonesciences.pyrros.Timer.WorkoutTimer.ACTION_RESUME_WORKOUT_ACTIVITY");
+
+        resumeWorkoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent intent = PendingIntent.getActivity(mContext, 0, resumeWorkoutIntent, 0);
+
+
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
+                .setContentTitle("Workout Timer")
+                .setContentText(millisRemaining / 1000 + " seconds remaining")
+                .setContentIntent(intent)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_LOW);
+
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
     }
 
     @Override
@@ -98,7 +152,7 @@ public class WorkoutTimer extends CountDownTimer {
         dismissAlarm.setAction("DismissAction");
         PendingIntent pendingIntentDismissAlarm = PendingIntent.getService(mContext, 0, dismissAlarm, 0);*/
 
-        final int NOTIFICATION_ID = 123;
+
 
         Intent buttonIntent = new Intent (mContext, ButtonReceiver.class);
         buttonIntent.putExtra("notificationId", NOTIFICATION_ID);
@@ -107,16 +161,15 @@ public class WorkoutTimer extends CountDownTimer {
 
         PendingIntent btPendingIntent = PendingIntent.getBroadcast(mContext, 0, buttonIntent, 0);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
-        builder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
                 .setContentTitle("Workout Timer")
-                .setContentText("Workout timer has now finished. Start your next set now")
+                .setContentText("Timer finished, begin next set!")
                 .setPriority(Notification.PRIORITY_HIGH)
                 .setVibrate(pattern)
                 .addAction(R.drawable.ic_close_gray_24dp, "disimss", btPendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+        notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
 
     }
 

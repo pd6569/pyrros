@@ -45,6 +45,11 @@
                 <action android:name="com.zonesciences.pyrros.Timer.WorkoutTimer.FINISH_NOTIFICATION"></action>
             </intent-filter>
         </receiver>
+
+        <intent-filter>
+            <action android:name="com.zonesciences.pyrros.Timer.WorkoutTimer.ACTION_RESUME_WORKOUT_ACTIVITY"></action>
+        </intent-filter>
+
     </application>
 
     <uses-permission android:name="android.permission.VIBRATE"/>
