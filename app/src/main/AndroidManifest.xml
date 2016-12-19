@@ -39,6 +39,12 @@
         </activity>
         <activity android:name=".CreateWorkoutActivity">
         </activity>
+
+        <receiver android:name=".Timer.ButtonReceiver">
+            <intent-filter>
+                <action android:name="com.zonesciences.pyrros.Timer.WorkoutTimer.FINISH_NOTIFICATION"></action>
+            </intent-filter>
+        </receiver>
     </application>
 
     <uses-permission android:name="android.permission.VIBRATE"/>
