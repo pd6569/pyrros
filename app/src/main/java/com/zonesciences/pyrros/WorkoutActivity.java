@@ -658,9 +658,11 @@ public class WorkoutActivity extends BaseActivity {
 
     private void setTimerState(){
         // Set timer state
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
-        String json = mSharedPreferences.getString(PREF_WORKOUT_TIMER_STATE, null);
+        String json = prefs.getString(PREF_WORKOUT_TIMER_STATE, null);
         mTimerState = gson.fromJson(json, TimerState.class);
+        Log.i(TAG, "timer active: " + mTimerState.hasActiveTimer() + " timer running: " + mTimerState.isTimerRunning() + " timer first start: " + mTimerState.isTimerFirstStart());
         mWorkoutTimerReference = WorkoutTimerReference.getWorkoutTimerReference();
 
         if (mTimerState == null){
@@ -671,7 +673,7 @@ public class WorkoutActivity extends BaseActivity {
                 // Has timer and it is paused, set timer state.
                 Log.i(TAG, "Timer state info available. Timer active and paused.");
                 mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
-            } else {
+            } else if (mTimerState.hasActiveTimer() && mTimerState.isTimerRunning()){
                 // Has running timer. Check if timer has expired or not, if not get reference to active running timer.
                 Log.i(TAG, "Timer state info available. Timer active and running.");
                 int timeNow = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
@@ -701,6 +703,9 @@ public class WorkoutActivity extends BaseActivity {
 
                     Log.i(TAG, "mWorkoutTimer: " + mWorkoutTimer);
                 }
+            } else if (!mTimerState.hasActiveTimer()){
+                Log.i(TAG, "Timer is not active");
+                mTimerState.reset();
             }
         }
     }
@@ -747,6 +752,13 @@ public class WorkoutActivity extends BaseActivity {
         mPyrrosApp.setCurrentActivity(this);
 
         setTimerState();
+
+        if (!mTimerState.isHasActiveTimer()) {
+            if (mTimerAction != null && mActiveTimerToolbarText != null){
+                mTimerAction.setVisible(true);
+                mActiveTimerToolbarText.setVisible(false);
+            }
+        }
 
         /**
          * REFRESH WORKOUT EXERCISES - LOOK TO SEE IF CHANGES MADE FROM EDIT WORKOUT ACTIVITY AND WRITE NEW TABS AND EXERCISES

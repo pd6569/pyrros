@@ -39,6 +39,8 @@ public class ButtonReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+
+
         mExerciseList = (ArrayList<String>) intent.getSerializableExtra(WorkoutActivity.WORKOUT_EXERCISES);
         mExerciseObjects = (ArrayList<Exercise>) intent.getSerializableExtra(WorkoutActivity.WORKOUT_EXERCISE_OBJECTS);
         mWorkoutKey = intent.getStringExtra(WorkoutActivity.WORKOUT_ID);

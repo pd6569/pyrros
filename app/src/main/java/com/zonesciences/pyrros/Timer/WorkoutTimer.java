@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.models.Exercise;
@@ -166,6 +167,24 @@ public class WorkoutTimer extends CountDownTimer {
         /*Intent dismissAlarm = new Intent(mContext, WorkoutActivity.class);
         dismissAlarm.setAction("DismissAction");
         PendingIntent pendingIntentDismissAlarm = PendingIntent.getService(mContext, 0, dismissAlarm, 0);*/
+
+        // reset timer state and set shared prefs
+        TimerState timerState = new TimerState();
+        timerState.setHasActiveTimer(false);
+        timerState.setTimerRunning(false);
+        timerState.setTimerFirstStart(true);
+
+        Log.i(TAG, "timer active: " + timerState.hasActiveTimer() + " timer running: " + timerState.isTimerRunning() + " timer first start: " + timerState.isTimerFirstStart());
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(timerState);
+        editor.putString(WorkoutActivity.PREF_WORKOUT_TIMER_STATE, json);
+        editor.apply();
+
+        /*TimerState checkTimerState;
+        String timerJson = mSharedPreferences.getString(WorkoutActivity.PREF_WORKOUT_TIMER_STATE, null);
+        checkTimerState = gson.fromJson(timerJson, TimerState.class);
+        Log.i(TAG, "timer active: " + checkTimerState.hasActiveTimer() + " timer running: " + checkTimerState.isTimerRunning() + " timer first start: " + checkTimerState.isTimerFirstStart());*/
 
 
 
