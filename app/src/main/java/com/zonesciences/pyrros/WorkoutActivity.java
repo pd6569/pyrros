@@ -1,5 +1,7 @@
 package com.zonesciences.pyrros;
 
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -125,13 +127,16 @@ public class WorkoutActivity extends BaseActivity {
     // Timer
     TimerDialog mTimerDialog;
     WorkoutTimer mWorkoutTimer;
-    WorkoutTimerReference mWorkoutTimerReference; // reference to single timer
     TimerState mTimerState;
+    WorkoutTimerReference mWorkoutTimerReference; // reference to single timer and timer state
     boolean mTimerDialogOpen;
 
     // Preferences
     SharedPreferences mSharedPreferences;
     SharedPreferences.Editor mPrefEditor;
+
+    // App referece
+    protected PyrrosApp mPyrrosApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +159,9 @@ public class WorkoutActivity extends BaseActivity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         setTimerState();
+
+        mPyrrosApp = (PyrrosApp) this.getApplicationContext();
+
         /*// Set timer state
         Gson gson = new Gson();
         String json = mSharedPreferences.getString(PREF_WORKOUT_TIMER_STATE, null);
@@ -483,7 +491,7 @@ public class WorkoutActivity extends BaseActivity {
         }
 
         if (i == R.id.action_pause_timer){
-            pauseTimer(mWorkoutTimer.getTimeRemaining());
+            pauseTimer(mWorkoutTimer.getTimeRemaining(), false);
         }
 
         if (i == R.id.action_resume_timer){
@@ -565,9 +573,9 @@ public class WorkoutActivity extends BaseActivity {
             }
 
             @Override
-            public void onExerciseTimerPaused(long timeRemaining) {
+            public void onExerciseTimerPaused(long timeRemaining, boolean pauseFromDialog) {
                 Log.i(TAG, "Timer paused. Time remaining: " + timeRemaining);
-                pauseTimer(timeRemaining);
+                pauseTimer(timeRemaining, pauseFromDialog);
             }
 
             @Override
@@ -632,25 +640,32 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     /****** TIMER CONTROLS ******/
-    private void pauseTimer(long timeRemaining){
+    public void pauseTimer(long timeRemaining, boolean pausedFromDialog){
         Log.i(TAG, "Pause Timer");
 
-        // update timer and reference
-        mWorkoutTimer.cancel();
-        mWorkoutTimer = null;
-        mWorkoutTimerReference.setWorkoutTimer(null);
+        if (mTimerDialogOpen && !pausedFromDialog){
+            Log.i(TAG, "Paused via notification. Dialog window open");
+            // Update dialog view
+            mTimerDialog.pauseTimer();
+        } else {
 
-        // update timer state
-        mTimerState.setTimerRunning(false);
-        mTimerState.setTimeRemaining(timeRemaining);
+            // update timer and reference
+            mWorkoutTimer.cancel();
+            mWorkoutTimer = null;
+            mWorkoutTimerReference.setWorkoutTimer(null);
 
-        // update toolbar
-        mTimerAction.setVisible(true);
-        mActiveTimerToolbarText.setVisible(false);
+            // update timer state
+            mTimerState.setTimerRunning(false);
+            mTimerState.setTimeRemaining(timeRemaining);
+
+            // update toolbar
+            mTimerAction.setVisible(true);
+            mActiveTimerToolbarText.setVisible(false);
+        }
     }
 
     // timerDuration is duration of new timer in seconds
-    private void resumeTimer(int timerDuration){
+    public void resumeTimer(int timerDuration){
         Log.i(TAG, "Resume Timer");
 
         // update timer and reference
@@ -668,7 +683,7 @@ public class WorkoutActivity extends BaseActivity {
 
     }
 
-    private void resetTimer(){
+    public void resetTimer(){
         Log.i(TAG, "Reset Timer");
 
         // remove timer
@@ -732,18 +747,29 @@ public class WorkoutActivity extends BaseActivity {
         }
     }
 
+    private void clearReferences(){
+        BaseActivity currentActivity = mPyrrosApp.getCurrentActivity();
+        if (this.equals(currentActivity)) {
+            mPyrrosApp.setCurrentActivity(null);
+        }
+    }
+
     @Override
     public void onPause(){
         super.onPause();
         Log.i(TAG, "onPause");
-        if (mTimerState.hasActiveTimer()){
+        clearReferences();
 
+        if (mTimerState.hasActiveTimer()){
             // if activity is paused while dialog open, need to get current timer state and store it.
             if (mTimerDialogOpen) {
                 Log.i(TAG, "activity stopped while dialog open, get values from timer");
                 mTimerState.setTimerRunning(mTimerDialog.isTimerRunning());
                 mTimerState.setCurrentProgress(mTimerDialog.getCurrentProgress());
                 mTimerState.setCurrentProgressMax(mTimerDialog.getCurrentProgressMax());
+
+                // Dismiss the dialog
+                mTimerDialog.getAlertDialog().dismiss();
             }
             mPrefEditor = mSharedPreferences.edit();
             Gson gson = new Gson();
@@ -759,16 +785,9 @@ public class WorkoutActivity extends BaseActivity {
         super.onResume();
         Log.i(TAG, "onResume");
 
+        mPyrrosApp.setCurrentActivity(this);
+
         setTimerState();
-        if (mActiveTimerToolbarText != null && mTimerAction != null) {
-            if (mTimerState.isTimerRunning()) {
-                mActiveTimerToolbarText.setVisible(true);
-                mTimerAction.setVisible(false);
-            } else {
-                mActiveTimerToolbarText.setVisible(false);
-                mTimerAction.setVisible(true);
-            }
-        }
 
 
         /**
@@ -838,61 +857,10 @@ public class WorkoutActivity extends BaseActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
+        clearReferences();
 
         Log.i(TAG, "onDestroy");
     }
 
-    /*public class WorkoutTimer extends CountDownTimer {
-
-        private static final String TAG = "WorkoutTimer";
-
-        private Context mContext;
-
-        TextView timerOverlay;
-
-        // Preferences
-        private SharedPreferences mSharedPreferences;
-
-    *//*public WorkoutTimer(long millisInFuture, long countDownInterval) {
-        super(millisInFuture, countDownInterval);
-    }*//*
-
-        public WorkoutTimer(long millisInFuture, long countDownInterval, Context context) {
-            super(millisInFuture, countDownInterval);
-            this.mContext = context;
-        }
-
-        @Override
-        public void onTick(long millisRemaining) {
-            int timeRemaining = (int) (millisRemaining / 1000);
-
-            if (timerOverlay != null) {
-                timerOverlay.setVisibility(View.VISIBLE);
-                timerOverlay.setText("" + (timeRemaining + 1));
-            }
-        }
-
-        @Override
-        public void onFinish() {
-            Log.i(TAG, "Workout Timer finished");
-
-            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-            if (!mSharedPreferences.getBoolean(WorkoutActivity.PREF_WORKOUT_ACTIVITY_STATE, false)){
-                Toast.makeText(mContext, "Workout Timer has finished", Toast.LENGTH_SHORT).show();
-            } else {
-                timerOverlay.setVisibility(View.GONE);
-            }
-
-            long[] pattern = {0, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000};
-
-            Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(pattern, -1);
-
-        }
-
-        public void setTimerOverlay(TextView timerOverlay) {
-            this.timerOverlay = timerOverlay;
-        }
-    }*/
 
 }

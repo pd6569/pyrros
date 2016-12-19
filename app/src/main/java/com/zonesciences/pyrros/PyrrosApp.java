@@ -1,6 +1,7 @@
 package com.zonesciences.pyrros;
 
 import android.app.Application;
+import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -14,5 +15,15 @@ public class PyrrosApp extends Application {
         super.onCreate();
         /* Enable disk persistence */
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+    }
+
+    private BaseActivity mCurrentActivity = null;
+
+    public BaseActivity getCurrentActivity(){
+        return mCurrentActivity;
+    }
+
+    public void setCurrentActivity(BaseActivity mCurrentActivity){
+        this.mCurrentActivity = mCurrentActivity;
     }
 }

@@ -52,6 +52,9 @@ public class TimerDialog implements View.OnClickListener {
     boolean mHasActiveTimer;
     int mTimeToSet;
 
+    // Dialog
+    AlertDialog mAlertDialog;
+
 
     // Listener
     ExerciseTimerListener mExerciseTimerListener;
@@ -123,9 +126,9 @@ public class TimerDialog implements View.OnClickListener {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setView(dialogView);
         builder.setCancelable(true);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
+        mAlertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
                 Log.i(TAG, "count down timer" + mCountDownTimer);
@@ -223,16 +226,8 @@ public class TimerDialog implements View.OnClickListener {
                 break;
 
             case R.id.timer_pause:
-                mTimerRunning = false;
-                mCountDownTimer.cancel();
-                mSetTimerField.setEnabled(true);
-                mStartTimerImageView.setVisibility(View.VISIBLE);
-                mPauseTimerImageView.setVisibility(View.GONE);
+                pauseTimer();
 
-                mTimeRemaining = mCountDownTimer.getTimeRemaining();
-
-                // Notify activity
-                mExerciseTimerListener.onExerciseTimerPaused(mTimeRemaining);
                 break;
             case R.id.timer_increase_time_button:
                 if (mSetTimerField.getText().toString().equals("")) {
@@ -285,6 +280,21 @@ public class TimerDialog implements View.OnClickListener {
         }
     }
 
+    // Timer actions:
+
+    public void pauseTimer(){
+        mTimerRunning = false;
+        mCountDownTimer.cancel();
+        mSetTimerField.setEnabled(true);
+        mStartTimerImageView.setVisibility(View.VISIBLE);
+        mPauseTimerImageView.setVisibility(View.GONE);
+
+        mTimeRemaining = mCountDownTimer.getTimeRemaining();
+
+        // Notify activity
+        mExerciseTimerListener.onExerciseTimerPaused(mTimeRemaining, true);
+    }
+
     // Listener
 
     public void setExerciseTimerListener (ExerciseTimerListener listener){
@@ -303,6 +313,10 @@ public class TimerDialog implements View.OnClickListener {
 
     public boolean isTimerRunning() {
         return mTimerRunning;
+    }
+
+    public AlertDialog getAlertDialog() {
+        return mAlertDialog;
     }
 
     // Setters

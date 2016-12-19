@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.google.gson.Gson;
+import com.zonesciences.pyrros.BaseActivity;
+import com.zonesciences.pyrros.PyrrosApp;
 import com.zonesciences.pyrros.WorkoutActivity;
+import com.zonesciences.pyrros.models.Workout;
 
 /**
  * Created by Peter on 19/12/2016.
@@ -23,8 +25,6 @@ public class ButtonReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
-        System.out.print("intent: " + intent.getExtras());
 
         if (intent.hasExtra(WorkoutTimer.EXTRA_DISMISS_NOTIFICATION)) {
             int notificationId = intent.getIntExtra(WorkoutTimer.EXTRA_DISMISS_NOTIFICATION, 0);
@@ -40,24 +40,41 @@ public class ButtonReceiver extends BroadcastReceiver {
 
 
             mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean isWorkoutActivityRunning = mSharedPreferences.getBoolean(WorkoutActivity.PREF_WORKOUT_ACTIVITY_STATE, false);
 
-            Gson gson = new Gson();
-            String json = mSharedPreferences.getString(WorkoutActivity.PREF_WORKOUT_TIMER_STATE, null);
-            mTimerState = gson.fromJson(json, TimerState.class);
             WorkoutTimerReference timerRef = WorkoutTimerReference.getWorkoutTimerReference();
 
-            // Pause timer
-            timerRef.getWorkoutTimer().cancel();
+            if (!isWorkoutActivityRunning) {
+                Gson gson = new Gson();
+                String json = mSharedPreferences.getString(WorkoutActivity.PREF_WORKOUT_TIMER_STATE, null);
+                mTimerState = gson.fromJson(json, TimerState.class);
 
-            // New values:
-            mTimerState.setTimerRunning(false);
-            mTimerState.setTimeRemaining(timerRef.getWorkoutTimer().getTimeRemaining());
 
-            mPrefEditor = mSharedPreferences.edit();
-            json = gson.toJson(mTimerState);
-            mPrefEditor.putString(WorkoutActivity.PREF_WORKOUT_TIMER_STATE, json);
-            mPrefEditor.apply();
+                // Pause timer
+                timerRef.getWorkoutTimer().cancel();
+
+                // New values:
+                mTimerState.setTimerRunning(false);
+                mTimerState.setTimeRemaining(timerRef.getWorkoutTimer().getTimeRemaining());
+
+                mPrefEditor = mSharedPreferences.edit();
+                json = gson.toJson(mTimerState);
+                mPrefEditor.putString(WorkoutActivity.PREF_WORKOUT_TIMER_STATE, json);
+                mPrefEditor.apply();
+            } else {
+                try {
+
+                    WorkoutActivity workoutActivity = (WorkoutActivity) ((PyrrosApp) context.getApplicationContext()).getCurrentActivity();
+                    workoutActivity.pauseTimer(timerRef.getWorkoutTimer().getTimeRemaining(), false);
+                } catch (Exception e){
+                    System.out.print("Error: " + e.toString());
+                }
+
+            }
 
         }
     }
+
+
+
 }
