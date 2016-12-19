@@ -152,7 +152,7 @@ public class ButtonReceiver extends BroadcastReceiver {
                 .setContentText(timeRemaining)
                     /*.setContentIntent(piResumeWorkout)*/
                 .setAutoCancel(true)
-                .setPriority(Notification.PRIORITY_LOW)
+                .setPriority(Notification.PRIORITY_MAX)
                 .addAction(R.drawable.ic_play_arrow_gray_24dp, "Resume", btPendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

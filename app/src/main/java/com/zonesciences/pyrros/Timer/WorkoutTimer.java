@@ -70,10 +70,6 @@ public class WorkoutTimer extends CountDownTimer {
     // Notifications
     NotificationCompat.Builder mNotificationBuilder;
 
-    /*public WorkoutTimer(long millisInFuture, long countDownInterval) {
-        super(millisInFuture, countDownInterval);
-    }*/
-
 
     public WorkoutTimer(long millisInFuture, long countDownInterval, Context context, String workoutKey, List<String> exerciseList, List<Exercise> exerciseObjects) {
         super(millisInFuture, countDownInterval);
@@ -116,7 +112,7 @@ public class WorkoutTimer extends CountDownTimer {
                 .setContentText(timeRemaining)
                 .setContentIntent(piResumeWorkout)
                 .setAutoCancel(true)
-                .setPriority(Notification.PRIORITY_LOW)
+                .setPriority(Notification.PRIORITY_MAX)
                 .addAction(R.drawable.ic_pause_gray_24dp, "Pause", btPendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -197,7 +193,7 @@ public class WorkoutTimer extends CountDownTimer {
         mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
                 .setContentTitle("Workout Timer")
                 .setContentText("Timer finished, begin next set!")
-                .setPriority(Notification.PRIORITY_HIGH)
+                .setPriority(Notification.PRIORITY_MAX)
                 .setVibrate(pattern)
                 .addAction(R.drawable.ic_close_gray_24dp, "disimss", btPendingIntent);
 
