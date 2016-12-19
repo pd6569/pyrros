@@ -17,6 +17,8 @@ public class WorkoutTimerReference {
 
     private WorkoutTimer mWorkoutTimer;
 
+    private TimerState mTimerState;
+
     private static WorkoutTimerReference workoutTimerReference = null;
 
     protected WorkoutTimerReference () {
@@ -37,5 +39,13 @@ public class WorkoutTimerReference {
 
     public void setWorkoutTimer(WorkoutTimer workoutTimer) {
         mWorkoutTimer = workoutTimer;
+    }
+
+    public TimerState getTimerState() {
+        return mTimerState;
+    }
+
+    public void setTimerState(TimerState timerState) {
+        mTimerState = timerState;
     }
 }

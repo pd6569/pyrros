@@ -39,6 +39,10 @@ public class WorkoutTimer extends CountDownTimer {
     public static final String MINUTES = "MinutesDisplay";
     public static final String SECONDS = "SecondsDisplay";
 
+    // notification extras
+    public static final String EXTRA_PAUSE_TIMER = "PauseTimer";
+    public static final String EXTRA_DISMISS_NOTIFICATION = "DismissNotification";
+
     private Context mContext;
 
     // Need to change menu item view in any activity
@@ -73,8 +77,44 @@ public class WorkoutTimer extends CountDownTimer {
         this.mExerciseList = exerciseList;
         this.mExerciseObjects = exerciseObjects;
         mNotificationBuilder = new NotificationCompat.Builder(mContext);
-
+        onStart(millisInFuture);
         Log.i(TAG, "exercise list : " + mExerciseList + " mWorkoutKey: " + mWorkoutKey + " Exercises: " + mExerciseObjects);
+    }
+
+    public void onStart(long millisInFuture){
+
+        // Intent to resume workout
+        Bundle extras = new Bundle();
+        extras.putString(WorkoutActivity.WORKOUT_ID, mWorkoutKey);
+        extras.putSerializable(WorkoutActivity.WORKOUT_EXERCISES, (ArrayList) mExerciseList);
+        extras.putSerializable(WorkoutActivity.WORKOUT_EXERCISE_OBJECTS, (ArrayList) mExerciseObjects);
+        Intent resumeWorkoutIntent = new Intent(mContext, WorkoutActivity.class);
+        resumeWorkoutIntent.putExtras(extras);
+        resumeWorkoutIntent.setAction("com.zonesciences.pyrros.intent.ACTION_RESUME_WORKOUT_ACTIVITY");
+
+        resumeWorkoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent piResumeWorkout = PendingIntent.getActivity(mContext, 0, resumeWorkoutIntent, 0);
+
+        // Intent to pause timer
+        Intent buttonIntent = new Intent (mContext, ButtonReceiver.class);
+        buttonIntent.putExtra(EXTRA_PAUSE_TIMER, true);
+        buttonIntent.setAction("com.zonesciences.pyrros.intent.ACTION_PAUSE_TIMER");
+        PendingIntent btPendingIntent = PendingIntent.getBroadcast(mContext, 0, buttonIntent, 0);
+
+
+        String timeRemaining = timeToDisplay(millisInFuture).get(MINUTES) + ":" + timeToDisplay(millisInFuture).get(SECONDS);
+
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
+                .setContentTitle("Workout Timer")
+                .setContentText(timeRemaining)
+                .setContentIntent(piResumeWorkout)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_LOW)
+                .addAction(R.drawable.ic_pause_gray_24dp, "Pause", btPendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
     }
 
     @Override
@@ -93,27 +133,10 @@ public class WorkoutTimer extends CountDownTimer {
             }
         }
 
-
-        Bundle extras = new Bundle();
-        extras.putString(WorkoutActivity.WORKOUT_ID, mWorkoutKey);
-        extras.putSerializable(WorkoutActivity.WORKOUT_EXERCISES, (ArrayList) mExerciseList);
-        extras.putSerializable(WorkoutActivity.WORKOUT_EXERCISE_OBJECTS, (ArrayList) mExerciseObjects);
-        Intent resumeWorkoutIntent = new Intent(mContext, WorkoutActivity.class);
-        resumeWorkoutIntent.putExtras(extras);
-        resumeWorkoutIntent.setAction("com.zonesciences.pyrros.Timer.WorkoutTimer.ACTION_RESUME_WORKOUT_ACTIVITY");
-
-        resumeWorkoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        PendingIntent intent = PendingIntent.getActivity(mContext, 0, resumeWorkoutIntent, 0);
-
-
+        // Update time remaining in notification bar
         String timeRemaining = timeToDisplay(millisRemaining).get(MINUTES) + ":" + timeToDisplay(millisRemaining).get(SECONDS);
         mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
-                .setContentTitle("Workout Timer")
-                .setContentText(timeRemaining)
-                .setContentIntent(intent)
-                .setAutoCancel(true)
-                .setPriority(Notification.PRIORITY_LOW);
+                .setContentText(timeRemaining);
 
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
@@ -142,12 +165,11 @@ public class WorkoutTimer extends CountDownTimer {
 
 
         Intent buttonIntent = new Intent (mContext, ButtonReceiver.class);
-        buttonIntent.putExtra("notificationId", NOTIFICATION_ID);
-        buttonIntent.setAction("com.zonesciences.pyrros.Timer.WorkoutTimer.FINISH_NOTIFICATION");
-        Log.i(TAG, "buttonIntent: " + buttonIntent.getExtras());
+        buttonIntent.putExtra(EXTRA_DISMISS_NOTIFICATION, NOTIFICATION_ID);
+        buttonIntent.setAction("com.zonesciences.pyrros.intent.ACTION_DISMISS_TIMER");
 
         PendingIntent btPendingIntent = PendingIntent.getBroadcast(mContext, 0, buttonIntent, 0);
-
+        mNotificationBuilder.mActions.clear();
         mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
                 .setContentTitle("Workout Timer")
                 .setContentText("Timer finished, begin next set!")

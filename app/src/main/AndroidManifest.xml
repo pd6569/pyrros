@@ -42,12 +42,13 @@
 
         <receiver android:name=".Timer.ButtonReceiver">
             <intent-filter>
-                <action android:name="com.zonesciences.pyrros.Timer.WorkoutTimer.FINISH_NOTIFICATION"></action>
+                <action android:name="com.zonesciences.pyrros.intent.ACTION_DISMISS_TIMER"></action>
+                <action android:name="com.zonesciences.pyrros.intent.ACTION_PAUSE_TIMER"></action>
             </intent-filter>
         </receiver>
 
         <intent-filter>
-            <action android:name="com.zonesciences.pyrros.Timer.WorkoutTimer.ACTION_RESUME_WORKOUT_ACTIVITY"></action>
+            <action android:name="com.zonesciences.pyrros.intent.ACTION_RESUME_WORKOUT_ACTIVITY"></action>
         </intent-filter>
 
     </application>
