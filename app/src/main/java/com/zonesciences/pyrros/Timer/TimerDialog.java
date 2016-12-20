@@ -59,6 +59,13 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
     boolean mHasActiveTimer;
     int mTimeToSet;
 
+    // Notification settins
+    boolean mSound;
+    boolean mVibrate;
+
+    // Timer ref
+    WorkoutTimerReference mWorkoutTimerReference;
+
     // Dialog
     AlertDialog mAlertDialog;
 
@@ -69,6 +76,7 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
     public TimerDialog(AppCompatActivity activity) {
         this.mActivity = activity;
+        mWorkoutTimerReference = WorkoutTimerReference.getWorkoutTimerReference();
     }
 
     public void createDialog() {
@@ -217,7 +225,7 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
                         mTimerFirstStart = false;
 
                         // Notify activity of timer creation and pass timer instance to activity
-                        mExerciseTimerListener.onExerciseTimerCreated(timerDuration);
+                        mExerciseTimerListener.onExerciseTimerCreated(timerDuration, mVibrate, mSound);
 
                     } else {
                         Log.i(TAG, "Error: Enter number, dickhead");
@@ -294,7 +302,7 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-        String onOff = new String();
+        String onOff;
         if (isChecked){
             onOff = "on";
         } else {
@@ -303,9 +311,11 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
         switch (compoundButton.getId()){
             case R.id.timer_sound_checkbox:
                 Toast.makeText(mActivity, "Sound is " + onOff, Toast.LENGTH_SHORT).show();
+                mSound = isChecked;
                 break;
             case R.id.timer_vibrate_checkbox:
                 Toast.makeText(mActivity, "Vibrate is " + onOff, Toast.LENGTH_SHORT).show();
+                mVibrate = isChecked;
                 break;
             case R.id.timer_autostart_checkbox:
                 Toast.makeText(mActivity, "Autostart is " + onOff, Toast.LENGTH_SHORT).show();

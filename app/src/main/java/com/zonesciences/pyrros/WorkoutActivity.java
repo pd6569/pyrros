@@ -71,6 +71,9 @@ public class WorkoutActivity extends BaseActivity {
     // Workout Timer
     public static final String PREF_WORKOUT_TIMER_STATE = "WorkoutTimerState";
     public static final String PREF_WORKOUT_ACTIVITY_STATE = "WorkoutActivityState";
+    public static final String PREF_WORKOUT_TIMER_SOUND = "WorkoutTimerSound";
+    public static final String PREF_WORKOUT_TIMER_VIBRATE = "WorkoutTimerVibrate";
+    public static final String PREF_WORKOUT_TIMER_AUTOSTART= "WorkoutTimerAutoStart";
 
     ViewPager mExercisesViewPager;
     WorkoutExercisesAdapter mWorkoutExercisesAdapter;
@@ -114,6 +117,10 @@ public class WorkoutActivity extends BaseActivity {
     TimerState mTimerState;
     WorkoutTimerReference mWorkoutTimerReference; // reference to single timer and timer state
     boolean mTimerDialogOpen;
+
+    // Notification settings
+    boolean mSound;
+    boolean mVibrate;
 
     // Preferences
     SharedPreferences mSharedPreferences;
@@ -498,12 +505,14 @@ public class WorkoutActivity extends BaseActivity {
 
         mTimerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
             @Override
-            public void onExerciseTimerCreated(int timerDuration) {
+            public void onExerciseTimerCreated(int timerDuration, boolean vibrate, boolean sound) {
                 Log.i(TAG, "Timer created");
                 mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
                 mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
                 mWorkoutTimer.setTimerAction(mTimerAction);
                 mWorkoutTimer.setDialogOpen(true);
+                mWorkoutTimer.setVibrate(vibrate);
+                mWorkoutTimer.setSound(sound);
                 mWorkoutTimer.start();
 
                 mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
@@ -512,9 +521,14 @@ public class WorkoutActivity extends BaseActivity {
                 mTimerState.setTimerFirstStart(false);
                 mTimerState.setHasActiveTimer(true);
 
+                // update notification settings
+                mVibrate = vibrate;
+                mSound = sound;
+
                 // set start time for timer and max duration
                 int startTime = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
                 mTimerState.setTimerStartTime(startTime);
+
                 Log.i(TAG, "TIMER CREATED TIME: " + startTime);
             }
 
@@ -625,6 +639,8 @@ public class WorkoutActivity extends BaseActivity {
             mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
             mWorkoutTimer.setTimerAction(mTimerAction);
             mWorkoutTimer.setDialogOpen(mTimerDialogOpen);
+            mWorkoutTimer.setSound(mSound);
+            mWorkoutTimer.setVibrate(mVibrate);
             mWorkoutTimer.start();
             mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
@@ -665,7 +681,6 @@ public class WorkoutActivity extends BaseActivity {
         Gson gson = new Gson();
         String json = prefs.getString(PREF_WORKOUT_TIMER_STATE, null);
         mTimerState = gson.fromJson(json, TimerState.class);
-        Log.i(TAG, "timer active: " + mTimerState.hasActiveTimer() + " timer running: " + mTimerState.isTimerRunning() + " timer first start: " + mTimerState.isTimerFirstStart());
         mWorkoutTimerReference = WorkoutTimerReference.getWorkoutTimerReference();
 
         if (mTimerState == null){
@@ -742,6 +757,8 @@ public class WorkoutActivity extends BaseActivity {
             Gson gson = new Gson();
             String json = gson.toJson(mTimerState);
             mPrefEditor.putString(PREF_WORKOUT_TIMER_STATE, json);
+            mPrefEditor.putBoolean(PREF_WORKOUT_TIMER_SOUND, mSound);
+            mPrefEditor.putBoolean(PREF_WORKOUT_TIMER_VIBRATE, mVibrate);
             mPrefEditor.apply();
         }
 
@@ -762,6 +779,10 @@ public class WorkoutActivity extends BaseActivity {
                 mActiveTimerToolbarText.setVisible(false);
             }
         }
+
+        // Load timer preferences
+        mSound = mSharedPreferences.getBoolean(PREF_WORKOUT_TIMER_SOUND, false);
+        mVibrate = mSharedPreferences.getBoolean(PREF_WORKOUT_TIMER_VIBRATE, false);
 
         /**
          * REFRESH WORKOUT EXERCISES - LOOK TO SEE IF CHANGES MADE FROM EDIT WORKOUT ACTIVITY AND WRITE NEW TABS AND EXERCISES

@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
@@ -161,7 +163,7 @@ public class WorkoutTimer extends CountDownTimer {
             timerAction.setVisible(true);
         }
 
-        long[] pattern = {500, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000};
+
 
         /*Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         v.vibrate(pattern, -1);*/
@@ -194,17 +196,35 @@ public class WorkoutTimer extends CountDownTimer {
         buttonIntent.putExtra(EXTRA_DISMISS_NOTIFICATION, NOTIFICATION_ID);
         buttonIntent.setAction("com.zonesciences.pyrros.intent.ACTION_DISMISS_TIMER");
 
+        // Sound
+        Uri alarmSound = Uri.parse("android.resource://" + mContext.getPackageName() + "/" + R.raw.timer);
+
+        // Vibration
+        long[] pattern = {500, 1000, 500, 1000, 500, 1000, 500, 1000, 500, 1000};
+
+
+
         PendingIntent btPendingIntent = PendingIntent.getBroadcast(mContext, 0, buttonIntent, 0);
         mNotificationBuilder.mActions.clear();
         mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
                 .setContentTitle("Workout Timer")
                 .setContentText("Timer finished, begin next set!")
                 .setPriority(Notification.PRIORITY_MAX)
-                .setVibrate(pattern)
                 .addAction(R.drawable.ic_close_gray_24dp, "disimss", btPendingIntent);
 
+        if (mVibrate){
+            mNotificationBuilder.setVibrate(pattern);
+        }
+
+        if (mSound) {
+            mNotificationBuilder.setSound(alarmSound);
+        }
+
+        Notification notification = mNotificationBuilder.build();
+        notification.flags |= Notification.FLAG_INSISTENT;
+
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+        notificationManager.notify(NOTIFICATION_ID, notification);
 
     }
 

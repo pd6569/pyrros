@@ -5,7 +5,7 @@ package com.zonesciences.pyrros.Timer;
  */
 public interface ExerciseTimerListener {
 
-    void onExerciseTimerCreated(int timerDuration);
+    void onExerciseTimerCreated(int timerDuration, boolean vibrate, boolean sound);
     void onExerciseTimerResumed(int timerDuration, boolean pausedFromDialog);
     void onExerciseTimerPaused(long timeRemaining, boolean pausedFromDialog);
     void onExerciseTimerFinished();
