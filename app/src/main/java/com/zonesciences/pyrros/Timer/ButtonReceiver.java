@@ -21,6 +21,8 @@ import com.zonesciences.pyrros.models.Workout;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: Sort out all this shit code
+
 /**
  * Created by Peter on 19/12/2016.
  */

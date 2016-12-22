@@ -670,6 +670,7 @@ public class WorkoutActivity extends BaseActivity {
 
         // update timer state
         mTimerState.reset();
+        Log.i(TAG, "timer active: " + mTimerState.isHasActiveTimer());
 
         // update toolbar
         mTimerAction.setVisible(true);
@@ -760,14 +761,16 @@ public class WorkoutActivity extends BaseActivity {
                 mTimerDialog.getAlertDialog().cancel();
                 mWorkoutTimer.setDialogOpen(false);
             }
-            mPrefEditor = mSharedPreferences.edit();
-            Gson gson = new Gson();
-            String json = gson.toJson(mTimerState);
-            mPrefEditor.putString(PREF_WORKOUT_TIMER_STATE, json);
-            mPrefEditor.putBoolean(PREF_WORKOUT_TIMER_SOUND, mSound);
-            mPrefEditor.putBoolean(PREF_WORKOUT_TIMER_VIBRATE, mVibrate);
-            mPrefEditor.apply();
         }
+
+        mPrefEditor = mSharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(mTimerState);
+        Log.i(TAG, "timer state active: " + mTimerState.hasActiveTimer());
+        mPrefEditor.putString(PREF_WORKOUT_TIMER_STATE, json);
+        mPrefEditor.putBoolean(PREF_WORKOUT_TIMER_SOUND, mSound);
+        mPrefEditor.putBoolean(PREF_WORKOUT_TIMER_VIBRATE, mVibrate);
+        mPrefEditor.apply();
 
     }
 

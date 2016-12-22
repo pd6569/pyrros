@@ -128,7 +128,6 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
                 mCountDownText.setText(WorkoutTimer.timeToDisplay(mTimerState.getTimeRemaining()).get(WorkoutTimer.MINUTES) + ":" + WorkoutTimer.timeToDisplay(mTimerState.getTimeRemaining()).get(WorkoutTimer.SECONDS));
             }
 
-            /*mCountDownText.setText("" + (int)((mTimeRemaining / 1000) + 1));*/
 
             if (mTimerState.isTimerRunning()) {
                 Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mTimerState.getTimeRemaining());
