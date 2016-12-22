@@ -108,9 +108,11 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
         mLayoutTimerProgress = (RelativeLayout) dialogView.findViewById(R.id.timer_layout_circular_timer);
 
         mSoundCheckBox = (CheckBox) dialogView.findViewById(R.id.timer_sound_checkbox);
+        mSoundCheckBox.setChecked(mSound);
         mSoundCheckBox.setOnCheckedChangeListener(this);
 
         mVibrateCheckBox = (CheckBox) dialogView.findViewById(R.id.timer_vibrate_checkbox);
+        mVibrateCheckBox.setChecked(mVibrate);
         mVibrateCheckBox.setOnCheckedChangeListener(this);
 
         mAutoStartCheckBox = (CheckBox) dialogView.findViewById(R.id.timer_autostart_checkbox);
@@ -401,6 +403,14 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
         mTimeRemaining = timeRemaining;
     }
 
+    public void setSound(boolean sound) {
+        mSound = sound;
+    }
+
+    public void setVibrate(boolean vibrate) {
+        mVibrate = vibrate;
+    }
+
     // other methods
 
     private void resetTimer(){
@@ -440,8 +450,6 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
                 progress = i;
                 mCountDownText.setText(WorkoutTimer.timeToDisplay(millisUntilFinished).get(WorkoutTimer.MINUTES) + ":" + WorkoutTimer.timeToDisplay(millisUntilFinished).get(WorkoutTimer.SECONDS));
 
-                /*mCountDownText.setText("" + (progress + 1));*/
-                Log.i(TAG, "Countdown progress: " + progress);
             }
 
             int progressBarUpdate = (int) (millisUntilFinished / 10);

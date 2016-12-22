@@ -473,6 +473,9 @@ public class WorkoutActivity extends BaseActivity {
         mTimerDialogOpen = true;
 
         mTimerDialog = new TimerDialog(this);
+        mTimerDialog.setSound(mSound);
+        mTimerDialog.setVibrate(mVibrate);
+
         if (mTimerState.hasActiveTimer()){
 
 
