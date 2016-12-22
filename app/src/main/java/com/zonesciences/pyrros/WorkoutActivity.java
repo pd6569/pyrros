@@ -494,17 +494,10 @@ public class WorkoutActivity extends BaseActivity {
 
                 }
 
-                setTimerProperties(mTimerDialog);
-
-
-
             } else {
                 Log.i(TAG, "Timer is active and paused");
-
-                setTimerProperties(mTimerDialog);
             }
         }
-
 
         mTimerDialog.setExerciseTimerListener(new ExerciseTimerListener() {
             @Override
@@ -535,12 +528,14 @@ public class WorkoutActivity extends BaseActivity {
                 mVibrate = vibrate;
                 mSound = sound;
 
-                // set start time for timer and max duration
+                // set timer state variables
                 int startTime = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
                 mTimerState.setTimerStartTime(startTime);
                 mTimerState.setTimerDuration(timerDuration);
                 mTimerState.setTimerFirstStart(false);
                 mTimerState.setHasActiveTimer(true);
+                mTimerState.setTimerRunning(true);
+                mTimerState.setCurrentProgressMax(timerDuration * 100);
 
                 Log.i(TAG, "TIMER CREATED TIME: " + startTime);
             }
@@ -574,18 +569,14 @@ public class WorkoutActivity extends BaseActivity {
             }
 
             @Override
-            public void onExerciseTimerDismissed(int currentProgress, int currentProgressMax){
-                Log.i(TAG, "Timer dismissed. Current Progress: " + currentProgress);
+            public void onExerciseTimerDismissed(){
+                Log.i(TAG, "Timer dismissed. Current Progress: " + mTimerDialog.getCurrentProgress());
 
                 mTimerDialogOpen = false;
 
                 if (mWorkoutTimer != null) {
                     mWorkoutTimer.setDialogOpen(false);
                 }
-
-                mTimerState.setCurrentProgress(currentProgress);
-                mTimerState.setCurrentProgressMax(currentProgressMax);
-
             }
 
             @Override
@@ -601,10 +592,6 @@ public class WorkoutActivity extends BaseActivity {
         }
     }
 
-    private void setTimerProperties(TimerDialog timerDialog){
-        timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
-        timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
-    }
 
     /****** TIMER CONTROLS ******/
     public void pauseTimer(boolean pausedFromDialog){
@@ -624,6 +611,7 @@ public class WorkoutActivity extends BaseActivity {
             // update timer state
             mTimerState.setTimerRunning(false);
             mTimerState.setTimeRemaining(mWorkoutTimer.getTimeRemaining());
+            mTimerState.setCurrentProgress(mTimerDialog.getCurrentProgress());
 
             // update toolbar
             mTimerAction.setVisible(true);
@@ -709,7 +697,7 @@ public class WorkoutActivity extends BaseActivity {
             if (mTimerState.hasActiveTimer() && !mTimerState.isTimerRunning()) {
                 // Has timer and it is paused, set timer state.
                 Log.i(TAG, "Timer state info available. Timer active and paused.");
-                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
+                mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 10, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
             } else if (mTimerState.hasActiveTimer() && mTimerState.isTimerRunning()){
                 // Has running timer. Check if timer has expired or not, if not get reference to active running timer.
                 Log.i(TAG, "Timer state info available. Timer active and running.");
@@ -727,7 +715,7 @@ public class WorkoutActivity extends BaseActivity {
                     // mWorkoutReference may be null if app is destroyed and restarted
                     if (mWorkoutTimer == null) {
                         // workout reference does not exist, so create new workout timer and set it as reference
-                        mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
+                        mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 10, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
                         mWorkoutTimer.start();
                         mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
                     }

@@ -9,6 +9,6 @@ public interface ExerciseTimerListener {
     void onExerciseTimerResumed(boolean resumedFromDialog);
     void onExerciseTimerPaused(boolean pausedFromDialog);
     void onExerciseTimerFinished();
-    void onExerciseTimerDismissed(int currentProgress, int currentProgressMax);
+    void onExerciseTimerDismissed();
     void onExerciseTimerReset();
 }
