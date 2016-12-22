@@ -518,13 +518,18 @@ public class WorkoutActivity extends BaseActivity {
                 mWorkoutTimer.setDialogOpen(true);
                 mWorkoutTimer.setVibrate(vibrate);
                 mWorkoutTimer.setSound(sound);
+                mWorkoutTimer.setWorkoutTimerListener(new WorkoutTimer.WorkoutTimerListener() {
+                    @Override
+                    public void onFinish() {
+                        if (mTimerDialogOpen) {
+                            mTimerDialog.displayTimerOptions();
+                        }
+                        mTimerState.reset();
+                    }
+                });
                 mWorkoutTimer.start();
 
                 mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
-
-                mTimerState.setTimerDuration(timerDuration);
-                mTimerState.setTimerFirstStart(false);
-                mTimerState.setHasActiveTimer(true);
 
                 // update notification settings
                 mVibrate = vibrate;
@@ -533,6 +538,9 @@ public class WorkoutActivity extends BaseActivity {
                 // set start time for timer and max duration
                 int startTime = (int) ((Calendar.getInstance().getTimeInMillis() / 1000));
                 mTimerState.setTimerStartTime(startTime);
+                mTimerState.setTimerDuration(timerDuration);
+                mTimerState.setTimerFirstStart(false);
+                mTimerState.setHasActiveTimer(true);
 
                 Log.i(TAG, "TIMER CREATED TIME: " + startTime);
             }
@@ -566,7 +574,7 @@ public class WorkoutActivity extends BaseActivity {
             }
 
             @Override
-            public void onExerciseTimerDismissed(boolean timerRunning, long timeRemaining, int currentProgress, int currentProgressMax){
+            public void onExerciseTimerDismissed(int currentProgress, int currentProgressMax){
                 Log.i(TAG, "Timer dismissed. Current Progress: " + currentProgress);
 
                 mTimerDialogOpen = false;
@@ -575,8 +583,6 @@ public class WorkoutActivity extends BaseActivity {
                     mWorkoutTimer.setDialogOpen(false);
                 }
 
-                mTimerState.setTimerRunning(timerRunning);
-                mTimerState.setTimeRemaining(timeRemaining);
                 mTimerState.setCurrentProgress(currentProgress);
                 mTimerState.setCurrentProgressMax(currentProgressMax);
 
@@ -596,10 +602,6 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     private void setTimerProperties(TimerDialog timerDialog){
-        timerDialog.setHasActiveTimer(mTimerState.hasActiveTimer());
-        timerDialog.setTimerFirstStart(mTimerState.isTimerFirstStart());
-        timerDialog.setTimerRunning(mTimerState.isTimerRunning());
-        timerDialog.setTimeRemaining(mTimerState.getTimeRemaining());
         timerDialog.setCurrentProgress(mTimerState.getCurrentProgress());
         timerDialog.setCurrentProgressMax(mTimerState.getCurrentProgressMax());
     }
@@ -649,6 +651,15 @@ public class WorkoutActivity extends BaseActivity {
             mWorkoutTimer.setDialogOpen(true);
             mWorkoutTimer.setVibrate(mVibrate);
             mWorkoutTimer.setSound(mSound);
+            mWorkoutTimer.setWorkoutTimerListener(new WorkoutTimer.WorkoutTimerListener() {
+                @Override
+                public void onFinish() {
+                    if (mTimerDialogOpen) {
+                        mTimerDialog.displayTimerOptions();
+                    }
+                    mTimerState.reset();
+                }
+            });
             mWorkoutTimer.start();
             mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
@@ -753,7 +764,6 @@ public class WorkoutActivity extends BaseActivity {
             // if activity is paused while dialog open, need to get current timer state and store it.
             if (mTimerDialogOpen) {
                 Log.i(TAG, "activity stopped while dialog open, get values from timer");
-                mTimerState.setTimerRunning(mTimerDialog.isTimerRunning());
                 mTimerState.setCurrentProgress(mTimerDialog.getCurrentProgress());
                 mTimerState.setCurrentProgressMax(mTimerDialog.getCurrentProgressMax());
 
@@ -883,6 +893,10 @@ public class WorkoutActivity extends BaseActivity {
 
     public ArrayList<String> getExercisesList() {
         return mExercisesList;
+    }
+
+    public TimerState getTimerState() {
+        return mTimerState;
     }
 
     /********* static methods ***********/

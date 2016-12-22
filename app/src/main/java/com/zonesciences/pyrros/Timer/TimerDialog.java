@@ -52,19 +52,20 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
     CheckBox mAutoStartCheckBox;
 
     // Timer variables
-    long mTimeRemaining;
+    /*long mTimeRemaining;
     boolean mTimerFirstStart = true;
-    boolean mTimerRunning;
+    boolean mTimerRunning;*/
     int mCurrentProgress;
     int mCurrentProgressMax;
-    boolean mHasActiveTimer;
+    /*boolean mHasActiveTimer;*/
     int mTimeToSet;
 
     // Notification settins
     boolean mSound;
     boolean mVibrate;
 
-    // Timer ref
+    // Timer ref and state
+    TimerState mTimerState;
     WorkoutTimerReference mWorkoutTimerReference;
 
     // Dialog
@@ -83,6 +84,9 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
     public void createDialog() {
         LayoutInflater inflater = LayoutInflater.from(mActivity);
         View dialogView = inflater.inflate(R.layout.dialog_timer, null);
+
+        // timer state set
+        mTimerState = mActivity.getTimerState();
 
         mSetTimerField = (EditText) dialogView.findViewById(R.id.timer_edit_text);
 
@@ -119,19 +123,19 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
         mAutoStartCheckBox = (CheckBox) dialogView.findViewById(R.id.timer_autostart_checkbox);
         mAutoStartCheckBox.setOnCheckedChangeListener(this);
 
-        if (!mTimerFirstStart) {
+        if (!mTimerState.isTimerFirstStart()) {
 
             // timer has been started before, timer has been resumed to progress view
-            Log.i(TAG, "Timer has been started before. Time remaining: " + mTimeRemaining);
+            Log.i(TAG, "Timer has been started before. Time remaining: " + mTimerState.getTimeRemaining());
             setTimerOptionsVisible(false);
             mCountDownProgressBar.setMax(mCurrentProgressMax);
 
-            mCountDownText.setText(WorkoutTimer.timeToDisplay(mTimeRemaining).get(WorkoutTimer.MINUTES) + ":" + WorkoutTimer.timeToDisplay(mTimeRemaining).get(WorkoutTimer.SECONDS));
+
 
             /*mCountDownText.setText("" + (int)((mTimeRemaining / 1000) + 1));*/
 
-            if (mTimerRunning) {
-                Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mTimeRemaining);
+            if (mTimerState.isTimerRunning()) {
+                Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mTimerState.getTimeRemaining());
                 mCountDownTimer = mWorkoutTimerReference.getWorkoutTimer();
                 mCountDownTimer.setCountDownText(mCountDownText);
                 mCountDownTimer.setCountDownProgressBar(mCountDownProgressBar);
@@ -140,9 +144,9 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
                 mPauseTimerImageView.setVisibility(View.VISIBLE);
             } else {
                 Log.i(TAG, "Timer resumed, timer paused. Current Progress: " + mCurrentProgress);
-
+                mCountDownText.setText(WorkoutTimer.timeToDisplay(mTimerState.getTimeRemaining()).get(WorkoutTimer.MINUTES) + ":" + WorkoutTimer.timeToDisplay(mTimerState.getTimeRemaining()).get(WorkoutTimer.SECONDS));
                 // set correct progress bar value to display progress in paused state
-                int progressBarUpdate = (int) (mTimeRemaining / 10);
+                int progressBarUpdate = (int) (mTimerState.getTimeRemaining() / 10);
                 mCountDownProgressBar.setProgress(mCountDownProgressBar.getMax() - progressBarUpdate);
 
                 /*mCountDownProgressBar.setProgress(mCurrentProgress);*/
@@ -160,22 +164,20 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
         mAlertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
-                Log.i(TAG, "count down timer" + mCountDownTimer);
-                if (mCountDownTimer != null) {
-                    mTimeRemaining = mCountDownTimer.getTimeRemaining();
-                    mCurrentProgress = mCountDownProgressBar.getProgress();
-                    mCurrentProgressMax = mCountDownProgressBar.getMax();
+                Log.i(TAG, "Count Down Dialog dismissed");
 
-                    // Notify activity and update with variables to store when timer is resumed.
-                    mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mTimeRemaining, mCurrentProgress, mCurrentProgressMax);
+                mCurrentProgress = mCountDownProgressBar.getProgress();
+                mCurrentProgressMax = mCountDownProgressBar.getMax();
 
-                }
+                // Notify activity and update with variables to store when timer is resumed.
+                mExerciseTimerListener.onExerciseTimerDismissed(mCurrentProgress, mCurrentProgressMax);
 
             }
         });
+
     }
 
-    public void setTimerOptionsVisible(boolean visible) {
+    private void setTimerOptionsVisible(boolean visible) {
         if (visible) {
             mLayoutTimerOptions.setVisibility(View.VISIBLE);
             mLayoutTimerSetTimer.setVisibility(View.VISIBLE);
@@ -202,13 +204,13 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.timer_start:
-                Log.i(TAG, "Start timer. Timer already started: " + !mTimerFirstStart);
+                Log.i(TAG, "Start timer. Timer already started: " + !mTimerState.isTimerRunning());
 
-                mTimerRunning = true;
-                mHasActiveTimer = true;
+                mTimerState.setTimerRunning(true);
+                mTimerState.setHasActiveTimer(true);
 
 
-                if (mTimerFirstStart) {
+                if (mTimerState.isTimerFirstStart()) {
 
                     if (!mSetTimerField.getText().toString().isEmpty()) {
 
@@ -225,7 +227,7 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
                         mCountDownProgressBar.setMax(timerDuration * 100);
 
-                        mTimerFirstStart = false;
+                        mTimerState.setTimerFirstStart(false);
 
                         // Notify activity of timer creation and pass timer instance to activity
                         mExerciseTimerListener.onExerciseTimerCreated(timerDuration, mVibrate, mSound);
@@ -278,12 +280,9 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
                 mStartTimerImageView.setVisibility(View.VISIBLE);
 
                 // Reset timer variables
-                mTimeRemaining = 0;
-                mTimerFirstStart = true;
-                mTimerRunning = false;
+                mActivity.resetTimer();
                 mCurrentProgress = 0;
                 mCurrentProgressMax = 0;
-                mHasActiveTimer = false;
 
                 // Notify activity
                 mExerciseTimerListener.onExerciseTimerReset();
@@ -322,8 +321,6 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
     // Timer actions:
 
     public void pauseTimer(){
-        // set timer variables
-        mTimerRunning = false;
 
         // update view
         mSetTimerField.setEnabled(true);
@@ -359,9 +356,6 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
         return mCountDownProgressBar.getMax();
     }
 
-    public boolean isTimerRunning() {
-        return mTimerRunning;
-    }
 
     public AlertDialog getAlertDialog() {
         return mAlertDialog;
@@ -377,28 +371,12 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
     // Setters
 
-    public void setHasActiveTimer(boolean hasActiveTimer) {
-        mHasActiveTimer = hasActiveTimer;
-    }
-
     public void setCurrentProgressMax(int currentProgressMax) {
         mCurrentProgressMax = currentProgressMax;
     }
 
     public void setCurrentProgress(int currentProgress) {
         mCurrentProgress = currentProgress;
-    }
-
-    public void setTimerRunning(boolean timerRunning) {
-        mTimerRunning = timerRunning;
-    }
-
-    public void setTimerFirstStart(boolean timerFirstStart) {
-        mTimerFirstStart = timerFirstStart;
-    }
-
-    public void setTimeRemaining(long timeRemaining) {
-        mTimeRemaining = timeRemaining;
     }
 
     public void setSound(boolean sound) {
@@ -415,6 +393,14 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
     }
 
+    public void displayTimerOptions(){
+        mSetTimerField.setText("");
+        mSetTimerField.setEnabled(true);
+        setTimerOptionsVisible(true);
+        mStartTimerImageView.setVisibility(View.VISIBLE);
+        mPauseTimerImageView.setVisibility(View.GONE);
+    }
+
 
 
 
@@ -422,7 +408,7 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
      * Workout Timer Class
      */
 
-    public class WorkoutTimerDialog extends CountDownTimer {
+   /* public class WorkoutTimerDialog extends CountDownTimer {
 
 
         int progress;
@@ -485,7 +471,7 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
         public int getProgress() {
             return progress;
         }
-    }
+    }*/
 }
 
 

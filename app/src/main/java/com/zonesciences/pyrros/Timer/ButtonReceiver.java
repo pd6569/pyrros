@@ -125,7 +125,7 @@ public class ButtonReceiver extends BroadcastReceiver {
                 boolean sound = mSharedPreferences.getBoolean(WorkoutActivity.PREF_WORKOUT_TIMER_SOUND, false);
 
                 // Start workout timer
-                WorkoutTimer timer = new WorkoutTimer(mTimerState.getTimeRemaining(), 500, context, mWorkoutKey, mExerciseList, mExerciseObjects);
+                WorkoutTimer timer = new WorkoutTimer(mTimerState.getTimeRemaining(), 10, context, mWorkoutKey, mExerciseList, mExerciseObjects);
                 timer.setVibrate(vibrate);
                 timer.setSound(sound);
                 timer.start();

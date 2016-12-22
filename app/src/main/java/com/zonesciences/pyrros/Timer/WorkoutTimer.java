@@ -85,6 +85,9 @@ public class WorkoutTimer extends CountDownTimer {
     // Notifications
     NotificationCompat.Builder mNotificationBuilder;
 
+    // Listener
+    WorkoutTimerListener mWorkoutTimerListener;
+
 
     public WorkoutTimer(long millisInFuture, long countDownInterval, Context context, String workoutKey, List<String> exerciseList, List<Exercise> exerciseObjects) {
         super(millisInFuture, countDownInterval);
@@ -192,6 +195,9 @@ public class WorkoutTimer extends CountDownTimer {
             timerAction.setVisible(true);
         }
 
+        if (mWorkoutTimerListener != null) {
+            mWorkoutTimerListener.onFinish();
+        }
 
 
         /*Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
@@ -306,6 +312,16 @@ public class WorkoutTimer extends CountDownTimer {
 
     public void setCountDownProgressBar(ProgressBar countDownProgressBar) {
         mCountDownProgressBar = countDownProgressBar;
+    }
+
+    // listener
+
+    public interface WorkoutTimerListener {
+        void onFinish();
+    }
+
+    public void setWorkoutTimerListener(WorkoutTimerListener listener){
+        this.mWorkoutTimerListener = listener;
     }
 
     // Method for formatting countdown display
