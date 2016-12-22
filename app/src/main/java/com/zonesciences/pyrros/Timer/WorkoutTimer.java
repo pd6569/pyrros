@@ -16,6 +16,7 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,11 +57,17 @@ public class WorkoutTimer extends CountDownTimer {
     MenuItem timerActionBarText;
     MenuItem timerAction;
 
+    // if dialog is open need to change progress bar and text
+    TextView mCountDownText;
+    ProgressBar mCountDownProgressBar;
+
+
     // Is dialog open
     boolean mIsDialogOpen;
 
     // timer variables
     long mTimeRemaining;
+    int mProgress;
 
     // Preferences
     private SharedPreferences mSharedPreferences;
@@ -85,6 +92,7 @@ public class WorkoutTimer extends CountDownTimer {
         this.mWorkoutKey = workoutKey;
         this.mExerciseList = exerciseList;
         this.mExerciseObjects = exerciseObjects;
+        mProgress = (int) millisInFuture / 1000;
         mNotificationBuilder = new NotificationCompat.Builder(mContext);
         onStart(millisInFuture);
         Log.i(TAG, "exercise list : " + mExerciseList + " mWorkoutKey: " + mWorkoutKey + " Exercises: " + mExerciseObjects);
@@ -130,6 +138,7 @@ public class WorkoutTimer extends CountDownTimer {
     @Override
     public void onTick(long millisRemaining) {
         mTimeRemaining = millisRemaining;
+        String timeRemaining = timeToDisplay(millisRemaining).get(MINUTES) + ":" + timeToDisplay(millisRemaining).get(SECONDS);
 
         if (timerActionBarText != null && timerAction != null) {
 
@@ -143,11 +152,31 @@ public class WorkoutTimer extends CountDownTimer {
             }
         }
 
+        int i = (int) (millisRemaining / 1000);
+
+        if (i != mProgress) {
+            mProgress = i;
+
+            if (mIsDialogOpen){
+                mCountDownText.setText(timeRemaining);
+                updateNotificationBar(timeRemaining);
+            } else {
+                updateNotificationBar(timeRemaining);
+            }
+        }
+
+        if (mIsDialogOpen) {
+
+            int progressBarUpdate = (int) (millisRemaining / 10);
+            mCountDownProgressBar.setProgress(mCountDownProgressBar.getMax() - progressBarUpdate);
+        }
+
+    }
+
+    private void updateNotificationBar(String timeRemaining){
         // Update time remaining in notification bar
-        String timeRemaining = timeToDisplay(millisRemaining).get(MINUTES) + ":" + timeToDisplay(millisRemaining).get(SECONDS);
         mNotificationBuilder.setSmallIcon(R.drawable.ic_timer_gray_24dp)
                 .setContentText(timeRemaining);
-
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
     }
@@ -269,6 +298,14 @@ public class WorkoutTimer extends CountDownTimer {
 
     public void setAutoStart(boolean autoStart) {
         mAutoStart = autoStart;
+    }
+
+    public void setCountDownText(TextView countDownText) {
+        mCountDownText = countDownText;
+    }
+
+    public void setCountDownProgressBar(ProgressBar countDownProgressBar) {
+        mCountDownProgressBar = countDownProgressBar;
     }
 
     // Method for formatting countdown display

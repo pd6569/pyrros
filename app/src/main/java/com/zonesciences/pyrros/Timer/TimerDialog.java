@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.WorkoutActivity;
 
 /**
  * Created by Peter on 14/12/2016.
@@ -28,10 +29,10 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
     public static final String TAG = "TimerDialog";
 
-    AppCompatActivity mActivity;
+    WorkoutActivity mActivity;
 
     // View
-    WorkoutTimerDialog mCountDownTimer;
+    WorkoutTimer mCountDownTimer;
 
     ProgressBar mCountDownProgressBar;
     EditText mSetTimerField;
@@ -74,7 +75,7 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
     ExerciseTimerListener mExerciseTimerListener;
 
 
-    public TimerDialog(AppCompatActivity activity) {
+    public TimerDialog(WorkoutActivity activity) {
         this.mActivity = activity;
         mWorkoutTimerReference = WorkoutTimerReference.getWorkoutTimerReference();
     }
@@ -131,8 +132,10 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
             if (mTimerRunning) {
                 Log.i(TAG, "Timer resumed, timer running. Time remaning: " + mTimeRemaining);
-                mCountDownTimer = new WorkoutTimerDialog(mTimeRemaining, 10);
-                mCountDownTimer.start();
+                mCountDownTimer = mWorkoutTimerReference.getWorkoutTimer();
+                mCountDownTimer.setCountDownText(mCountDownText);
+                mCountDownTimer.setCountDownProgressBar(mCountDownProgressBar);
+                mCountDownTimer.setDialogOpen(true);
                 mStartTimerImageView.setVisibility(View.GONE);
                 mPauseTimerImageView.setVisibility(View.VISIBLE);
             } else {
@@ -166,8 +169,6 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
                     // Notify activity and update with variables to store when timer is resumed.
                     mExerciseTimerListener.onExerciseTimerDismissed(mTimerRunning, mTimeRemaining, mCurrentProgress, mCurrentProgressMax);
 
-                    // Cancel timer otherwise will get multiple onFinish notifications from multiple timer objects.
-                    mCountDownTimer.cancel();
                 }
 
             }
@@ -220,9 +221,9 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
                         mSetTimerField.setEnabled(false);
 
+                        Log.i(TAG, "mCountDown text: " +mCountDownText + " mprogressbar: " + mCountDownProgressBar);
+
                         mCountDownProgressBar.setMax(timerDuration * 100);
-                        mCountDownTimer = new WorkoutTimerDialog(milliseconds, 10);
-                        mCountDownTimer.start();
 
                         mTimerFirstStart = false;
 
@@ -271,6 +272,11 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
             case R.id.timer_delete:
 
+                // Update View
+                setTimerOptionsVisible(true);
+                mSetTimerField.setEnabled(true);
+                mStartTimerImageView.setVisibility(View.VISIBLE);
+
                 // Reset timer variables
                 mTimeRemaining = 0;
                 mTimerFirstStart = true;
@@ -279,20 +285,8 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
                 mCurrentProgressMax = 0;
                 mHasActiveTimer = false;
 
-                // Destroy timer.
-                if (mCountDownTimer != null) {
-                    mCountDownTimer.cancel();
-                    mCountDownTimer = null;
-                }
-
                 // Notify activity
                 mExerciseTimerListener.onExerciseTimerReset();
-
-                // Update View
-                setTimerOptionsVisible(true);
-                mSetTimerField.setEnabled(true);
-                mStartTimerImageView.setVisibility(View.VISIBLE);
-
 
                 break;
         }
@@ -328,29 +322,25 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
     // Timer actions:
 
     public void pauseTimer(){
+        // set timer variables
         mTimerRunning = false;
-        mCountDownTimer.cancel();
+
+        // update view
         mSetTimerField.setEnabled(true);
         mStartTimerImageView.setVisibility(View.VISIBLE);
         mPauseTimerImageView.setVisibility(View.GONE);
 
-        mTimeRemaining = mCountDownTimer.getTimeRemaining();
-
         // Notify activity
-        mExerciseTimerListener.onExerciseTimerPaused(mTimeRemaining, true);
+        mExerciseTimerListener.onExerciseTimerPaused(true);
     }
 
     public void resumeTimer(){
-        mCountDownTimer = null;
-        mCountDownTimer = new WorkoutTimerDialog(mTimeRemaining, 10);
-        mCountDownTimer.start();
 
         mStartTimerImageView.setVisibility(View.GONE);
         mPauseTimerImageView.setVisibility(View.VISIBLE);
 
         // notify activity that timer has been resumed:
-        int newTimerDuration = (int) (mTimeRemaining / 1000);
-        mExerciseTimerListener.onExerciseTimerResumed(newTimerDuration, true);
+        mExerciseTimerListener.onExerciseTimerResumed(true);
     }
 
     // Listener
@@ -375,6 +365,14 @@ public class TimerDialog implements View.OnClickListener, CompoundButton.OnCheck
 
     public AlertDialog getAlertDialog() {
         return mAlertDialog;
+    }
+
+    public ProgressBar getCountDownProgressBar() {
+        return mCountDownProgressBar;
+    }
+
+    public TextView getCountDownText() {
+        return mCountDownText;
     }
 
     // Setters

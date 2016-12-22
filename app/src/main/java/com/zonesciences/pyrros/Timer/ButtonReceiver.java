@@ -85,7 +85,7 @@ public class ButtonReceiver extends BroadcastReceiver {
             } else {
                 try {
                     WorkoutActivity workoutActivity = (WorkoutActivity) ((PyrrosApp) context.getApplicationContext()).getCurrentActivity();
-                    workoutActivity.pauseTimer(timerRef.getWorkoutTimer().getTimeRemaining(), false);
+                    workoutActivity.pauseTimer(false);
                 } catch (Exception e){
                     System.out.print("Error: " + e.toString());
                 }
@@ -134,7 +134,7 @@ public class ButtonReceiver extends BroadcastReceiver {
             } else {
                 try {
                     WorkoutActivity workoutActivity = (WorkoutActivity) ((PyrrosApp) context.getApplicationContext()).getCurrentActivity();
-                    workoutActivity.resumeTimer((int) (timerRef.getWorkoutTimer().getTimeRemaining() / 1000), false);
+                    workoutActivity.resumeTimer(false);
                 } catch (Exception e){
                     System.out.print("Error: " + e.toString());
                 }

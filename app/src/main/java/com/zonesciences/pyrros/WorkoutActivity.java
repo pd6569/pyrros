@@ -444,11 +444,11 @@ public class WorkoutActivity extends BaseActivity {
         }
 
         if (i == R.id.action_pause_timer){
-            pauseTimer(mWorkoutTimer.getTimeRemaining(), false);
+            pauseTimer(false);
         }
 
         if (i == R.id.action_resume_timer){
-            resumeTimer((int) mTimerState.getTimeRemaining() / 1000, false);
+            resumeTimer(false);
         }
 
         if (i == R.id.action_reset_timer){
@@ -510,9 +510,11 @@ public class WorkoutActivity extends BaseActivity {
             @Override
             public void onExerciseTimerCreated(int timerDuration, boolean vibrate, boolean sound) {
                 Log.i(TAG, "Timer created");
-                mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
+                mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 10, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
                 mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
                 mWorkoutTimer.setTimerAction(mTimerAction);
+                mWorkoutTimer.setCountDownProgressBar(mTimerDialog.getCountDownProgressBar());
+                mWorkoutTimer.setCountDownText(mTimerDialog.getCountDownText());
                 mWorkoutTimer.setDialogOpen(true);
                 mWorkoutTimer.setVibrate(vibrate);
                 mWorkoutTimer.setSound(sound);
@@ -536,15 +538,15 @@ public class WorkoutActivity extends BaseActivity {
             }
 
             @Override
-            public void onExerciseTimerPaused(long timeRemaining, boolean pauseFromDialog) {
-                Log.i(TAG, "Timer paused. Time remaining: " + timeRemaining);
-                pauseTimer(timeRemaining, pauseFromDialog);
+            public void onExerciseTimerPaused(boolean pauseFromDialog) {
+                Log.i(TAG, "Timer paused.");
+                pauseTimer(pauseFromDialog);
             }
 
             @Override
-            public void onExerciseTimerResumed(int timerDuration, boolean pausedFromDialog) {
-                Log.i(TAG, "Timer resumed. Reset timer start time and timer duration: " + timerDuration);
-                resumeTimer(timerDuration, pausedFromDialog);
+            public void onExerciseTimerResumed(boolean resumedFromDialog) {
+                Log.i(TAG, "Timer resumed.");
+                resumeTimer(resumedFromDialog);
             }
 
             @Override
@@ -603,7 +605,7 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     /****** TIMER CONTROLS ******/
-    public void pauseTimer(long timeRemaining, boolean pausedFromDialog){
+    public void pauseTimer(boolean pausedFromDialog){
         Log.i(TAG, "Pause Timer");
 
         if (mTimerDialogOpen && !pausedFromDialog){
@@ -619,7 +621,7 @@ public class WorkoutActivity extends BaseActivity {
 
             // update timer state
             mTimerState.setTimerRunning(false);
-            mTimerState.setTimeRemaining(timeRemaining);
+            mTimerState.setTimeRemaining(mWorkoutTimer.getTimeRemaining());
 
             // update toolbar
             mTimerAction.setVisible(true);
@@ -628,28 +630,31 @@ public class WorkoutActivity extends BaseActivity {
     }
 
     // timerDuration is duration of new timer in seconds
-    public void resumeTimer(int timerDuration, boolean pausedFromDialog){
+    public void resumeTimer(boolean resumedFromDialog){
         Log.i(TAG, "Resume Timer");
 
-        if (mTimerDialogOpen && !pausedFromDialog) {
+        if (mTimerDialogOpen && !resumedFromDialog) {
             Log.i(TAG, "Resumed via notification. Dialog window open");
             // Update dialog view
             mTimerDialog.resumeTimer();
         } else {
 
             // update timer and reference
-            mWorkoutTimer = new WorkoutTimer(timerDuration * 1000, 500, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
-            mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+            mWorkoutTimer = null;
+            mWorkoutTimer = new WorkoutTimer(mTimerState.getTimeRemaining(), 10, getApplicationContext(), mWorkoutKey, mExercisesList, mExerciseObjects);
             mWorkoutTimer.setTimerAction(mTimerAction);
-            mWorkoutTimer.setDialogOpen(mTimerDialogOpen);
-            mWorkoutTimer.setSound(mSound);
+            mWorkoutTimer.setTimerActionBarText(mActiveTimerToolbarText);
+            mWorkoutTimer.setCountDownText(mTimerDialog.getCountDownText());
+            mWorkoutTimer.setCountDownProgressBar(mTimerDialog.getCountDownProgressBar());
+            mWorkoutTimer.setDialogOpen(true);
             mWorkoutTimer.setVibrate(mVibrate);
+            mWorkoutTimer.setSound(mSound);
             mWorkoutTimer.start();
             mWorkoutTimerReference.setWorkoutTimer(mWorkoutTimer);
 
             // update timer state
             mTimerState.setTimerStartTime((int) ((Calendar.getInstance().getTimeInMillis() / 1000)));
-            mTimerState.setTimerDuration(timerDuration);
+            mTimerState.setTimerDuration((int) mTimerState.getTimeRemaining() / 1000);
             mTimerState.setTimerRunning(true);
         }
     }
@@ -755,6 +760,7 @@ public class WorkoutActivity extends BaseActivity {
                 // Dismiss the dialog and stop timer
 
                 mTimerDialog.getAlertDialog().cancel();
+                mWorkoutTimer.setDialogOpen(false);
             }
             mPrefEditor = mSharedPreferences.edit();
             Gson gson = new Gson();
@@ -859,6 +865,25 @@ public class WorkoutActivity extends BaseActivity {
         Log.i(TAG, "onDestroy");
     }
 
+
+
+    /********* getters and setters **********/
+
+    public MenuItem getTimerAction() {
+        return mTimerAction;
+    }
+
+    public MenuItem getActiveTimerToolbarText() {
+        return mActiveTimerToolbarText;
+    }
+
+    public ArrayList<Exercise> getExerciseObjects() {
+        return mExerciseObjects;
+    }
+
+    public ArrayList<String> getExercisesList() {
+        return mExercisesList;
+    }
 
     /********* static methods ***********/
 
