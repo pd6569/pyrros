@@ -26,4 +26,10 @@
         android:visible="true"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_create_routine"
+        android:title="Create routine"
+        android:visible="true"
+        app:showAsAction="never" />
+
 </menu>

@@ -182,6 +182,9 @@ public class MainActivity extends BaseActivity {
                     // Handle errors
                 }
             });
+        } else if (i == R.id.action_create_routine){
+            startActivity(new Intent(this, CreateRoutineActivity.class));
+            return  true;
         }
 
         return super.onOptionsItemSelected(item);

@@ -1,13 +1,38 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.zonesciences.pyrros.fragment.CreateRoutine.RoutineDetailsFragment">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment"/>
+    <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical"
+                  tools:context="com.zonesciences.pyrros.fragment.CreateRoutine.RoutineDetailsFragment">
 
-</FrameLayout>
+        <EditText
+            android:id="@+id/edit_text_routine_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Routine name"
+            android:layout_margin="5dp"
+            android:padding="5dp"/>
+
+        <Button
+            android:id="@+id/button_routine_add_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/routine_add_day"
+            android:layout_gravity="center"
+            android:padding="10dp"/>
+
+        <LinearLayout
+            android:id="@+id/linear_layout_routine_workout_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
