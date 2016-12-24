@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.zonesciences.pyrros">
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <application
         android:name=".PyrrosApp"
@@ -42,18 +44,18 @@
 
         <receiver android:name=".Timer.ButtonReceiver">
             <intent-filter>
-                <action android:name="com.zonesciences.pyrros.intent.ACTION_DISMISS_TIMER"></action>
-                <action android:name="com.zonesciences.pyrros.intent.ACTION_PAUSE_TIMER"></action>
-                <action android:name="com.zonesciences.pyrros.intent.ACTION_RESUME_TIMER"></action>
+                <action android:name="com.zonesciences.pyrros.intent.ACTION_DISMISS_TIMER"/>
+                <action android:name="com.zonesciences.pyrros.intent.ACTION_PAUSE_TIMER"/>
+                <action android:name="com.zonesciences.pyrros.intent.ACTION_RESUME_TIMER"/>
             </intent-filter>
         </receiver>
 
         <intent-filter>
-            <action android:name="com.zonesciences.pyrros.intent.ACTION_RESUME_WORKOUT_ACTIVITY"></action>
+            <action android:name="com.zonesciences.pyrros.intent.ACTION_RESUME_WORKOUT_ACTIVITY"/>
         </intent-filter>
 
+        <activity android:name=".CreateRoutineActivity">
+        </activity>
     </application>
-
-    <uses-permission android:name="android.permission.VIBRATE"/>
 
 </manifest>
