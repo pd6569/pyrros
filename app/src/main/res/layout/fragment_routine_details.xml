@@ -14,8 +14,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Routine name"
-            android:layout_margin="5dp"
-            android:padding="5dp"/>
+            android:textSize="18dp"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:inputType="textNoSuggestions"/>
 
         <Button
             android:id="@+id/button_routine_add_day"
