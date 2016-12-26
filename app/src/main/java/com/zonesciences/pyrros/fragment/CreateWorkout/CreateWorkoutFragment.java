@@ -161,6 +161,11 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                         mAllExercises.add(e);
                     }
                 }
+
+                if (mCreateWorkoutForRoutine){
+                    setSelectedExercises();
+                }
+
                 mFilteredExercises.addAll(mAllExercises);
                 mAdapter = new ExercisesFilterAdapter(mContext, (ArrayList) mFilteredExercises, mInEditWorkout);
                 mAdapter.setExercisesListener(new ExercisesListener() {
@@ -263,6 +268,9 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         return rootView;
     }
 
+    public void setSelectedExercises(){
+
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

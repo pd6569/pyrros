@@ -103,6 +103,11 @@ public class CreateWorkoutActivity extends BaseActivity {
             Log.i(TAG, "Create for routine" + mCreateWorkoutForRoutine);
         }
 
+        if (intent.hasExtra(EXTRA_WORKOUT_EXERCISES)){
+            mWorkoutExercises = (ArrayList<Exercise>) intent.getSerializableExtra(EXTRA_WORKOUT_EXERCISES);
+            Log.i(TAG, "Exercises recieved: " + mWorkoutExercises.size());
+        }
+
         // Initialise database and get user details
         mDatabase = Utils.getDatabase().getReference();
         mUserId = getUid();
@@ -265,7 +270,8 @@ public class CreateWorkoutActivity extends BaseActivity {
         return mWorkoutDate;
     }
 
-    public void setWorkoutDate(String workoutDate) {
-        mWorkoutDate = workoutDate;
+
+    public void setWorkoutExercises(ArrayList<Exercise> workoutExercises) {
+        this.mWorkoutExercises = workoutExercises;
     }
 }

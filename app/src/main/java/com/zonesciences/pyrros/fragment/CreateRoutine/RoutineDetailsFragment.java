@@ -54,12 +54,10 @@ public class RoutineDetailsFragment extends Fragment {
     RoutineExercisesAdapter mAdapter;
 
 
-    // Data
-    ArrayList<Exercise> mWorkoutExercises;
-
     // Maps
     Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();
     Map<Integer, View> mWorkoutViewMap = new HashMap<>();
+    Map<Integer, ArrayList<Exercise>> mWorkoutExercisesMap = new HashMap<>();
 
     // Track views to update by id
     int mWorkoutCardToUpdate;
@@ -99,10 +97,6 @@ public class RoutineDetailsFragment extends Fragment {
 
                 mWorkoutViewNameMap.put(id, workoutTitle);
 
-                if (mWorkoutExercises == null) {
-                    mWorkoutExercises = new ArrayList<Exercise>();
-                }
-
                 mLinearLayoutWorkoutContainer.addView(workoutView);
 
                 TextView noExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
@@ -110,8 +104,8 @@ public class RoutineDetailsFragment extends Fragment {
 
                     @Override
                     public void onClick(View view){
-                        Log.i(TAG, "No exercises, open exercise selection. Text clicked: " + view.getId());
                         mWorkoutCardToUpdate = id;
+                        Log.i(TAG, "No exercises, open exercise selection. Card Id" + mWorkoutCardToUpdate);
                         Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
                         i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
                         startActivityForResult(i, REQUEST_CREATE_WORKOUT);
@@ -131,13 +125,16 @@ public class RoutineDetailsFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == REQUEST_CREATE_WORKOUT){
             if (resultCode == RESULT_OK) {
-                ArrayList<Exercise> workoutExercises = new ArrayList<>();
-                workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
+                final ArrayList<Exercise> workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
                 if (workoutExercises.size() > 0){
-                    mWorkoutExercises = workoutExercises;
-
+                    final int cardId = mWorkoutCardToUpdate;
+                    if (mWorkoutExercisesMap.containsKey(cardId)){
+                        mWorkoutExercisesMap.remove(cardId);
+                    }
+                    mWorkoutExercisesMap.put(cardId, workoutExercises);
                     View viewToUpdate = mWorkoutViewMap.get(mWorkoutCardToUpdate);
                     LinearLayout exercisesContainer = (LinearLayout) viewToUpdate.findViewById(R.id.linear_layout_routine_workout_exercises_container);
+                    exercisesContainer.removeAllViews();
                     for (int i = 0; i < workoutExercises.size(); i++){
                         TextView exercise = new TextView(getContext());
                         exercise.setText(workoutExercises.get(i).getName());
@@ -147,13 +144,20 @@ public class RoutineDetailsFragment extends Fragment {
                     exercisesContainer.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Log.i(TAG, "card layout clicked");
+                            Log.i(TAG, "card layout clicked. card id: " + cardId);
+                            mWorkoutCardToUpdate = cardId;
+                            Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
+                            i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
+                            i.putExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES, workoutExercises);
+                            startActivityForResult(i, REQUEST_CREATE_WORKOUT);
+                            for (Exercise e : workoutExercises){
+                                Log.i(TAG, "Passing exercises back to create workoutactivity " + e.getName());
+                            }
                         }
                     });
 
                     viewToUpdate.findViewById(R.id.no_exercises_textview).setVisibility(View.GONE);
 
-                    Log.i(TAG, "mWorkoutExercises: " + mWorkoutExercises.size());
                 }
 
                 Log.i(TAG, "Request from create workout activity received successfully. Data received: " + workoutExercises.size());
