@@ -58,7 +58,11 @@ public class RoutineDetailsFragment extends Fragment {
     ArrayList<Exercise> mWorkoutExercises;
 
     // Maps
-    Map<String, Integer> mLayoutMap = new HashMap<>();
+    Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();
+    Map<Integer, View> mWorkoutViewMap = new HashMap<>();
+
+    // Track views to update by id
+    int mWorkoutCardToUpdate;
 
     public RoutineDetailsFragment() {
         // Required empty public constructor
@@ -68,7 +72,9 @@ public class RoutineDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_routine_details, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_routine_details, container, false);
+
+        Log.i(TAG, "onCreateView");
 
         mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);
         mWorkoutNameField = (EditText) rootView.findViewById(R.id.edit_text_routine_name);
@@ -78,12 +84,20 @@ public class RoutineDetailsFragment extends Fragment {
         mAddDayButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.cardview_routine_day, null);
-
-
+                final View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.cardview_routine_day, null);
+                final int id = View.generateViewId();
+                workoutView.setId(id);
                 TextView title = (TextView) workoutView.findViewById(R.id.routine_workout_item_textview);
                 String workoutTitle = mWorkoutNameField.getText().toString();
                 title.setText(workoutTitle);
+                title.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i(TAG, "Workout clicked. CardView ID: " + workoutView.getId());
+                    }
+                });
+
+                mWorkoutViewNameMap.put(id, workoutTitle);
 
                 if (mWorkoutExercises == null) {
                     mWorkoutExercises = new ArrayList<Exercise>();
@@ -104,11 +118,14 @@ public class RoutineDetailsFragment extends Fragment {
                     @Override
                     public void onClick(View view){
                         Log.i(TAG, "No exercises, open exercise selection. Text clicked: " + view.getId());
+                        mWorkoutCardToUpdate = id;
                         Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
                         i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
                         startActivityForResult(i, REQUEST_CREATE_WORKOUT);
                     }
                 });
+
+                mWorkoutViewMap.put(id, workoutView);
             }
         });
 
@@ -127,7 +144,13 @@ public class RoutineDetailsFragment extends Fragment {
                     mWorkoutExercises = workoutExercises;
                     /*mAdapter = new RoutineExercisesAdapter(getContext(), mWorkoutExercises);
                     mRecyclerView.setAdapter(mAdapter);*/
-
+                    View viewToUpdate = mWorkoutViewMap.get(mWorkoutCardToUpdate);
+                    LinearLayout cardLayout = (LinearLayout) viewToUpdate.findViewById(R.id.linear_layout_routine_workout_cardview);
+                    for (int i = 0; i < workoutExercises.size(); i++){
+                        TextView exercise = new TextView(getContext());
+                        exercise.setText(workoutExercises.get(i).getName());
+                        cardLayout.addView(exercise);
+                    }
 
                     Log.i(TAG, "mWorkoutExercises: " + mWorkoutExercises.size());
                 }
