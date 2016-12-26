@@ -81,6 +81,9 @@ public class CreateWorkoutActivity extends BaseActivity {
     // Current workout list
     ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
 
+    // Preselected exercises e.g. from Routine Activity
+    ArrayList<Exercise> mPreselectedExercises = new ArrayList<>();
+
     // Is this activity to create a workout for a routine?
     boolean mCreateWorkoutForRoutine = false;
 
@@ -104,8 +107,8 @@ public class CreateWorkoutActivity extends BaseActivity {
         }
 
         if (intent.hasExtra(EXTRA_WORKOUT_EXERCISES)){
-            mWorkoutExercises = (ArrayList<Exercise>) intent.getSerializableExtra(EXTRA_WORKOUT_EXERCISES);
-            Log.i(TAG, "Exercises recieved: " + mWorkoutExercises.size());
+            mPreselectedExercises = (ArrayList<Exercise>) intent.getSerializableExtra(EXTRA_WORKOUT_EXERCISES);
+            Log.i(TAG, "Exercises recieved: " + mPreselectedExercises.size());
         }
 
         // Initialise database and get user details
@@ -211,6 +214,11 @@ public class CreateWorkoutActivity extends BaseActivity {
                     }
                 });
                 frag.setCreateWorkoutForRoutine(mCreateWorkoutForRoutine);
+
+                if (mCreateWorkoutForRoutine){
+                    frag.setPreselectedExercises(mPreselectedExercises);
+                }
+
                 mFragmentReferenceMap.put(position, frag);
                 return frag;
             } else {

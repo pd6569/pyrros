@@ -81,6 +81,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     List<Exercise> mFilteredExercises = new ArrayList<>(); // references the exercise objects contained in all exercises - NOT NEW OBJECTS IN MEMORY
     List<List<Exercise>> mFilterHistory = new ArrayList<>();
     List<Exercise> mWorkoutExercises = new ArrayList<>();
+    List<Exercise> mPreselectedExercises = new ArrayList<>(); // if create workout is launched from routine activity need to ensure any selected exercises are marked as selected
 
     // Database, workout and user details
     DatabaseReference mDatabase;
@@ -162,8 +163,11 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     }
                 }
 
+                // make sure that any preselected exercises are marked as checked.
                 if (mCreateWorkoutForRoutine){
-                    setSelectedExercises();
+                    if (mPreselectedExercises != null && !mPreselectedExercises.isEmpty()) {
+                        setSelectedExercises(mPreselectedExercises);
+                    }
                 }
 
                 mFilteredExercises.addAll(mAllExercises);
@@ -196,7 +200,14 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                         Log.i(TAG, "Exercises changed: " + mWorkoutExercises.size());
                     }
                 });
+
+                // if exercises are preselected from RoutineActivity, then ensure that these are checked and that sort workout is notified
+                if (!mWorkoutExercises.isEmpty()){
+                    mAdapter.setWorkoutExercises((ArrayList<Exercise>) mWorkoutExercises);
+                    mExercisesListener.onExercisesChanged((ArrayList<Exercise>) mWorkoutExercises);
+                }
                 mExercisesFilterRecycler.setAdapter(mAdapter);
+
             }
 
             @Override
@@ -268,8 +279,16 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         return rootView;
     }
 
-    public void setSelectedExercises(){
-
+    // if exercises are preselected from Routine Activity, then make sure that these are "checked"
+    private void setSelectedExercises(List<Exercise> selectedExercises){
+        for (Exercise e : mAllExercises){
+            for (Exercise selectedExercise : selectedExercises){
+                if (e.getName().equals(selectedExercise.getName())){
+                    e.setSelected(true);
+                    mWorkoutExercises.add(e);
+                }
+            }
+        }
     }
 
     @Override
@@ -614,6 +633,10 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     public void clearAllExercises(){
         mAllExercises.clear();
+    }
+
+    public void setPreselectedExercises(ArrayList<Exercise> preselectedExercises) {
+        this.mPreselectedExercises = preselectedExercises;
     }
 
     public class FilterSpinnerAdapter extends ArrayAdapter<String>{

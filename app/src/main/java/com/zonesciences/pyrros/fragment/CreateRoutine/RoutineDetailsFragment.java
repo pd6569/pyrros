@@ -90,6 +90,7 @@ public class RoutineDetailsFragment extends Fragment {
                 workoutView.setId(id);
                 TextView title = (TextView) workoutView.findViewById(R.id.routine_workout_item_textview);
                 String workoutTitle = mWorkoutNameField.getText().toString();
+                mWorkoutNameField.setText("");
                 title.setText(workoutTitle);
                 title.setOnClickListener(new View.OnClickListener() {
                     @Override
