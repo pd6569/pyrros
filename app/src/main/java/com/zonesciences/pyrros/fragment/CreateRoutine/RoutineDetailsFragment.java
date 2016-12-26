@@ -103,13 +103,6 @@ public class RoutineDetailsFragment extends Fragment {
                     mWorkoutExercises = new ArrayList<Exercise>();
                 }
 
-                /*mRecyclerView = (RecyclerView) workoutView.findViewById(R.id.recycler_routine_exercises);
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                mRecyclerView.setHasFixedSize(true);
-                mAdapter = new RoutineExercisesAdapter(getContext(), mWorkoutExercises);
-                mRecyclerView.setAdapter(mAdapter);*/
-
-
                 mLinearLayoutWorkoutContainer.addView(workoutView);
 
                 mNoExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
@@ -142,8 +135,7 @@ public class RoutineDetailsFragment extends Fragment {
                 workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
                 if (workoutExercises.size() > 0){
                     mWorkoutExercises = workoutExercises;
-                    /*mAdapter = new RoutineExercisesAdapter(getContext(), mWorkoutExercises);
-                    mRecyclerView.setAdapter(mAdapter);*/
+
                     View viewToUpdate = mWorkoutViewMap.get(mWorkoutCardToUpdate);
                     LinearLayout cardLayout = (LinearLayout) viewToUpdate.findViewById(R.id.linear_layout_routine_workout_cardview);
                     for (int i = 0; i < workoutExercises.size(); i++){

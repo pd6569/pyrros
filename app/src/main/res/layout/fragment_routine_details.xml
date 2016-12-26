@@ -9,23 +9,32 @@
                   android:orientation="vertical"
                   tools:context="com.zonesciences.pyrros.fragment.CreateRoutine.RoutineDetailsFragment">
 
-        <EditText
-            android:id="@+id/edit_text_routine_name"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Routine name"
-            android:textSize="18dp"
-            android:layout_margin="10dp"
-            android:padding="10dp"
-            android:inputType="textNoSuggestions"/>
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/button_routine_add_day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/routine_add_day"
-            android:layout_gravity="center"
-            android:padding="10dp"/>
+            <EditText
+                android:id="@+id/edit_text_routine_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Routine name"
+                android:textSize="18dp"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:inputType="textNoSuggestions"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/button_routine_add_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/routine_add_day"
+                android:layout_gravity="center"
+                android:padding="10dp"/>
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/linear_layout_routine_workout_container"
