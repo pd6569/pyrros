@@ -119,5 +119,7 @@
     <string name="routine_add_day">Add workout</string>
     <string name="no_exercises">Add exercises</string>
     <string name="action_done">Done</string>
+    <string name="menu_edit_routine">Edit routine</string>
+    <string name="menu_save_routine">Save</string>
 
 </resources>

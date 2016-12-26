@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".CreateRoutineActivity">
+
+    <item
+        android:id="@+id/action_edit_routine"
+        android:title="@string/menu_edit_routine"
+        android:visible="true"
+        android:icon="@drawable/ic_create_white_24dp"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_save_routine"
+        android:title="@string/menu_save_routine"
+        android:visible="false"
+        app:showAsAction="always" />
+
+</menu>

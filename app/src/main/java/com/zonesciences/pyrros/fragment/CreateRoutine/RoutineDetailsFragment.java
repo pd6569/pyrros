@@ -49,6 +49,7 @@ public class RoutineDetailsFragment extends Fragment {
     // REQUEST CODE
     private static final int REQUEST_CREATE_WORKOUT = 1;
 
+    // View
     Button mAddDayButton;
     AutoCompleteTextView mWorkoutNameField;
     LinearLayout mLinearLayoutWorkoutContainer;
@@ -80,7 +81,7 @@ public class RoutineDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_routine_details, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_routine_details, container, false);
 
         Log.i(TAG, "onCreateView");
 
@@ -112,6 +113,7 @@ public class RoutineDetailsFragment extends Fragment {
                     public void onClick(View v) {
                         Log.i(TAG, "Delete workout card id: " + id);
                         mLinearLayoutWorkoutContainer.removeView(workoutView);
+                        mWorkoutExercisesMap.remove(id);
                     }
                 });
 
