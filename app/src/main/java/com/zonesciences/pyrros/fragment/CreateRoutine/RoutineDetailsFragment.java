@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -48,7 +50,7 @@ public class RoutineDetailsFragment extends Fragment {
     private static final int REQUEST_CREATE_WORKOUT = 1;
 
     Button mAddDayButton;
-    EditText mWorkoutNameField;
+    AutoCompleteTextView mWorkoutNameField;
     LinearLayout mLinearLayoutWorkoutContainer;
 
     // Maps
@@ -59,8 +61,20 @@ public class RoutineDetailsFragment extends Fragment {
     // Track views to update by id
     int mWorkoutCardToUpdate;
 
+    // Data
+    ArrayAdapter mAutoCompleteAdapter;
+    String[] mWorkoutNameSuggestions;
+
     public RoutineDetailsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate");
+        mWorkoutNameSuggestions = getResources().getStringArray(R.array.workout_name_suggestions);
+        mAutoCompleteAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, mWorkoutNameSuggestions);
     }
 
     @Override
@@ -71,7 +85,9 @@ public class RoutineDetailsFragment extends Fragment {
         Log.i(TAG, "onCreateView");
 
         mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);
-        mWorkoutNameField = (EditText) rootView.findViewById(R.id.edit_text_routine_name);
+        mWorkoutNameField = (AutoCompleteTextView) rootView.findViewById(R.id.autocomplete_field_workout_name);
+        mWorkoutNameField.setAdapter(mAutoCompleteAdapter);
+        mWorkoutNameField.setThreshold(1);
 
         mAddDayButton = (Button) rootView.findViewById(R.id.button_routine_add_day);
         mAddDayButton.setOnClickListener(new View.OnClickListener(){

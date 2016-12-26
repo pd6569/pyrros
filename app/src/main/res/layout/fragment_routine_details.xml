@@ -14,15 +14,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/edit_text_routine_name"
+            <AutoCompleteTextView
+                android:id="@+id/autocomplete_field_workout_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Routine name"
+                android:hint="Workout name"
                 android:textSize="18dp"
                 android:layout_margin="10dp"
                 android:padding="10dp"
-                android:inputType="textNoSuggestions"
+                android:inputType="textAutoComplete"
                 android:layout_weight="1"/>
 
             <Button

@@ -32,4 +32,29 @@
         <item>Machine</item>
     </string-array>
 
+    <string-array name="workout_name_suggestions">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+        <item>Workout A</item>
+        <item>Workout B</item>
+        <item>Workout C</item>
+        <item>Upper Body</item>
+        <item>Lower Body</item>
+        <item>Chest, Triceps, Shoulders </item>
+        <item>Back, Biceps</item>
+        <item>Legs, Abs</item>
+        <item>Full Body</item>
+        <item>Hypertrophy</item>
+        <item>Endurance</item>
+        <item>Strength</item>
+        <item>Power</item>
+        <item>Push</item>
+        <item>Pull</item>
+    </string-array>
+
 </resources>
