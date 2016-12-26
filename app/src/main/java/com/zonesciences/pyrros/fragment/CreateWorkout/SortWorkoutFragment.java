@@ -2,7 +2,6 @@ package com.zonesciences.pyrros.fragment.CreateWorkout;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -67,8 +66,9 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
     // Menu
     private MenuItem mStartWorkoutAction;
 
-    // Where is fragment being displayed
+    // Where is fragment being displayed / what is the context of activity use
     boolean mInEditWorkout;
+    boolean mCreateWorkoutForRoutine;
 
     public static SortWorkoutFragment newInstance(List<Exercise> workoutExercises, boolean inEditWorkout){
         Bundle bundle = new Bundle();
@@ -330,6 +330,11 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
         if (!mInEditWorkout) {
             mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
+
+            if (mCreateWorkoutForRoutine){
+                mStartWorkoutAction.setIcon(R.drawable.ic_done_white_24dp);
+            }
+
             if (mWorkoutExercises.size() > 0) {
                 mStartWorkoutAction.setVisible(true);
             }
@@ -360,6 +365,10 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
     public void setInEditWorkout(boolean inEditWorkout) {
         mInEditWorkout = inEditWorkout;
+    }
+
+    public void setCreateWorkoutForRoutine (boolean createWorkoutForRoutine) {
+        mCreateWorkoutForRoutine = createWorkoutForRoutine;
     }
 
     public void setMultiSelectDisabled(boolean multiSelectDisabled) {

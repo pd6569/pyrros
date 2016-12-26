@@ -70,7 +70,9 @@ public class RoutineDetailsFragment extends Fragment {
                     @Override
                     public void onClick(View view){
                         Log.i(TAG, "No exercises, open exercise selection. Text clicked: " + view.getId());
-                        startActivity(new Intent(getContext(), CreateWorkoutActivity.class));
+                        Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
+                        i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
+                        startActivity(i);
                     }
                 });
             }

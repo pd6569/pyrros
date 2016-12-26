@@ -118,5 +118,6 @@
     <string name="dismiss">Dismiss</string>
     <string name="routine_add_day">Add workout</string>
     <string name="no_exercises">No exercises, click to add</string>
+    <string name="action_done">Done</string>
 
 </resources>

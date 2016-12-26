@@ -52,7 +52,9 @@ public class CreateWorkoutActivity extends BaseActivity {
     private static final String TAG = "CreateWorkoutActivity";
 
     // Args
-    private static final String ARG_WORKOUT_DATE = "WorkoutDate";
+    public static final String ARG_WORKOUT_DATE = "WorkoutDate";
+    public static final String ARG_CREATE_WORKOUT_FOR_ROUTINE = "CreateWorkoutForRoutine";
+
 
     // Context
     Context mContext;
@@ -76,6 +78,9 @@ public class CreateWorkoutActivity extends BaseActivity {
     // Current workout list
     ArrayList<Exercise> mWorkoutExercises = new ArrayList<>();
 
+    // Is this activity to create a workout for a routine?
+    boolean mCreateWorkoutForRoutine = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -84,8 +89,15 @@ public class CreateWorkoutActivity extends BaseActivity {
         Intent intent = getIntent();
 
         mContext = getApplicationContext();
+
+        // if creating new workout from calendar view, need to create on specific date
         if (intent.hasExtra(ARG_WORKOUT_DATE)) {
             mWorkoutDate = intent.getExtras().getString(ARG_WORKOUT_DATE);
+        }
+
+        if (intent.hasExtra(ARG_CREATE_WORKOUT_FOR_ROUTINE)){
+            mCreateWorkoutForRoutine = intent.getBooleanExtra(ARG_CREATE_WORKOUT_FOR_ROUTINE, false);
+            Log.i(TAG, "Create for routine" + mCreateWorkoutForRoutine);
         }
 
         // Initialise database and get user details
@@ -174,6 +186,7 @@ public class CreateWorkoutActivity extends BaseActivity {
                         Log.i(TAG, "Exercise changed in adapter, activity notified: " + mWorkoutExercises.size());
                     }
                 });
+                frag.setCreateWorkoutForRoutine(mCreateWorkoutForRoutine);
                 mFragmentReferenceMap.put(position, frag);
                 return frag;
             } else {
@@ -204,6 +217,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
                     }
                 });
+                frag.setCreateWorkoutForRoutine(mCreateWorkoutForRoutine);
                 mFragmentReferenceMap.put(position, frag);
                 return frag;
             }

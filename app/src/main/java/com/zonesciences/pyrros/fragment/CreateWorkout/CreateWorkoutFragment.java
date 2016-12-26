@@ -6,12 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,8 +34,6 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
 import com.zonesciences.pyrros.adapters.ExercisesFilterAdapter;
 import com.zonesciences.pyrros.models.Exercise;
-import com.zonesciences.pyrros.models.Record;
-import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
@@ -122,6 +118,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     // Where is fragment being displayed
     boolean mInEditWorkout;
+    boolean mCreateWorkoutForRoutine;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -273,6 +270,12 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         super.onCreateOptionsMenu(menu, inflater);
 
         mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
+
+        if (mCreateWorkoutForRoutine){
+            mStartWorkoutAction.setIcon(R.drawable.ic_done_white_24dp);
+        }
+
+
         if (mWorkoutExercises.size() > 0){
             mStartWorkoutAction.setVisible(true);
         }
@@ -478,6 +481,10 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     public void setInEditWorkout(boolean inEditWorkout) {
         mInEditWorkout = inEditWorkout;
+    }
+
+    public void setCreateWorkoutForRoutine (boolean createWorkoutForRoutine) {
+        mCreateWorkoutForRoutine = createWorkoutForRoutine;
     }
 
     public void setExercisesListener(ExercisesListener listener){
