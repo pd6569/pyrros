@@ -191,6 +191,9 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     @Override
                     public void onExerciseRemoved(Exercise exercise) {
                         mExercisesListener.onExerciseRemoved(exercise);
+                        if (!mStartWorkoutAction.isVisible() && !mInEditWorkout){
+                            mStartWorkoutAction.setVisible(true);
+                        }
                     }
 
                     @Override
