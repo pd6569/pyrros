@@ -1,6 +1,7 @@
 package com.zonesciences.pyrros.fragment.CreateRoutine;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
 
 /**
@@ -27,6 +29,7 @@ public class RoutineDetailsFragment extends Fragment {
     Button mAddDayButton;
     EditText mWorkoutNameField;
     LinearLayout mLinearLayoutWorkoutContainer;
+    TextView mNoExercisesTextView;
 
 
     public RoutineDetailsFragment() {
@@ -60,8 +63,20 @@ public class RoutineDetailsFragment extends Fragment {
                 mLinearLayoutWorkoutContainer.addView(recyclerView);
 
                 mLinearLayoutWorkoutContainer.addView(workoutView);
+
+                mNoExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
+                mNoExercisesTextView.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view){
+                        Log.i(TAG, "No exercises, open exercise selection. Text clicked: " + view.getId());
+                        startActivity(new Intent(getContext(), CreateWorkoutActivity.class));
+                    }
+                });
             }
         });
+
+
 
         return rootView;
     }
