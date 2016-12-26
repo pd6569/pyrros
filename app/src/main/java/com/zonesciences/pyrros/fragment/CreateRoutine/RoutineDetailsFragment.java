@@ -105,8 +105,8 @@ public class RoutineDetailsFragment extends Fragment {
 
                 mLinearLayoutWorkoutContainer.addView(workoutView);
 
-                mNoExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
-                mNoExercisesTextView.setOnClickListener(new View.OnClickListener() {
+                TextView noExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
+                noExercisesTextView.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View view){
@@ -137,12 +137,21 @@ public class RoutineDetailsFragment extends Fragment {
                     mWorkoutExercises = workoutExercises;
 
                     View viewToUpdate = mWorkoutViewMap.get(mWorkoutCardToUpdate);
-                    LinearLayout cardLayout = (LinearLayout) viewToUpdate.findViewById(R.id.linear_layout_routine_workout_cardview);
+                    LinearLayout exercisesContainer = (LinearLayout) viewToUpdate.findViewById(R.id.linear_layout_routine_workout_exercises_container);
                     for (int i = 0; i < workoutExercises.size(); i++){
                         TextView exercise = new TextView(getContext());
                         exercise.setText(workoutExercises.get(i).getName());
-                        cardLayout.addView(exercise);
+                        exercisesContainer.addView(exercise);
                     }
+
+                    exercisesContainer.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.i(TAG, "card layout clicked");
+                        }
+                    });
+
+                    viewToUpdate.findViewById(R.id.no_exercises_textview).setVisibility(View.GONE);
 
                     Log.i(TAG, "mWorkoutExercises: " + mWorkoutExercises.size());
                 }

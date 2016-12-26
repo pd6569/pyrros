@@ -117,7 +117,7 @@
     <string name="menu_active_timer">0</string>
     <string name="dismiss">Dismiss</string>
     <string name="routine_add_day">Add workout</string>
-    <string name="no_exercises">No exercises, click to add</string>
+    <string name="no_exercises">Add exercises</string>
     <string name="action_done">Done</string>
 
 </resources>
