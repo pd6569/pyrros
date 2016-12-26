@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout    xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/workout_card_frame_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -11,7 +12,7 @@
                                         android:elevation="5dp">
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:id="@+id/item_routine_details"
+                      android:id="@+id/linear_layout_routine_workout_cardview"
                       android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:orientation="vertical"
@@ -65,11 +66,13 @@
                 />
 
             <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_routine_exercises"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="vertical"
-                tools:listitem="@layout/item_sort_workout">
-            </android.support.v7.widget.RecyclerView>
+                android:clipToPadding="false"
+                android:padding="5dp"
+                android:scrollbars="none"
+                tools:listitem="@layout/item_exercise" />
 
         </LinearLayout>
 

@@ -4,10 +4,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
+import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.fragment.CreateRoutine.RoutineDetailsFragment;
 
-public class CreateRoutineActivity extends AppCompatActivity {
+public class CreateRoutineActivity extends BaseActivity {
+
+    private static final String TAG = "CreateRoutineAcctivity";
 
     RoutineDetailsFragment mRoutineDetailsFragment;
 
@@ -24,4 +29,6 @@ public class CreateRoutineActivity extends AppCompatActivity {
         ft.commit();
 
     }
+
+
 }

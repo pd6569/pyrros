@@ -4,6 +4,8 @@ package com.zonesciences.pyrros.fragment.CreateRoutine;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,14 +15,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.zonesciences.pyrros.CreateRoutineActivity;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
+import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.RoutineExercisesAdapter;
+import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -39,6 +49,16 @@ public class RoutineDetailsFragment extends Fragment {
     LinearLayout mLinearLayoutWorkoutContainer;
     TextView mNoExercisesTextView;
 
+    // Recycler view
+    RecyclerView mRecyclerView;
+    RoutineExercisesAdapter mAdapter;
+
+
+    // Data
+    ArrayList<Exercise> mWorkoutExercises;
+
+    // Maps
+    Map<String, Integer> mLayoutMap = new HashMap<>();
 
     public RoutineDetailsFragment() {
         // Required empty public constructor
@@ -60,15 +80,21 @@ public class RoutineDetailsFragment extends Fragment {
             public void onClick(View view){
                 View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.cardview_routine_day, null);
 
-                TextView title = (TextView) workoutView.findViewById(R.id.routine_workout_item_textview);
-                title.setText(mWorkoutNameField.getText().toString());
 
-                RecyclerView recyclerView = new RecyclerView(getContext(), null);
-                int id = View.generateViewId();
-                Log.i(TAG, "recycler id: " + id);
-                recyclerView.setId(id);
-                recyclerView.setHasFixedSize(true);
-                mLinearLayoutWorkoutContainer.addView(recyclerView);
+                TextView title = (TextView) workoutView.findViewById(R.id.routine_workout_item_textview);
+                String workoutTitle = mWorkoutNameField.getText().toString();
+                title.setText(workoutTitle);
+
+                if (mWorkoutExercises == null) {
+                    mWorkoutExercises = new ArrayList<Exercise>();
+                }
+
+                /*mRecyclerView = (RecyclerView) workoutView.findViewById(R.id.recycler_routine_exercises);
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                mRecyclerView.setHasFixedSize(true);
+                mAdapter = new RoutineExercisesAdapter(getContext(), mWorkoutExercises);
+                mRecyclerView.setAdapter(mAdapter);*/
+
 
                 mLinearLayoutWorkoutContainer.addView(workoutView);
 
@@ -97,9 +123,21 @@ public class RoutineDetailsFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 ArrayList<Exercise> workoutExercises = new ArrayList<>();
                 workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
+                if (workoutExercises.size() > 0){
+                    mWorkoutExercises = workoutExercises;
+                    /*mAdapter = new RoutineExercisesAdapter(getContext(), mWorkoutExercises);
+                    mRecyclerView.setAdapter(mAdapter);*/
+
+
+                    Log.i(TAG, "mWorkoutExercises: " + mWorkoutExercises.size());
+                }
 
                 Log.i(TAG, "Request from create workout activity received successfully. Data received: " + workoutExercises.size());
             }
         }
     }
+
+
+
+
 }
