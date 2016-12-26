@@ -55,6 +55,9 @@ public class CreateWorkoutActivity extends BaseActivity {
     public static final String ARG_WORKOUT_DATE = "WorkoutDate";
     public static final String ARG_CREATE_WORKOUT_FOR_ROUTINE = "CreateWorkoutForRoutine";
 
+    // Extras
+    public static final String EXTRA_WORKOUT_EXERCISES = "WorkoutExercises";
+
 
     // Context
     Context mContext;
@@ -138,6 +141,22 @@ public class CreateWorkoutActivity extends BaseActivity {
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs_create_workout);
         mTabLayout.setupWithViewPager(mViewPager);
 
+    }
+
+    @Override
+    public void finish(){
+        if (mCreateWorkoutForRoutine){
+            if (mWorkoutExercises.size() > 0){
+                Log.i(TAG, "Finish activity and return to routine, pass exercises");
+                Intent i = new Intent();
+                i.putExtra(EXTRA_WORKOUT_EXERCISES, mWorkoutExercises);
+                this.setResult(RESULT_OK, i);
+            } else {
+                Log.i(TAG, "Finish activity and return to routine, no exercises to pass");
+                this.setResult(RESULT_CANCELED);
+            }
+        }
+        super.finish();
     }
 
 

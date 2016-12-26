@@ -18,6 +18,11 @@ import android.widget.TextView;
 
 import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.models.Exercise;
+
+import java.util.ArrayList;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +30,9 @@ import com.zonesciences.pyrros.R;
 public class RoutineDetailsFragment extends Fragment {
 
     private static final String TAG = "RoutineDetailsFragment";
+
+    // REQUEST CODE
+    private static final int REQUEST_CREATE_WORKOUT = 1;
 
     Button mAddDayButton;
     EditText mWorkoutNameField;
@@ -72,7 +80,7 @@ public class RoutineDetailsFragment extends Fragment {
                         Log.i(TAG, "No exercises, open exercise selection. Text clicked: " + view.getId());
                         Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
                         i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
-                        startActivity(i);
+                        startActivityForResult(i, REQUEST_CREATE_WORKOUT);
                     }
                 });
             }
@@ -83,4 +91,15 @@ public class RoutineDetailsFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (requestCode == REQUEST_CREATE_WORKOUT){
+            if (resultCode == RESULT_OK) {
+                ArrayList<Exercise> workoutExercises = new ArrayList<>();
+                workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
+
+                Log.i(TAG, "Request from create workout activity received successfully. Data received: " + workoutExercises.size());
+            }
+        }
+    }
 }

@@ -492,6 +492,14 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     }
 
     public void startWorkout(){
+
+        // if activity is being started from CreateRoutineActivity then DO NOT START A WORKOUT!
+
+        if (mCreateWorkoutForRoutine) {
+            createWorkoutForRoutine();
+            return;
+        }
+
         mWorkoutKey = mDatabase.child("workouts").push().getKey();
         mWorkoutDate = ((CreateWorkoutActivity) getActivity()).getWorkoutDate();
         ArrayList<Exercise> exercisesToLoad = (ArrayList) mAdapter.getWorkoutExercises();
@@ -547,6 +555,11 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
         Intent i = new Intent (getActivity(), WorkoutActivity.class);
         i.putExtras(extras);
         startActivity(i);
+    }
+
+    private void createWorkoutForRoutine(){
+        Log.i(TAG, "create workout for routine, do not start a workout, return to routine activity");
+        getActivity().finish();
     }
 
     @Override
