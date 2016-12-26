@@ -99,6 +99,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
         mContext = getContext();
 
+
         setHasOptionsMenu(!mInEditWorkout);
     }
 
@@ -110,6 +111,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
         Log.i(TAG, "onCreateView");
 
         View rootView = inflater.inflate(R.layout.fragment_sort_workout, container, false);
+
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_sort_workout);
         mLayoutManager = new LinearLayoutManager(mContext);
@@ -160,7 +162,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
             }
         }));
 
-        if (mInEditWorkout) {
+        if (mInEditWorkout || mCreateWorkoutForRoutine) {
             mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
             mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
             mItemTouchHelper.attachToRecyclerView(mRecyclerView);
@@ -249,39 +251,10 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
     public void setUserVisibleHint(boolean isVisibleToUser){
         if (!mInEditWorkout) {
             if (isVisibleToUser) {
-
+                Log.i(TAG, "isVisibleToUser");
                 if (!mExercisesAdded) {
                     if (!mWorkoutExercises.isEmpty()) {
-                        mExercisesAdded = true;
-                        mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
-                        mAdapter.setExercisesListener(new ExercisesListener() {
-                            @Override
-                            public void onExerciseAdded(Exercise exercise) {
-
-                            }
-
-                            @Override
-                            public void onExercisesEmpty() {
-                                Log.i(TAG, "Exercises empty");
-                                mStartWorkoutAction.setVisible(false);
-                            }
-
-                            @Override
-                            public void onExerciseRemoved(Exercise exercise) {
-
-                            }
-
-                            @Override
-                            public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
-                                Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
-                                mWorkoutExercises = exerciseList;
-                                mExercisesListener.onExercisesChanged(mWorkoutExercises);
-                            }
-                        });
-                        mRecyclerView.setAdapter(mAdapter);
-                        mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
-                        mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
-                        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+                        setNewAdapter();
                     }
                 }
             }
@@ -299,6 +272,39 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
     public SortWorkoutAdapter getAdapter() {
         return mAdapter;
+    }
+
+    public void setNewAdapter(){
+        mExercisesAdded = true;
+        mAdapter = new SortWorkoutAdapter(getActivity(), mWorkoutExercises, this);
+        mAdapter.setExercisesListener(new ExercisesListener() {
+            @Override
+            public void onExerciseAdded(Exercise exercise) {
+
+            }
+
+            @Override
+            public void onExercisesEmpty() {
+                Log.i(TAG, "Exercises empty");
+                mStartWorkoutAction.setVisible(false);
+            }
+
+            @Override
+            public void onExerciseRemoved(Exercise exercise) {
+
+            }
+
+            @Override
+            public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
+                mWorkoutExercises = exerciseList;
+                mExercisesListener.onExercisesChanged(mWorkoutExercises);
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+        mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
+        mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     @Override

@@ -7,45 +7,25 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.zonesciences.pyrros.adapters.ExercisesFilterAdapter;
 import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
-import com.zonesciences.pyrros.models.Record;
 import com.zonesciences.pyrros.models.User;
-import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class CreateWorkoutActivity extends BaseActivity {
 
@@ -136,6 +116,12 @@ public class CreateWorkoutActivity extends BaseActivity {
         mPagerAdapter = new CreateWorkoutPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
 
+        // If create workout is being opened via Routine Activity and there are already exercises
+        // selected, then load straight up into the SortWorkoutFragment view
+        if (mCreateWorkoutForRoutine && mPreselectedExercises.size() > 0) {
+            mViewPager.setCurrentItem(1);
+        }
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_workout);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -210,6 +196,9 @@ public class CreateWorkoutActivity extends BaseActivity {
                         SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
                         sortWorkoutFragment.setWorkoutExercises(mWorkoutExercises);
                         sortWorkoutFragment.getAdapter().notifyDataSetChanged();
+                        if (mCreateWorkoutForRoutine) {
+                            sortWorkoutFragment.setNewAdapter();
+                        }
                         Log.i(TAG, "Exercise changed in adapter, activity notified: " + mWorkoutExercises.size());
                     }
                 });

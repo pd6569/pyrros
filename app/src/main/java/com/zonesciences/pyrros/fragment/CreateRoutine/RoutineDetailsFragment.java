@@ -50,12 +50,6 @@ public class RoutineDetailsFragment extends Fragment {
     Button mAddDayButton;
     EditText mWorkoutNameField;
     LinearLayout mLinearLayoutWorkoutContainer;
-    TextView mNoExercisesTextView;
-
-    // Recycler view
-    RecyclerView mRecyclerView;
-    RoutineExercisesAdapter mAdapter;
-
 
     // Maps
     Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();
@@ -69,7 +63,6 @@ public class RoutineDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -79,7 +72,6 @@ public class RoutineDetailsFragment extends Fragment {
 
         mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);
         mWorkoutNameField = (EditText) rootView.findViewById(R.id.edit_text_routine_name);
-
 
         mAddDayButton = (Button) rootView.findViewById(R.id.button_routine_add_day);
         mAddDayButton.setOnClickListener(new View.OnClickListener(){
