@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -30,7 +31,9 @@ import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -92,6 +95,14 @@ public class RoutineDetailsFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Log.i(TAG, "Workout clicked. CardView ID: " + workoutView.getId());
+                    }
+                });
+                ImageView deleteWorkout = (ImageView) workoutView.findViewById(R.id.routine_workout_delete_imageview);
+                deleteWorkout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i(TAG, "Delete workout card id: " + id);
+                        mLinearLayoutWorkoutContainer.removeView(workoutView);
                     }
                 });
 

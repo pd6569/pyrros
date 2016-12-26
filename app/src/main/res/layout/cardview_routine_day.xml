@@ -34,9 +34,20 @@
                     android:id="@+id/routine_workout_item_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:gravity="left"
+                    android:layout_gravity="center_vertical"
                     android:textAllCaps="true"
+                    android:layout_weight="1"
                     android:text="Workout Day 1"/>
+
+                <ImageView
+                    android:id="@+id/routine_workout_delete_imageview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:clickable="true"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_delete_gray_24dp"/>
 
             </LinearLayout>
 
