@@ -139,4 +139,5 @@ public class CreateRoutineActivity extends BaseActivity {
         mRoutineDetailsFragment.getRoutine().setName(routineName);
         mRoutineDetailsFragment.setRoutineChanged(true);
     }
+
 }
