@@ -72,12 +72,14 @@ public class RoutineDetailsFragment extends Fragment {
     // Data tracking
     Routine mRoutine;
     ArrayList<Workout> mWorkouts = new ArrayList<>();
+    ArrayList<String> mWorkoutIds = new ArrayList<>();
 
     // Listener
     WorkoutChangedListener mWorkoutChangedListener;
 
     // Firebase and user info
     DatabaseReference mDatabase;
+    String mRoutineKey;
     String mUsername;
     String mUid;
     String mClientTimeStamp;
@@ -112,6 +114,9 @@ public class RoutineDetailsFragment extends Fragment {
 
             }
         });
+
+        // Generate unique routines key
+        mRoutineKey = mDatabase.child("routines").push().getKey();
     }
 
     @Override
@@ -159,9 +164,11 @@ public class RoutineDetailsFragment extends Fragment {
             }
         });
 
-        // Add workout object
+        // Create unique workout Id and add workout object
         final Workout workout = new Workout (mUid, mUsername, mClientTimeStamp, workoutTitle, true);
+        final String workoutId = mDatabase.child("routine-workouts").push().getKey();
         mWorkouts.add(workout);
+        mWorkoutIds.add(workoutId);
         mWorkoutIdWorkoutObjectMap.put(workoutViewId, workout);
 
 
@@ -176,8 +183,9 @@ public class RoutineDetailsFragment extends Fragment {
                 // Notify activity
                 mWorkoutChangedListener.onWorkoutRemoved();
 
-                // Remove workout from map and list
+                // Remove workout from map and list and remove workout id
                 mWorkouts.remove(workout);
+                mWorkouts.remove(workoutId);
                 mWorkoutIdWorkoutObjectMap.remove(workoutViewId);
             }
         });
@@ -295,10 +303,13 @@ public class RoutineDetailsFragment extends Fragment {
 
         // Write to database
         Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
+        childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
 
-        String routineKey = mDatabase.child("routines").push().getKey();
-        childUpdates.put("/routines/" + routineKey, mRoutine.toMap());
-        childUpdates.put("/user-routines/" + mUid + "/" + routineKey, mRoutine.toMap());
+        for (int i = 0; i < mWorkouts.size(); i++){
+            childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + mWorkoutIds.get(i), mWorkouts.get(i).toMap());
+            childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + mWorkoutIds.get(i), mWorkouts.get(i).toMap());
+        }
         mDatabase.updateChildren(childUpdates);
 
     }
