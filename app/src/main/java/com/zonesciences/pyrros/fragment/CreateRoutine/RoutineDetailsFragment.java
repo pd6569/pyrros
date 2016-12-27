@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 
-    //TODO: BUG - when one exercise remaining, cannot remove when launching CreateWorkoutActivity
     //TODO: BUG - when launching directly into sort workout fragment, "done" arrow does not show on moving/deleting exercises
 
 public class RoutineDetailsFragment extends Fragment {
@@ -159,42 +159,53 @@ public class RoutineDetailsFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == REQUEST_CREATE_WORKOUT){
             if (resultCode == RESULT_OK) {
+                Log.i(TAG, "Result OK");
+
                 final ArrayList<Exercise> workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
+
+                final int workoutViewId = mWorkoutCardToUpdate;
+
+                // get view to update and remove all views
+                View viewToUpdate = mWorkoutViewMap.get(mWorkoutCardToUpdate);
+                LinearLayout exercisesContainer = (LinearLayout) viewToUpdate.findViewById(R.id.linear_layout_routine_workout_exercises_container);
+                exercisesContainer.removeAllViews();
+
+                // remove previous exercises from map
+                if (mWorkoutExercisesMap.containsKey(workoutViewId)) mWorkoutExercisesMap.remove(workoutViewId);
+
                 if (workoutExercises.size() > 0){
-                    final int cardId = mWorkoutCardToUpdate;
-                    if (mWorkoutExercisesMap.containsKey(cardId)){
-                        mWorkoutExercisesMap.remove(cardId);
-                    }
-                    mWorkoutExercisesMap.put(cardId, workoutExercises);
-                    View viewToUpdate = mWorkoutViewMap.get(mWorkoutCardToUpdate);
-                    LinearLayout exercisesContainer = (LinearLayout) viewToUpdate.findViewById(R.id.linear_layout_routine_workout_exercises_container);
-                    exercisesContainer.removeAllViews();
+
+                    // add new exercises
+                    mWorkoutExercisesMap.put(workoutViewId, workoutExercises);
+
+                    // Generate new views from exercise list and add to container
                     for (int i = 0; i < workoutExercises.size(); i++){
                         TextView exercise = new TextView(getContext());
                         exercise.setText(workoutExercises.get(i).getName());
                         exercisesContainer.addView(exercise);
                     }
 
+                    // clicking on exercise list will open select exercise/order exercise activity
                     exercisesContainer.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Log.i(TAG, "card layout clicked. card id: " + cardId);
-                            mWorkoutCardToUpdate = cardId;
+                            mWorkoutCardToUpdate = workoutViewId;
                             Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
                             i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
                             i.putExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES, workoutExercises);
                             startActivityForResult(i, REQUEST_CREATE_WORKOUT);
-                            for (Exercise e : workoutExercises){
-                                Log.i(TAG, "Passing exercises back to create workoutactivity " + e.getName());
-                            }
                         }
                     });
 
                     viewToUpdate.findViewById(R.id.no_exercises_textview).setVisibility(View.GONE);
 
+                } else {
+                    Log.i(TAG, "All exercises have been remove from the workout");
+                    viewToUpdate.findViewById(R.id.no_exercises_textview).setVisibility(View.VISIBLE);
                 }
 
-                Log.i(TAG, "Request from create workout activity received successfully. Data received: " + workoutExercises.size());
+            } else if (resultCode == RESULT_CANCELED) {
+                Log.i(TAG, "Result cancelled");
             }
         }
     }

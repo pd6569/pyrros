@@ -140,15 +140,10 @@ public class CreateWorkoutActivity extends BaseActivity {
     @Override
     public void finish(){
         if (mCreateWorkoutForRoutine){
-            if (mWorkoutExercises.size() > 0){
-                Log.i(TAG, "Finish activity and return to routine, pass exercises");
-                Intent i = new Intent();
-                i.putExtra(EXTRA_WORKOUT_EXERCISES, mWorkoutExercises);
-                this.setResult(RESULT_OK, i);
-            } else {
-                Log.i(TAG, "Finish activity and return to routine, no exercises to pass");
-                this.setResult(RESULT_CANCELED);
-            }
+            Log.i(TAG, "Finish activity and return to routine, pass exercises");
+            Intent i = new Intent();
+            i.putExtra(EXTRA_WORKOUT_EXERCISES, mWorkoutExercises);
+            this.setResult(RESULT_OK, i);
         }
         super.finish();
     }
