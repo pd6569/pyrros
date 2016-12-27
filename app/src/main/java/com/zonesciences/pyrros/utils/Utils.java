@@ -10,10 +10,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.WorkoutActivity;
+import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.User;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -150,6 +156,7 @@ public class Utils {
     public static String getUid(){
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
+
 
     public static FirebaseDatabase getDatabase(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();

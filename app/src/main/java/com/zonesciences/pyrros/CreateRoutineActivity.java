@@ -114,10 +114,14 @@ public class CreateRoutineActivity extends BaseActivity {
     }
 
     public void saveRoutine(){
-        mRoutineNameTextView.setText(mRoutineNameEditText.getText().toString());
+        String routineName = mRoutineNameEditText.getText().toString();
+        mRoutineNameTextView.setText(routineName);
         mRoutineNameTextView.setVisibility(View.VISIBLE);
         mRoutineNameEditText.setVisibility(View.GONE);
         mEditRoutineMenuItem.setVisible(true);
         mSaveRoutineMenuItem.setVisible(false);
+
+        // update routine object
+        mRoutineDetailsFragment.getRoutine().setName(routineName);
     }
 }

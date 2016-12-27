@@ -3,6 +3,7 @@ package com.zonesciences.pyrros.fragment.CreateRoutine;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,13 +16,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Routine;
+import com.zonesciences.pyrros.models.User;
+import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -48,16 +60,27 @@ public class RoutineDetailsFragment extends Fragment {
     /*Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();*/
     Map<Integer, View> mWorkoutViewMap = new HashMap<>();
     Map<Integer, ArrayList<Exercise>> mWorkoutExercisesMap = new HashMap<>();
+    Map<Integer, Workout> mWorkoutIdWorkoutObjectMap = new HashMap<>();
 
     // Track views to update by id
     int mWorkoutCardToUpdate;
 
-    // Data
+    // AutoComplete
     ArrayAdapter mAutoCompleteAdapter;
     String[] mWorkoutNameSuggestions;
 
+    // Data tracking
+    Routine mRoutine;
+    ArrayList<Workout> mWorkouts = new ArrayList<>();
+
     // Listener
     WorkoutChangedListener mWorkoutChangedListener;
+
+    // Firebase and user info
+    DatabaseReference mDatabase;
+    String mUsername;
+    String mUid;
+    String mClientTimeStamp;
 
     public RoutineDetailsFragment() {
         // Required empty public constructor
@@ -69,6 +92,26 @@ public class RoutineDetailsFragment extends Fragment {
         Log.i(TAG, "onCreate");
         mWorkoutNameSuggestions = getResources().getStringArray(R.array.workout_name_suggestions);
         mAutoCompleteAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, mWorkoutNameSuggestions);
+
+        mUid = Utils.getUid();
+        mClientTimeStamp = Utils.getClientTimeStamp(true);
+        mRoutine = new Routine(mUid, mClientTimeStamp, true);
+
+        // Get username and update routine object
+        mDatabase = Utils.getDatabase().getReference();
+        mDatabase.child("users").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                mUsername = user.getUsername();
+                mRoutine.setCreator(mUsername);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -98,6 +141,8 @@ public class RoutineDetailsFragment extends Fragment {
 
     public void addWorkout(){
 
+
+
         // generate unique id for each workoutView
         final View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.item_routine_workout, null);
         final int workoutViewId = View.generateViewId();
@@ -114,6 +159,12 @@ public class RoutineDetailsFragment extends Fragment {
             }
         });
 
+        // Add workout object
+        final Workout workout = new Workout (mUid, mUsername, mClientTimeStamp, workoutTitle, true);
+        mWorkouts.add(workout);
+        mWorkoutIdWorkoutObjectMap.put(workoutViewId, workout);
+
+
         ImageView deleteWorkout = (ImageView) workoutView.findViewById(R.id.routine_workout_delete_imageview);
         deleteWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,6 +175,10 @@ public class RoutineDetailsFragment extends Fragment {
 
                 // Notify activity
                 mWorkoutChangedListener.onWorkoutRemoved();
+
+                // Remove workout from map and list
+                mWorkouts.remove(workout);
+                mWorkoutIdWorkoutObjectMap.remove(workoutViewId);
             }
         });
 
@@ -151,6 +206,7 @@ public class RoutineDetailsFragment extends Fragment {
 
         // Notify activity
         mWorkoutChangedListener.onWorkoutAdded();
+
 
     }
 
@@ -210,9 +266,41 @@ public class RoutineDetailsFragment extends Fragment {
         }
     }
 
+
+    // Getters and setters
+
+    public Routine getRoutine() {
+        return mRoutine;
+    }
+
+    public void setRoutine(Routine routine) {
+        this.mRoutine = routine;
+    }
+
     // Set listener
     public void setOnWorkoutChangedListener(WorkoutChangedListener listener){
         this.mWorkoutChangedListener = listener;
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        Log.i(TAG, "onPause");
+
+        int numWorkouts = mWorkouts.size();
+        mRoutine.setNumWorkouts(numWorkouts);
+
+        Log.i(TAG, "numWorkouts: " + numWorkouts);
+
+        // Write to database
+        Map<String, Object> childUpdates = new HashMap<>();
+
+        String routineKey = mDatabase.child("routines").push().getKey();
+        childUpdates.put("/routines/" + routineKey, mRoutine.toMap());
+        childUpdates.put("/user-routines/" + mUid + "/" + routineKey, mRoutine.toMap());
+        mDatabase.updateChildren(childUpdates);
+
     }
 
 
