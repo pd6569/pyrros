@@ -38,6 +38,7 @@ import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,10 +164,10 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                     }
                 }
 
-                // make sure that any preselected exercises are marked as checked.
+                // make sure that any preselected exercises are marked as checked and ordered.
                 if (mCreateWorkoutForRoutine){
                     if (mPreselectedExercises != null && !mPreselectedExercises.isEmpty()) {
-                        setSelectedExercises(mPreselectedExercises);
+                        setOrderAndSelection(mPreselectedExercises);
                     }
                 }
 
@@ -283,12 +284,14 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
     }
 
     // if exercises are preselected from Routine Activity, then make sure that these are "checked"
-    private void setSelectedExercises(List<Exercise> selectedExercises){
+    private void setOrderAndSelection (List<Exercise> selectedExercises){
         for (Exercise e : mAllExercises){
             for (Exercise selectedExercise : selectedExercises){
                 if (e.getName().equals(selectedExercise.getName())){
                     e.setSelected(true);
+                    e.setOrder(selectedExercise.getOrder());
                     mWorkoutExercises.add(e);
+                    Collections.sort(mWorkoutExercises);
                 }
             }
         }

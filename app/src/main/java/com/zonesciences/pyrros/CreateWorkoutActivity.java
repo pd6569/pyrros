@@ -88,7 +88,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
         if (intent.hasExtra(EXTRA_WORKOUT_EXERCISES)){
             mPreselectedExercises = (ArrayList<Exercise>) intent.getSerializableExtra(EXTRA_WORKOUT_EXERCISES);
-            Log.i(TAG, "Exercises recieved: " + mPreselectedExercises.size());
+            Log.i(TAG, "Exercises received: " + mPreselectedExercises.size());
         }
 
         // Initialise database and get user details
