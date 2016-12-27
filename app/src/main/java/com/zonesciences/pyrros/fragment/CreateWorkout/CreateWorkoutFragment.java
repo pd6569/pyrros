@@ -526,7 +526,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     public void startWorkout(){
 
-        // if activity is being started from CreateRoutineActivity then DO NOT START A WORKOUT!
+        // if activity is being started from RoutineActivity then DO NOT START A WORKOUT!
 
         if (mCreateWorkoutForRoutine) {
             createWorkoutForRoutine();

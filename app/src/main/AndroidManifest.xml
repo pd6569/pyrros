@@ -54,7 +54,7 @@
             <action android:name="com.zonesciences.pyrros.intent.ACTION_RESUME_WORKOUT_ACTIVITY"/>
         </intent-filter>
 
-        <activity android:name=".CreateRoutineActivity">
+        <activity android:name=".RoutineActivity">
         </activity>
     </application>
 

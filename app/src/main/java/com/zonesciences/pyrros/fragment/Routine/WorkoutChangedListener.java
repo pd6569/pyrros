@@ -1,4 +1,4 @@
-package com.zonesciences.pyrros.fragment.CreateRoutine;
+package com.zonesciences.pyrros.fragment.Routine;
 
 /**
  * Created by peter on 27/12/2016.

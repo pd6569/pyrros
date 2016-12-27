@@ -12,14 +12,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
-import com.zonesciences.pyrros.fragment.CreateRoutine.RoutineDetailsFragment;
-import com.zonesciences.pyrros.fragment.CreateRoutine.WorkoutChangedListener;
+import com.zonesciences.pyrros.fragment.Routine.RoutineDetailsFragment;
+import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class CreateRoutineActivity extends BaseActivity {
+public class RoutineActivity extends BaseActivity {
 
     private static final String TAG = "CreateRoutineAcctivity";
 

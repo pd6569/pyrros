@@ -1,4 +1,4 @@
-package com.zonesciences.pyrros.fragment.CreateRoutine;
+package com.zonesciences.pyrros.fragment.Routine;
 
 
 import android.content.Intent;

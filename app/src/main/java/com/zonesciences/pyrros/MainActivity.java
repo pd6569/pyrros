@@ -31,7 +31,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.fragment.DashboardFragment;
 import com.zonesciences.pyrros.fragment.Workouts.WorkoutViewListener;
 import com.zonesciences.pyrros.fragment.Workouts.WorkoutsContainerFragment;
@@ -183,7 +182,7 @@ public class MainActivity extends BaseActivity {
                 }
             });
         } else if (i == R.id.action_create_routine){
-            startActivity(new Intent(this, CreateRoutineActivity.class));
+            startActivity(new Intent(this, RoutineActivity.class));
             return  true;
         }
 
