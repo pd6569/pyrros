@@ -54,9 +54,7 @@ public class RoutineActivity extends BaseActivity {
         setContentView(R.layout.activity_create_routine);
 
         Intent intent = getIntent();
-        Log.i(TAG, "intent: " + intent.hasExtra(EXTRA_FRAGMENT_TO_LOAD));
         mFragmentToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_LOAD, FRAGMENT_CREATE_ROUTINE);
-        Log.i(TAG, "mFragmentToLoad: " + mFragmentToLoad);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_routine);
         setSupportActionBar(mToolbar);
@@ -94,13 +92,18 @@ public class RoutineActivity extends BaseActivity {
         mRoutineNameTextView = (TextView) findViewById(R.id.toolbar_title_create_routine);
         mRoutineNameEditText = (EditText) findViewById(R.id.toolbar_title_edit_text);
 
-        mRoutineNameTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editRoutineName();
+        if (mFragmentToLoad == FRAGMENT_CREATE_ROUTINE) {
 
-            }
-        });
+            mRoutineNameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editRoutineName();
+
+                }
+            });
+        } else {
+            mRoutineNameTextView.setText("Routines");
+        }
 
     }
 
@@ -109,6 +112,12 @@ public class RoutineActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_create_routine, menu);
         mEditRoutineMenuItem = menu.findItem(R.id.action_edit_routine);
         mSaveRoutineMenuItem = menu.findItem(R.id.action_save_routine);
+
+        if (mFragmentToLoad == FRAGMENT_VIEW_ROUTINES){
+            mEditRoutineMenuItem.setVisible(false);
+            mSaveRoutineMenuItem.setVisible(false);
+            menu.findItem(R.id.action_clear_routines).setVisible(false);
+        }
 
         return super.onCreateOptionsMenu(menu);
 
