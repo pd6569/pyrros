@@ -39,6 +39,7 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  */
 
+
     //TODO: BUG - when launching directly into sort workout fragment, "done" arrow does not show on moving/deleting exercises
 
 public class RoutineDetailsFragment extends Fragment {
@@ -82,6 +83,9 @@ public class RoutineDetailsFragment extends Fragment {
     String mUsername;
     String mUid;
     String mClientTimeStamp;
+
+    // Track routine changes in order to write changes to database
+    boolean mRoutineChanged = false;
 
     public RoutineDetailsFragment() {
         // Required empty public constructor
@@ -145,6 +149,8 @@ public class RoutineDetailsFragment extends Fragment {
 
     public void addWorkout(){
 
+        mRoutineChanged = true;
+
         // generate unique id for each workoutView
         final View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.item_routine_workout, null);
         final int workoutViewId = View.generateViewId();
@@ -173,6 +179,8 @@ public class RoutineDetailsFragment extends Fragment {
         deleteWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mRoutineChanged = true;
+
                 Log.i(TAG, "Delete workout card id: " + workoutViewId);
                 mLinearLayoutWorkoutContainer.removeView(workoutView);
                 mWorkoutViewIdExercisesMap.remove(workoutViewId);
@@ -226,6 +234,7 @@ public class RoutineDetailsFragment extends Fragment {
                 Log.i(TAG, "Result OK");
 
                 final ArrayList<Exercise> workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
+                mRoutineChanged = data.getBooleanExtra(CreateWorkoutActivity.EXTRA_EXERCISES_CHANGED, false);
 
                 final int workoutViewId = mWorkoutCardToUpdate;
                 final String workoutKey = mWorkoutKeyToUpdate;
@@ -292,6 +301,10 @@ public class RoutineDetailsFragment extends Fragment {
         this.mRoutine = routine;
     }
 
+    public void setRoutineChanged(boolean routineChanged) {
+        this.mRoutineChanged = routineChanged;
+    }
+
     // Set listener
     public void setOnWorkoutChangedListener(WorkoutChangedListener listener){
         this.mWorkoutChangedListener = listener;
@@ -303,50 +316,53 @@ public class RoutineDetailsFragment extends Fragment {
 
         Log.i(TAG, "onPause");
 
-        // Update routine local object
-        int numWorkouts = mWorkouts.size();
-        mRoutine.setNumWorkouts(numWorkouts);
+        if (mRoutineChanged) {
+            // Update routine local object
+            int numWorkouts = mWorkouts.size();
+            mRoutine.setNumWorkouts(numWorkouts);
 
-        Map <String, Boolean> workoutsInRoutine = new HashMap<>();
-        for (String workoutId : mWorkoutKeys){
-            workoutsInRoutine.put(workoutId, true);
-        }
-        mRoutine.setWorkouts(workoutsInRoutine);
+            Map<String, Boolean> workoutsInRoutine = new HashMap<>();
+            for (String workoutId : mWorkoutKeys) {
+                workoutsInRoutine.put(workoutId, true);
+            }
+            mRoutine.setWorkouts(workoutsInRoutine);
 
-        Log.i(TAG, "numWorkouts: " + numWorkouts);
+            // Clear data before rewriting
+            Map<String, Object> clearRoutineData = new HashMap<>();
+            clearRoutineData.put("/routine-workouts/" + mRoutineKey, null);
+            clearRoutineData.put("/routine-workout-exercises/" + mRoutineKey, null);
+            clearRoutineData.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey, null);
+            clearRoutineData.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey, null);
+            mDatabase.updateChildren(clearRoutineData);
 
-        Log.i(TAG, "mWorkoutKeyExercisesMap: " + mWorkoutKeyExercisesMap.size());
+            // Write to database
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
+            childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
 
+            for (int i = 0; i < mWorkouts.size(); i++) {
 
-        // Remove all exercises before rewriting
-        mDatabase.child("routine-workout-exercises").child(mRoutineKey).setValue(null);
-        mDatabase.child("user-routine-workout-exercises").child(mUid).child(mRoutineKey).setValue(null);
-
-        // Write to database
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
-        childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
-
-        for (int i = 0; i < mWorkouts.size(); i++){
-            childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + mWorkoutKeys.get(i), mWorkouts.get(i).toMap());
-            childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + mWorkoutKeys.get(i), mWorkouts.get(i).toMap());
-
-            if (!mWorkoutKeyExercisesMap.isEmpty()) {
-                List<Exercise> exercises = mWorkoutKeyExercisesMap.get(mWorkoutKeys.get(i));
-                if (exercises != null) {
-                    for (Exercise e : exercises) {
-                        String exerciseKey = e.getName();
-                        e.setExerciseId();
-                        childUpdates.put("/routine-workout-exercises/" + mRoutineKey + "/" + mWorkoutKeys.get(i) + "/" + exerciseKey, e.toMap());
-                        childUpdates.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey + "/" + mWorkoutKeys.get(i) + "/" + exerciseKey, e.toMap());
+                if (!mWorkoutKeyExercisesMap.isEmpty()) {
+                    List<Exercise> exercises = mWorkoutKeyExercisesMap.get(mWorkoutKeys.get(i));
+                    if (exercises != null) {
+                        mWorkouts.get(i).setNumExercises(exercises.size());
+                        for (Exercise e : exercises) {
+                            String exerciseKey = e.getName();
+                            e.setExerciseId();
+                            childUpdates.put("/routine-workout-exercises/" + mRoutineKey + "/" + mWorkoutKeys.get(i) + "/" + exerciseKey, e.toMap());
+                            childUpdates.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey + "/" + mWorkoutKeys.get(i) + "/" + exerciseKey, e.toMap());
+                        }
                     }
                 }
+
+                childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + mWorkoutKeys.get(i), mWorkouts.get(i).toMap());
+                childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + mWorkoutKeys.get(i), mWorkouts.get(i).toMap());
+
             }
+            mDatabase.updateChildren(childUpdates);
 
+            mRoutineChanged = false;
         }
-
-
-        mDatabase.updateChildren(childUpdates);
 
     }
 

@@ -2,9 +2,7 @@ package com.zonesciences.pyrros;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -13,9 +11,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
+import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.fragment.CreateRoutine.RoutineDetailsFragment;
 import com.zonesciences.pyrros.fragment.CreateRoutine.WorkoutChangedListener;
+import com.zonesciences.pyrros.utils.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreateRoutineActivity extends BaseActivity {
 
@@ -99,6 +101,18 @@ public class CreateRoutineActivity extends BaseActivity {
             case R.id.action_save_routine:
                 Log.i(TAG, "Save routine");
                 saveRoutine();
+                return true;
+            case R.id.action_clear_routines:
+                DatabaseReference database = Utils.getDatabase().getReference();
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("/routines/", null);
+                childUpdates.put("/user-routines/", null);
+                childUpdates.put("/routine-workouts/", null);
+                childUpdates.put("/user-routine-workouts/", null);
+                childUpdates.put("/routine-workout-exercises/", null);
+                childUpdates.put("/user-routine-workout-exercises/", null);
+                database.updateChildren(childUpdates);
+
             default:
                 break;
         }
@@ -121,7 +135,8 @@ public class CreateRoutineActivity extends BaseActivity {
         mEditRoutineMenuItem.setVisible(true);
         mSaveRoutineMenuItem.setVisible(false);
 
-        // update routine object
+        // update routine object and notify that change has been made
         mRoutineDetailsFragment.getRoutine().setName(routineName);
+        mRoutineDetailsFragment.setRoutineChanged(true);
     }
 }

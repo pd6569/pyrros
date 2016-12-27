@@ -37,6 +37,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
     // Extras
     public static final String EXTRA_WORKOUT_EXERCISES = "WorkoutExercises";
+    public static final String EXTRA_EXERCISES_CHANGED = "WorkoutExercisesChanged";
 
 
     // Context
@@ -63,6 +64,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
     // Preselected exercises e.g. from Routine Activity
     ArrayList<Exercise> mPreselectedExercises = new ArrayList<>();
+    boolean mExercisesChanged = false;
 
     // Is this activity to create a workout for a routine?
     boolean mCreateWorkoutForRoutine = false;
@@ -143,6 +145,7 @@ public class CreateWorkoutActivity extends BaseActivity {
             Log.i(TAG, "Finish activity and return to routine, pass exercises");
             Intent i = new Intent();
             i.putExtra(EXTRA_WORKOUT_EXERCISES, mWorkoutExercises);
+            i.putExtra(EXTRA_EXERCISES_CHANGED, mExercisesChanged);
             this.setResult(RESULT_OK, i);
         }
         super.finish();
@@ -186,6 +189,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                        mExercisesChanged = true;
                         mWorkoutExercises = exerciseList;
                         boolean isFirstExercise;
                         SortWorkoutFragment sortWorkoutFragment = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
@@ -225,6 +229,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
                     @Override
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
+                        mExercisesChanged = true;
                         mWorkoutExercises = exerciseList;
                         CreateWorkoutFragment createWorkoutFragment = (CreateWorkoutFragment) mFragmentReferenceMap.get(0);
                         createWorkoutFragment.getAdapter().notifyDataSetChanged();

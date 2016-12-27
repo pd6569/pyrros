@@ -17,4 +17,10 @@
         android:icon="@drawable/ic_done_white_24dp"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/action_clear_routines"
+        android:title="Delete routines"
+        android:visible="true"
+        app:showAsAction="never" />
+
 </menu>
