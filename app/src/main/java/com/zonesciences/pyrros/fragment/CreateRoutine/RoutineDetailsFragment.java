@@ -3,7 +3,6 @@ package com.zonesciences.pyrros.fragment.CreateRoutine;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +18,9 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Routine;
 import com.zonesciences.pyrros.models.User;
@@ -32,8 +29,8 @@ import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -59,11 +56,13 @@ public class RoutineDetailsFragment extends Fragment {
     // Maps
     /*Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();*/
     Map<Integer, View> mWorkoutViewMap = new HashMap<>();
-    Map<Integer, ArrayList<Exercise>> mWorkoutExercisesMap = new HashMap<>();
+    Map<Integer, ArrayList<Exercise>> mWorkoutViewIdExercisesMap = new HashMap<>();
+    Map<String, ArrayList<Exercise>> mWorkoutKeyExercisesMap = new HashMap<>();
     Map<Integer, Workout> mWorkoutIdWorkoutObjectMap = new HashMap<>();
 
-    // Track views to update by id
+    // Track workouts to update view and object
     int mWorkoutCardToUpdate;
+    String mWorkoutKeyToUpdate;
 
     // AutoComplete
     ArrayAdapter mAutoCompleteAdapter;
@@ -72,7 +71,7 @@ public class RoutineDetailsFragment extends Fragment {
     // Data tracking
     Routine mRoutine;
     ArrayList<Workout> mWorkouts = new ArrayList<>();
-    ArrayList<String> mWorkoutIds = new ArrayList<>();
+    ArrayList<String> mWorkoutKeys = new ArrayList<>();
 
     // Listener
     WorkoutChangedListener mWorkoutChangedListener;
@@ -146,8 +145,6 @@ public class RoutineDetailsFragment extends Fragment {
 
     public void addWorkout(){
 
-
-
         // generate unique id for each workoutView
         final View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.item_routine_workout, null);
         final int workoutViewId = View.generateViewId();
@@ -166,9 +163,9 @@ public class RoutineDetailsFragment extends Fragment {
 
         // Create unique workout Id and add workout object
         final Workout workout = new Workout (mUid, mUsername, mClientTimeStamp, workoutTitle, true);
-        final String workoutId = mDatabase.child("routine-workouts").push().getKey();
+        final String workoutKey = mDatabase.child("routine-workouts").push().getKey();
         mWorkouts.add(workout);
-        mWorkoutIds.add(workoutId);
+        mWorkoutKeys.add(workoutKey);
         mWorkoutIdWorkoutObjectMap.put(workoutViewId, workout);
 
 
@@ -178,15 +175,16 @@ public class RoutineDetailsFragment extends Fragment {
             public void onClick(View v) {
                 Log.i(TAG, "Delete workout card id: " + workoutViewId);
                 mLinearLayoutWorkoutContainer.removeView(workoutView);
-                mWorkoutExercisesMap.remove(workoutViewId);
+                mWorkoutViewIdExercisesMap.remove(workoutViewId);
 
                 // Notify activity
                 mWorkoutChangedListener.onWorkoutRemoved();
 
                 // Remove workout from map and list and remove workout id
                 mWorkouts.remove(workout);
-                mWorkouts.remove(workoutId);
+                mWorkoutKeys.remove(workoutKey);
                 mWorkoutIdWorkoutObjectMap.remove(workoutViewId);
+                mWorkoutKeyExercisesMap.remove(workoutKey);
             }
         });
 
@@ -198,8 +196,10 @@ public class RoutineDetailsFragment extends Fragment {
             @Override
             public void onClick(View view){
 
-                // when returning to this activity, can update correct workoutView card
+                // when returning to this activity, can update correct workoutView card and correct workoutId
                 mWorkoutCardToUpdate = workoutViewId;
+                mWorkoutKeyToUpdate = workoutKey;
+
                 Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
                 i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
                 startActivityForResult(i, REQUEST_CREATE_WORKOUT);
@@ -228,6 +228,9 @@ public class RoutineDetailsFragment extends Fragment {
                 final ArrayList<Exercise> workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
 
                 final int workoutViewId = mWorkoutCardToUpdate;
+                final String workoutKey = mWorkoutKeyToUpdate;
+
+                Log.i(TAG, "workoutKey: " + workoutKey);
 
                 // get view to update and remove all views
                 View viewToUpdate = mWorkoutViewMap.get(mWorkoutCardToUpdate);
@@ -235,12 +238,14 @@ public class RoutineDetailsFragment extends Fragment {
                 exercisesContainer.removeAllViews();
 
                 // remove previous exercises from map
-                if (mWorkoutExercisesMap.containsKey(workoutViewId)) mWorkoutExercisesMap.remove(workoutViewId);
+                if (mWorkoutViewIdExercisesMap.containsKey(workoutViewId)) mWorkoutViewIdExercisesMap.remove(workoutViewId);
+                if (mWorkoutKeyExercisesMap.containsKey(workoutKey)) mWorkoutKeyExercisesMap.remove(workoutKey);
 
                 if (workoutExercises.size() > 0){
 
                     // add new exercises
-                    mWorkoutExercisesMap.put(workoutViewId, workoutExercises);
+                    mWorkoutViewIdExercisesMap.put(workoutViewId, workoutExercises);
+                    mWorkoutKeyExercisesMap.put(workoutKey, workoutExercises);
 
                     // Generate new views from exercise list and add to container
                     for (int i = 0; i < workoutExercises.size(); i++){
@@ -296,10 +301,19 @@ public class RoutineDetailsFragment extends Fragment {
 
         Log.i(TAG, "onPause");
 
+        // Update routine local object
         int numWorkouts = mWorkouts.size();
         mRoutine.setNumWorkouts(numWorkouts);
 
+        Map <String, Boolean> workoutsInRoutine = new HashMap<>();
+        for (String workoutId : mWorkoutKeys){
+            workoutsInRoutine.put(workoutId, true);
+        }
+        mRoutine.setWorkouts(workoutsInRoutine);
+
         Log.i(TAG, "numWorkouts: " + numWorkouts);
+
+        Log.i(TAG, "mWorkoutKeyExercisesMap: " + mWorkoutKeyExercisesMap.size());
 
         // Write to database
         Map<String, Object> childUpdates = new HashMap<>();
@@ -307,8 +321,21 @@ public class RoutineDetailsFragment extends Fragment {
         childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
 
         for (int i = 0; i < mWorkouts.size(); i++){
-            childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + mWorkoutIds.get(i), mWorkouts.get(i).toMap());
-            childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + mWorkoutIds.get(i), mWorkouts.get(i).toMap());
+            childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + mWorkoutKeys.get(i), mWorkouts.get(i).toMap());
+            childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + mWorkoutKeys.get(i), mWorkouts.get(i).toMap());
+
+            if (!mWorkoutKeyExercisesMap.isEmpty()) {
+                List<Exercise> exercises = mWorkoutKeyExercisesMap.get(mWorkoutKeys.get(i));
+                if (exercises != null) {
+                    for (Exercise e : exercises) {
+                        String exerciseKey = e.getName();
+                        e.setExerciseId();
+                        childUpdates.put("/routine-workout-exercises/" + mRoutineKey + "/" + mWorkoutKeys.get(i) + "/" + exerciseKey, e.toMap());
+                        childUpdates.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey + "/" + mWorkoutKeys.get(i) + "/" + exerciseKey, e.toMap());
+                    }
+                }
+            }
+
         }
         mDatabase.updateChildren(childUpdates);
 
