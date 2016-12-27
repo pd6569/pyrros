@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.fragment.CreateRoutine.RoutineDetailsFragment;
+import com.zonesciences.pyrros.fragment.CreateRoutine.WorkoutChangedListener;
 
 public class CreateRoutineActivity extends BaseActivity {
 
@@ -42,6 +43,22 @@ public class CreateRoutineActivity extends BaseActivity {
 
 
         mRoutineDetailsFragment = new RoutineDetailsFragment();
+        mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
+            @Override
+            public void onWorkoutAdded() {
+                Log.i(TAG, "Workout added");
+            }
+
+            @Override
+            public void onWorkoutRemoved() {
+                Log.i(TAG, "Workout removed");
+            }
+
+            @Override
+            public void onWorkoutChanged() {
+                Log.i(TAG, "Workout changed");
+            }
+        });
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();

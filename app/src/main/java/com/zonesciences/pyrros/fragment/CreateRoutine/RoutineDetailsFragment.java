@@ -29,6 +29,7 @@ import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.RoutineExercisesAdapter;
 import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
@@ -42,6 +43,10 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
+
+    //TODO: BUG - when one exercise remaining, cannot remove when launching CreateWorkoutActivity
+    //TODO: BUG - when launching directly into sort workout fragment, "done" arrow does not show on moving/deleting exercises
+
 public class RoutineDetailsFragment extends Fragment {
 
     private static final String TAG = "RoutineDetailsFragment";
@@ -65,6 +70,9 @@ public class RoutineDetailsFragment extends Fragment {
     // Data
     ArrayAdapter mAutoCompleteAdapter;
     String[] mWorkoutNameSuggestions;
+
+    // Listener
+    WorkoutChangedListener mWorkoutChangedListener;
 
     public RoutineDetailsFragment() {
         // Required empty public constructor
@@ -187,7 +195,10 @@ public class RoutineDetailsFragment extends Fragment {
         }
     }
 
-
+    // Set listener
+    public void setOnWorkoutChangedListener(WorkoutChangedListener listener){
+        this.mWorkoutChangedListener = listener;
+    }
 
 
 }
