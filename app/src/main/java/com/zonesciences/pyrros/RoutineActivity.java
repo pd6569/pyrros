@@ -1,5 +1,6 @@
 package com.zonesciences.pyrros;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.fragment.Routine.RoutineDetailsFragment;
+import com.zonesciences.pyrros.fragment.Routine.ViewRoutinesFragment;
 import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.utils.Utils;
 
@@ -23,7 +25,16 @@ public class RoutineActivity extends BaseActivity {
 
     private static final String TAG = "CreateRoutineAcctivity";
 
+    // Fragment constants
+    public static final int FRAGMENT_CREATE_ROUTINE = 1;
+    public static final int FRAGMENT_VIEW_ROUTINES = 2;
+
+    // Extas
+    public static final String EXTRA_FRAGMENT_TO_LOAD = "RoutineFragmentToLoad";
+
+    // Fragments
     RoutineDetailsFragment mRoutineDetailsFragment;
+    ViewRoutinesFragment mViewRoutineFragment;
 
     // View
     TextView mRoutineNameTextView;
@@ -34,16 +45,25 @@ public class RoutineActivity extends BaseActivity {
     MenuItem mEditRoutineMenuItem;
     MenuItem mSaveRoutineMenuItem;
 
+    // Fragment to load
+    int mFragmentToLoad = FRAGMENT_CREATE_ROUTINE;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_routine);
+
+        Intent intent = getIntent();
+        Log.i(TAG, "intent: " + intent.hasExtra(EXTRA_FRAGMENT_TO_LOAD));
+        mFragmentToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_LOAD, FRAGMENT_CREATE_ROUTINE);
+        Log.i(TAG, "mFragmentToLoad: " + mFragmentToLoad);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_routine);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
+        mViewRoutineFragment = new ViewRoutinesFragment();
         mRoutineDetailsFragment = new RoutineDetailsFragment();
         mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
             @Override
@@ -64,7 +84,11 @@ public class RoutineActivity extends BaseActivity {
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.add(R.id.routine_fragment_container, mRoutineDetailsFragment);
+        if (mFragmentToLoad == FRAGMENT_CREATE_ROUTINE) {
+            ft.add(R.id.routine_fragment_container, mRoutineDetailsFragment);
+        } else if (mFragmentToLoad == FRAGMENT_VIEW_ROUTINES){
+            ft.add(R.id.routine_fragment_container, mViewRoutineFragment);
+        }
         ft.commit();
 
         mRoutineNameTextView = (TextView) findViewById(R.id.toolbar_title_create_routine);

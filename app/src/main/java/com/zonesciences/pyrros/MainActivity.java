@@ -182,7 +182,14 @@ public class MainActivity extends BaseActivity {
                 }
             });
         } else if (i == R.id.action_create_routine){
-            startActivity(new Intent(this, RoutineActivity.class));
+            Intent intent = new Intent(this, RoutineActivity.class);
+            intent.putExtra(RoutineActivity.EXTRA_FRAGMENT_TO_LOAD, RoutineActivity.FRAGMENT_CREATE_ROUTINE);
+            startActivity(intent);
+            return  true;
+        } else if (i == R.id.action_view_routines){
+            Intent intent = new Intent(this, RoutineActivity.class);
+            intent.putExtra(RoutineActivity.EXTRA_FRAGMENT_TO_LOAD, RoutineActivity.FRAGMENT_VIEW_ROUTINES);
+            startActivity(intent);
             return  true;
         }
 

@@ -32,4 +32,10 @@
         android:visible="true"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_view_routines"
+        android:title="View routines"
+        android:visible="true"
+        app:showAsAction="never" />
+
 </menu>
