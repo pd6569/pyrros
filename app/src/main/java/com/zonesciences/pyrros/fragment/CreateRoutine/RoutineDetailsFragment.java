@@ -259,6 +259,8 @@ public class RoutineDetailsFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             mWorkoutCardToUpdate = workoutViewId;
+                            mWorkoutKeyToUpdate = workoutKey;
+
                             Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
                             i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
                             i.putExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES, workoutExercises);
@@ -315,6 +317,11 @@ public class RoutineDetailsFragment extends Fragment {
 
         Log.i(TAG, "mWorkoutKeyExercisesMap: " + mWorkoutKeyExercisesMap.size());
 
+
+        // Remove all exercises before rewriting
+        mDatabase.child("routine-workout-exercises").child(mRoutineKey).setValue(null);
+        mDatabase.child("user-routine-workout-exercises").child(mUid).child(mRoutineKey).setValue(null);
+
         // Write to database
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
@@ -337,6 +344,8 @@ public class RoutineDetailsFragment extends Fragment {
             }
 
         }
+
+
         mDatabase.updateChildren(childUpdates);
 
     }
