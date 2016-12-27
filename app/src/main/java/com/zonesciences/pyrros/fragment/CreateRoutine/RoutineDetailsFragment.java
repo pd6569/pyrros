@@ -122,6 +122,9 @@ public class RoutineDetailsFragment extends Fragment {
                         Log.i(TAG, "Delete workout card id: " + id);
                         mLinearLayoutWorkoutContainer.removeView(workoutView);
                         mWorkoutExercisesMap.remove(id);
+
+                        // Notify activity
+                        mWorkoutChangedListener.onWorkoutRemoved();
                     }
                 });
 
@@ -143,6 +146,9 @@ public class RoutineDetailsFragment extends Fragment {
                 });
 
                 mWorkoutViewMap.put(id, workoutView);
+
+                // Notify activity
+                mWorkoutChangedListener.onWorkoutAdded();
             }
         });
 
