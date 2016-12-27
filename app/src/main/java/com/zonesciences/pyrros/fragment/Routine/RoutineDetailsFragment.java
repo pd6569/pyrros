@@ -88,6 +88,13 @@ public class RoutineDetailsFragment extends Fragment {
     // Track routine changes in order to write changes to database
     boolean mRoutineChanged = false;
 
+    public static RoutineDetailsFragment newInstance() {
+        Bundle args = new Bundle();
+        RoutineDetailsFragment fragment = new RoutineDetailsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public RoutineDetailsFragment() {
         // Required empty public constructor
     }

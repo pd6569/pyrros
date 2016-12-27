@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.fragment.Routine.RoutineDetailsFragment;
 import com.zonesciences.pyrros.fragment.Routine.ViewRoutinesFragment;
 import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
+import com.zonesciences.pyrros.models.Routine;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.HashMap;
@@ -61,8 +62,8 @@ public class RoutineActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        mViewRoutineFragment = new ViewRoutinesFragment();
-        mRoutineDetailsFragment = new RoutineDetailsFragment();
+        mViewRoutineFragment = ViewRoutinesFragment.newInstance();
+        mRoutineDetailsFragment = RoutineDetailsFragment.newInstance();
         mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
             @Override
             public void onWorkoutAdded() {

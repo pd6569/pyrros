@@ -14,6 +14,14 @@ import com.zonesciences.pyrros.R;
  */
 public class ViewRoutinesFragment extends Fragment {
 
+    public static ViewRoutinesFragment newInstance() {
+
+        Bundle args = new Bundle();
+
+        ViewRoutinesFragment fragment = new ViewRoutinesFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public ViewRoutinesFragment() {
         // Required empty public constructor
