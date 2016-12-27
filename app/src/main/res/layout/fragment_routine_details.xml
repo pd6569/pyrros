@@ -26,7 +26,7 @@
                 android:layout_weight="1"/>
 
             <Button
-                android:id="@+id/button_routine_add_day"
+                android:id="@+id/button_routine_add_workout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/routine_add_day"

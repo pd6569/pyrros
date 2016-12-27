@@ -4,11 +4,6 @@ package com.zonesciences.pyrros.fragment.CreateRoutine;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,27 +11,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.zonesciences.pyrros.CreateRoutineActivity;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
-import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
-import com.zonesciences.pyrros.adapters.RoutineExercisesAdapter;
-import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.models.Exercise;
-import com.zonesciences.pyrros.models.Workout;
-import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -55,12 +40,12 @@ public class RoutineDetailsFragment extends Fragment {
     private static final int REQUEST_CREATE_WORKOUT = 1;
 
     // View
-    Button mAddDayButton;
     AutoCompleteTextView mWorkoutNameField;
+    Button mAddWorkoutButton;
     LinearLayout mLinearLayoutWorkoutContainer;
 
     // Maps
-    Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();
+    /*Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();*/
     Map<Integer, View> mWorkoutViewMap = new HashMap<>();
     Map<Integer, ArrayList<Exercise>> mWorkoutExercisesMap = new HashMap<>();
 
@@ -93,69 +78,82 @@ public class RoutineDetailsFragment extends Fragment {
 
         Log.i(TAG, "onCreateView");
 
-        mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);
+
         mWorkoutNameField = (AutoCompleteTextView) rootView.findViewById(R.id.autocomplete_field_workout_name);
         mWorkoutNameField.setAdapter(mAutoCompleteAdapter);
         mWorkoutNameField.setThreshold(1);
 
-        mAddDayButton = (Button) rootView.findViewById(R.id.button_routine_add_day);
-        mAddDayButton.setOnClickListener(new View.OnClickListener(){
+        mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);
+
+        mAddWorkoutButton = (Button) rootView.findViewById(R.id.button_routine_add_workout);
+        mAddWorkoutButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                final View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.cardview_routine_day, null);
-                final int id = View.generateViewId();
-                workoutView.setId(id);
-                TextView title = (TextView) workoutView.findViewById(R.id.routine_workout_item_textview);
-                String workoutTitle = mWorkoutNameField.getText().toString();
-                mWorkoutNameField.setText("");
-                title.setText(workoutTitle);
-                title.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.i(TAG, "Workout clicked. CardView ID: " + workoutView.getId());
-                    }
-                });
-                ImageView deleteWorkout = (ImageView) workoutView.findViewById(R.id.routine_workout_delete_imageview);
-                deleteWorkout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.i(TAG, "Delete workout card id: " + id);
-                        mLinearLayoutWorkoutContainer.removeView(workoutView);
-                        mWorkoutExercisesMap.remove(id);
-
-                        // Notify activity
-                        mWorkoutChangedListener.onWorkoutRemoved();
-                    }
-                });
-
-                mWorkoutViewNameMap.put(id, workoutTitle);
-
-                mLinearLayoutWorkoutContainer.addView(workoutView);
-
-                TextView noExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
-                noExercisesTextView.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view){
-                        mWorkoutCardToUpdate = id;
-                        Log.i(TAG, "No exercises, open exercise selection. Card Id" + mWorkoutCardToUpdate);
-                        Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
-                        i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
-                        startActivityForResult(i, REQUEST_CREATE_WORKOUT);
-                    }
-                });
-
-                mWorkoutViewMap.put(id, workoutView);
-
-                // Notify activity
-                mWorkoutChangedListener.onWorkoutAdded();
+                addWorkout();
             }
         });
 
-
-
         return rootView;
     }
+
+    public void addWorkout(){
+
+        // generate unique id for each workoutView
+        final View workoutView = LayoutInflater.from(getContext()).inflate(R.layout.item_routine_workout, null);
+        final int workoutViewId = View.generateViewId();
+        workoutView.setId(workoutViewId);
+
+        String workoutTitle = mWorkoutNameField.getText().toString();
+        TextView title = (TextView) workoutView.findViewById(R.id.routine_workout_item_textview);
+        mWorkoutNameField.setText("");
+        title.setText(workoutTitle);
+        title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "Workout clicked. CardView ID: " + workoutView.getId());
+            }
+        });
+
+        ImageView deleteWorkout = (ImageView) workoutView.findViewById(R.id.routine_workout_delete_imageview);
+        deleteWorkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "Delete workout card id: " + workoutViewId);
+                mLinearLayoutWorkoutContainer.removeView(workoutView);
+                mWorkoutExercisesMap.remove(workoutViewId);
+
+                // Notify activity
+                mWorkoutChangedListener.onWorkoutRemoved();
+            }
+        });
+
+                /*mWorkoutViewNameMap.put(workoutId, workoutTitle);*/
+
+        TextView noExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
+        noExercisesTextView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view){
+
+                // when returning to this activity, can update correct workoutView card
+                mWorkoutCardToUpdate = workoutViewId;
+                Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
+                i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
+                startActivityForResult(i, REQUEST_CREATE_WORKOUT);
+            }
+        });
+
+        // add new workout view to container at top of layout
+        mLinearLayoutWorkoutContainer.addView(workoutView, 0);
+
+        // track specific workoutView by workoutViewId
+        mWorkoutViewMap.put(workoutViewId, workoutView);
+
+        // Notify activity
+        mWorkoutChangedListener.onWorkoutAdded();
+
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
