@@ -39,7 +39,6 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  */
 
-
     //TODO: BUG - when launching directly into sort workout fragment, "done" arrow does not show on moving/deleting exercises
 
 public class RoutineDetailsFragment extends Fragment {
@@ -55,7 +54,6 @@ public class RoutineDetailsFragment extends Fragment {
     LinearLayout mLinearLayoutWorkoutContainer;
 
     // Maps
-    /*Map<Integer,  String> mWorkoutViewNameMap = new HashMap<>();*/
     Map<Integer, View> mWorkoutViewMap = new HashMap<>();
     Map<Integer, ArrayList<Exercise>> mWorkoutViewIdExercisesMap = new HashMap<>();
     Map<String, ArrayList<Exercise>> mWorkoutKeyExercisesMap = new HashMap<>();
@@ -103,12 +101,13 @@ public class RoutineDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
+
         mWorkoutNameSuggestions = getResources().getStringArray(R.array.workout_name_suggestions);
         mAutoCompleteAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, mWorkoutNameSuggestions);
 
         mUid = Utils.getUid();
         mClientTimeStamp = Utils.getClientTimeStamp(true);
-        mRoutine = new Routine(mUid, mClientTimeStamp, true);
+
 
         // Get username and update routine object
         mDatabase = Utils.getDatabase().getReference();
@@ -126,7 +125,8 @@ public class RoutineDetailsFragment extends Fragment {
             }
         });
 
-        // Generate unique routines key
+        // Generate unique routines key if new routine
+        mRoutine = new Routine(mUid, mClientTimeStamp, true);
         mRoutineKey = mDatabase.child("routines").push().getKey();
     }
 
