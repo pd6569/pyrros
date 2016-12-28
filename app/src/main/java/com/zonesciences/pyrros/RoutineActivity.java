@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.fragment.Routine.RoutineDetailsFragment;
 import com.zonesciences.pyrros.fragment.Routine.RoutineLoadListener;
+import com.zonesciences.pyrros.fragment.Routine.RoutineSelectedListener;
 import com.zonesciences.pyrros.fragment.Routine.ViewRoutinesFragment;
 import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.models.Routine;
@@ -80,24 +81,23 @@ public class RoutineActivity extends BaseActivity {
                 mRoutinesList = routinesList;
                 Log.i(TAG, "Complete loading routines. Number of routines: " + mRoutinesList.size());
             }
-        });
-        mRoutineDetailsFragment = RoutineDetailsFragment.newInstance();
-        mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
+        }, new RoutineSelectedListener() {
             @Override
-            public void onWorkoutAdded() {
-                Log.i(TAG, "Workout added");
-            }
+            public void onRoutineSelected(Routine routine) {
+                Log.i(TAG, "Routine selected: " + routine.getName() + " Number of workouts: " + routine.getWorkoutsList().size());
 
-            @Override
-            public void onWorkoutRemoved() {
-                Log.i(TAG, "Workout removed");
-            }
-
-            @Override
-            public void onWorkoutChanged() {
-                Log.i(TAG, "Workout changed");
+                if (mRoutineDetailsFragment == null){
+                    createRoutineDetailFragment();
+                }
+                mRoutineDetailsFragment.setRoutine(routine);
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.replace(R.id.routine_fragment_container, mRoutineDetailsFragment).addToBackStack(null).commit();
             }
         });
+
+        createRoutineDetailFragment();
+
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
@@ -124,6 +124,25 @@ public class RoutineActivity extends BaseActivity {
             mRoutineNameTextView.setText("Routines");
         }
 
+    }
+    public void createRoutineDetailFragment(){
+        mRoutineDetailsFragment = RoutineDetailsFragment.newInstance();
+        mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
+            @Override
+            public void onWorkoutAdded() {
+                Log.i(TAG, "Workout added");
+            }
+
+            @Override
+            public void onWorkoutRemoved() {
+                Log.i(TAG, "Workout removed");
+            }
+
+            @Override
+            public void onWorkoutChanged() {
+                Log.i(TAG, "Workout changed");
+            }
+        });
     }
 
     @Override

@@ -4,6 +4,8 @@ package com.zonesciences.pyrros.fragment.Routine;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.RoutineWorkoutsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Routine;
 import com.zonesciences.pyrros.models.User;
@@ -52,6 +55,10 @@ public class RoutineDetailsFragment extends Fragment {
     AutoCompleteTextView mWorkoutNameField;
     Button mAddWorkoutButton;
     LinearLayout mLinearLayoutWorkoutContainer;
+
+    // Recycler
+    RecyclerView mRecycler;
+    RoutineWorkoutsAdapter mAdapter;
 
     // Maps
     Map<Integer, View> mWorkoutViewMap = new HashMap<>();
@@ -126,8 +133,10 @@ public class RoutineDetailsFragment extends Fragment {
         });
 
         // Generate unique routines key if new routine
-        mRoutine = new Routine(mUid, mClientTimeStamp, true);
-        mRoutineKey = mDatabase.child("routines").push().getKey();
+        if (mRoutine == null) {
+            mRoutine = new Routine(mUid, mClientTimeStamp, true);
+            mRoutineKey = mDatabase.child("routines").push().getKey();
+        }
     }
 
     @Override
@@ -142,7 +151,7 @@ public class RoutineDetailsFragment extends Fragment {
         mWorkoutNameField.setAdapter(mAutoCompleteAdapter);
         mWorkoutNameField.setThreshold(1);
 
-        mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);
+        /*mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);*/
 
         mAddWorkoutButton = (Button) rootView.findViewById(R.id.button_routine_add_workout);
         mAddWorkoutButton.setOnClickListener(new View.OnClickListener(){
@@ -151,6 +160,15 @@ public class RoutineDetailsFragment extends Fragment {
                 addWorkout();
             }
         });
+
+        mRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_routine_workouts);
+        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        if (mRoutine.getWorkoutsList() != null) {
+            Log.i(TAG, "Has workouts, set adapter");
+            mAdapter = new RoutineWorkoutsAdapter(getContext(), mRoutine.getWorkoutsList());
+            mRecycler.setAdapter(mAdapter);
+        }
 
         return rootView;
     }

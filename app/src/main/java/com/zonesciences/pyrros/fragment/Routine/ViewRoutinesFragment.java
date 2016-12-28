@@ -43,15 +43,17 @@ public class ViewRoutinesFragment extends Fragment {
     RecyclerView mRecycler;
 
 
-    // Listener
+    // Listeners
     RoutineLoadListener mLoadListener;
+    RoutineSelectedListener mRoutineSelectedListener;
 
-    public static ViewRoutinesFragment newInstance(RoutineLoadListener routineLoadListener) {
+    public static ViewRoutinesFragment newInstance(RoutineLoadListener routineLoadListener, RoutineSelectedListener routineSelectedListener) {
 
         Bundle args = new Bundle();
         ViewRoutinesFragment fragment = new ViewRoutinesFragment();
         fragment.setArguments(args);
         fragment.setRoutineLoadListener(routineLoadListener);
+        fragment.setRoutineSelectedListener(routineSelectedListener);
         return fragment;
     }
 
@@ -141,7 +143,15 @@ public class ViewRoutinesFragment extends Fragment {
                         }
                     };
                     mLoadListener.onLoadComplete(mRoutines);
-                    mRecycler.setAdapter(new RoutinesAdapter(getContext(), mRoutines));
+                    RoutinesAdapter adapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
+                        @Override
+                        public void onRoutineSelected(Routine routine) {
+                            Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());
+                            mRoutineSelectedListener.onRoutineSelected(routine);
+                        }
+                    });
+
+                    mRecycler.setAdapter(adapter);
                 }
             }
 
@@ -156,6 +166,10 @@ public class ViewRoutinesFragment extends Fragment {
     // Load listener
     public void setRoutineLoadListener (RoutineLoadListener listener){
         this.mLoadListener = listener;
+    }
+
+    public void setRoutineSelectedListener (RoutineSelectedListener listener){
+        this.mRoutineSelectedListener = listener;
     }
 
 }

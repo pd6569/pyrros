@@ -1,50 +1,53 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context="com.zonesciences.pyrros.fragment.Routine.RoutineDetailsFragment">
 
     <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:orientation="vertical"
-                  tools:context="com.zonesciences.pyrros.fragment.Routine.RoutineDetailsFragment">
+        android:id="@+id/layout_add_workout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <AutoCompleteTextView
+            android:id="@+id/autocomplete_field_workout_name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:hint="Workout name"
+            android:textSize="18dp"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:inputType="textAutoComplete"
+            android:layout_weight="1"/>
 
-            <AutoCompleteTextView
-                android:id="@+id/autocomplete_field_workout_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="Workout name"
-                android:textSize="18dp"
-                android:layout_margin="10dp"
-                android:padding="10dp"
-                android:inputType="textAutoComplete"
-                android:layout_weight="1"/>
-
-            <Button
-                android:id="@+id/button_routine_add_workout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/routine_add_day"
-                android:layout_gravity="center"
-                android:padding="10dp"/>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/linear_layout_routine_workout_container"
-            android:animateLayoutChanges="true"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/button_routine_add_workout"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-        </LinearLayout>
+            android:text="@string/routine_add_day"
+            android:layout_gravity="center"
+            android:padding="10dp"/>
 
     </LinearLayout>
 
-</ScrollView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_routine_workouts"
+        android:layout_below="@+id/layout_add_workout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_routine_workout">
+    </android.support.v7.widget.RecyclerView>
+
+    <!--<LinearLayout
+        android:id="@+id/linear_layout_routine_workout_container"
+        android:animateLayoutChanges="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    </LinearLayout>-->
+
+</RelativeLayout>
+
