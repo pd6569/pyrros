@@ -4,6 +4,8 @@ package com.zonesciences.pyrros.fragment.Routine;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.BaseActivity;
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.adapters.RoutinesAdapter;
 import com.zonesciences.pyrros.models.Routine;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
@@ -35,6 +38,10 @@ public class ViewRoutinesFragment extends Fragment {
 
     // Routine objects
     List<Routine> mRoutines = new ArrayList<>();
+
+    // RecyclerView
+    RecyclerView mRecycler;
+
 
     // Listener
     RoutineLoadListener mLoadListener;
@@ -61,6 +68,25 @@ public class ViewRoutinesFragment extends Fragment {
         mUid = Utils.getUid();
 
         mLoadListener.onLoadStart();
+        loadRoutines();
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_view_routines, container, false);
+        Log.i(TAG, "onCreateView");
+
+        mRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_view_routines);
+        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecycler.setHasFixedSize(true);
+
+        return rootView;
+    }
+
+    private void loadRoutines(){
         mDatabase.child("user-routines").child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -96,7 +122,6 @@ public class ViewRoutinesFragment extends Fragment {
 
             }
         });
-
     }
 
     private void createWorkouts(String routineKey, String workoutKey, final Routine routine, final boolean lastWorkout){
@@ -116,6 +141,7 @@ public class ViewRoutinesFragment extends Fragment {
                         }
                     };
                     mLoadListener.onLoadComplete(mRoutines);
+                    mRecycler.setAdapter(new RoutinesAdapter(getContext(), mRoutines));
                 }
             }
 
@@ -125,15 +151,6 @@ public class ViewRoutinesFragment extends Fragment {
             }
         });
 
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_view_routines, container, false);
-
-        return rootView;
     }
 
     // Load listener
