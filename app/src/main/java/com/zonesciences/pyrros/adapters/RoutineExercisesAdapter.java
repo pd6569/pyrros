@@ -50,7 +50,7 @@ public class RoutineExercisesAdapter extends RecyclerView.Adapter<RoutineExercis
 
     @Override
     public void onBindViewHolder(RoutineExercisesAdapter.ViewHolder holder, int position) {
-        Log.i(TAG, "onBindViewHolder. exercise name: " + mWorkoutExercises.get(position).getName());
+        Log.i(TAG, "onBindViewHolder. exercise name: " + mWorkoutExercises);
         holder.exerciseName.setText(mWorkoutExercises.get(position).getName());
     }
 

@@ -10,7 +10,7 @@
         android:id="@+id/item_view_routines"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?selectableItemBackground"
@@ -31,6 +31,22 @@
             android:gravity="center"
             android:layout_weight="8"
             android:text="Routine name"/>
+
+        <View
+            android:id="@+id/workout_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/divider">
+        </View>
+
+        <LinearLayout
+            android:id="@+id/linear_layout_routine_view_workouts_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
 
 
     </LinearLayout>

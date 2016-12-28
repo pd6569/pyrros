@@ -5,10 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Routine;
+import com.zonesciences.pyrros.models.Workout;
 
 import java.util.List;
 
@@ -24,11 +26,13 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView routineName;
+        LinearLayout workoutsContainer;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             routineName = (TextView) itemView.findViewById(R.id.view_routines_title_textview);
+            workoutsContainer = (LinearLayout) itemView.findViewById(R.id.linear_layout_routine_view_workouts_container);
         }
     }
 
@@ -54,6 +58,12 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.ViewHo
             routineName = mRoutines.get(position).getName();
         };
         holder.routineName.setText(routineName);
+        holder.workoutsContainer.removeAllViews();
+        for (Workout w : mRoutines.get(position).getWorkoutsList()){
+            TextView workoutName = new TextView(mContext);
+            workoutName.setText(w.getName());
+            holder.workoutsContainer.addView(workoutName);
+        }
     }
 
     @Override
