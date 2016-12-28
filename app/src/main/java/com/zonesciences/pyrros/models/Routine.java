@@ -2,6 +2,7 @@ package com.zonesciences.pyrros.models;
 
 import com.google.firebase.database.Exclude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class Routine {
     public Map<String, Boolean> users = new HashMap<>();
     public Map<String, Boolean> workouts = new HashMap<>();
     public int numWorkouts;
+    public List<Workout> workoutsList;
 
     public Routine(){
 
@@ -147,5 +149,23 @@ public class Routine {
     @Exclude
     public void setNumWorkouts(int numWorkouts) {
         this.numWorkouts = numWorkouts;
+    }
+
+    @Exclude
+    public List<Workout> getWorkoutsList() {
+        return workoutsList;
+    }
+
+    @Exclude
+    public void setWorkoutsList(List<Workout> workoutsList) {
+        this.workoutsList = workoutsList;
+    }
+
+    @Exclude
+    public void addWorkoutToList(Workout workout){
+        if (workoutsList == null){
+            workoutsList = new ArrayList<>();
+        }
+        workoutsList.add(workout);
     }
 }
