@@ -43,6 +43,7 @@ public class ViewRoutinesFragment extends Fragment {
 
     // RecyclerView
     RecyclerView mRecycler;
+    RoutinesAdapter mAdapter;
 
 
     // Listeners
@@ -86,8 +87,35 @@ public class ViewRoutinesFragment extends Fragment {
         mRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_view_routines);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecycler.setHasFixedSize(true);
+        if (mAdapter != null){
+            mRecycler.setAdapter(mAdapter);
+        }
 
         return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i(TAG, "onPause");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i(TAG, "onStart");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop");
     }
 
     private void loadRoutines(){
@@ -177,7 +205,7 @@ public class ViewRoutinesFragment extends Fragment {
                         Log.i(TAG, "All exercises added to workouts. Loading complete");
 
                         mLoadListener.onLoadComplete(mRoutines);
-                        RoutinesAdapter adapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
+                        mAdapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
                             @Override
                             public void onRoutineSelected(Routine routine) {
                                 Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());
@@ -185,7 +213,7 @@ public class ViewRoutinesFragment extends Fragment {
                             }
                         });
 
-                        mRecycler.setAdapter(adapter);
+                        mRecycler.setAdapter(mAdapter);
                     }
                 }
                 Collections.sort(exercisesList);

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.RoutineActivity;
+import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 
@@ -31,8 +32,9 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
     Context mActivity;
     List<Workout> mWorkouts;
 
-    // Listener
+    // Listeners
     AddExerciseListener mAddExerciseListener;
+    WorkoutChangedListener mWorkoutChangedListener;
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -45,11 +47,19 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
             super(itemView);
             workoutTitleTextView = (TextView) itemView.findViewById(R.id.routine_workout_item_textview);
             deleteWorkoutImageView = (ImageView) itemView.findViewById(R.id.routine_workout_delete_imageview);
+            deleteWorkoutImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mWorkouts.remove(getAdapterPosition());
+                    notifyItemRemoved(getAdapterPosition());
+                    mWorkoutChangedListener.onWorkoutRemoved();
+                }
+            });
             noExercisesTextView = (TextView) itemView.findViewById(R.id.no_exercises_textview);
             noExercisesTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mAddExerciseListener.onAddFirstExercises();
+                    mAddExerciseListener.onAddFirstExercises(getAdapterPosition());
                 }
             });
 
@@ -58,16 +68,17 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
                 @Override
                 public void onClick(View v) {
                     Log.i(TAG, "Clicked workout: " + mWorkouts.get(getAdapterPosition()).getName() + " Position: " + getAdapterPosition());
-                    mAddExerciseListener.onChangeExistingExercises();
+                    mAddExerciseListener.onChangeExistingExercises(getAdapterPosition());
                 }
             });
         }
     }
 
-    public RoutineWorkoutsAdapter(Activity activity, List<Workout> workouts, AddExerciseListener listener){
+    public RoutineWorkoutsAdapter(Activity activity, List<Workout> workouts, AddExerciseListener addExerciseListener, WorkoutChangedListener workoutChangedListener){
         this.mActivity = activity;
         this.mWorkouts = workouts;
-        this.mAddExerciseListener = listener;
+        this.mAddExerciseListener = addExerciseListener;
+        this.mWorkoutChangedListener = workoutChangedListener;
     }
 
     @Override
@@ -82,13 +93,20 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
         holder.workoutTitleTextView.setText(mWorkouts.get(position).getName());
         holder.exercisesContainerLinearLayout.removeAllViews();
         List<Exercise> exercises = mWorkouts.get(position).getExercises();
+
         if (exercises != null) {
-            holder.noExercisesTextView.setVisibility(View.GONE);
+            if (exercises.isEmpty()) {
+                holder.noExercisesTextView.setVisibility(View.VISIBLE);
+            } else {
+                holder.noExercisesTextView.setVisibility(View.GONE);
+            }
             for (Exercise e : exercises){
                 TextView exerciseName = new TextView(mActivity);
                 exerciseName.setText(e.getName());
                 holder.exercisesContainerLinearLayout.addView(exerciseName);
             }
+        } else {
+            holder.noExercisesTextView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -97,9 +115,20 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
         return mWorkouts.size();
     }
 
+    // Getters and setters
+
+
+    public List<Workout> getWorkouts() {
+        return mWorkouts;
+    }
+
+    public void setWorkouts(List<Workout> workouts) {
+        this.mWorkouts = workouts;
+    }
+
     // Listener
     public interface AddExerciseListener {
-        void onAddFirstExercises();
-        void onChangeExistingExercises();
+        void onAddFirstExercises(int workoutPositionToUpdate);
+        void onChangeExistingExercises(int workoutPositionToUpdate);
     }
 }

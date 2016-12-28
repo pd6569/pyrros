@@ -28,6 +28,7 @@ public class Workout {
     public Map<String, Boolean> users = new HashMap<>();
     public List<Exercise> exercises;
     public int numExercises;
+    public String workoutKey;
 
     public Workout(){
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
@@ -53,7 +54,7 @@ public class Workout {
         result.put("userCount", userCount);
         result.put("users", users);
         result.put("numExercises", numExercises);
-
+        result.put("workoutKey", workoutKey);
         return result;
     }
     // [END post_to_map]
@@ -132,6 +133,16 @@ public class Workout {
     @Exclude
     public void setClientTimeStamp(String clientTimeStamp) {
         this.clientTimeStamp = clientTimeStamp;
+    }
+
+    @Exclude
+    public String getWorkoutKey() {
+        return workoutKey;
+    }
+
+    @Exclude
+    public void setWorkoutKey(String workoutKey) {
+        this.workoutKey = workoutKey;
     }
 }
 //[END workout_class]

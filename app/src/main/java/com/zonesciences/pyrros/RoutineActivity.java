@@ -68,33 +68,7 @@ public class RoutineActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        mViewRoutineFragment = ViewRoutinesFragment.newInstance(new RoutineLoadListener() {
-            @Override
-            public void onLoadStart() {
-                Log.i(TAG, "Start loading routines");
-                showProgressDialog();
-            }
-
-            @Override
-            public void onLoadComplete(List<Routine> routinesList) {
-                hideProgressDialog();
-                mRoutinesList = routinesList;
-                Log.i(TAG, "Complete loading routines. Number of routines: " + mRoutinesList.size());
-            }
-        }, new RoutineSelectedListener() {
-            @Override
-            public void onRoutineSelected(Routine routine) {
-                Log.i(TAG, "Routine selected: " + routine.getName() + " Number of workouts: " + routine.getWorkoutsList().size());
-
-                if (mRoutineDetailsFragment == null){
-                    createRoutineDetailFragment();
-                }
-                mRoutineDetailsFragment.setRoutine(routine);
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.replace(R.id.routine_fragment_container, mRoutineDetailsFragment).addToBackStack(null).commit();
-            }
-        });
+        createViewRoutinesFragment();
 
         createRoutineDetailFragment();
 
@@ -125,7 +99,7 @@ public class RoutineActivity extends BaseActivity {
         }
 
     }
-    public void createRoutineDetailFragment(){
+    private void createRoutineDetailFragment(){
         mRoutineDetailsFragment = RoutineDetailsFragment.newInstance();
         mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
             @Override
@@ -141,6 +115,36 @@ public class RoutineActivity extends BaseActivity {
             @Override
             public void onWorkoutChanged() {
                 Log.i(TAG, "Workout changed");
+            }
+        });
+    }
+
+    private void createViewRoutinesFragment(){
+        mViewRoutineFragment = ViewRoutinesFragment.newInstance(new RoutineLoadListener() {
+            @Override
+            public void onLoadStart() {
+                Log.i(TAG, "Start loading routines");
+                showProgressDialog();
+            }
+
+            @Override
+            public void onLoadComplete(List<Routine> routinesList) {
+                hideProgressDialog();
+                mRoutinesList = routinesList;
+                Log.i(TAG, "Complete loading routines. Number of routines: " + mRoutinesList.size());
+            }
+        }, new RoutineSelectedListener() {
+            @Override
+            public void onRoutineSelected(Routine routine) {
+                Log.i(TAG, "Routine selected: " + routine.getName() + " Number of workouts: " + routine.getWorkoutsList().size());
+
+                if (mRoutineDetailsFragment == null){
+                    createRoutineDetailFragment();
+                }
+                mRoutineDetailsFragment.setRoutine(routine);
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.replace(R.id.routine_fragment_container, mRoutineDetailsFragment).addToBackStack(null).commit();
             }
         });
     }
