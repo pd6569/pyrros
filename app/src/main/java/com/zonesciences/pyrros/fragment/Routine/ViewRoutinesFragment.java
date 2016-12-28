@@ -13,6 +13,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.BaseActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.models.Routine;
 import com.zonesciences.pyrros.models.Workout;
@@ -35,12 +36,15 @@ public class ViewRoutinesFragment extends Fragment {
     // Routine objects
     List<Routine> mRoutines = new ArrayList<>();
 
-    public static ViewRoutinesFragment newInstance() {
+    // Listener
+    RoutineLoadListener mLoadListener;
+
+    public static ViewRoutinesFragment newInstance(RoutineLoadListener routineLoadListener) {
 
         Bundle args = new Bundle();
-
         ViewRoutinesFragment fragment = new ViewRoutinesFragment();
         fragment.setArguments(args);
+        fragment.setRoutineLoadListener(routineLoadListener);
         return fragment;
     }
 
@@ -56,6 +60,7 @@ public class ViewRoutinesFragment extends Fragment {
         mDatabase = Utils.getDatabase().getReference();
         mUid = Utils.getUid();
 
+        mLoadListener.onLoadStart();
         mDatabase.child("user-routines").child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -110,6 +115,7 @@ public class ViewRoutinesFragment extends Fragment {
                             Log.i(TAG, "Workout name: " + routine.getWorkoutsList().get(i).getName());
                         }
                     };
+                    mLoadListener.onLoadComplete(mRoutines);
                 }
             }
 
@@ -128,6 +134,11 @@ public class ViewRoutinesFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_view_routines, container, false);
 
         return rootView;
+    }
+
+    // Load listener
+    public void setRoutineLoadListener (RoutineLoadListener listener){
+        this.mLoadListener = listener;
     }
 
 }

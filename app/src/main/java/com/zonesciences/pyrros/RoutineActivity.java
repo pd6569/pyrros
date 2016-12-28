@@ -14,12 +14,14 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.zonesciences.pyrros.fragment.Routine.RoutineDetailsFragment;
+import com.zonesciences.pyrros.fragment.Routine.RoutineLoadListener;
 import com.zonesciences.pyrros.fragment.Routine.ViewRoutinesFragment;
 import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.models.Routine;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RoutineActivity extends BaseActivity {
@@ -49,6 +51,9 @@ public class RoutineActivity extends BaseActivity {
     // Fragment to load
     int mFragmentToLoad = FRAGMENT_CREATE_ROUTINE;
 
+    // Routines
+    List<Routine> mRoutinesList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +67,20 @@ public class RoutineActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        mViewRoutineFragment = ViewRoutinesFragment.newInstance();
+        mViewRoutineFragment = ViewRoutinesFragment.newInstance(new RoutineLoadListener() {
+            @Override
+            public void onLoadStart() {
+                Log.i(TAG, "Start loading routines");
+                showProgressDialog();
+            }
+
+            @Override
+            public void onLoadComplete(List<Routine> routinesList) {
+                hideProgressDialog();
+                mRoutinesList = routinesList;
+                Log.i(TAG, "Complete loading routines. Number of routines: " + mRoutinesList.size());
+            }
+        });
         mRoutineDetailsFragment = RoutineDetailsFragment.newInstance();
         mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
             @Override
