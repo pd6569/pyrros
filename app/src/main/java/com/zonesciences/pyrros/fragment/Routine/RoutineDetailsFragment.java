@@ -136,6 +136,8 @@ public class RoutineDetailsFragment extends Fragment {
         if (mRoutine == null) {
             mRoutine = new Routine(mUid, mClientTimeStamp, true);
             mRoutineKey = mDatabase.child("routines").push().getKey();
+        } else {
+            mRoutineKey = mRoutine.getRoutineKey();
         }
     }
 
@@ -162,7 +164,9 @@ public class RoutineDetailsFragment extends Fragment {
         });
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_routine_workouts);
-        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRecycler.setLayoutManager(layoutManager);
+
 
         if (mRoutine.getWorkoutsList() != null) {
             Log.i(TAG, "Has workouts, set adapter");
@@ -175,7 +179,18 @@ public class RoutineDetailsFragment extends Fragment {
 
     public void addWorkout(){
 
-        mRoutineChanged = true;
+        String workoutTitle = mWorkoutNameField.getText().toString();
+        Workout workout = new Workout (mUid, mUsername, mClientTimeStamp, workoutTitle, true);
+        mRoutine.addWorkoutToList(workout);
+
+        if (mAdapter == null){
+            mAdapter = new RoutineWorkoutsAdapter(getContext(), mRoutine.getWorkoutsList());
+            mRecycler.setAdapter(mAdapter);
+        }
+        mAdapter.notifyItemInserted(0);
+        mRecycler.smoothScrollToPosition(0);
+
+        /*mRoutineChanged = true;
         mNumWorkouts++;
         Log.i(TAG, "Workout added: " + mNumWorkouts + " workouts");
 
@@ -225,7 +240,7 @@ public class RoutineDetailsFragment extends Fragment {
             }
         });
 
-                /*mWorkoutViewNameMap.put(workoutId, workoutTitle);*/
+                *//*mWorkoutViewNameMap.put(workoutId, workoutTitle);*//*
 
         TextView noExercisesTextView = (TextView) workoutView.findViewById(R.id.no_exercises_textview);
         noExercisesTextView.setOnClickListener(new View.OnClickListener() {
@@ -250,7 +265,7 @@ public class RoutineDetailsFragment extends Fragment {
         mWorkoutViewMap.put(workoutViewId, workoutView);
 
         // Notify activity
-        mWorkoutChangedListener.onWorkoutAdded();
+        mWorkoutChangedListener.onWorkoutAdded();*/
 
 
     }

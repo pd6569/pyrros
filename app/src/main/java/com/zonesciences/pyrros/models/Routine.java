@@ -15,6 +15,7 @@ public class Routine {
 
     //variable names must match key name in hashmap method below
     public String uid;
+    public String routineKey;
     public String creator;
     public String name;
     public Boolean shared;
@@ -166,6 +167,16 @@ public class Routine {
         if (workoutsList == null){
             workoutsList = new ArrayList<>();
         }
-        workoutsList.add(workout);
+        workoutsList.add(0, workout);
+    }
+
+    @Exclude
+    public String getRoutineKey() {
+        return routineKey;
+    }
+
+    @Exclude
+    public void setRoutineKey(String routineKey) {
+        this.routineKey = routineKey;
     }
 }

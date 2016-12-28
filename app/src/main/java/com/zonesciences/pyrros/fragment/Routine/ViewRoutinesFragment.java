@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.BaseActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.RoutinesAdapter;
+import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Routine;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
@@ -36,7 +37,7 @@ public class ViewRoutinesFragment extends Fragment {
     DatabaseReference mDatabase;
     String mUid;
 
-    // Routine objects
+    // Routines
     List<Routine> mRoutines = new ArrayList<>();
 
     // RecyclerView
@@ -101,6 +102,7 @@ public class ViewRoutinesFragment extends Fragment {
                     Log.i(TAG, "Num routines: " + numRoutines + " current routine: " + currentRoutine);
                     String routineKey = routine.getKey();
                     Routine r = routine.getValue(Routine.class);
+                    r.setRoutineKey(routineKey);
                     mRoutines.add(r);
 
                     int numWorkouts = r.getWorkouts().size();
@@ -126,13 +128,14 @@ public class ViewRoutinesFragment extends Fragment {
         });
     }
 
-    private void createWorkouts(String routineKey, String workoutKey, final Routine routine, final boolean lastWorkout){
+    private void createWorkouts(final String routineKey, final String workoutKey, final Routine routine, final boolean lastWorkout){
         mDatabase.child("user-routine-workouts").child(mUid).child(routineKey).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 Workout w = dataSnapshot.getValue(Workout.class);
                 routine.addWorkoutToList(w);
+                addExercisesToWorkout(w, workoutKey, routineKey, lastWorkout);
 
                 if (lastWorkout) {
                     Log.i(TAG, "Finished creating routines");
@@ -142,16 +145,7 @@ public class ViewRoutinesFragment extends Fragment {
                             Log.i(TAG, "Workout name: " + routine.getWorkoutsList().get(i).getName());
                         }
                     };
-                    mLoadListener.onLoadComplete(mRoutines);
-                    RoutinesAdapter adapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
-                        @Override
-                        public void onRoutineSelected(Routine routine) {
-                            Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());
-                            mRoutineSelectedListener.onRoutineSelected(routine);
-                        }
-                    });
 
-                    mRecycler.setAdapter(adapter);
                 }
             }
 
@@ -161,6 +155,46 @@ public class ViewRoutinesFragment extends Fragment {
             }
         });
 
+    }
+
+    private void addExercisesToWorkout(final Workout workout, String workoutKey, String routineKey, final boolean lastWorkout) {
+        mDatabase.child("user-routine-workout-exercises").child(mUid).child(routineKey).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                int numExercises = (int) dataSnapshot.getChildrenCount();
+                int currentExercise = 0;
+
+                List<Exercise> exercisesList = new ArrayList<Exercise>();
+                for (DataSnapshot exercise : dataSnapshot.getChildren()){
+                    currentExercise++;
+
+                    Exercise e = exercise.getValue(Exercise.class);
+                    exercisesList.add(e);
+                    workout.setExercises(exercisesList);
+
+                    if (currentExercise == numExercises && lastWorkout == true){
+                        Log.i(TAG, "All exercises added to workouts. Loading complete");
+
+                        mLoadListener.onLoadComplete(mRoutines);
+                        RoutinesAdapter adapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
+                            @Override
+                            public void onRoutineSelected(Routine routine) {
+                                Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());
+                                mRoutineSelectedListener.onRoutineSelected(routine);
+                            }
+                        });
+
+                        mRecycler.setAdapter(adapter);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     // Load listener
