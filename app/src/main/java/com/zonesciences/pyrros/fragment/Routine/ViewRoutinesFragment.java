@@ -24,6 +24,7 @@ import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -171,7 +172,6 @@ public class ViewRoutinesFragment extends Fragment {
 
                     Exercise e = exercise.getValue(Exercise.class);
                     exercisesList.add(e);
-                    workout.setExercises(exercisesList);
 
                     if (currentExercise == numExercises && lastWorkout == true){
                         Log.i(TAG, "All exercises added to workouts. Loading complete");
@@ -188,6 +188,8 @@ public class ViewRoutinesFragment extends Fragment {
                         mRecycler.setAdapter(adapter);
                     }
                 }
+                Collections.sort(exercisesList);
+                workout.setExercises(exercisesList);
             }
 
             @Override

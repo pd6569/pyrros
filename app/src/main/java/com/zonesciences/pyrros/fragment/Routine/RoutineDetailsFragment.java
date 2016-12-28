@@ -170,7 +170,7 @@ public class RoutineDetailsFragment extends Fragment {
 
         if (mRoutine.getWorkoutsList() != null) {
             Log.i(TAG, "Has workouts, set adapter");
-            mAdapter = new RoutineWorkoutsAdapter(getContext(), mRoutine.getWorkoutsList());
+            mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener);
             mRecycler.setAdapter(mAdapter);
         }
 
@@ -184,7 +184,7 @@ public class RoutineDetailsFragment extends Fragment {
         mRoutine.addWorkoutToList(workout);
 
         if (mAdapter == null){
-            mAdapter = new RoutineWorkoutsAdapter(getContext(), mRoutine.getWorkoutsList());
+            mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener);
             mRecycler.setAdapter(mAdapter);
         }
         mAdapter.notifyItemInserted(0);
@@ -432,4 +432,19 @@ public class RoutineDetailsFragment extends Fragment {
     public String getRoutineKey() {
         return mRoutineKey;
     }
+
+    // Listeners
+
+    RoutineWorkoutsAdapter.AddExerciseListener addExerciseListener = new RoutineWorkoutsAdapter.AddExerciseListener() {
+        @Override
+        public void onAddFirstExercises() {
+            Log.i(TAG, "First exercises added");
+        }
+
+        @Override
+        public void onChangeExistingExercises() {
+            Log.i(TAG, "Edit existing exercises");
+
+        }
+    };
 }
