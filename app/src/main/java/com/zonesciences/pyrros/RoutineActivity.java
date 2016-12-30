@@ -86,14 +86,7 @@ public class RoutineActivity extends BaseActivity {
         mRoutineNameEditText = (EditText) findViewById(R.id.toolbar_title_edit_text);
 
         if (mFragmentToLoad == FRAGMENT_CREATE_ROUTINE) {
-
-            mRoutineNameTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    editRoutineName();
-
-                }
-            });
+            setToolbarTitleClickListener();
         } else {
             mRoutineNameTextView.setText("Routines");
         }
@@ -141,6 +134,12 @@ public class RoutineActivity extends BaseActivity {
                 if (mRoutineDetailsFragment == null){
                     createRoutineDetailFragment();
                 }
+
+                // Change toolbar to display routine name and edit icons
+                mRoutineNameTextView.setText(routine.getName());
+                mEditRoutineMenuItem.setVisible(true);
+                setToolbarTitleClickListener();
+
                 mRoutineDetailsFragment.setRoutine(routine);
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
@@ -194,7 +193,7 @@ public class RoutineActivity extends BaseActivity {
         return false;
     }
 
-    public void editRoutineName(){
+    private void editRoutineName(){
         mRoutineNameTextView.setVisibility(View.GONE);
         mRoutineNameEditText.setVisibility(View.VISIBLE);
         mRoutineNameEditText.requestFocus();
@@ -202,7 +201,7 @@ public class RoutineActivity extends BaseActivity {
         mSaveRoutineMenuItem.setVisible(true);
     }
 
-    public void saveRoutine(){
+    private void saveRoutine(){
         String routineName = mRoutineNameEditText.getText().toString();
         mRoutineNameTextView.setText(routineName);
         mRoutineNameTextView.setVisibility(View.VISIBLE);
@@ -215,4 +214,32 @@ public class RoutineActivity extends BaseActivity {
         mRoutineDetailsFragment.setRoutineChanged(true);
     }
 
+    private void setToolbarTitleClickListener(){
+        mRoutineNameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editRoutineName();
+
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "onBackPressed");
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0){
+            // Revert toolbar and remove click listener
+            mRoutineNameTextView.setOnClickListener(null);
+            if (mRoutineNameEditText.getVisibility() == View.VISIBLE){
+                mRoutineNameEditText.setVisibility(View.GONE);
+                mSaveRoutineMenuItem.setVisible(false);
+                mRoutineNameTextView.setVisibility(View.VISIBLE);
+            }
+            mRoutineNameTextView.setText("Routines");
+            mEditRoutineMenuItem.setVisible(false);
+        }
+
+        super.onBackPressed();
+    }
 }
