@@ -27,16 +27,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/routine_workout_item_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:layout_gravity="center_vertical"
-                android:textAllCaps="true"
-                android:layout_weight="1"
-                android:text="Workout Day 1"/>
-
             <ImageView
                 android:id="@+id/routine_workout_delete_imageview"
                 android:layout_width="wrap_content"
@@ -44,7 +34,28 @@
                 android:padding="5dp"
                 android:clickable="true"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_delete_gray_24dp"/>
+                android:src="@drawable/ic_close_gray_24dp"/>
+
+            <TextView
+                android:id="@+id/routine_workout_item_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_vertical"
+                android:textAllCaps="true"
+                android:layout_weight="1"
+                android:text="Workout Day 1"/>
+
+            <ImageView
+                android:id="@+id/routine_workout_reorder_workouts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:clickable="true"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_reorder_gray_24dp"/>
+
+
 
         </LinearLayout>
 
