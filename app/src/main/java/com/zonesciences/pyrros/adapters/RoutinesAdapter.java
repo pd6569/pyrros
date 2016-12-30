@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.fragment.Routine.RoutineSelectedListener;
 import com.zonesciences.pyrros.models.Routine;
@@ -29,6 +30,7 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.ViewHo
 
     // Listener
     RoutineSelectedListener mRoutineSelectedListener;
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -88,5 +90,6 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.ViewHo
     public int getItemCount() {
         return mRoutines.size();
     }
+
 
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.CreateWorkoutActivity;
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperCallback;
+import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.RoutineWorkoutsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
@@ -47,7 +50,7 @@ import static android.app.Activity.RESULT_OK;
     //TODO: Write workoutKey and routineKey into objects when creating anywhere in app
     //TODO: fix workoutChanged issue (createworkout activity always says that workout has changed)
 
-public class RoutineDetailsFragment extends Fragment {
+public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
     private static final String TAG = "RoutineDetailsFragment";
 
@@ -62,6 +65,11 @@ public class RoutineDetailsFragment extends Fragment {
     // Recycler
     RecyclerView mRecycler;
     RoutineWorkoutsAdapter mAdapter;
+
+    // Item touch helper
+    // Touch Helper
+    ItemTouchHelper mItemTouchHelper;
+    ItemTouchHelper.Callback mItemTouchHelperCallback;
 
     // Maps
     Map<Integer, View> mWorkoutViewMap = new HashMap<>();
@@ -172,10 +180,16 @@ public class RoutineDetailsFragment extends Fragment {
         mRecycler.setLayoutManager(layoutManager);
 
 
+
+
         if (mRoutine.getWorkoutsList() != null) {
             Log.i(TAG, "Has workouts, set adapter");
-            mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener, workoutChangedListener);
+            mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener, workoutChangedListener, this);
             mRecycler.setAdapter(mAdapter);
+
+            mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
+            mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+            mItemTouchHelper.attachToRecyclerView(mRecycler);
         }
 
         return rootView;
@@ -192,8 +206,12 @@ public class RoutineDetailsFragment extends Fragment {
         mRoutine.addWorkoutToList(workout);
 
         if (mAdapter == null){
-            mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener, workoutChangedListener);
+            mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener, workoutChangedListener, this);
             mRecycler.setAdapter(mAdapter);
+
+            mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
+            mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+            mItemTouchHelper.attachToRecyclerView(mRecycler);
         }
         mAdapter.notifyItemInserted(0);
         mRecycler.smoothScrollToPosition(0);
@@ -368,4 +386,15 @@ public class RoutineDetailsFragment extends Fragment {
             mRoutineChanged = true;
         }
     };
+
+    // Drag Listener
+    @Override
+    public void onStartDrag (RecyclerView.ViewHolder viewHolder){
+        mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void onStopDrag(){
+
+    }
 }

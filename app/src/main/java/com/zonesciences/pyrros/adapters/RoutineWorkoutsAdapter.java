@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,19 +14,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.CreateWorkoutActivity;
+import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
+import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.RoutineActivity;
 import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by peter on 28/12/2016.
  */
 
-public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkoutsAdapter.ViewHolder> {
+public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkoutsAdapter.ViewHolder> implements ItemTouchHelperAdapter{
 
     private static final String TAG = "RoutineWorkoutsAdapter";
 
@@ -35,11 +39,13 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
     // Listeners
     AddExerciseListener mAddExerciseListener;
     WorkoutChangedListener mWorkoutChangedListener;
+    OnDragListener mDragListener;
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView workoutTitleTextView;
         ImageView deleteWorkoutImageView;
+        ImageView reorderHandle;
         TextView noExercisesTextView;
         LinearLayout exercisesContainerLinearLayout;
 
@@ -55,6 +61,7 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
                     mWorkoutChangedListener.onWorkoutRemoved();
                 }
             });
+            reorderHandle = (ImageView) itemView.findViewById(R.id.routine_workout_reorder_workouts);
             noExercisesTextView = (TextView) itemView.findViewById(R.id.no_exercises_textview);
             noExercisesTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -74,11 +81,12 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
         }
     }
 
-    public RoutineWorkoutsAdapter(Activity activity, List<Workout> workouts, AddExerciseListener addExerciseListener, WorkoutChangedListener workoutChangedListener){
+    public RoutineWorkoutsAdapter(Activity activity, List<Workout> workouts, AddExerciseListener addExerciseListener, WorkoutChangedListener workoutChangedListener, OnDragListener dragListener){
         this.mActivity = activity;
         this.mWorkouts = workouts;
         this.mAddExerciseListener = addExerciseListener;
         this.mWorkoutChangedListener = workoutChangedListener;
+        this.mDragListener = dragListener;
     }
 
     @Override
@@ -89,9 +97,17 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.workoutTitleTextView.setText(mWorkouts.get(position).getName());
         holder.exercisesContainerLinearLayout.removeAllViews();
+        holder.reorderHandle.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mDragListener.onStartDrag(holder);
+                return true;
+            }
+        });
+
         List<Exercise> exercises = mWorkouts.get(position).getExercises();
 
         if (exercises != null) {
@@ -131,4 +147,34 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
         void onAddFirstExercises(int workoutPositionToUpdate);
         void onChangeExistingExercises(int workoutPositionToUpdate);
     }
+
+    // START ITEM TOUCH HELPER METHODS
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition){
+            for (int i = fromPosition; i < toPosition; i++){
+                Collections.swap(mWorkouts, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--){
+                Collections.swap(mWorkouts, i, i - 1);
+            }
+        }
+
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+
+    }
+
+    @Override
+    public void onMoveCompleted() {
+
+    }
+
+    // END ITEM TOUCH HELPER METHODS
 }

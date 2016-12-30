@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//TODO: touch listener for reordering workouts
+
+
 public class RoutineActivity extends BaseActivity {
 
     private static final String TAG = "CreateRoutineAcctivity";

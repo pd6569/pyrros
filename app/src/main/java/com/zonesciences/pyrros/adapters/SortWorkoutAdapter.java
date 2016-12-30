@@ -161,7 +161,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        System.out.println("Attemping to moving exercise. mWorkoutExercises size: " + mWorkoutExercises.size() + " from position: " + fromPosition + " toPosition: " + toPosition);
+        System.out.println("Attemping to move exercise. mWorkoutExercises size: " + mWorkoutExercises.size() + " from position: " + fromPosition + " toPosition: " + toPosition);
         if (fromPosition < toPosition){
             for (int i = fromPosition; i < toPosition; i++){
                 Collections.swap(mWorkoutExercises, i, i + 1);
