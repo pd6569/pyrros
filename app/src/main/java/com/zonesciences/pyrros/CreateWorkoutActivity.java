@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,6 +23,8 @@ import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.utils.Utils;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +41,7 @@ public class CreateWorkoutActivity extends BaseActivity {
     // Extras
     public static final String EXTRA_WORKOUT_EXERCISES = "WorkoutExercises";
     public static final String EXTRA_EXERCISES_CHANGED = "WorkoutExercisesChanged";
+    public static final String EXTRA_WORKOUT_TITLE = "WorkoutTitle";
 
 
     // Context
@@ -93,6 +97,8 @@ public class CreateWorkoutActivity extends BaseActivity {
             Log.i(TAG, "Exercises received: " + mPreselectedExercises.size());
         }
 
+
+
         // Initialise database and get user details
         mDatabase = Utils.getDatabase().getReference();
         mUserId = getUid();
@@ -127,12 +133,18 @@ public class CreateWorkoutActivity extends BaseActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_workout);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mToolbar.findViewById(R.id.toolbar_title_create_workout).setOnClickListener(new View.OnClickListener() {
+        TextView toolbarTitleText = (TextView) mToolbar.findViewById(R.id.toolbar_title_create_workout);
+        toolbarTitleText.findViewById(R.id.toolbar_title_create_workout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Title clicked");
             }
         });
+
+        if (intent.hasExtra(EXTRA_WORKOUT_TITLE)){
+            String workoutTitle = intent.getStringExtra(EXTRA_WORKOUT_TITLE);
+            toolbarTitleText.setText(workoutTitle);
+        }
 
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs_create_workout);
         mTabLayout.setupWithViewPager(mViewPager);

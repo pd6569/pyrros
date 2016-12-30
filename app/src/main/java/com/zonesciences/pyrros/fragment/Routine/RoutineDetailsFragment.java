@@ -329,6 +329,7 @@ public class RoutineDetailsFragment extends Fragment {
             mWorkoutPositionToUpdate = workoutPositionToUpdate;
             Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
             i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
+            i.putExtra(CreateWorkoutActivity.EXTRA_WORKOUT_TITLE, mAdapter.getWorkouts().get(workoutPositionToUpdate).getName());
             startActivityForResult(i, REQUEST_CREATE_WORKOUT);
         }
 
@@ -343,6 +344,7 @@ public class RoutineDetailsFragment extends Fragment {
             Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
             i.putExtra(CreateWorkoutActivity.ARG_CREATE_WORKOUT_FOR_ROUTINE, true);
             i.putExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES, workoutExercises);
+            i.putExtra(CreateWorkoutActivity.EXTRA_WORKOUT_TITLE, mAdapter.getWorkouts().get(workoutPositionToUpdate).getName());
             startActivityForResult(i, REQUEST_CREATE_WORKOUT);
         }
     };
