@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment">
+
+    <LinearLayout
+        android:id="@+id/linearlayout_dialog_exercise_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+        android:weightSum="1">
+
+        <ImageView
+            android:id="@+id/dialog_exercise_options_close_imageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_close_gray_24dp"
+            android:layout_weight="2"
+            android:layout_gravity="right"
+            android:padding="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/linearlayout_dialog_exercise_options">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:weightSum="3">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                />
+
+                <Button
+                    android:id="@+id/exercise_options_decrease_reps_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:text="-"/>
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"/>
+
+                <Button
+                    android:id="@+id/exercise_options_increase_reps_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:text="+"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+
+                <Button
+                    android:id="@+id/exercise_options_add_set"
+                    style="@style/AppTheme.Positive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="true"
+                    android:layout_gravity="center"
+                    android:text="@string/add_set"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/dialog_exercise_options_add_sets_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        tools:listitem="@layout/item_add_sets">
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>
+
+

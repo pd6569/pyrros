@@ -126,7 +126,6 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
                     }
 
-
                     return false;
                 }
             });
