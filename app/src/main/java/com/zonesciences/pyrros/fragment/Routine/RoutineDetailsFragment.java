@@ -260,6 +260,9 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             // Update routine local object
             int numWorkouts = mAdapter.getWorkouts().size();
             List<Workout> workouts = mRoutine.getWorkoutsList();
+            for (Workout workout : workouts){
+                Log.i(TAG, "Workout : " + workout.getName() + " Order: " + workout.getWorkoutOrder());
+            }
 
             mRoutine.setNumWorkouts(numWorkouts);
 

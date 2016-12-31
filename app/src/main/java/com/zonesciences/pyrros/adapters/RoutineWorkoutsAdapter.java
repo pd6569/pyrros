@@ -163,6 +163,7 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
         }
 
         notifyItemMoved(fromPosition, toPosition);
+
         return true;
     }
 
@@ -173,8 +174,18 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
 
     @Override
     public void onMoveCompleted() {
-
+        setWorkoutOrder();
+        mWorkoutChangedListener.onWorkoutChanged();
     }
 
     // END ITEM TOUCH HELPER METHODS
+
+    public void setWorkoutOrder(){
+        for (int i = 0; i < mWorkouts.size(); i++){
+            mWorkouts.get(i).setWorkoutOrder(i);
+            for (Workout workout : mWorkouts){
+                Log.i(TAG, "Workout : " + workout.getName() + " Order: " + workout.getWorkoutOrder());
+            }
+        }
+    }
 }

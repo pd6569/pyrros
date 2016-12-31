@@ -16,7 +16,7 @@ import java.util.Map;
 // [START workout_class]
 
 @IgnoreExtraProperties
-public class Workout {
+public class Workout implements Comparable<Workout> {
 
     //variable names must match key name in hashmap method below
     public String uid;
@@ -29,6 +29,7 @@ public class Workout {
     public List<Exercise> exercises;
     public int numExercises;
     public String workoutKey;
+    public int workoutOrder;
 
     public Workout(){
         //Default constructor required for calls to DataSnapshot.getValue(Workout.class);
@@ -55,6 +56,7 @@ public class Workout {
         result.put("users", users);
         result.put("numExercises", numExercises);
         result.put("workoutKey", workoutKey);
+        result.put("workoutOrder", workoutOrder);
         return result;
     }
     // [END post_to_map]
@@ -143,6 +145,25 @@ public class Workout {
     @Exclude
     public void setWorkoutKey(String workoutKey) {
         this.workoutKey = workoutKey;
+    }
+
+    @Exclude
+    public int getWorkoutOrder() {
+        return workoutOrder;
+    }
+
+    @Exclude
+    public void setWorkoutOrder(int workoutOrder) {
+        this.workoutOrder = workoutOrder;
+    }
+
+
+    @Override
+    public int compareTo(Workout workout) {
+        int compareOrder =((Workout) workout).getWorkoutOrder();
+
+        //Ascending order
+        return this.workoutOrder - compareOrder;
     }
 }
 //[END workout_class]

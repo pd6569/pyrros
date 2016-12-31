@@ -167,7 +167,8 @@ public class ViewRoutinesFragment extends Fragment {
                 addExercisesToWorkout(w, workoutKey, routineKey, lastWorkout);
 
                 if (lastWorkout) {
-                    Log.i(TAG, "Finished creating routines");
+                    Log.i(TAG, "Finished creating routines. Sort routines into order");
+
                     for (Routine routine : mRoutines) {
                         Log.i(TAG, "routine name: " + routine.getName() + "numWorkouts: " + routine.getNumWorkouts() + "workoutList: " + routine.getWorkoutsList().size());
                         for (int i = 0; i < routine.getWorkoutsList().size(); i++){
@@ -205,6 +206,12 @@ public class ViewRoutinesFragment extends Fragment {
                         Log.i(TAG, "All exercises added to workouts. Loading complete");
 
                         mLoadListener.onLoadComplete(mRoutines);
+
+                        // sort workout order
+                        for (int i = 0; i < mRoutines.size(); i++){
+                            Collections.sort(mRoutines.get(i).getWorkoutsList());
+                        }
+
                         mAdapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
                             @Override
                             public void onRoutineSelected(Routine routine) {
