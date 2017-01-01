@@ -99,6 +99,11 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     }
 
     @Exclude
+    public void setReps(List<Integer> reps) {
+        this.reps = reps;
+    }
+
+    @Exclude
     public int getSets() {
         return sets;
     }
@@ -147,6 +152,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     public void setEquipment(String equipment) {
         this.equipment = equipment;
     }
+
 
     @Exclude
     public boolean hasExerciseId(){

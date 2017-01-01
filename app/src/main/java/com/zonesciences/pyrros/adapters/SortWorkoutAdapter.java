@@ -147,19 +147,26 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener(){
                                 public void onClick(DialogInterface dialogBox, int id){
-
+                                    Log.i(TAG, "OK");
+                                    if (!adapter.getSets().isEmpty()){
+                                        mWorkoutExercises.get(getAdapterPosition()).setReps(adapter.getSets());
+                                    }
                                 }
                             })
                             .setOnDismissListener(new DialogInterface.OnDismissListener() {
                                 @Override
                                 public void onDismiss(DialogInterface dialog) {
                                     Log.i(TAG, "onDismiss");
+                                    if (!adapter.getSets().isEmpty()){
+                                        mWorkoutExercises.get(getAdapterPosition()).setReps(adapter.getSets());
+                                    }
                                     mSets = null;
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
                                 public void onClick(DialogInterface dialogBox, int id){
                                     dialogBox.cancel();
+                                    mSets = null;
                                 }
                             });
                     final AlertDialog alertDialog = builder.create();
