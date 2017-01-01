@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:layout_weight="3">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/set_number_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set 1"
-        android:layout_weight="1"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
         android:layout_margin="5dp"/>
 
     <TextView
@@ -18,7 +19,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10 reps"
-        android:layout_weight="1"
+        android:layout_centerInParent="true"
         android:layout_margin="5dp"/>
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/delete_set_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete_gray_24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"/>
+</RelativeLayout>

@@ -9,6 +9,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -33,11 +35,15 @@ import com.zonesciences.pyrros.models.Exercise;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 
 /**
  * Created by Peter on 03/12/2016.
  */
+
+//TODO: consider creating alert dialog as a standalone fragment
+
 public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.SortWorkoutViewHolder> implements ItemTouchHelperAdapter, ActionModeAdapterInterface {
 
     private static final String TAG = "SortWorkoutAdapter";
@@ -47,6 +53,10 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     SparseBooleanArray mSelectedExerciseIds;
     boolean allowReordering = true;
+
+    // Exerise options variables
+    List<Integer> mSets;
+    int mNumReps;
 
     // Listener
     ExercisesListener mExercisesListener;
@@ -63,6 +73,10 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
             exerciseName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    // Sets
+                    mSets = mWorkoutExercises.get(getAdapterPosition()).getReps();
+
                     Log.i(TAG, "Open dialog options");
                     LayoutInflater inflater = LayoutInflater.from(mActivity);
                     View dialogView = inflater.inflate(R.layout.dialog_exercise_options, null);
@@ -74,9 +88,17 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                     dialogTitle.setText(mWorkoutExercises.get(getAdapterPosition()).getName());
                     ImageView closeDialog = (ImageView) dialogView.findViewById(R.id.dialog_exercise_options_close_imageview);
 
-
                     //RecyclerView
                     RecyclerView recyclerView = (RecyclerView)  dialogView.findViewById(R.id.dialog_exercise_options_add_sets_recycler);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
+                    recyclerView.setHasFixedSize(true);
+                    DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL);
+                    recyclerView.addItemDecoration(dividerItemDecoration);
+                    if (mSets == null){
+                        mSets = new ArrayList<Integer>();
+                    }
+                    final AddSetExerciseOptionsAdapter adapter = new AddSetExerciseOptionsAdapter(mActivity, mSets);
+                    recyclerView.setAdapter(adapter);
 
 
                     final EditText numRepsField = (EditText) dialogView.findViewById(R.id.exercise_options_num_reps_edit_text);
@@ -84,37 +106,55 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                     decreaseReps.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            int numReps;
                             if (!numRepsField.getText().toString().isEmpty()) {
-                                numReps = Integer.parseInt(numRepsField.getText().toString());
+                                mNumReps = Integer.parseInt(numRepsField.getText().toString());
                             } else {
-                                numReps = 0;
+                                mNumReps = 0;
                             }
-                            if (numReps > 0){
-                                numReps--;
+                            if (mNumReps > 0){
+                                mNumReps--;
                             }
-                            numRepsField.setText("" + numReps);
+                            numRepsField.setText("" + mNumReps);
                         }
                     });
                     Button increaseReps = (Button) dialogView.findViewById(R.id.exercise_options_increase_reps_button);
                     increaseReps.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            int numReps;
                             if (!numRepsField.getText().toString().isEmpty()) {
-                                numReps = Integer.parseInt(numRepsField.getText().toString());
+                                mNumReps = Integer.parseInt(numRepsField.getText().toString());
                             } else {
-                                numReps = 0;
+                                mNumReps = 0;
                             }
-                            numReps++;
-                            numRepsField.setText("" + numReps);
+                            mNumReps++;
+                            numRepsField.setText("" + mNumReps);
                         }
                     });
+
+                    Button addSet = (Button) dialogView.findViewById(R.id.exercise_options_add_set);
+                    addSet.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (mSets == null){
+                                mSets = new ArrayList<Integer>();
+                            }
+                            mSets.add(Integer.parseInt(numRepsField.getText().toString()));
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+
                     builder
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener(){
                                 public void onClick(DialogInterface dialogBox, int id){
 
+                                }
+                            })
+                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    Log.i(TAG, "onDismiss");
+                                    mSets = null;
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){

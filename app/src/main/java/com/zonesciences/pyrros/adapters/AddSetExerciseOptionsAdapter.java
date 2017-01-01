@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
 
@@ -20,16 +21,21 @@ import java.util.List;
 public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExerciseOptionsAdapter.ViewHolder> {
 
     Context mContext;
-    List<Long> mSets = new ArrayList<>();
+    List<Integer> mSets;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
+        TextView setNumberText;
+        TextView numRepsText;
+
         public ViewHolder(View itemView) {
             super(itemView);
+            setNumberText = (TextView) itemView.findViewById(R.id.set_number_textview);
+            numRepsText = (TextView) itemView.findViewById(R.id.number_of_reps_textview);
         }
     }
 
-    public AddSetExerciseOptionsAdapter(Context context, List<Long> sets){
+    public AddSetExerciseOptionsAdapter(Context context, List<Integer> sets){
         this.mContext = context;
         this.mSets = sets;
     }
@@ -43,7 +49,9 @@ public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExe
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
+        System.out.print("onBindViewHolder");
+        holder.setNumberText.setText("Set " + (position + 1));
+        holder.numRepsText.setText(Long.toString(mSets.get(position)) + " reps");
     }
 
     @Override
@@ -51,4 +59,7 @@ public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExe
         return mSets.size();
     }
 
+    public List<Integer> getSets() {
+        return mSets;
+    }
 }
