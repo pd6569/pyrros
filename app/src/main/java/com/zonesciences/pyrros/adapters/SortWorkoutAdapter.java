@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -68,8 +69,47 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                     AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setView(dialogView);
 
-                    final TextView dialogTitle = (TextView) dialogView.findViewById(R.id.dialog_exercise_options_exercise_title_textview);
+                    // Find views
+                    TextView dialogTitle = (TextView) dialogView.findViewById(R.id.dialog_exercise_options_exercise_title_textview);
                     dialogTitle.setText(mWorkoutExercises.get(getAdapterPosition()).getName());
+                    ImageView closeDialog = (ImageView) dialogView.findViewById(R.id.dialog_exercise_options_close_imageview);
+
+
+                    //RecyclerView
+                    RecyclerView recyclerView = (RecyclerView)  dialogView.findViewById(R.id.dialog_exercise_options_add_sets_recycler);
+
+
+                    final EditText numRepsField = (EditText) dialogView.findViewById(R.id.exercise_options_num_reps_edit_text);
+                    Button decreaseReps = (Button) dialogView.findViewById(R.id.exercise_options_decrease_reps_button);
+                    decreaseReps.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int numReps;
+                            if (!numRepsField.getText().toString().isEmpty()) {
+                                numReps = Integer.parseInt(numRepsField.getText().toString());
+                            } else {
+                                numReps = 0;
+                            }
+                            if (numReps > 0){
+                                numReps--;
+                            }
+                            numRepsField.setText("" + numReps);
+                        }
+                    });
+                    Button increaseReps = (Button) dialogView.findViewById(R.id.exercise_options_increase_reps_button);
+                    increaseReps.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            int numReps;
+                            if (!numRepsField.getText().toString().isEmpty()) {
+                                numReps = Integer.parseInt(numRepsField.getText().toString());
+                            } else {
+                                numReps = 0;
+                            }
+                            numReps++;
+                            numRepsField.setText("" + numReps);
+                        }
+                    });
                     builder
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener(){
@@ -82,8 +122,16 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                                     dialogBox.cancel();
                                 }
                             });
-                    AlertDialog alertDialog = builder.create();
+                    final AlertDialog alertDialog = builder.create();
                     alertDialog.show();
+
+                    closeDialog.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                        }
+                    });
+
                 }
             });
             reorderHandle = (ImageView) itemView.findViewById(R.id.sort_workout_reorder_handle);
