@@ -290,6 +290,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                 if (e.getName().equals(selectedExercise.getName())){
                     e.setSelected(true);
                     e.setOrder(selectedExercise.getOrder());
+                    e.setReps(selectedExercise.getReps());
                     mWorkoutExercises.add(e);
                     Collections.sort(mWorkoutExercises);
                 }

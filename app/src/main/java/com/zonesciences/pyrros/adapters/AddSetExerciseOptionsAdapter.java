@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
@@ -27,11 +28,20 @@ public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExe
 
         TextView setNumberText;
         TextView numRepsText;
+        ImageView deleteSet;
 
         public ViewHolder(View itemView) {
             super(itemView);
             setNumberText = (TextView) itemView.findViewById(R.id.set_number_textview);
             numRepsText = (TextView) itemView.findViewById(R.id.number_of_reps_textview);
+            deleteSet = (ImageView) itemView.findViewById(R.id.delete_set_imageview);
+            deleteSet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSets.remove(getAdapterPosition());
+                    notifyDataSetChanged();
+                }
+            });
         }
     }
 
@@ -48,10 +58,11 @@ public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExe
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         System.out.print("onBindViewHolder");
         holder.setNumberText.setText("Set " + (position + 1));
         holder.numRepsText.setText(Long.toString(mSets.get(position)) + " reps");
+
     }
 
     @Override

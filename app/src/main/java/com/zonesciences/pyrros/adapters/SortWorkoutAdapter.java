@@ -77,6 +77,10 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                     // Sets
                     mSets = mWorkoutExercises.get(getAdapterPosition()).getReps();
 
+                    if (mSets != null) {
+                        Log.i(TAG, "mSets" + mSets.size());
+                    }
+
                     Log.i(TAG, "Open dialog options");
                     LayoutInflater inflater = LayoutInflater.from(mActivity);
                     View dialogView = inflater.inflate(R.layout.dialog_exercise_options, null);

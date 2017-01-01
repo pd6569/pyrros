@@ -227,6 +227,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
                 Log.i(TAG, "Result OK");
 
                 final ArrayList<Exercise> workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
+
                 mRoutineChanged = data.getBooleanExtra(CreateWorkoutActivity.EXTRA_EXERCISES_CHANGED, false);
                 Log.i(TAG, "routineChanged: " + mRoutineChanged);
 
@@ -257,6 +258,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         Log.i(TAG, "onPause");
 
         if (mRoutineChanged) {
+
             // Update routine local object
             int numWorkouts = mAdapter.getWorkouts().size();
             List<Workout> workouts = mRoutine.getWorkoutsList();
@@ -360,6 +362,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             mWorkoutPositionToUpdate = workoutPositionToUpdate;
 
             ArrayList<Exercise> workoutExercises = (ArrayList) mRoutine.getWorkoutsList().get(mWorkoutPositionToUpdate).getExercises();
+
             Collections.sort(workoutExercises);
 
             Intent i = new Intent(getContext(), CreateWorkoutActivity.class);
