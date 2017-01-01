@@ -1,11 +1,14 @@
 package com.zonesciences.pyrros.adapters;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -13,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -55,6 +59,33 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         public SortWorkoutViewHolder(View itemView) {
             super(itemView);
             exerciseName = (TextView) itemView.findViewById(R.id.sort_workout_exercise_name);
+            exerciseName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i(TAG, "Open dialog options");
+                    LayoutInflater inflater = LayoutInflater.from(mActivity);
+                    View dialogView = inflater.inflate(R.layout.dialog_exercise_options, null);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setView(dialogView);
+
+                    final TextView dialogTitle = (TextView) dialogView.findViewById(R.id.dialog_exercise_options_exercise_title_textview);
+                    dialogTitle.setText(mWorkoutExercises.get(getAdapterPosition()).getName());
+                    builder
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dialogBox, int id){
+
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dialogBox, int id){
+                                    dialogBox.cancel();
+                                }
+                            });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+            });
             reorderHandle = (ImageView) itemView.findViewById(R.id.sort_workout_reorder_handle);
             deleteExercise = (ImageView) itemView.findViewById(R.id.sort_workout_delete);
             deleteExercise.setOnClickListener(new View.OnClickListener(){
