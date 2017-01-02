@@ -75,7 +75,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                 public void onClick(View v) {
 
                     // Sets
-                    mSets = mWorkoutExercises.get(getAdapterPosition()).getReps();
+                    mSets = mWorkoutExercises.get(getAdapterPosition()).getPrescribedReps();
 
                     if (mSets != null) {
                         Log.i(TAG, "mSets" + mSets.size());
@@ -153,7 +153,8 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                                 public void onClick(DialogInterface dialogBox, int id){
                                     Log.i(TAG, "OK");
                                     if (!adapter.getSets().isEmpty()){
-                                        mWorkoutExercises.get(getAdapterPosition()).setReps(adapter.getSets());
+                                        mWorkoutExercises.get(getAdapterPosition()).setPrescribedReps(adapter.getSets());
+
                                     }
                                 }
                             })
@@ -162,7 +163,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                                 public void onDismiss(DialogInterface dialog) {
                                     Log.i(TAG, "onDismiss");
                                     if (!adapter.getSets().isEmpty()){
-                                        mWorkoutExercises.get(getAdapterPosition()).setReps(adapter.getSets());
+                                        mWorkoutExercises.get(getAdapterPosition()).setPrescribedReps(adapter.getSets());
                                     }
                                     mSets = null;
                                 }

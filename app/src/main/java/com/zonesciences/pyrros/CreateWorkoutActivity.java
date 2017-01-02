@@ -156,6 +156,11 @@ public class CreateWorkoutActivity extends BaseActivity {
     public void finish(){
         if (mCreateWorkoutForRoutine){
             Log.i(TAG, "Finish activity and return to routine, pass exercises");
+
+            for (Exercise e : mWorkoutExercises){
+                Log.i(TAG, "Exercise: " + e.getName() + " Prescribed Reps : " + e.getPrescribedReps());
+            }
+
             Intent i = new Intent();
             i.putExtra(EXTRA_WORKOUT_EXERCISES, mWorkoutExercises);
             i.putExtra(EXTRA_EXERCISES_CHANGED, mExercisesChanged);

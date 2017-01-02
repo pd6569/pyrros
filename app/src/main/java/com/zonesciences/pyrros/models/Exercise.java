@@ -26,6 +26,10 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     public String exerciseId;
     public String equipment;
     public boolean isSelected;
+    public List<Integer> prescribedReps;
+    public List<Double> prescribedWeight;
+    public int restInterval;
+    public int tempo;
 
     public Exercise(){
         // Default constructor required for calls to DataSnapshot.getValue(Exercise.class)
@@ -70,6 +74,10 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         result.put("order", order);
         result.put("exerciseId", exerciseId);
         result.put("equipment", equipment);
+        result.put("prescribedReps", prescribedReps);
+        result.put("prescribedWeight", prescribedWeight);
+        result.put("restInterval", restInterval);
+        result.put("tempo", tempo);
         return result;
     }
 
@@ -153,6 +161,45 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         this.equipment = equipment;
     }
 
+    @Exclude
+    public List<Integer> getPrescribedReps() {
+        return prescribedReps;
+    }
+
+    @Exclude
+    public void setPrescribedReps(List<Integer> prescribedReps) {
+        this.prescribedReps = prescribedReps;
+    }
+
+    @Exclude
+    public List<Double> getPrescribedWeight() {
+        return prescribedWeight;
+    }
+
+    @Exclude
+    public void setPrescribedWeight(List<Double> prescribedWeight) {
+        this.prescribedWeight = prescribedWeight;
+    }
+
+    @Exclude
+    public int getRestInterval() {
+        return restInterval;
+    }
+
+    @Exclude
+    public void setRestInterval(int restInterval) {
+        this.restInterval = restInterval;
+    }
+
+    @Exclude
+    public int getTempo() {
+        return tempo;
+    }
+
+    @Exclude
+    public void setTempo(int tempo) {
+        this.tempo = tempo;
+    }
 
     @Exclude
     public boolean hasExerciseId(){
@@ -191,6 +238,22 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     }
 
     @Exclude
+    public void addPrescribedReps (int newPrescribedReps){
+        if (prescribedReps == null){
+            prescribedReps = new ArrayList<>();
+        }
+        prescribedReps.add(newPrescribedReps);
+    }
+
+    @Exclude
+    public void addPrescribedWeight (int newPrescribedWeight){
+        if (prescribedWeight == null){
+            prescribedWeight = new ArrayList<>();
+        }
+        prescribedReps.add(newPrescribedWeight);
+    }
+
+    @Exclude
     @Override
     public int compareTo(Exercise exercise) {
         int compareOrder =((Exercise) exercise).getOrder();
@@ -214,6 +277,18 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
             in.readList(reps, Integer.class.getClassLoader());
         } else {
             reps = null;
+        }
+        if (in.readByte() == 0x01) {
+            prescribedReps = new ArrayList<Integer>();
+            in.readList(prescribedReps, Integer.class.getClassLoader());
+        } else {
+            prescribedReps = null;
+        }
+        if (in.readByte() == 0x01) {
+            prescribedWeight = new ArrayList<Double>();
+            in.readList(prescribedWeight, Integer.class.getClassLoader());
+        } else {
+            prescribedWeight = null;
         }
         sets = in.readInt();
         order = in.readInt();
@@ -243,6 +318,18 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         } else {
             dest.writeByte((byte) (0x01));
             dest.writeList(reps);
+        }
+        if (prescribedReps == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(prescribedReps);
+        }
+        if (prescribedWeight == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(prescribedWeight);
         }
         dest.writeInt(sets);
         dest.writeInt(order);

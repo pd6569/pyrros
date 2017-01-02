@@ -228,6 +228,10 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
                 final ArrayList<Exercise> workoutExercises = (ArrayList<Exercise>) data.getSerializableExtra(CreateWorkoutActivity.EXTRA_WORKOUT_EXERCISES);
 
+                for (Exercise e : workoutExercises){
+                    Log.i(TAG, "Exercise: " + e.getName() + " Prescribed Reps : " + e.getPrescribedReps());
+                }
+
                 mRoutineChanged = data.getBooleanExtra(CreateWorkoutActivity.EXTRA_EXERCISES_CHANGED, false);
                 Log.i(TAG, "routineChanged: " + mRoutineChanged);
 
@@ -362,6 +366,10 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             mWorkoutPositionToUpdate = workoutPositionToUpdate;
 
             ArrayList<Exercise> workoutExercises = (ArrayList) mRoutine.getWorkoutsList().get(mWorkoutPositionToUpdate).getExercises();
+
+            for (Exercise e : workoutExercises){
+                Log.i(TAG, "Exercise: " + e.getName() + " Prescribed Reps : " + e.getPrescribedReps());
+            }
 
             Collections.sort(workoutExercises);
 
