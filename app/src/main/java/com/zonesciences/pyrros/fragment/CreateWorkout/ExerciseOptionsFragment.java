@@ -39,11 +39,10 @@ public class ExerciseOptionsFragment extends Fragment {
     int mNumReps;
 
     // View
-    TextView mOptionsTitle;
-    ImageView mCloseOptions;
     EditText mNumRepsField;
     Button mIncreaseReps;
     Button mDecreaseReps;
+    Button mAddSet;
 
     // Recycler
     RecyclerView mRecyclerView;
@@ -78,22 +77,19 @@ public class ExerciseOptionsFragment extends Fragment {
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_exercise_options, container, false);
 
-        mOptionsTitle = (TextView) view.findViewById(R.id.dialog_exercise_options_exercise_title_textview);
-        mOptionsTitle.setText(mExercise.getName());
-
-        mCloseOptions = (ImageView) view.findViewById(R.id.dialog_exercise_options_close_imageview);
-
         // Recycler
-        RecyclerView recyclerView = (RecyclerView)  view.findViewById(R.id.dialog_exercise_options_add_sets_recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true);
+        mRecyclerView = (RecyclerView)  view.findViewById(R.id.dialog_exercise_options_add_sets_recycler);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(dividerItemDecoration);
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
+
         if (mSets == null){
             mSets = new ArrayList<Integer>();
         }
-        final AddSetExerciseOptionsAdapter adapter = new AddSetExerciseOptionsAdapter(getContext(), mSets);
-        recyclerView.setAdapter(adapter);
+
+        mAdapter = new AddSetExerciseOptionsAdapter(getContext(), mSets);
+        mRecyclerView.setAdapter(mAdapter);
 
         mNumRepsField = (EditText) view.findViewById(R.id.exercise_options_num_reps_edit_text);
         mDecreaseReps = (Button) view.findViewById(R.id.exercise_options_decrease_reps_button);
@@ -111,8 +107,8 @@ public class ExerciseOptionsFragment extends Fragment {
                 mNumRepsField.setText("" + mNumReps);
             }
         });
-        Button increaseReps = (Button) view.findViewById(R.id.exercise_options_increase_reps_button);
-        increaseReps.setOnClickListener(new View.OnClickListener() {
+        mIncreaseReps = (Button) view.findViewById(R.id.exercise_options_increase_reps_button);
+        mIncreaseReps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!mNumRepsField.getText().toString().isEmpty()) {
@@ -125,15 +121,16 @@ public class ExerciseOptionsFragment extends Fragment {
             }
         });
 
-        Button addSet = (Button) view.findViewById(R.id.exercise_options_add_set);
-        addSet.setOnClickListener(new View.OnClickListener() {
+        mAddSet = (Button) view.findViewById(R.id.exercise_options_add_set);
+        mAddSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mSets == null){
                     mSets = new ArrayList<Integer>();
                 }
                 mSets.add(Integer.parseInt(mNumRepsField.getText().toString()));
-                adapter.notifyDataSetChanged();
+                mExercise.setPrescribedReps(mSets);
+                mAdapter.notifyDataSetChanged();
             }
         });
 
