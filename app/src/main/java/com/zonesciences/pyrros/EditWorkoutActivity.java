@@ -203,6 +203,11 @@ public class EditWorkoutActivity extends BaseActivity {
                     public void onExercisesChanged(ArrayList<Exercise> exerciseList) {
 
                     }
+
+                    @Override
+                    public void onExerciseSelected(Exercise exercise) {
+
+                    }
                 });
 
                 mDatabase.child("exercises").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -321,6 +326,11 @@ public class EditWorkoutActivity extends BaseActivity {
                             mExercisesEmpty = false;
                         }
                         Log.i(TAG, "Exercise empty: " + mExercisesEmpty);
+                    }
+
+                    @Override
+                    public void onExerciseSelected(Exercise exercise) {
+
                     }
                 });
                 fragment = sortWorkoutFragment;

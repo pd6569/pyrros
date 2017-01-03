@@ -74,6 +74,8 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                 @Override
                 public void onClick(View v) {
 
+                    mExercisesListener.onExerciseSelected(mWorkoutExercises.get(getAdapterPosition()));
+/*
                     // Sets
                     mSets = mWorkoutExercises.get(getAdapterPosition()).getPrescribedReps();
 
@@ -83,7 +85,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
                     Log.i(TAG, "Open dialog options");
                     LayoutInflater inflater = LayoutInflater.from(mActivity);
-                    View dialogView = inflater.inflate(R.layout.dialog_exercise_options, null);
+                    View dialogView = inflater.inflate(R.layout.fragment_exercise_options, null);
                     AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setView(dialogView);
 
@@ -182,7 +184,7 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                         public void onClick(View v) {
                             alertDialog.dismiss();
                         }
-                    });
+                    });*/
 
                 }
             });

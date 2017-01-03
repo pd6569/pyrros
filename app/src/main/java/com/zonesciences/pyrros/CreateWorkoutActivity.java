@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,13 +19,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
+import com.zonesciences.pyrros.fragment.CreateWorkout.ExerciseOptionsFragment;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
 import com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.User;
 import com.zonesciences.pyrros.utils.Utils;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -218,6 +218,13 @@ public class CreateWorkoutActivity extends BaseActivity {
                         }
                         Log.i(TAG, "Exercise changed in adapter, activity notified: " + mWorkoutExercises.size());
                     }
+
+                    @Override
+                    public void onExerciseSelected(Exercise exercise) {
+                        Log.i(TAG, "onExerciseSelected. Selected: " + exercise.getName());
+                        showExerciseOptionsFragment(exercise);
+
+                    }
                 });
                 frag.setCreateWorkoutForRoutine(mCreateWorkoutForRoutine);
 
@@ -255,6 +262,12 @@ public class CreateWorkoutActivity extends BaseActivity {
                         Log.i(TAG, "Exercises changed. New workout exercises list size: " + mWorkoutExercises.size());
 
                     }
+
+                    @Override
+                    public void onExerciseSelected(Exercise exercise) {
+                        Log.i(TAG, "onExerciseSelected. Selected: " + exercise.getName());
+                        showExerciseOptionsFragment(exercise);
+                    }
                 });
                 frag.setCreateWorkoutForRoutine(mCreateWorkoutForRoutine);
                 mFragmentReferenceMap.put(position, frag);
@@ -288,5 +301,38 @@ public class CreateWorkoutActivity extends BaseActivity {
 
     public void setWorkoutExercises(ArrayList<Exercise> workoutExercises) {
         this.mWorkoutExercises = workoutExercises;
+    }
+
+
+    public void showExerciseOptionsFragment(Exercise exercise) {
+
+        mViewPager.setVisibility(View.GONE);
+        mTabLayout.setVisibility(View.GONE);
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        ExerciseOptionsFragment newFrag = ExerciseOptionsFragment.newInstance(exercise);
+
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.replace(R.id.exercise_options_fragment_container, newFrag, "exerciseOptionsFragment").addToBackStack(null).commit();
+
+        Log.i(TAG, "BackStackCount: " + fm.getBackStackEntryCount());
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Pressed");
+
+        ExerciseOptionsFragment fragment = (ExerciseOptionsFragment) getSupportFragmentManager().findFragmentByTag("exerciseOptionsFragment");
+        if (fragment != null) {
+            Log.i(TAG, "Exercise Options is Open");
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            mViewPager.setVisibility(View.VISIBLE);
+            mTabLayout.setVisibility(View.VISIBLE);
+        };
+
+        super.onBackPressed();
+
     }
 }

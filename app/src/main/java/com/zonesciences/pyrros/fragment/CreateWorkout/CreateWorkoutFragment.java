@@ -203,6 +203,11 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
                         mExercisesListener.onExercisesChanged((ArrayList) mWorkoutExercises);
                         Log.i(TAG, "Exercises changed: " + mWorkoutExercises.size());
                     }
+
+                    @Override
+                    public void onExerciseSelected(Exercise exercise) {
+
+                    }
                 });
 
                 // if exercises are preselected from RoutineActivity, then ensure that these are checked and that sort workout is notified

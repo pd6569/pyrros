@@ -4,6 +4,8 @@ package com.zonesciences.pyrros.fragment.CreateWorkout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -140,6 +142,11 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
                 Log.i(TAG, "Exercises changed in sort workout adapter, fragment notified. Now notify host activity");
                 mWorkoutExercises = exerciseList;
                 mExercisesListener.onExercisesChanged(mWorkoutExercises);
+            }
+
+            @Override
+            public void onExerciseSelected(Exercise exercise) {
+
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -300,6 +307,11 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
                 mWorkoutExercises = exerciseList;
                 mExercisesListener.onExercisesChanged(mWorkoutExercises);
             }
+
+            @Override
+            public void onExerciseSelected(Exercise exercise) {
+                mExercisesListener.onExerciseSelected(exercise);
+            }
         });
         mRecyclerView.setAdapter(mAdapter);
         mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
@@ -380,4 +392,26 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
     public void setMultiSelectDisabled(boolean multiSelectDisabled) {
         isMultiSelectDisabled = multiSelectDisabled;
     }
+
+    /*public void showExerciseOptions(Exercise exercise){
+
+        FragmentManager fm = getChildFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        // Remove any currently showing dialog.
+        Fragment prevFrag = fm.findFragmentByTag("exerciseOptionsFragment");
+
+        if (prevFrag != null) {
+            Log.i(TAG, "Exercise options fragment found, remove it");
+            ft.remove(prevFrag);
+            ft.addToBackStack(null);
+        }
+
+        ExerciseOptionsFragment newFrag = ExerciseOptionsFragment.newInstance(exercise);
+
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.replace(R.id.sort_workout_layout, newFrag, "exerciseOptionsFragment").addToBackStack(null).commit();
+
+        Log.i(TAG, "BackStackCount: " + fm.getBackStackEntryCount());
+    }*/
 }

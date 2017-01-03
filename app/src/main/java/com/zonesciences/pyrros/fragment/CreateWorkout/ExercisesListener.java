@@ -13,5 +13,6 @@ public interface ExercisesListener {
     public void onExercisesEmpty ();
     public void onExerciseRemoved (Exercise exercise);
     public void onExercisesChanged (ArrayList<Exercise> exerciseList);
+    public void onExerciseSelected (Exercise exercise);
 
 }
