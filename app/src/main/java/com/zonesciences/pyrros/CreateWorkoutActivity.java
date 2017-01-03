@@ -11,6 +11,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.zonesciences.pyrros.adapters.SortWorkoutAdapter;
 import com.zonesciences.pyrros.fragment.CreateWorkout.CreateWorkoutFragment;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExerciseOptionsFragment;
 import com.zonesciences.pyrros.fragment.CreateWorkout.ExercisesListener;
@@ -56,6 +59,7 @@ public class CreateWorkoutActivity extends BaseActivity {
 
     // Toolbar, tabs and pager
     Toolbar mToolbar;
+    TextView mToolbarTitleText;
     TabLayout mTabLayout;
     ViewPager mViewPager;
     CreateWorkoutPagerAdapter mPagerAdapter;
@@ -69,6 +73,7 @@ public class CreateWorkoutActivity extends BaseActivity {
     // Preselected exercises e.g. from Routine Activity
     ArrayList<Exercise> mPreselectedExercises = new ArrayList<>();
     boolean mExercisesChanged = false;
+    String mWorkoutTitle = "New Workout";
 
     // Is this activity to create a workout for a routine?
     boolean mCreateWorkoutForRoutine = false;
@@ -95,6 +100,11 @@ public class CreateWorkoutActivity extends BaseActivity {
         if (intent.hasExtra(EXTRA_WORKOUT_EXERCISES)){
             mPreselectedExercises = (ArrayList<Exercise>) intent.getSerializableExtra(EXTRA_WORKOUT_EXERCISES);
             Log.i(TAG, "Exercises received: " + mPreselectedExercises.size());
+
+        }
+
+        if (intent.hasExtra(EXTRA_WORKOUT_TITLE)){
+            mWorkoutTitle = intent.getStringExtra(EXTRA_WORKOUT_TITLE);
 
         }
 
@@ -134,21 +144,54 @@ public class CreateWorkoutActivity extends BaseActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_workout);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        TextView toolbarTitleText = (TextView) mToolbar.findViewById(R.id.toolbar_title_create_workout);
-        toolbarTitleText.findViewById(R.id.toolbar_title_create_workout).setOnClickListener(new View.OnClickListener() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mToolbarTitleText = (TextView) mToolbar.findViewById(R.id.toolbar_title_create_workout);
+        mToolbarTitleText.setText(mWorkoutTitle);
+        mToolbarTitleText.findViewById(R.id.toolbar_title_create_workout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Title clicked");
             }
         });
 
-        if (intent.hasExtra(EXTRA_WORKOUT_TITLE)){
-            String workoutTitle = intent.getStringExtra(EXTRA_WORKOUT_TITLE);
-            toolbarTitleText.setText(workoutTitle);
-        }
-
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs_create_workout);
         mTabLayout.setupWithViewPager(mViewPager);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home){
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "Back Pressed");
+
+        ExerciseOptionsFragment fragment = (ExerciseOptionsFragment) getSupportFragmentManager().findFragmentByTag("exerciseOptionsFragment");
+        if (fragment != null) {
+            Log.i(TAG, "Exercise Options is Open");
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            mViewPager.setVisibility(View.VISIBLE);
+            mTabLayout.setVisibility(View.VISIBLE);
+
+            // reset start workout / save changes action
+            SortWorkoutFragment frag = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
+            frag.getStartWorkoutAction().setVisible(true);
+
+            // reset title
+            if (mWorkoutTitle != null) {
+                mToolbarTitleText.setText(mWorkoutTitle);
+            } else {
+                mToolbarTitleText.setText("New Workout");
+            }
+        };
+
+        super.onBackPressed();
 
     }
 
@@ -169,6 +212,44 @@ public class CreateWorkoutActivity extends BaseActivity {
         super.finish();
     }
 
+    public void showExerciseOptionsFragment(final Exercise exercise) {
+
+        mViewPager.setVisibility(View.GONE);
+        mTabLayout.setVisibility(View.GONE);
+
+        // Setup toolbar
+        mToolbarTitleText.setText("Edit: " + exercise.getName());
+        SortWorkoutFragment fragment = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
+        fragment.getStartWorkoutAction().setVisible(false);
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        ExerciseOptionsFragment newFrag = ExerciseOptionsFragment.newInstance(exercise);
+
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.replace(R.id.exercise_options_fragment_container, newFrag, "exerciseOptionsFragment").addToBackStack(null).commit();
+
+        Log.i(TAG, "BackStackCount: " + fm.getBackStackEntryCount());
+    }
+
+    // GETTERS AND SETTERS
+    public Fragment getFragment (int position){
+        return mFragmentReferenceMap.get(position);
+    }
+
+    public String getWorkoutDate() {
+        return mWorkoutDate;
+    }
+
+
+    public void setWorkoutExercises(ArrayList<Exercise> workoutExercises) {
+        this.mWorkoutExercises = workoutExercises;
+    }
+
+    /***
+     * PAGER ADAPTER CLASS
+     */
 
     class CreateWorkoutPagerAdapter extends FragmentPagerAdapter {
 
@@ -290,49 +371,4 @@ public class CreateWorkoutActivity extends BaseActivity {
         }
     }
 
-    public Fragment getFragment (int position){
-        return mFragmentReferenceMap.get(position);
-    }
-
-    public String getWorkoutDate() {
-        return mWorkoutDate;
-    }
-
-
-    public void setWorkoutExercises(ArrayList<Exercise> workoutExercises) {
-        this.mWorkoutExercises = workoutExercises;
-    }
-
-
-    public void showExerciseOptionsFragment(Exercise exercise) {
-
-        mViewPager.setVisibility(View.GONE);
-        mTabLayout.setVisibility(View.GONE);
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        ExerciseOptionsFragment newFrag = ExerciseOptionsFragment.newInstance(exercise);
-
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.replace(R.id.exercise_options_fragment_container, newFrag, "exerciseOptionsFragment").addToBackStack(null).commit();
-
-        Log.i(TAG, "BackStackCount: " + fm.getBackStackEntryCount());
-    }
-
-    @Override
-    public void onBackPressed() {
-        Log.i(TAG, "Back Pressed");
-
-        ExerciseOptionsFragment fragment = (ExerciseOptionsFragment) getSupportFragmentManager().findFragmentByTag("exerciseOptionsFragment");
-        if (fragment != null) {
-            Log.i(TAG, "Exercise Options is Open");
-            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-            mViewPager.setVisibility(View.VISIBLE);
-            mTabLayout.setVisibility(View.VISIBLE);
-        };
-
-        super.onBackPressed();
-
-    }
 }

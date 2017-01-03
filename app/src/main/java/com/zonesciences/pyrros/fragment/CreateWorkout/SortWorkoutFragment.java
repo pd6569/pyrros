@@ -67,6 +67,7 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
     // Menu
     private MenuItem mStartWorkoutAction;
+    boolean mDisplayStartWorkout;
 
     // Where is fragment being displayed / what is the context of activity use
     boolean mInEditWorkout;
@@ -129,7 +130,8 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
             @Override
             public void onExercisesEmpty() {
                 Log.i(TAG, "Exercises empty");
-                if (!mInEditWorkout) mStartWorkoutAction.setVisible(false);
+                mDisplayStartWorkout = false;
+                if (!mInEditWorkout) mStartWorkoutAction.setVisible(mDisplayStartWorkout);
             }
 
             @Override
@@ -293,7 +295,8 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
             @Override
             public void onExercisesEmpty() {
                 Log.i(TAG, "Exercises empty");
-                mStartWorkoutAction.setVisible(false);
+                mDisplayStartWorkout = false;
+                mStartWorkoutAction.setVisible(mDisplayStartWorkout);
             }
 
             @Override
@@ -349,12 +352,14 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
         if (!mInEditWorkout) {
             mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
 
+            // change "start" text to tick/done icon if creating/editing workout for a routine
             if (mCreateWorkoutForRoutine){
                 mStartWorkoutAction.setIcon(R.drawable.ic_done_white_24dp);
             }
 
             if (mWorkoutExercises.size() > 0) {
-                mStartWorkoutAction.setVisible(true);
+                mDisplayStartWorkout = true;
+                mStartWorkoutAction.setVisible(mDisplayStartWorkout);
             }
         }
 
@@ -391,6 +396,14 @@ public class SortWorkoutFragment extends Fragment implements OnDragListener, Act
 
     public void setMultiSelectDisabled(boolean multiSelectDisabled) {
         isMultiSelectDisabled = multiSelectDisabled;
+    }
+
+    public MenuItem getStartWorkoutAction() {
+        return mStartWorkoutAction;
+    }
+
+    public boolean isDisplayStartWorkout() {
+        return mDisplayStartWorkout;
     }
 
     /*public void showExerciseOptions(Exercise exercise){

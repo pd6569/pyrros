@@ -311,6 +311,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
         mStartWorkoutAction = menu.findItem(R.id.action_start_workout);
 
+        // change "start" text to tick/done icon if creating/editing workout for a routine
         if (mCreateWorkoutForRoutine){
             mStartWorkoutAction.setIcon(R.drawable.ic_done_white_24dp);
         }
@@ -599,7 +600,7 @@ public class CreateWorkoutFragment extends Fragment implements SearchView.OnQuer
 
     private void createWorkoutForRoutine(){
         Log.i(TAG, "create workout for routine, do not start a workout, return to routine activity");
-        getActivity().finish();
+        getActivity().onBackPressed();
     }
 
     @Override
