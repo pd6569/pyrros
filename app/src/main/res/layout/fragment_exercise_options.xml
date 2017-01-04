@@ -117,8 +117,7 @@
             android:layout_height="wrap_content"
             android:inputType="number"
             android:maxLength="3"
-            android:hint="LLL"
-            android:textColorHint="#00FFFFFF"
+            android:hint="Reps"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"/>
 

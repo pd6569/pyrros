@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
@@ -48,6 +49,8 @@ public class ExerciseOptionsFragment extends Fragment {
     Button mIncreaseReps;
     Button mDecreaseReps;
     Button mAddSet;
+    LinearLayout mRepTempoLinearLayout;
+    LinearLayout mRestIntervalLinearLayout;
 
     // Recycler
     RecyclerView mRecyclerView;
@@ -82,7 +85,7 @@ public class ExerciseOptionsFragment extends Fragment {
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_exercise_options, container, false);
 
-        // Recycler
+        // Recycler for adding sets
         mRecyclerView = (RecyclerView)  view.findViewById(R.id.dialog_exercise_options_add_sets_recycler);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
@@ -95,6 +98,24 @@ public class ExerciseOptionsFragment extends Fragment {
 
         mAdapter = new AddSetExerciseOptionsAdapter(getContext(), mSets);
         mRecyclerView.setAdapter(mAdapter);
+
+        // Rep Tempo
+        mRepTempoLinearLayout = (LinearLayout) view.findViewById(R.id.exercise_options_rep_tempo_setting);
+        mRepTempoLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRepTempoDialog();
+            }
+        });
+
+        // Rest
+        mRestIntervalLinearLayout = (LinearLayout) view.findViewById(R.id.exercise_options_rep_tempo_setting);
+        mRestIntervalLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRestIntervalDialog();
+            }
+        });
 
         mNumRepsField = (EditText) view.findViewById(R.id.exercise_options_num_reps_edit_text);
         mDecreaseReps = (Button) view.findViewById(R.id.exercise_options_decrease_reps_button);
@@ -140,6 +161,14 @@ public class ExerciseOptionsFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void showRepTempoDialog(){
+
+    }
+
+    public void showRestIntervalDialog(){
+
     }
 
     /*@Override
