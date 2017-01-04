@@ -6,6 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment">
 
+    <!--REP TEMPO-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,7 +35,6 @@
             android:id="@+id/exercise_options_rep_tempo_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAllCaps="true"
             android:gravity="left"
             android:layout_margin="5dp"
             android:paddingBottom="5dp"
@@ -41,6 +42,8 @@
 
     </LinearLayout>
 
+
+    <!--REST INTERVAL-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -78,6 +81,7 @@
 
     </LinearLayout>
 
+    <!-- ADD SETS -->
 
     <TextView
         android:layout_width="wrap_content"
@@ -96,6 +100,13 @@
         android:layout_marginLeft="5dp"
         android:background="@color/colorAccent">
     </View>
+
+    <TextView
+        android:id="@+id/exercise_options_num_sets_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="8 sets of 12 reps"/>
 
     <LinearLayout
         android:layout_width="match_parent"

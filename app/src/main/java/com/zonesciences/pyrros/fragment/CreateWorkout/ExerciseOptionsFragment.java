@@ -25,6 +25,7 @@ import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,12 +43,6 @@ public class ExerciseOptionsFragment extends Fragment {
     List<Integer> mSets;
     int mNumReps;
 
-    // View
-    EditText mNumRepsField;
-    Button mIncreaseReps;
-    Button mDecreaseReps;
-    Button mAddSet;
-
     // Rep Tempo
     TextView mRepTempoText;
     NumberPicker mEccentricNumberPicker;
@@ -60,9 +55,15 @@ public class ExerciseOptionsFragment extends Fragment {
     NumberPicker mRestIntervalSecondsNumberPicker;
 
 
-    // Recycler
+    // Recycler and add sets views
     RecyclerView mRecyclerView;
     AddSetExerciseOptionsAdapter mAdapter;
+    TextView mNumSetsText;
+    EditText mNumRepsField;
+    Button mIncreaseReps;
+    Button mDecreaseReps;
+    Button mAddSet;
+
 
     public static ExerciseOptionsFragment newInstance(Exercise exercise){
         ExerciseOptionsFragment fragment = new ExerciseOptionsFragment();
@@ -105,6 +106,12 @@ public class ExerciseOptionsFragment extends Fragment {
         }
 
         mAdapter = new AddSetExerciseOptionsAdapter(getContext(), mSets);
+        mAdapter.setSetRemovedListener(new AddSetExerciseOptionsAdapter.SetRemovedListener() {
+            @Override
+            public void onSetRemoved() {
+                updateSetsInfo();
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
 
         // Rep Tempo
@@ -112,7 +119,7 @@ public class ExerciseOptionsFragment extends Fragment {
         if (mExercise.getRepTempo() != null) {
             mRepTempoText.setText(mExercise.getRepTempo());
         } else {
-            mRepTempoText.setText("Tempo not set");
+            mRepTempoText.setText("Not set");
         }
         mRepTempoText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,13 +130,22 @@ public class ExerciseOptionsFragment extends Fragment {
 
         // Rest Interval
         mRestIntervalText = (TextView) view.findViewById(R.id.exercise_options_rest_interval_textview);
-        mRestIntervalText.setText(Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.MINUTES) + ":" + Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.SECONDS));
+        if (mExercise.getRestInterval() == 0){
+            mRestIntervalText.setText("Not set");
+        } else {
+            mRestIntervalText.setText(Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.MINUTES) + ":" + Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.SECONDS));
+        }
         mRestIntervalText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showRestIntervalDialog();
             }
         });
+
+        // Add sets
+
+        mNumSetsText = (TextView) view.findViewById(R.id.exercise_options_num_sets_textview);
+        updateSetsInfo();
 
         mNumRepsField = (EditText) view.findViewById(R.id.exercise_options_num_reps_edit_text);
         mDecreaseReps = (Button) view.findViewById(R.id.exercise_options_decrease_reps_button);
@@ -171,10 +187,30 @@ public class ExerciseOptionsFragment extends Fragment {
                 mSets.add(Integer.parseInt(mNumRepsField.getText().toString()));
                 mExercise.setPrescribedReps(mSets);
                 mAdapter.notifyDataSetChanged();
+                updateSetsInfo();
             }
         });
 
         return view;
+    }
+
+    private void updateSetsInfo() {
+        if (mSets == null || mSets.size() == 0) {
+            mNumSetsText.setText("No sets added");
+        } else {
+            int numSets = mSets.size();
+            String setsInfo;
+            boolean sameReps = false;
+            int repsLow = Collections.min(mSets);
+            int repsHigh = Collections.max(mSets);
+            if (repsLow == repsHigh) sameReps = true;
+            if (sameReps) {
+                setsInfo = numSets + " sets of " + repsHigh + " reps";
+            } else {
+                setsInfo = numSets + " sets of " + repsLow + "-" + repsHigh + " reps";
+            }
+            mNumSetsText.setText(setsInfo);
+        }
     }
 
     public void showRepTempoDialog(){

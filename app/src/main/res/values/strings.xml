@@ -121,7 +121,7 @@
     <string name="action_done">Done</string>
     <string name="menu_edit_routine">Edit routine</string>
     <string name="menu_save_routine">Save</string>
-    <string name="add_sets">add sets</string>
+    <string name="add_sets">Sets</string>
     <string name="repetition_tempo">Rep tempo</string>
     <string name="rest_interval">rest interval</string>
     <string name="eccentric">Eccentric</string>

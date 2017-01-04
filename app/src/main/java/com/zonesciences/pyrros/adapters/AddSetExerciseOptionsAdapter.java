@@ -24,6 +24,9 @@ public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExe
     Context mContext;
     List<Integer> mSets;
 
+    // Listener
+    SetRemovedListener mSetRemovedListener;
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView setNumberText;
@@ -40,6 +43,7 @@ public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExe
                 public void onClick(View v) {
                     mSets.remove(getAdapterPosition());
                     notifyDataSetChanged();
+                    mSetRemovedListener.onSetRemoved();
                 }
             });
         }
@@ -72,5 +76,14 @@ public class AddSetExerciseOptionsAdapter extends RecyclerView.Adapter<AddSetExe
 
     public List<Integer> getSets() {
         return mSets;
+    }
+
+    // Sets listener
+    public interface SetRemovedListener{
+        void onSetRemoved();
+    }
+
+    public void setSetRemovedListener(SetRemovedListener listener){
+        this.mSetRemovedListener = listener;
     }
 }
