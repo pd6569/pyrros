@@ -19,8 +19,10 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.R;
+import com.zonesciences.pyrros.Timer.WorkoutTimer;
 import com.zonesciences.pyrros.adapters.AddSetExerciseOptionsAdapter;
 import com.zonesciences.pyrros.models.Exercise;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +54,11 @@ public class ExerciseOptionsFragment extends Fragment {
     NumberPicker mPauseNumberPicker;
     NumberPicker mConcentricPicker;
 
+    // Rest Interval
     TextView mRestIntervalText;
+    NumberPicker mRestIntervalMinutesNumberPicker;
+    NumberPicker mRestIntervalSecondsNumberPicker;
+
 
     // Recycler
     RecyclerView mRecyclerView;
@@ -103,7 +109,11 @@ public class ExerciseOptionsFragment extends Fragment {
 
         // Rep Tempo
         mRepTempoText = (TextView) view.findViewById(R.id.exercise_options_rep_tempo_textview);
-        mRepTempoText.setText(mExercise.getRepTempo());
+        if (mExercise.getRepTempo() != null) {
+            mRepTempoText.setText(mExercise.getRepTempo());
+        } else {
+            mRepTempoText.setText("Tempo not set");
+        }
         mRepTempoText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +122,14 @@ public class ExerciseOptionsFragment extends Fragment {
         });
 
         // Rest Interval
-
+        mRestIntervalText = (TextView) view.findViewById(R.id.exercise_options_rest_interval_textview);
+        mRestIntervalText.setText(Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.MINUTES) + ":" + Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.SECONDS));
+        mRestIntervalText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRestIntervalDialog();
+            }
+        });
 
         mNumRepsField = (EditText) view.findViewById(R.id.exercise_options_num_reps_edit_text);
         mDecreaseReps = (Button) view.findViewById(R.id.exercise_options_decrease_reps_button);
@@ -203,6 +220,7 @@ public class ExerciseOptionsFragment extends Fragment {
 
 
         builder
+                .setTitle("Rep Tempo")
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialogBox, int id){
@@ -232,6 +250,55 @@ public class ExerciseOptionsFragment extends Fragment {
 
     public void showRestIntervalDialog(){
 
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.dialog_rest_interval, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+
+        int mins;
+        int secs;
+
+        mins = (int) (mExercise.getRestInterval() / 60);
+        secs = (int) mExercise.getRestInterval() - (mins * 60);
+
+        // Minutes number picker
+        mRestIntervalMinutesNumberPicker = (NumberPicker) dialogView.findViewById(R.id.rest_interval_mins_number_picker);
+        mRestIntervalMinutesNumberPicker.setMinValue(0);
+        mRestIntervalMinutesNumberPicker.setMaxValue(15);
+        mRestIntervalMinutesNumberPicker.setValue(mins);
+
+        // Seconds number picker
+        mRestIntervalSecondsNumberPicker = (NumberPicker) dialogView.findViewById(R.id.rest_interval__secs_number_picker);
+        mRestIntervalSecondsNumberPicker.setMinValue(0);
+        mRestIntervalSecondsNumberPicker.setMaxValue(59);
+        mRestIntervalSecondsNumberPicker.setValue(secs);
+
+        builder
+                .setTitle("Rest interval")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialogBox, int id){
+                        int mins = mRestIntervalMinutesNumberPicker.getValue();
+                        int secs = mRestIntervalSecondsNumberPicker.getValue();
+                        int restInterval = (mins * 60) + secs;
+                        mExercise.setRestInterval(restInterval);
+                        Log.i(TAG, "Rest interval: " + restInterval);
+                        mRestIntervalText.setText(Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.MINUTES) + ":" + Utils.timeToDisplay(mExercise.getRestInterval() * 1000).get(Utils.SECONDS));
+                    }
+                })
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Log.i(TAG, "onDismiss");
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialogBox, int id){
+                        dialogBox.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     /*@Override

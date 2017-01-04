@@ -30,7 +30,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Peter on 11/11/2016.
@@ -44,12 +46,15 @@ public class Utils {
     public static final String UNIT_IMPERIAL = " lbs";
 
     // Date formats
-
     public static final String DATE_FORMAT_FULL = "yyyy-MM-dd, HH:mm:ss";
     public static final String DATE_FORMAT_1 = "EEE, dd MMM";
     public static final String DATE_FORMAT_2 = "EEE dd MMM, yyyy";
     public static final String DATE_FORMAT_DATE_ONLY = "yyyy-MM-dd";
     public static final String DATE_FORMAT_TIME_ONLY = "HH:mm";
+
+    // Time
+    public static final String MINUTES = "MinutesDisplay";
+    public static final String SECONDS = "SecondsDisplay";
 
     public static String formatWeight(double weight){
         String s;
@@ -161,5 +166,43 @@ public class Utils {
     public static FirebaseDatabase getDatabase(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         return database;
+    }
+
+    // Method for formatting countdown display
+    public static Map<String, String> timeToDisplay (long timeRemainingMillis){
+
+        Map<String, String> timeToDisplay = new HashMap<>();
+
+        int timeRemainingSecs = (int) (timeRemainingMillis / 1000);
+
+        int secondsRemaining;
+
+        double minutesRemaining = timeRemainingSecs / 60;
+
+        if (minutesRemaining >= 1){
+            secondsRemaining = (timeRemainingSecs - ((int) minutesRemaining * 60));
+        } else {
+            secondsRemaining = timeRemainingSecs;
+        }
+
+        String minsToDisplay = new String();
+        String secsToDisplay = new String();
+
+        if (minutesRemaining < 10){
+            minsToDisplay = 0 + Integer.toString((int) minutesRemaining);
+        } else {
+            minsToDisplay = Integer.toString((int) minutesRemaining);
+        }
+        if (secondsRemaining < 10){
+            secsToDisplay = 0 + Integer.toString(secondsRemaining);
+        } else {
+            secsToDisplay = Integer.toString(secondsRemaining);
+        }
+
+        timeToDisplay.put(MINUTES, minsToDisplay);
+        timeToDisplay.put(SECONDS, secsToDisplay);
+
+        return timeToDisplay;
+
     }
 }

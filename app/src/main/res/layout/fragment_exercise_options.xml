@@ -50,7 +50,6 @@
         android:clickable="true">
 
         <TextView
-            android:id="@+id/exercise_options_rest_interval_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
@@ -69,6 +68,7 @@
         </View>
 
         <TextView
+            android:id="@+id/exercise_options_rest_interval_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="left"

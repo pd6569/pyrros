@@ -299,6 +299,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         order = in.readInt();
         exerciseId = in.readString();
         repTempo = in.readString();
+        restInterval = in.readInt();
     }
 
     @Exclude
@@ -341,6 +342,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         dest.writeInt(order);
         dest.writeString(exerciseId);
         dest.writeString(repTempo);
+        dest.writeInt(restInterval);
     }
 
     @Exclude
