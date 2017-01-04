@@ -24,6 +24,7 @@
                 android:textStyle="bold" />
 
             <NumberPicker
+                android:id="@+id/eccentric_number_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
             </NumberPicker>
@@ -49,7 +50,7 @@
                 android:textStyle="bold" />
 
             <NumberPicker
-                android:id="@+id/rep_tempo_pause_number_picker"
+                android:id="@+id/pause_number_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -75,6 +76,7 @@
                 android:textStyle="bold" />
 
             <NumberPicker
+                android:id="@+id/concentric_number_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 

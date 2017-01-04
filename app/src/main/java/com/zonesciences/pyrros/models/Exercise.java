@@ -16,6 +16,11 @@ import java.util.UUID;
  */
 public class Exercise implements Comparable<Exercise>, Parcelable {
 
+
+    /***
+     * IF YOU ADD A NEW PROPERTY - MAKE SURE YOU AMMEND PARCELABLE METHODS TO INCLUDE THE ADDED PROPERTIES
+     */
+
     public String uid;
     public String name;
     public String muscleGroup;
@@ -29,7 +34,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     public List<Integer> prescribedReps;
     public List<Double> prescribedWeight;
     public int restInterval;
-    public int tempo;
+    public String repTempo;
 
     public Exercise(){
         // Default constructor required for calls to DataSnapshot.getValue(Exercise.class)
@@ -77,7 +82,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         result.put("prescribedReps", prescribedReps);
         result.put("prescribedWeight", prescribedWeight);
         result.put("restInterval", restInterval);
-        result.put("tempo", tempo);
+        result.put("repTempo", repTempo);
         return result;
     }
 
@@ -192,13 +197,13 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
     }
 
     @Exclude
-    public int getTempo() {
-        return tempo;
+    public String getRepTempo() {
+        return repTempo;
     }
 
     @Exclude
-    public void setTempo(int tempo) {
-        this.tempo = tempo;
+    public void setRepTempo(String repTempo) {
+        this.repTempo = repTempo;
     }
 
     @Exclude
@@ -293,6 +298,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         sets = in.readInt();
         order = in.readInt();
         exerciseId = in.readString();
+        repTempo = in.readString();
     }
 
     @Exclude
@@ -334,6 +340,7 @@ public class Exercise implements Comparable<Exercise>, Parcelable {
         dest.writeInt(sets);
         dest.writeInt(order);
         dest.writeString(exerciseId);
+        dest.writeString(repTempo);
     }
 
     @Exclude

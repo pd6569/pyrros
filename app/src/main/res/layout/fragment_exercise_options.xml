@@ -7,12 +7,9 @@
     tools:context="com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment">
 
     <LinearLayout
-        android:id="@+id/exercise_options_rep_tempo_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:focusable="true"
-        android:clickable="true">
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -33,6 +30,7 @@
         </View>
 
         <TextView
+            android:id="@+id/exercise_options_rep_tempo_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
@@ -45,7 +43,6 @@
 
 
     <LinearLayout
-        android:id="@+id/exercise_options_exercise_rest_interval_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -53,6 +50,7 @@
         android:clickable="true">
 
         <TextView
+            android:id="@+id/exercise_options_rest_interval_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
