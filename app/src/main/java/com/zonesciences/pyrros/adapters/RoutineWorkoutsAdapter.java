@@ -50,6 +50,12 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
         TextView noExercisesTextView;
         LinearLayout exercisesContainerLinearLayout;
 
+        // Workout Overview
+        LinearLayout workoutOverviewContainer;
+        TextView totalSetsTextView;
+        TextView muscleGroupsTextView;
+        TextView workoutDurationTextView;
+
         public ViewHolder(View itemView) {
             super(itemView);
             workoutTitleTextView = (TextView) itemView.findViewById(R.id.routine_workout_item_textview);
@@ -79,6 +85,11 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
                     mAddExerciseListener.onChangeExistingExercises(getAdapterPosition());
                 }
             });
+
+            workoutOverviewContainer = (LinearLayout) itemView.findViewById(R.id.linear_layout_routine_workout_overview_container);
+            totalSetsTextView = (TextView) itemView.findViewById(R.id.routine_workout_total_sets_textview);
+            muscleGroupsTextView = (TextView) itemView.findViewById(R.id.routine_workout_muscle_groups_textview);
+            workoutDurationTextView = (TextView) itemView.findViewById(R.id.routine_workout_workout_duration_textview);
         }
     }
 
@@ -135,6 +146,14 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
             }
         } else {
             holder.noExercisesTextView.setVisibility(View.VISIBLE);
+        }
+
+        holder.workoutOverviewContainer.setVisibility(View.GONE);
+        if (exercises != null){
+            holder.workoutOverviewContainer.setVisibility(View.VISIBLE);
+            int totalSets;
+            String muscleGroups;
+            int workoutDuration;
         }
     }
 

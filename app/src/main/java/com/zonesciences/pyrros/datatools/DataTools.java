@@ -76,6 +76,11 @@ public class DataTools {
 
     OnDataLoadCompleteListener mListener;
 
+    // Anonymous constructor
+    public DataTools (ArrayList<Exercise> exercises){
+        mExercises = exercises;
+    }
+
 
     //Constructor without exercises list passed in - generates exercises from firebase call.
     public DataTools (String userId, String exerciseKey){
@@ -286,6 +291,18 @@ public class DataTools {
 
     // Methods for calculations
 
+    public int totalPrescribedSets(){
+        int totalPrescribedSets = 0;
+        for(Exercise exercise : mExercises){
+            List<Integer> prescribedReps = exercise.getPrescribedReps();
+            if (prescribedReps != null) {
+                int prescribedSets = exercise.getPrescribedReps().size();
+                totalPrescribedSets = totalPrescribedSets + prescribedSets;
+            }
+        }
+        return totalPrescribedSets;
+    }
+
     public int totalSets(){
         int totalSets = 0;
         for(Exercise exercise : mExercises){
@@ -337,6 +354,56 @@ public class DataTools {
             }
         }
         return totalVolume;
+    }
+
+    public String getMuscleGroupsForWorkout(){
+        List<String> muscleGroupsList = new ArrayList<>();
+        for (Exercise e : mExercises){
+            if (!muscleGroupsList.contains(e.getMuscleGroup())){
+                muscleGroupsList.add(e.getMuscleGroup());
+            }
+        }
+        String muscleGroupsString = new String();
+        for (int i = 0; i < muscleGroupsList.size(); i++){
+            if (i == 0){
+                muscleGroupsString = muscleGroupsList.get(i);
+            } else {
+                muscleGroupsString.concat(", " + muscleGroupsList.get(i));
+            }
+        }
+
+        return muscleGroupsString;
+    }
+
+    public int getEstimatedWorkoutDuration(){
+        int workoutDuration = 300; // 5 minute warm up as standard
+        for (Exercise e : mExercises){
+            if (e.getPrescribedReps() == null){
+                // reps not prescribed for exercise, add default value of 5 minutes for this exercise
+                workoutDuration+=300;
+            } else {
+
+                // estimate duration for set
+                List<Integer> prescribedReps = e.getPrescribedReps();
+                int exerciseDuration = 0;
+                for (int rep : prescribedReps){
+                    int setDuration = rep * 4;
+                    workoutDuration += setDuration;
+                }
+
+                // add in rest intervals
+                if (e.getRestInterval() > 0){
+                    int totalRestTime = e.getRestInterval() * (prescribedReps.size() - 1);
+                    workoutDuration += totalRestTime;
+                }
+            }
+        }
+
+        // add in rest between exercises
+        int restBetweenExercises = 120 * (mExercises.size() - 1);
+        workoutDuration += restBetweenExercises;
+
+        return workoutDuration;
     }
 
 
