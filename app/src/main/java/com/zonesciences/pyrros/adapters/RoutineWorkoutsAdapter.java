@@ -160,7 +160,7 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
 
             holder.totalSetsTextView.setText(Integer.toString(totalSets));
             holder.muscleGroupsTextView.setText(muscleGroups);
-            holder.workoutDurationTextView.setText(Integer.toString(workoutDurationMinutes));
+            holder.workoutDurationTextView.setText(Integer.toString(workoutDurationMinutes) + " mins");
         }
     }
 
