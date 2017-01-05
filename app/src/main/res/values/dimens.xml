@@ -12,4 +12,5 @@
     <dimen name="timer_options">16dp</dimen>
     <dimen name="timer_overlay">24dp</dimen>
     <dimen name="workout_overview">20dp</dimen>
+    <dimen name="routine_overview">18dp</dimen>
 </resources>

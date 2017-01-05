@@ -16,7 +16,7 @@
         android:foreground="?selectableItemBackground"
         android:weightSum="10"
         android:paddingTop="15dp"
-        android:paddingBottom="15dp"
+        android:paddingBottom="5dp"
         android:paddingLeft="10dp"
         android:paddingRight="15dp">
 
@@ -33,6 +33,13 @@
             android:layout_weight="8"
             android:text="Routine name"/>
 
+        <TextView
+            android:id="@+id/view_routines_subtitle_creator_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="italic"
+            android:text="created by peterdesouza"/>
+
         <View
             android:id="@+id/workout_divider"
             android:layout_width="match_parent"
@@ -42,13 +49,126 @@
             android:background="@color/divider">
         </View>
 
+        <TextView
+            android:id="@+id/view_routines_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:text="Routine created by some noob for the purposes of packing on tonnes of lean muscle in the shortest amount of time possible. Consists of 2 workouts each week rotating in monthly cycles"/>
+
+        <!-- Routine Overview Box -->
+
         <LinearLayout
-            android:id="@+id/linear_layout_routine_view_workouts_container"
+            android:id="@+id/item_routines_overview_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:background="@drawable/border_routine_overview"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:weightSum="3">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Workouts"/>
+
+                <TextView
+                    android:id="@+id/item_routines_num_workouts_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/routine_overview"
+                    android:text="4"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Focus"/>
+
+                <TextView
+                    android:id="@+id/item_routines_focus_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/routine_overview"
+                    android:text="Hypertrophy"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Level"/>
+
+                <TextView
+                    android:id="@+id/item_routines_workout_level_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/routine_overview"
+                    android:text="Advanced"/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/divider">
+        </View>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/item_routines_view_routine_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:textAllCaps="true"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:padding="5dp"
+                android:text="View"
+                />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

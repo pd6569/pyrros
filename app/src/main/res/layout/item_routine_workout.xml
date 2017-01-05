@@ -98,6 +98,7 @@
             android:id="@+id/linear_layout_routine_workout_overview_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="vertical"
             android:background="@drawable/border_workout_overview">
 

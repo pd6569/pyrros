@@ -25,6 +25,9 @@ public class Routine {
     public Map<String, Boolean> workouts = new HashMap<>();
     public int numWorkouts;
     public List<Workout> workoutsList;
+    public String description;
+    public String focus;
+    public String level;
 
     public Routine(){
 
@@ -56,6 +59,9 @@ public class Routine {
         result.put("users", users);
         result.put("workouts", workouts);
         result.put("numWorkouts", numWorkouts);
+        result.put("description", description);
+        result.put("focus", focus);
+        result.put("level", level);
         return result;
     }
 
@@ -160,6 +166,36 @@ public class Routine {
     @Exclude
     public void setWorkoutsList(List<Workout> workoutsList) {
         this.workoutsList = workoutsList;
+    }
+
+    @Exclude
+    public String getDescription() {
+        return description;
+    }
+
+    @Exclude
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Exclude
+    public String getFocus() {
+        return focus;
+    }
+
+    @Exclude
+    public void setFocus(String focus) {
+        this.focus = focus;
+    }
+
+    @Exclude
+    public String getLevel() {
+        return level;
+    }
+
+    @Exclude
+    public void setLevel(String level) {
+        this.level = level;
     }
 
     @Exclude
