@@ -21,6 +21,7 @@ import com.zonesciences.pyrros.RoutineActivity;
 import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
+import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.Collections;
 import java.util.List;
@@ -117,9 +118,20 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
                 holder.noExercisesTextView.setVisibility(View.GONE);
             }
             for (Exercise e : exercises){
-                TextView exerciseName = new TextView(mActivity);
-                exerciseName.setText(e.getName());
-                holder.exercisesContainerLinearLayout.addView(exerciseName);
+                LayoutInflater inflater = LayoutInflater.from(mActivity);
+                View exerciseView = inflater.inflate(R.layout.item_routine_exercise_details, null);
+                TextView exerciseNameText = (TextView) exerciseView.findViewById(R.id.routine_exercise_details_exercise_name);
+                TextView setsText = (TextView) exerciseView.findViewById(R.id.routine_exercise_details_sets);
+
+                exerciseNameText.setText(e.getName());
+                List<Integer> sets = e.getPrescribedReps();
+                if (sets != null){
+                    setsText.setText(Utils.generateSetsInfoString(sets));
+                } else {
+                    setsText.setVisibility(View.GONE);
+                }
+
+                holder.exercisesContainerLinearLayout.addView(exerciseView);
             }
         } else {
             holder.noExercisesTextView.setVisibility(View.VISIBLE);

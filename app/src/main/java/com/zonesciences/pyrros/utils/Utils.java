@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -204,5 +205,30 @@ public class Utils {
 
         return timeToDisplay;
 
+    }
+
+
+    /// Format display of sets information.
+
+    /**
+     * Returns String which displays number of sets and reps for an exercise
+     * @param sets List of reps for the sets to be formatted into string
+     * @return String with formatted sets and reps
+     */
+    public static String generateSetsInfoString (List<Integer> sets) {
+
+        int numSets = sets.size();
+        String setsInfo;
+        boolean sameReps = false;
+        int repsLow = Collections.min(sets);
+        int repsHigh = Collections.max(sets);
+        if (repsLow == repsHigh) sameReps = true;
+        if (sameReps) {
+            setsInfo = numSets + " sets of " + repsHigh + " reps";
+        } else {
+            setsInfo = numSets + " sets of " + repsLow + "-" + repsHigh + " reps";
+        }
+
+        return setsInfo;
     }
 }
