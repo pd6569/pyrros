@@ -18,11 +18,13 @@ import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.ItemTouchHelper.OnDragListener;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.RoutineActivity;
+import com.zonesciences.pyrros.datatools.DataTools;
 import com.zonesciences.pyrros.fragment.Routine.WorkoutChangedListener;
 import com.zonesciences.pyrros.models.Exercise;
 import com.zonesciences.pyrros.models.Workout;
 import com.zonesciences.pyrros.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -151,9 +153,14 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
         holder.workoutOverviewContainer.setVisibility(View.GONE);
         if (exercises != null){
             holder.workoutOverviewContainer.setVisibility(View.VISIBLE);
-            int totalSets;
-            String muscleGroups;
-            int workoutDuration;
+            DataTools dataTools = new DataTools((ArrayList) mWorkouts.get(position).getExercises());
+            int totalSets = dataTools.totalPrescribedSets();
+            String muscleGroups = dataTools.getMuscleGroupsForWorkout();
+            int workoutDurationMinutes = dataTools.getEstimatedWorkoutDurationSeconds() / 60;
+
+            holder.totalSetsTextView.setText(Integer.toString(totalSets));
+            holder.muscleGroupsTextView.setText(muscleGroups);
+            holder.workoutDurationTextView.setText(Integer.toString(workoutDurationMinutes));
         }
     }
 

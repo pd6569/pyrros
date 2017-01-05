@@ -11,4 +11,5 @@
     <dimen name="toolbar_title">20dp</dimen>
     <dimen name="timer_options">16dp</dimen>
     <dimen name="timer_overlay">24dp</dimen>
+    <dimen name="workout_overview">20dp</dimen>
 </resources>

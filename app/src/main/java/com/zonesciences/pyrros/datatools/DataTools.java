@@ -359,6 +359,11 @@ public class DataTools {
     public String getMuscleGroupsForWorkout(){
         List<String> muscleGroupsList = new ArrayList<>();
         for (Exercise e : mExercises){
+            if (e.getMuscleGroup().equals("full body")){
+                muscleGroupsList.clear();
+                muscleGroupsList.add("full body");
+                break;
+            }
             if (!muscleGroupsList.contains(e.getMuscleGroup())){
                 muscleGroupsList.add(e.getMuscleGroup());
             }
@@ -368,14 +373,14 @@ public class DataTools {
             if (i == 0){
                 muscleGroupsString = muscleGroupsList.get(i);
             } else {
-                muscleGroupsString.concat(", " + muscleGroupsList.get(i));
+                muscleGroupsString += "\n" + muscleGroupsList.get(i);
             }
         }
 
         return muscleGroupsString;
     }
 
-    public int getEstimatedWorkoutDuration(){
+    public int getEstimatedWorkoutDurationSeconds(){
         int workoutDuration = 300; // 5 minute warm up as standard
         for (Exercise e : mExercises){
             if (e.getPrescribedReps() == null){
@@ -387,15 +392,19 @@ public class DataTools {
                 List<Integer> prescribedReps = e.getPrescribedReps();
                 int exerciseDuration = 0;
                 for (int rep : prescribedReps){
-                    int setDuration = rep * 4;
+                    int setDuration = rep * 5;
                     workoutDuration += setDuration;
                 }
 
                 // add in rest intervals
+                int totalRestTime = 0;
                 if (e.getRestInterval() > 0){
-                    int totalRestTime = e.getRestInterval() * (prescribedReps.size() - 1);
-                    workoutDuration += totalRestTime;
+                    totalRestTime = e.getRestInterval() * (prescribedReps.size() - 1);
+
+                } else {
+                    totalRestTime = 60 * (prescribedReps.size() - 1);
                 }
+                workoutDuration += totalRestTime;
             }
         }
 

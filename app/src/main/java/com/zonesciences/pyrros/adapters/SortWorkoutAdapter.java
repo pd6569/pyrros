@@ -174,9 +174,13 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
             // Display sets and reps
             if (prescribedReps != null){
-                holder.setsOptionsLayout.setVisibility(View.VISIBLE);
-                holder.setsOptions.setText(generateSetsInfoString(prescribedReps));
-                holder.setsOptions.setVisibility(View.VISIBLE);
+                if (prescribedReps.size() == 0){
+                    holder.setsOptionsLayout.setVisibility(View.GONE);
+                } else {
+                    holder.setsOptionsLayout.setVisibility(View.VISIBLE);
+                    holder.setsOptions.setText(generateSetsInfoString(prescribedReps));
+                    holder.setsOptions.setVisibility(View.VISIBLE);
+                }
             }
 
             //Display rest
