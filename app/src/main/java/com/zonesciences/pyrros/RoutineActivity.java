@@ -69,6 +69,7 @@ public class RoutineActivity extends BaseActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_routine);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         createViewRoutinesFragment();
@@ -170,6 +171,9 @@ public class RoutineActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.action_edit_routine:
                 Log.i(TAG, "Edit workout");
                 editRoutineName();
@@ -199,6 +203,7 @@ public class RoutineActivity extends BaseActivity {
     private void editRoutineName(){
         mRoutineNameTextView.setVisibility(View.GONE);
         mRoutineNameEditText.setVisibility(View.VISIBLE);
+        mRoutineNameEditText.setText(mRoutineNameTextView.getText());
         mRoutineNameEditText.requestFocus();
         mEditRoutineMenuItem.setVisible(false);
         mSaveRoutineMenuItem.setVisible(true);

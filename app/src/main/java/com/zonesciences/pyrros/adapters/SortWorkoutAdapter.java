@@ -111,6 +111,12 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
                 }
             });
             exerciseOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_layout);
+            exerciseOptionsLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mExercisesListener.onExerciseSelected(mWorkoutExercises.get(getAdapterPosition()));
+                }
+            });
             setsOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_num_sets_layout);
             tempoOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_tempo_layout);
             restOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_rest_layout);
@@ -166,16 +172,21 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
             int restInterval =  mWorkoutExercises.get(position).getRestInterval();
             String repTempo = mWorkoutExercises.get(position).getRepTempo();
 
+            // Display sets and reps
             if (prescribedReps != null){
                 holder.setsOptionsLayout.setVisibility(View.VISIBLE);
-                holder.setsOptions.setText(Integer.toString(prescribedReps.size()));
+                holder.setsOptions.setText(generateSetsInfoString(prescribedReps));
                 holder.setsOptions.setVisibility(View.VISIBLE);
             }
+
+            //Display rest
             if (restInterval != 0){
                 holder.restOptionsLayout.setVisibility(View.VISIBLE);
                 holder.restOptions.setText(Integer.toString(restInterval) + " seconds");
                 holder.restOptions.setVisibility(View.VISIBLE);
             }
+
+            // Display tempo
             if (repTempo != null){
                 holder.tempoOptionsLayout.setVisibility(View.VISIBLE);
                 holder.tempoOptions.setText(repTempo);
@@ -219,6 +230,24 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
             mWorkoutExercises.get(i).setOrder(i);
             Log.i(TAG, "Setting exercise order. Exercise: " + mWorkoutExercises.get(i).getName() + " order: " + mWorkoutExercises.get(i).getOrder());
         }
+    }
+
+    // Display sets information text method
+    private String generateSetsInfoString (List<Integer> sets) {
+
+        int numSets = sets.size();
+        String setsInfo;
+        boolean sameReps = false;
+        int repsLow = Collections.min(sets);
+        int repsHigh = Collections.max(sets);
+        if (repsLow == repsHigh) sameReps = true;
+        if (sameReps) {
+            setsInfo = numSets + " sets of " + repsHigh + " reps";
+        } else {
+            setsInfo = numSets + " sets of " + repsLow + "-" + repsHigh + " reps";
+        }
+
+        return setsInfo;
     }
 
 
