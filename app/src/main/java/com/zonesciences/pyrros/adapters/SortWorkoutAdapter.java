@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zonesciences.pyrros.ActionMode.ActionModeAdapterInterface;
@@ -67,125 +68,22 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
         ImageView reorderHandle;
         ImageView deleteExercise;
 
+        // Exercise options
+        LinearLayout exerciseOptionsLayout;
+        LinearLayout setsOptionsLayout;
+        LinearLayout tempoOptionsLayout;
+        LinearLayout restOptionsLayout;
+        TextView setsOptions;
+        TextView tempoOptions;
+        TextView restOptions;
+
         public SortWorkoutViewHolder(View itemView) {
             super(itemView);
             exerciseName = (TextView) itemView.findViewById(R.id.sort_workout_exercise_name);
             exerciseName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     mExercisesListener.onExerciseSelected(mWorkoutExercises.get(getAdapterPosition()));
-/*
-                    // Sets
-                    mSets = mWorkoutExercises.get(getAdapterPosition()).getPrescribedReps();
-
-                    if (mSets != null) {
-                        Log.i(TAG, "mSets" + mSets.size());
-                    }
-
-                    Log.i(TAG, "Open dialog options");
-                    LayoutInflater inflater = LayoutInflater.from(mActivity);
-                    View dialogView = inflater.inflate(R.layout.fragment_exercise_options, null);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                    builder.setView(dialogView);
-
-                    // Find views
-                    TextView dialogTitle = (TextView) dialogView.findViewById(R.id.dialog_exercise_options_exercise_title_textview);
-                    dialogTitle.setText(mWorkoutExercises.get(getAdapterPosition()).getName());
-                    ImageView closeDialog = (ImageView) dialogView.findViewById(R.id.dialog_exercise_options_close_imageview);
-
-                    //RecyclerView
-                    RecyclerView recyclerView = (RecyclerView)  dialogView.findViewById(R.id.dialog_exercise_options_add_sets_recycler);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
-                    recyclerView.setHasFixedSize(true);
-                    DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL);
-                    recyclerView.addItemDecoration(dividerItemDecoration);
-                    if (mSets == null){
-                        mSets = new ArrayList<Integer>();
-                    }
-                    final AddSetExerciseOptionsAdapter adapter = new AddSetExerciseOptionsAdapter(mActivity, mSets);
-                    recyclerView.setAdapter(adapter);
-
-
-                    final EditText numRepsField = (EditText) dialogView.findViewById(R.id.exercise_options_num_reps_edit_text);
-                    Button decreaseReps = (Button) dialogView.findViewById(R.id.exercise_options_decrease_reps_button);
-                    decreaseReps.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (!numRepsField.getText().toString().isEmpty()) {
-                                mNumReps = Integer.parseInt(numRepsField.getText().toString());
-                            } else {
-                                mNumReps = 0;
-                            }
-                            if (mNumReps > 0){
-                                mNumReps--;
-                            }
-                            numRepsField.setText("" + mNumReps);
-                        }
-                    });
-                    Button increaseReps = (Button) dialogView.findViewById(R.id.exercise_options_increase_reps_button);
-                    increaseReps.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (!numRepsField.getText().toString().isEmpty()) {
-                                mNumReps = Integer.parseInt(numRepsField.getText().toString());
-                            } else {
-                                mNumReps = 0;
-                            }
-                            mNumReps++;
-                            numRepsField.setText("" + mNumReps);
-                        }
-                    });
-
-                    Button addSet = (Button) dialogView.findViewById(R.id.exercise_options_add_set);
-                    addSet.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (mSets == null){
-                                mSets = new ArrayList<Integer>();
-                            }
-                            mSets.add(Integer.parseInt(numRepsField.getText().toString()));
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
-
-                    builder
-                            .setCancelable(false)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener(){
-                                public void onClick(DialogInterface dialogBox, int id){
-                                    Log.i(TAG, "OK");
-                                    if (!adapter.getSets().isEmpty()){
-                                        mWorkoutExercises.get(getAdapterPosition()).setPrescribedReps(adapter.getSets());
-
-                                    }
-                                }
-                            })
-                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                @Override
-                                public void onDismiss(DialogInterface dialog) {
-                                    Log.i(TAG, "onDismiss");
-                                    if (!adapter.getSets().isEmpty()){
-                                        mWorkoutExercises.get(getAdapterPosition()).setPrescribedReps(adapter.getSets());
-                                    }
-                                    mSets = null;
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                                public void onClick(DialogInterface dialogBox, int id){
-                                    dialogBox.cancel();
-                                    mSets = null;
-                                }
-                            });
-                    final AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-
-                    closeDialog.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            alertDialog.dismiss();
-                        }
-                    });*/
-
                 }
             });
             reorderHandle = (ImageView) itemView.findViewById(R.id.sort_workout_reorder_handle);
@@ -212,6 +110,14 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
                 }
             });
+            exerciseOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_layout);
+            setsOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_num_sets_layout);
+            tempoOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_tempo_layout);
+            restOptionsLayout = (LinearLayout) itemView.findViewById(R.id.sort_workout_exercise_options_rest_layout);
+
+            setsOptions = (TextView) itemView.findViewById(R.id.sort_workout_exercise_options_num_sets_text);
+            tempoOptions = (TextView) itemView.findViewById(R.id.sort_workout_exercise_options_tempo_text);
+            restOptions = (TextView) itemView.findViewById(R.id.sort_workout_exercise_options_rest_layout_text);
         }
 
         @Override
@@ -246,7 +152,36 @@ public class SortWorkoutAdapter extends RecyclerView.Adapter<SortWorkoutAdapter.
 
     @Override
     public void onBindViewHolder(final SortWorkoutViewHolder holder, final int position) {
+        Log.i(TAG, "onBindViewHolder");
         holder.exerciseName.setText(mWorkoutExercises.get(position).getName());
+        // CLEAR EXERCISE OPTIONS
+        holder.exerciseOptionsLayout.setVisibility(View.GONE);
+
+        if (mWorkoutExercises.get(position).getPrescribedReps() != null || mWorkoutExercises.get(position).getRepTempo() != null || mWorkoutExercises.get(position).getRestInterval() != 0){
+            Log.i(TAG, "Some exercise options set");
+            // Some exercises options are set, show exercise options
+            holder.exerciseOptionsLayout.setVisibility(View.VISIBLE);
+
+            List<Integer> prescribedReps = mWorkoutExercises.get(position).getPrescribedReps();
+            int restInterval =  mWorkoutExercises.get(position).getRestInterval();
+            String repTempo = mWorkoutExercises.get(position).getRepTempo();
+
+            if (prescribedReps != null){
+                holder.setsOptionsLayout.setVisibility(View.VISIBLE);
+                holder.setsOptions.setText(Integer.toString(prescribedReps.size()));
+                holder.setsOptions.setVisibility(View.VISIBLE);
+            }
+            if (restInterval != 0){
+                holder.restOptionsLayout.setVisibility(View.VISIBLE);
+                holder.restOptions.setText(Integer.toString(restInterval) + " seconds");
+                holder.restOptions.setVisibility(View.VISIBLE);
+            }
+            if (repTempo != null){
+                holder.tempoOptionsLayout.setVisibility(View.VISIBLE);
+                holder.tempoOptions.setText(repTempo);
+                holder.tempoOptions.setVisibility(View.VISIBLE);
+            }
+        }
         if (allowReordering) {
             holder.reorderHandle.setVisibility(View.VISIBLE);
             holder.deleteExercise.setVisibility(View.VISIBLE);

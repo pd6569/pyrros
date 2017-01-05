@@ -182,6 +182,7 @@ public class CreateWorkoutActivity extends BaseActivity {
             // reset start workout / save changes action
             SortWorkoutFragment frag = (SortWorkoutFragment) mFragmentReferenceMap.get(1);
             frag.getStartWorkoutAction().setVisible(true);
+            frag.getAdapter().notifyDataSetChanged();
 
             // reset title
             if (mWorkoutTitle != null) {

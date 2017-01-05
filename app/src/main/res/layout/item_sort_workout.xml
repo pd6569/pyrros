@@ -6,50 +6,161 @@
                                     android:layout_height="wrap_content"
                                     android:layout_margin="5dp">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:id="@+id/item_sort_workout"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:orientation="horizontal"
-                  android:clickable="true"
-                  android:focusable="true"
-                  android:foreground="?selectableItemBackground"
-                  android:weightSum="10"
-                  android:paddingTop="15dp"
-                  android:paddingBottom="15dp"
-                  android:paddingLeft="10dp"
-                  android:paddingRight="15dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/sort_workout_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_weight="1"
-            android:padding="5dp"
-            android:src="@drawable/ic_close_gray_24dp"/>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:id="@+id/item_sort_workout"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="horizontal"
+                      android:clickable="true"
+                      android:focusable="true"
+                      android:foreground="?selectableItemBackground"
+                      android:weightSum="10"
+                      android:paddingTop="15dp"
+                      android:paddingBottom="15dp"
+                      android:paddingLeft="10dp"
+                      android:paddingRight="15dp">
 
-        <TextView
-            android:id="@+id/sort_workout_exercise_name"
+            <ImageView
+                android:id="@+id/sort_workout_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:src="@drawable/ic_close_gray_24dp"/>
+
+            <TextView
+                android:id="@+id/sort_workout_exercise_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="true"
+                android:textSize="16dp"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="8"
+                android:text="Exercise Name"/>
+
+            <ImageView
+                android:id="@+id/sort_workout_reorder_handle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="center"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:src="@drawable/ic_reorder_gray_24dp"/>
+
+        </LinearLayout>
+
+        <!--EXERCISE OPTIONS-->
+
+        <LinearLayout
+            android:id="@+id/sort_workout_exercise_options_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAllCaps="true"
-            android:textSize="16dp"
+            android:orientation="vertical"
             android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:layout_weight="8"
-            android:text="Exercise Name"/>
+            android:visibility="gone">
 
-        <ImageView
-            android:id="@+id/sort_workout_reorder_handle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="center"
-            android:layout_weight="1"
-            android:padding="5dp"
-            android:src="@drawable/ic_reorder_gray_24dp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:background="@color/divider">
+            </View>
+
+            <LinearLayout
+                android:id="@+id/sort_workout_exercise_options_num_sets_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:layout_margin="10dp"
+                    android:text="Sets: "/>
+
+                <TextView
+                    android:id="@+id/sort_workout_exercise_options_num_sets_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:layout_margin="10dp"
+                    android:text="8 sets"/>
+
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/sort_workout_exercise_options_tempo_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:layout_margin="10dp"
+                    android:text="Tempo: "/>
+
+                <TextView
+                    android:id="@+id/sort_workout_exercise_options_tempo_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:layout_margin="10dp"
+                    android:text="1-2-3 "/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sort_workout_exercise_options_rest_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:layout_margin="10dp"
+                    android:text="Rest: "/>
+
+                <TextView
+                    android:id="@+id/sort_workout_exercise_options_rest_layout_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:layout_margin="10dp"
+                    android:text="90 seconds "/>
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
 
     </LinearLayout>
 
