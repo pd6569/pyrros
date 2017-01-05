@@ -66,8 +66,6 @@
             android:layout_height="wrap_content"
             android:padding="10dp">
 
-
-
             <LinearLayout
                 android:id="@+id/users_layout"
                 android:layout_width="wrap_content"

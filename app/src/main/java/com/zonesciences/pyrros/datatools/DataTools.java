@@ -373,7 +373,7 @@ public class DataTools {
             if (i == 0){
                 muscleGroupsString = muscleGroupsList.get(i);
             } else {
-                muscleGroupsString += "\n" + muscleGroupsList.get(i);
+                muscleGroupsString += ", " + muscleGroupsList.get(i);
             }
         }
 

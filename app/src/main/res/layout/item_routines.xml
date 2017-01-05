@@ -23,12 +23,13 @@
 
         <TextView
             android:id="@+id/view_routines_title_textview"
+            style="@style/TextAppearance.AppCompat.Large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
-            android:textSize="16dp"
+            android:textStyle="bold"
             android:layout_gravity="center_vertical"
-            android:gravity="center"
+            android:gravity="left"
             android:layout_weight="8"
             android:text="Routine name"/>
 

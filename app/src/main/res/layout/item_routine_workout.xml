@@ -98,82 +98,115 @@
             android:id="@+id/linear_layout_routine_workout_overview_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/border_workout_overview"
-            android:weightSum="3">
+            android:orientation="vertical"
+            android:background="@drawable/border_workout_overview">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_weight="1">
+                android:orientation="horizontal"
+                android:weightSum="3">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Sets"/>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_weight="1">
 
-                <TextView
-                    android:id="@+id/routine_workout_total_sets_textview"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Exercises"/>
+
+                    <TextView
+                        android:id="@+id/routine_workout_num_exercises_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/workout_overview"
+                        android:text="4"/>
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/workout_overview"
-                    android:text="25"/>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Sets"/>
+
+                    <TextView
+                        android:id="@+id/routine_workout_total_sets_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/workout_overview"
+                        android:text="25"/>
+
+                </LinearLayout>
+
+
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Duration"/>
+
+                    <TextView
+                        android:id="@+id/routine_workout_workout_duration_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/workout_overview"
+                        android:text="45 mins"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
                 android:gravity="center"
                 android:layout_weight="1">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Muscles"/>
 
                 <TextView
                     android:id="@+id/routine_workout_muscle_groups_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="5dp"
                     android:textAllCaps="true"
+                    android:textSize="12dp"
                     android:textStyle="bold"
-                    android:textSize="@dimen/workout_overview"
-                    android:text="biceps\ntriceps\nlegs\nback"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Duration"/>
-
-                <TextView
-                    android:id="@+id/routine_workout_workout_duration_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/workout_overview"
-                    android:text="45 mins"/>
+                    android:gravity="center_horizontal"
+                    android:text="biceps, triceps, legs, abs, shoulders, chest"/>
 
             </LinearLayout>
 
         </LinearLayout>
+
+
 
     </LinearLayout>
 

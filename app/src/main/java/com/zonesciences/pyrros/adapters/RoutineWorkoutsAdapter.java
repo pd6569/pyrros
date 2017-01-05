@@ -54,6 +54,7 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
 
         // Workout Overview
         LinearLayout workoutOverviewContainer;
+        TextView numExercises;
         TextView totalSetsTextView;
         TextView muscleGroupsTextView;
         TextView workoutDurationTextView;
@@ -89,6 +90,7 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
             });
 
             workoutOverviewContainer = (LinearLayout) itemView.findViewById(R.id.linear_layout_routine_workout_overview_container);
+            numExercises = (TextView) itemView.findViewById(R.id.routine_workout_num_exercises_textview);
             totalSetsTextView = (TextView) itemView.findViewById(R.id.routine_workout_total_sets_textview);
             muscleGroupsTextView = (TextView) itemView.findViewById(R.id.routine_workout_muscle_groups_textview);
             workoutDurationTextView = (TextView) itemView.findViewById(R.id.routine_workout_workout_duration_textview);
@@ -150,6 +152,7 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
             holder.noExercisesTextView.setVisibility(View.VISIBLE);
         }
 
+        // Set workout overview layout
         holder.workoutOverviewContainer.setVisibility(View.GONE);
         if (exercises != null){
             holder.workoutOverviewContainer.setVisibility(View.VISIBLE);
@@ -158,6 +161,7 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
             String muscleGroups = dataTools.getMuscleGroupsForWorkout();
             int workoutDurationMinutes = dataTools.getEstimatedWorkoutDurationSeconds() / 60;
 
+            holder.numExercises.setText(Integer.toString(exercises.size()));
             holder.totalSetsTextView.setText(Integer.toString(totalSets));
             holder.muscleGroupsTextView.setText(muscleGroups);
             holder.workoutDurationTextView.setText(Integer.toString(workoutDurationMinutes) + " mins");
