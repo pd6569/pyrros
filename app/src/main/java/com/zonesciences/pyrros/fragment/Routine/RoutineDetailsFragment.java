@@ -1,8 +1,10 @@
 package com.zonesciences.pyrros.fragment.Routine;
 
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -58,9 +60,12 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     private static final int REQUEST_CREATE_WORKOUT = 1;
 
     // View
+    LinearLayout mAddWorkoutLayout;
     AutoCompleteTextView mWorkoutNameField;
     Button mAddWorkoutButton;
-    LinearLayout mLinearLayoutWorkoutContainer;
+
+    // Floating action button
+    FloatingActionButton mFabAddWorkout;
 
     // Recycler
     RecyclerView mRecycler;
@@ -160,7 +165,16 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
         Log.i(TAG, "onCreateView");
 
+        mFabAddWorkout = (FloatingActionButton) rootView.findViewById(R.id.fab_add_workout);
+        mFabAddWorkout.setVisibility(View.GONE);
+        mFabAddWorkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideFabShowAddWorkout();
+            }
+        });
 
+        mAddWorkoutLayout = (LinearLayout) rootView.findViewById(R.id.layout_add_workout);
         mWorkoutNameField = (AutoCompleteTextView) rootView.findViewById(R.id.autocomplete_field_workout_name);
         mWorkoutNameField.setAdapter(mAutoCompleteAdapter);
         mWorkoutNameField.setThreshold(1);
@@ -216,8 +230,71 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         mAdapter.notifyItemInserted(0);
         mRecycler.smoothScrollToPosition(0);
 
+        showFabHideAddWorkout();
     }
 
+
+    public void hideFabShowAddWorkout(){
+        mAddWorkoutLayout.setVisibility(View.VISIBLE);
+        mAddWorkoutLayout.setAlpha(0.0f);
+        mAddWorkoutLayout.animate()
+                .translationY(0)
+                .alpha(1.0f)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mFabAddWorkout.animate().alpha(0.0f);
+                        mFabAddWorkout.setVisibility(View.GONE);
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    public void showFabHideAddWorkout(){
+        mAddWorkoutLayout.animate()
+                .translationY(-mAddWorkoutLayout.getHeight())
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mAddWorkoutLayout.setVisibility(View.GONE);
+
+                        mFabAddWorkout.setVisibility(View.VISIBLE);
+                        mFabAddWorkout.setAlpha(0.0f);
+                        mFabAddWorkout.animate().alpha(1.0f);
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -250,10 +327,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     }
 
 
-    // Set listener
-    public void setOnWorkoutChangedListener(WorkoutChangedListener listener){
-        this.mWorkoutChangedListener = listener;
-    }
+
 
     @Override
     public void onPause(){
@@ -347,6 +421,17 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         return mRoutineKey;
     }
 
+    // Set listener
+    public void setOnWorkoutChangedListener(WorkoutChangedListener listener){
+        this.mWorkoutChangedListener = listener;
+    }
+
+    // Other methods
+
+    public void showAddWorkoutView(){
+        Log.i(TAG, "Show add workout view");
+    }
+
     // Listeners
 
     RoutineWorkoutsAdapter.AddExerciseListener addExerciseListener = new RoutineWorkoutsAdapter.AddExerciseListener() {
@@ -411,4 +496,5 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     public void onStopDrag(){
 
     }
+
 }
