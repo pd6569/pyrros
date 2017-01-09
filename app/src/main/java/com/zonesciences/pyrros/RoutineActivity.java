@@ -145,6 +145,7 @@ public class RoutineActivity extends BaseActivity {
                 setToolbarTitleClickListener();
 
                 mRoutineDetailsFragment.setRoutine(routine);
+                mRoutineDetailsFragment.setShowAddWorkoutPanel(false);
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
                 ft.replace(R.id.routine_fragment_container, mRoutineDetailsFragment).addToBackStack(null).commit();

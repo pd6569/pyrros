@@ -110,6 +110,9 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     // Track routine changes in order to write changes to database
     boolean mRoutineChanged = false;
 
+    // View to show on load
+    boolean mShowAddWorkoutPanel = true;
+
     public static RoutineDetailsFragment newInstance() {
         Bundle args = new Bundle();
         RoutineDetailsFragment fragment = new RoutineDetailsFragment();
@@ -166,7 +169,18 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         Log.i(TAG, "onCreateView");
 
         mFabAddWorkout = (FloatingActionButton) rootView.findViewById(R.id.fab_add_workout);
-        mFabAddWorkout.setVisibility(View.GONE);
+        mAddWorkoutLayout = (LinearLayout) rootView.findViewById(R.id.layout_add_workout);
+        mWorkoutNameField = (AutoCompleteTextView) rootView.findViewById(R.id.autocomplete_field_workout_name);
+        mAddWorkoutButton = (Button) rootView.findViewById(R.id.button_routine_add_workout);
+
+        if (mShowAddWorkoutPanel == false){
+            mFabAddWorkout.setVisibility(View.VISIBLE);
+            mAddWorkoutLayout.setVisibility(View.GONE);
+        } else {
+            mFabAddWorkout.setVisibility(View.GONE);
+            mAddWorkoutLayout.setVisibility(View.VISIBLE);
+        }
+
         mFabAddWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -174,20 +188,18 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             }
         });
 
-        mAddWorkoutLayout = (LinearLayout) rootView.findViewById(R.id.layout_add_workout);
-        mWorkoutNameField = (AutoCompleteTextView) rootView.findViewById(R.id.autocomplete_field_workout_name);
+
         mWorkoutNameField.setAdapter(mAutoCompleteAdapter);
         mWorkoutNameField.setThreshold(1);
 
-        /*mLinearLayoutWorkoutContainer = (LinearLayout) rootView.findViewById(R.id.linear_layout_routine_workout_container);*/
-
-        mAddWorkoutButton = (Button) rootView.findViewById(R.id.button_routine_add_workout);
         mAddWorkoutButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 addWorkout();
             }
         });
+
+
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_routine_workouts);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -327,9 +339,6 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     }
 
 
-
-
-    //TODO: if workout is empty, delete workout. if all workouts empty then delete the routine
     @Override
     public void onPause(){
         super.onPause();
@@ -418,6 +427,10 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
     public String getRoutineKey() {
         return mRoutineKey;
+    }
+
+    public void setShowAddWorkoutPanel(boolean showAddWorkoutPanel) {
+        mShowAddWorkoutPanel = showAddWorkoutPanel;
     }
 
     // Set listener

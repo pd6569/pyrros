@@ -118,11 +118,16 @@ public class ViewRoutinesFragment extends Fragment {
         Log.i(TAG, "onStop");
     }
 
+    /**
+     * Load routines from database
+     */
+
     private void loadRoutines(){
         mDatabase.child("user-routines").child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                // Track last routine in order to stop showing loading dialog
                 int numRoutines = (int) dataSnapshot.getChildrenCount();
                 int currentRoutine = 0;
                 boolean lastRoutine = false;
@@ -139,19 +144,6 @@ public class ViewRoutinesFragment extends Fragment {
 
                     createWorkouts(routineKey, r, lastRoutine);
 
-                    /*int numWorkouts = r.getWorkouts().size();
-                    int currentWorkout = 0;
-                    boolean lastWorkout = false;
-
-                    for (String workoutKey : r.getWorkouts().keySet()){
-                        currentWorkout++;
-                        if (currentRoutine == numRoutines && currentWorkout == numWorkouts) {
-                            lastWorkout = true;
-                        }
-                        Log.i(TAG, "numWorkouts: " + numWorkouts + " currentWorkout: " + currentWorkout + " last workout: " + lastWorkout);
-                        Log.i(TAG, "Routine: " + routineKey + " workoutKey: " + workoutKey);
-                        createWorkouts(routineKey, workoutKey, r, lastWorkout);
-                    }*/
                 }
             }
 
@@ -166,6 +158,8 @@ public class ViewRoutinesFragment extends Fragment {
         mDatabase.child("user-routine-workouts").child(mUid).child(routineKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // track workouts with exercises - once final exercises from last workout in last routine loaded, can stop showing loading dialog
 
                 int numWorkoutsWithExercises = 0;
                 int currentWorkoutWithExercises = 0;
@@ -194,6 +188,8 @@ public class ViewRoutinesFragment extends Fragment {
                     }
 
                 }
+
+                // ensure that loading completes if the final routine contains no workouts with exercises!
 
                 if (numWorkoutsWithExercises == 0){
                     Log.i(TAG, "Routine contains empty workouts. Check if last routine and finish loading");
@@ -227,6 +223,7 @@ public class ViewRoutinesFragment extends Fragment {
                     Exercise e = exercise.getValue(Exercise.class);
                     exercisesList.add(e);
 
+                    // hide loading dialog if all exercises have been loaded 
                     if (currentExercise == numExercises && lastRoutine == true && lastWorkout == true){
                         Log.i(TAG, "All exercises added to workouts. Routine Loading complete");
 
@@ -263,41 +260,6 @@ public class ViewRoutinesFragment extends Fragment {
 
         mRecycler.setAdapter(mAdapter);
     }
-    /*private void createWorkouts(final String routineKey, final String workoutKey, final Routine routine, final boolean lastWorkout){
-        mDatabase.child("user-routine-workouts").child(mUid).child(routineKey).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Workout w = dataSnapshot.getValue(Workout.class);
-                routine.addWorkoutToList(w);
-
-                if (w.getNumExercises() > 0) {
-                    addExercisesToWorkout(w, workoutKey, routineKey);
-                } else {
-                    Log.i(TAG, "Workout : " + w.getWorkoutKey() + " has no exercises, skip");
-                }
-
-                *//*if (lastWorkout) {
-                    Log.i(TAG, "Finished creating routines. Sort routines into order");
-
-                    for (Routine routine : mRoutines) {
-                        Log.i(TAG, "routine name: " + routine.getName() + "numWorkouts: " + routine.getNumWorkouts() + "workoutList: " + routine.getWorkoutsList().size());
-                        for (int i = 0; i < routine.getWorkoutsList().size(); i++){
-                            Log.i(TAG, "Workout name: " + routine.getWorkoutsList().get(i).getName());
-                        }
-                    };
-
-                }*//*
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }*/
-
 
 
     // Load listener
