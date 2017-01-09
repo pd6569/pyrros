@@ -125,6 +125,7 @@ public class ViewRoutinesFragment extends Fragment {
 
                 int numRoutines = (int) dataSnapshot.getChildrenCount();
                 int currentRoutine = 0;
+                boolean lastRoutine = false;
 
                 for (DataSnapshot routine : dataSnapshot.getChildren()){
                     currentRoutine++;
@@ -134,7 +135,11 @@ public class ViewRoutinesFragment extends Fragment {
                     r.setRoutineKey(routineKey);
                     mRoutines.add(r);
 
-                    int numWorkouts = r.getWorkouts().size();
+                    if (currentRoutine == numRoutines) lastRoutine = true;
+
+                    createWorkouts(routineKey, r, lastRoutine);
+
+                    /*int numWorkouts = r.getWorkouts().size();
                     int currentWorkout = 0;
                     boolean lastWorkout = false;
 
@@ -146,7 +151,7 @@ public class ViewRoutinesFragment extends Fragment {
                         Log.i(TAG, "numWorkouts: " + numWorkouts + " currentWorkout: " + currentWorkout + " last workout: " + lastWorkout);
                         Log.i(TAG, "Routine: " + routineKey + " workoutKey: " + workoutKey);
                         createWorkouts(routineKey, workoutKey, r, lastWorkout);
-                    }
+                    }*/
                 }
             }
 
@@ -157,24 +162,44 @@ public class ViewRoutinesFragment extends Fragment {
         });
     }
 
-    private void createWorkouts(final String routineKey, final String workoutKey, final Routine routine, final boolean lastWorkout){
-        mDatabase.child("user-routine-workouts").child(mUid).child(routineKey).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void createWorkouts(final String routineKey, final Routine routine, final boolean lastRoutine) {
+        mDatabase.child("user-routine-workouts").child(mUid).child(routineKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                Workout w = dataSnapshot.getValue(Workout.class);
-                routine.addWorkoutToList(w);
-                addExercisesToWorkout(w, workoutKey, routineKey, lastWorkout);
+                int numWorkoutsWithExercises = 0;
+                int currentWorkoutWithExercises = 0;
+                boolean lastWorkout = false;
 
-                if (lastWorkout) {
-                    Log.i(TAG, "Finished creating routines. Sort routines into order");
+                // Calculate number of workouts with exercises
+                for (DataSnapshot workout : dataSnapshot.getChildren()){
+                    if (workout.getValue(Workout.class).getNumExercises() > 0) {
+                        numWorkoutsWithExercises++;
+                        Log.i(TAG, "numWorkoutsWithExercises: " + workout.getValue(Workout.class).getName() + " - "  + numWorkoutsWithExercises);
+                    }
+                }
 
-                    for (Routine routine : mRoutines) {
-                        Log.i(TAG, "routine name: " + routine.getName() + "numWorkouts: " + routine.getNumWorkouts() + "workoutList: " + routine.getWorkoutsList().size());
-                        for (int i = 0; i < routine.getWorkoutsList().size(); i++){
-                            Log.i(TAG, "Workout name: " + routine.getWorkoutsList().get(i).getName());
+
+                for (DataSnapshot workout : dataSnapshot.getChildren()){
+
+                    Workout w = workout.getValue(Workout.class);
+                    routine.addWorkoutToList(w);
+                    if (w.getNumExercises() > 0) {
+                        currentWorkoutWithExercises++;
+                        if (currentWorkoutWithExercises == numWorkoutsWithExercises) {
+                            Log.i(TAG, "Last workout with exercises. " + w.getName() + " number exercises: " + w.getNumExercises());
+                            lastWorkout = true;
                         }
-                    };
+                        addExercisesToWorkout(w, w.getWorkoutKey(), routineKey, lastRoutine, lastWorkout);
+                    }
+
+                }
+
+                if (numWorkoutsWithExercises == 0){
+                    Log.i(TAG, "Routine contains empty workouts. Check if last routine and finish loading");
+                    if (lastRoutine){
+                        finishLoadingRoutines();
+                    }
 
                 }
             }
@@ -184,10 +209,10 @@ public class ViewRoutinesFragment extends Fragment {
 
             }
         });
-
     }
 
-    private void addExercisesToWorkout(final Workout workout, String workoutKey, String routineKey, final boolean lastWorkout) {
+
+    private void addExercisesToWorkout(final Workout workout, String workoutKey, String routineKey, final boolean lastRoutine, final boolean lastWorkout) {
         mDatabase.child("user-routine-workout-exercises").child(mUid).child(routineKey).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -202,25 +227,10 @@ public class ViewRoutinesFragment extends Fragment {
                     Exercise e = exercise.getValue(Exercise.class);
                     exercisesList.add(e);
 
-                    if (currentExercise == numExercises && lastWorkout == true){
-                        Log.i(TAG, "All exercises added to workouts. Loading complete");
+                    if (currentExercise == numExercises && lastRoutine == true && lastWorkout == true){
+                        Log.i(TAG, "All exercises added to workouts. Routine Loading complete");
 
-                        mLoadListener.onLoadComplete(mRoutines);
-
-                        // sort workout order
-                        for (int i = 0; i < mRoutines.size(); i++){
-                            Collections.sort(mRoutines.get(i).getWorkoutsList());
-                        }
-
-                        mAdapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
-                            @Override
-                            public void onRoutineSelected(Routine routine) {
-                                Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());
-                                mRoutineSelectedListener.onRoutineSelected(routine);
-                            }
-                        });
-
-                        mRecycler.setAdapter(mAdapter);
+                        finishLoadingRoutines();
                     }
                 }
                 Collections.sort(exercisesList);
@@ -233,6 +243,62 @@ public class ViewRoutinesFragment extends Fragment {
             }
         });
     }
+
+    private void finishLoadingRoutines(){
+
+        mLoadListener.onLoadComplete(mRoutines);
+
+        // sort workout order
+        for (int i = 0; i < mRoutines.size(); i++){
+            Collections.sort(mRoutines.get(i).getWorkoutsList());
+        }
+
+        mAdapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
+            @Override
+            public void onRoutineSelected(Routine routine) {
+                Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());
+                mRoutineSelectedListener.onRoutineSelected(routine);
+            }
+        });
+
+        mRecycler.setAdapter(mAdapter);
+    }
+    /*private void createWorkouts(final String routineKey, final String workoutKey, final Routine routine, final boolean lastWorkout){
+        mDatabase.child("user-routine-workouts").child(mUid).child(routineKey).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Workout w = dataSnapshot.getValue(Workout.class);
+                routine.addWorkoutToList(w);
+
+                if (w.getNumExercises() > 0) {
+                    addExercisesToWorkout(w, workoutKey, routineKey);
+                } else {
+                    Log.i(TAG, "Workout : " + w.getWorkoutKey() + " has no exercises, skip");
+                }
+
+                *//*if (lastWorkout) {
+                    Log.i(TAG, "Finished creating routines. Sort routines into order");
+
+                    for (Routine routine : mRoutines) {
+                        Log.i(TAG, "routine name: " + routine.getName() + "numWorkouts: " + routine.getNumWorkouts() + "workoutList: " + routine.getWorkoutsList().size());
+                        for (int i = 0; i < routine.getWorkoutsList().size(); i++){
+                            Log.i(TAG, "Workout name: " + routine.getWorkoutsList().get(i).getName());
+                        }
+                    };
+
+                }*//*
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }*/
+
+
 
     // Load listener
     public void setRoutineLoadListener (RoutineLoadListener listener){

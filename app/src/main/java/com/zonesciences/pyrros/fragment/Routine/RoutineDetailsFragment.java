@@ -329,6 +329,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
 
 
+    //TODO: if workout is empty, delete workout. if all workouts empty then delete the routine
     @Override
     public void onPause(){
         super.onPause();
@@ -338,11 +339,9 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         if (mRoutineChanged) {
 
             // Update routine local object
-            int numWorkouts = mAdapter.getWorkouts().size();
+
             List<Workout> workouts = mRoutine.getWorkoutsList();
-            for (Workout workout : workouts){
-                Log.i(TAG, "Workout : " + workout.getName() + " Order: " + workout.getWorkoutOrder());
-            }
+            int numWorkouts = workouts.size();
 
             mRoutine.setNumWorkouts(numWorkouts);
 
