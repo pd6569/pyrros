@@ -30,7 +30,7 @@ import java.util.Map;
 //TODO: touch listener for reordering workouts
 
 
-public class RoutineActivity extends BaseActivity {
+public class RoutineActivity extends BaseActivity implements RoutineDetailsFragment.RoutineCreatedListener {
 
     private static final String TAG = "CreateRoutineAcctivity";
 
@@ -179,7 +179,7 @@ public class RoutineActivity extends BaseActivity {
                 return true;
             case R.id.action_edit_routine:
                 Log.i(TAG, "Edit workout");
-                editRoutineName();
+                showRoutineProperties();
                 return true;
 
             case R.id.action_save_routine:
@@ -212,6 +212,11 @@ public class RoutineActivity extends BaseActivity {
         mSaveRoutineMenuItem.setVisible(true);
     }
 
+    private void showRoutineProperties(){
+        mRoutineDetailsFragment.hideAll();
+        mRoutineDetailsFragment.showRoutineProperties();
+    }
+
     private void saveRoutine(){
         String routineName = mRoutineNameEditText.getText().toString();
         mRoutineNameTextView.setText(routineName);
@@ -239,6 +244,7 @@ public class RoutineActivity extends BaseActivity {
     public void onBackPressed() {
         Log.i(TAG, "onBackPressed");
 
+        // Check if routine details fragment has been opened from view routine fragment
         if (getSupportFragmentManager().getBackStackEntryCount() > 0){
             // Revert toolbar and remove click listener
             mRoutineNameTextView.setOnClickListener(null);
@@ -252,5 +258,10 @@ public class RoutineActivity extends BaseActivity {
         }
 
         super.onBackPressed();
+    }
+
+    @Override
+    public void onRoutineCreated(String routineName) {
+        mRoutineNameTextView.setText(routineName);
     }
 }

@@ -6,14 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.zonesciences.pyrros.ItemTouchHelper.ItemTouchHelperAdapter;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.fragment.Routine.RoutineSelectedListener;
 import com.zonesciences.pyrros.models.Routine;
-import com.zonesciences.pyrros.models.Workout;
 
 import java.util.List;
 
@@ -96,7 +93,7 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.ViewHo
 
         // workout overview
         int numWorkouts = mRoutines.get(position).getWorkoutsList().size();
-        String focus = mRoutines.get(position).getFocus();
+        String focus = mRoutines.get(position).getGoal();
         if (focus == null){
             focus = "General";
         }

@@ -2,6 +2,7 @@ package com.zonesciences.pyrros.fragment.Routine;
 
 
 import android.animation.Animator;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,19 +12,23 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -81,6 +86,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     Spinner mRoutineGoalsSpinner;
     Spinner mRoutineLevelSpinner;
     TextView mSaveRoutinePropertiesText;
+    SwitchCompat mSharedSwitch;
 
     // Spinner adapter
     ArrayAdapter mGoalsAdapter;
@@ -121,6 +127,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
     // Listener
     WorkoutChangedListener mWorkoutChangedListener;
+    RoutineCreatedListener mRoutineCreatedListener;
 
     // Firebase and user info
     DatabaseReference mDatabase;
@@ -135,6 +142,12 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     // View to show on load
     boolean mIsNewRoutine = true;
     boolean mShowAddWorkoutPanel = false;
+
+    // Routine properties
+    boolean mGoalPropertySet;
+    boolean mLevelPropertySet;
+
+
 
     public static RoutineDetailsFragment newInstance() {
         Bundle args = new Bundle();
@@ -175,7 +188,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             }
         });
 
-        // Generate unique routines key if new routine
+        // Generate unique routines key if new routine (routine can be set from viewroutines fragment via setter)
         if (mRoutine == null) {
             mRoutine = new Routine(mUid, mClientTimeStamp, true);
             mRoutineKey = mDatabase.child("routines").push().getKey();
@@ -202,9 +215,41 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         mRoutineNameLayout = (TextInputLayout) rootView.findViewById(R.id.input_layout_routine_name);
         mRoutineDescriptionLayout = (TextInputLayout) rootView.findViewById(R.id.input_layout_routine_description);
         mRoutineNameField = (EditText) rootView.findViewById(R.id.routine_name_edit_text);
+        if (mRoutine.getName() != null){
+            mRoutineNameField.setText(mRoutine.getName());
+        }
         mRoutineDescriptionField = (EditText) rootView.findViewById(R.id.routine_description_edit_text);
+        if (mRoutine.getDescription() != null){
+            mRoutineDescriptionField.setText(mRoutine.getDescription());
+        }
+
         mRoutineGoalsSpinner = (Spinner) rootView.findViewById(R.id.routine_goal_spinner);
+        mRoutineGoalsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                mRoutine.setGoal(parent.getItemAtPosition(pos).toString());
+                mGoalPropertySet = true;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         mRoutineLevelSpinner = (Spinner) rootView.findViewById(R.id.routine_level_spinner);
+        mRoutineLevelSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                mRoutine.setLevel(parent.getItemAtPosition(pos).toString());
+                mLevelPropertySet = true;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         mSaveRoutinePropertiesText = (TextView) rootView.findViewById(R.id.routine_properties_ok_textview);
         mSaveRoutinePropertiesText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,7 +262,37 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         mLevelAdapter = ArrayAdapter.createFromResource(getContext(), R.array.routine_properties_level, R.layout.simple_spinner_item);
 
         mRoutineGoalsSpinner.setAdapter(mGoalsAdapter);
+        if (mRoutine.getGoal() != null){
+            String goal = mRoutine.getGoal();
+            String[] goals = getResources().getStringArray(R.array.routine_properties_goal);
+            for (int i = 0 ; i < goals.length; i++){
+                if (goals[i].equals(goal)){
+                    mRoutineGoalsSpinner.setSelection(i);
+                }
+            }
+        }
+
         mRoutineLevelSpinner.setAdapter(mLevelAdapter);
+        if (mRoutine.getLevel() != null){
+            String level = mRoutine.getGoal();
+            String[] levels = getResources().getStringArray(R.array.routine_properties_level);
+            for (int i = 0 ; i < levels.length; i++){
+                if (levels[i].equals(level)){
+                    mRoutineLevelSpinner.setSelection(i);
+                }
+            }
+        }
+
+        mSharedSwitch = (SwitchCompat) rootView.findViewById(R.id.routine_shared_switch);
+        mSharedSwitch.setChecked(mRoutine.getShared());
+
+        mSharedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                Log.i(TAG, "Shared switch changed: " + isChecked);
+                mRoutine.setShared(isChecked);
+            }
+        });
 
         if (mIsNewRoutine){
             Log.i(TAG, "New routine being created");
@@ -274,6 +349,26 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     }
 
     private void saveRoutineProperties(){
+        if (mRoutineNameField.getText().toString().trim().isEmpty()){
+            mRoutineNameLayout.setError(getString(R.string.error_routine_name));
+            mRoutineNameField.requestFocus();
+            return;
+        }
+        mRoutineCreatedListener.onRoutineCreated(mRoutineNameField.getText().toString());
+        mRoutine.setName(mRoutineNameField.getText().toString());
+
+        if (!mRoutineDescriptionField.getText().toString().trim().isEmpty()){
+            mRoutine.setDescription(mRoutineDescriptionField.getText().toString().trim());
+        }
+
+        if (!mGoalPropertySet){
+            mRoutine.setGoal("General");
+        }
+
+        if (!mLevelPropertySet){
+            mRoutine.setLevel("Any");
+        }
+
         mRoutinePropetiesCardView.animate()
                 .translationX(mRoutinePropetiesCardView.getWidth())
                 .alpha(0.0f)
@@ -287,6 +382,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
                     public void onAnimationEnd(Animator animator) {
                         mRoutinePropetiesCardView.setVisibility(View.GONE);
                         hideFabShowAddWorkout();
+                        showWorkoutRecycler();
                     }
 
                     @Override
@@ -302,6 +398,8 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     }
 
     public void addWorkout(){
+
+        showWorkoutRecycler();
 
         if (mWorkoutNameField.getText().toString().equals("")){
             Snackbar sb = Snackbar.make(mWorkoutNameField, "Enter name for workout", Snackbar.LENGTH_SHORT);
@@ -367,6 +465,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     }
 
     public void showFabHideAddWorkout(){
+        Log.i(TAG,"showFabHideAddWorkout");
         mAddWorkoutCardView.animate()
                 .translationY(-mAddWorkoutCardView.getHeight())
                 .setListener(new Animator.AnimatorListener() {
@@ -378,11 +477,6 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
                     @Override
                     public void onAnimationEnd(Animator animator) {
                         mAddWorkoutCardView.setVisibility(GONE);
-
-                        mFabAddWorkout.setVisibility(View.VISIBLE);
-                        mFabAddWorkout.setAlpha(0.0f);
-                        mFabAddWorkout.animate().alpha(1.0f);
-
                     }
 
                     @Override
@@ -395,6 +489,178 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
                     }
                 });
+        mFabAddWorkout.animate()
+                .alpha(1.0f)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mFabAddWorkout.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    public void showRoutineProperties(){
+        mRoutinePropetiesCardView.setAlpha(0.0f);
+        mRoutinePropetiesCardView.animate()
+                .alpha(1.0f)
+                .translationX(0)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mRoutinePropetiesCardView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    public void hideAll(){
+        if (mAddWorkoutCardView.getVisibility() == View.VISIBLE) {
+            hideAddWorkoutPanel();
+        }
+        if (mFabAddWorkout.getVisibility() == View.VISIBLE){
+            hideFab();
+        }
+        if (mRecycler.getVisibility() == View.VISIBLE){
+            hideWorkoutRecycler();
+        }
+    }
+
+    private void hideAddWorkoutPanel(){
+        mAddWorkoutCardView.animate()
+                .translationY(-mAddWorkoutCardView.getHeight())
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mAddWorkoutCardView.setVisibility(GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    private void hideFab(){
+        mFabAddWorkout.animate()
+                .alpha(0.0f)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mFabAddWorkout.setVisibility(GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    private void hideWorkoutRecycler(){
+        mRecycler.animate()
+                .alpha(0.0f)
+                .translationX(-mRecycler.getWidth())
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mRecycler.setVisibility(GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    private void showWorkoutRecycler(){
+        if (mRecycler.getVisibility() != View.VISIBLE){
+            Log.i(TAG, "Show recycler");
+            mRecycler.animate()
+                    .alpha(1.0f)
+                    .translationX(0)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            mRecycler.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+
+                        }
+                    });
+        }
     }
 
     @Override
@@ -427,70 +693,75 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         }
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mRoutineCreatedListener = (RoutineCreatedListener) context;
+        } catch (ClassCastException e){
+            throw new ClassCastException(context.toString() + " must implement RoutineCreatedListener");
+        }
+    }
 
     @Override
     public void onPause(){
         super.onPause();
 
-        Log.i(TAG, "onPause");
+        Log.i(TAG, "onPause. Write routine to database");
 
-        if (mRoutineChanged) {
+        // Update routine local object
 
-            // Update routine local object
+        List<Workout> workouts = mRoutine.getWorkoutsList();
+        int numWorkouts = workouts.size();
 
-            List<Workout> workouts = mRoutine.getWorkoutsList();
-            int numWorkouts = workouts.size();
+        mRoutine.setNumWorkouts(numWorkouts);
 
-            mRoutine.setNumWorkouts(numWorkouts);
+        Map<String, Boolean> workoutsInRoutine = new HashMap<>();
+        for (Workout workout : workouts) {
+            String workoutKey = workout.getWorkoutKey();
+            workoutsInRoutine.put(workoutKey, true);
+        }
+        mRoutine.setWorkouts(workoutsInRoutine);
 
-            Map<String, Boolean> workoutsInRoutine = new HashMap<>();
-            for (Workout workout : workouts) {
-                String workoutKey = workout.getWorkoutKey();
-                workoutsInRoutine.put(workoutKey, true);
-            }
-            mRoutine.setWorkouts(workoutsInRoutine);
+        // Clear data before rewriting
+        Map<String, Object> clearRoutineData = new HashMap<>();
+        if (numWorkouts == 0){
+            Log.i(TAG, "No exercises, so remove routine for now");
+            clearRoutineData.put("/routines/" + mRoutineKey, null);
+            clearRoutineData.put("/user-routines/" + mUid + "/" + mRoutineKey, null);
+        }
+        clearRoutineData.put("/routine-workouts/" + mRoutineKey, null);
+        clearRoutineData.put("/routine-workout-exercises/" + mRoutineKey, null);
+        clearRoutineData.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey, null);
+        clearRoutineData.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey, null);
+        mDatabase.updateChildren(clearRoutineData);
 
-            // Clear data before rewriting
-            Map<String, Object> clearRoutineData = new HashMap<>();
-            if (numWorkouts == 0){
-                Log.i(TAG, "No exercises, so remove routine for now");
-                clearRoutineData.put("/routines/" + mRoutineKey, null);
-                clearRoutineData.put("/user-routines/" + mUid + "/" + mRoutineKey, null);
-            }
-            clearRoutineData.put("/routine-workouts/" + mRoutineKey, null);
-            clearRoutineData.put("/routine-workout-exercises/" + mRoutineKey, null);
-            clearRoutineData.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey, null);
-            clearRoutineData.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey, null);
-            mDatabase.updateChildren(clearRoutineData);
+        // Write to database
+        if (numWorkouts > 0) {
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
+            childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
 
-            // Write to database
-            if (numWorkouts > 0) {
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
-                childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
+            for (int i = 0; i < workouts.size(); i++) {
 
-                for (int i = 0; i < workouts.size(); i++) {
-
-                    List<Exercise> exercises = workouts.get(i).getExercises();
-                    if (exercises != null) {
-                        workouts.get(i).setNumExercises(exercises.size());
-                        for (Exercise e : exercises) {
-                            String exerciseKey = e.getName();
-                            e.setExerciseId();
-                            childUpdates.put("/routine-workout-exercises/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
-                            childUpdates.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
-                        }
+                List<Exercise> exercises = workouts.get(i).getExercises();
+                if (exercises != null) {
+                    workouts.get(i).setNumExercises(exercises.size());
+                    for (Exercise e : exercises) {
+                        String exerciseKey = e.getName();
+                        e.setExerciseId();
+                        childUpdates.put("/routine-workout-exercises/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
+                        childUpdates.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
                     }
-
-
-                    childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
-                    childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
-
                 }
-                mDatabase.updateChildren(childUpdates);
-            }
 
-            mRoutineChanged = false;
+
+                childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
+                childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
+
+            }
+            mDatabase.updateChildren(childUpdates);
         }
 
     }
@@ -590,6 +861,10 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             mRoutineChanged = true;
         }
     };
+
+    public interface RoutineCreatedListener {
+        void onRoutineCreated(String routineName);
+    }
 
     // Drag Listener
     @Override

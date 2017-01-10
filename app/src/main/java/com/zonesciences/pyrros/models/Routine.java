@@ -18,7 +18,7 @@ public class Routine {
     public String routineKey;
     public String creator;
     public String name;
-    public Boolean shared;
+    public boolean shared;
     public int userCount;
     public String clientTimeStamp;
     public Map<String, Boolean> users = new HashMap<>();
@@ -26,7 +26,7 @@ public class Routine {
     public int numWorkouts;
     public List<Workout> workoutsList;
     public String description;
-    public String focus;
+    public String goal;
     public String level;
 
     public Routine(){
@@ -60,7 +60,7 @@ public class Routine {
         result.put("workouts", workouts);
         result.put("numWorkouts", numWorkouts);
         result.put("description", description);
-        result.put("focus", focus);
+        result.put("goal", goal);
         result.put("level", level);
         return result;
     }
@@ -99,12 +99,12 @@ public class Routine {
     }
 
     @Exclude
-    public Boolean getShared() {
+    public boolean getShared() {
         return shared;
     }
 
     @Exclude
-    public void setShared(Boolean shared) {
+    public void setShared(boolean shared) {
         this.shared = shared;
     }
 
@@ -179,13 +179,13 @@ public class Routine {
     }
 
     @Exclude
-    public String getFocus() {
-        return focus;
+    public String getGoal() {
+        return goal;
     }
 
     @Exclude
-    public void setFocus(String focus) {
-        this.focus = focus;
+    public void setGoal(String goal) {
+        this.goal = goal;
     }
 
     @Exclude
