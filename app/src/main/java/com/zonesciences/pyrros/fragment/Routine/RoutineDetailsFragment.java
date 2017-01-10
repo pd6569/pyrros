@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -17,8 +19,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -44,6 +49,7 @@ import java.util.Map;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static android.view.View.GONE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,9 +67,24 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     private static final int REQUEST_CREATE_WORKOUT = 1;
 
     // View
+    CardView mAddWorkoutCardView;
     LinearLayout mAddWorkoutLayout;
     AutoCompleteTextView mWorkoutNameField;
     Button mAddWorkoutButton;
+
+    // Views for create new workout
+    CardView mRoutinePropetiesCardView;
+    TextInputLayout mRoutineNameLayout;
+    TextInputLayout mRoutineDescriptionLayout;
+    EditText mRoutineNameField;
+    EditText mRoutineDescriptionField;
+    Spinner mRoutineGoalsSpinner;
+    Spinner mRoutineLevelSpinner;
+    TextView mSaveRoutinePropertiesText;
+
+    // Spinner adapter
+    ArrayAdapter mGoalsAdapter;
+    ArrayAdapter mLevelAdapter;
 
     // Floating action button
     FloatingActionButton mFabAddWorkout;
@@ -112,7 +133,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     boolean mRoutineChanged = false;
 
     // View to show on load
-    boolean mCreateNewRoutine;
+    boolean mIsNewRoutine = true;
     boolean mShowAddWorkoutPanel = false;
 
     public static RoutineDetailsFragment newInstance() {
@@ -171,16 +192,45 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         Log.i(TAG, "onCreateView");
 
         mFabAddWorkout = (FloatingActionButton) rootView.findViewById(R.id.fab_add_workout);
+        mAddWorkoutCardView = (CardView) rootView.findViewById(R.id.add_workout_cardview);
         mAddWorkoutLayout = (LinearLayout) rootView.findViewById(R.id.layout_add_workout);
         mWorkoutNameField = (AutoCompleteTextView) rootView.findViewById(R.id.autocomplete_field_workout_name);
         mAddWorkoutButton = (Button) rootView.findViewById(R.id.button_routine_add_workout);
 
-        if (mShowAddWorkoutPanel == false){
-            mFabAddWorkout.setVisibility(View.VISIBLE);
-            mAddWorkoutLayout.setVisibility(View.GONE);
+        // Create new workout
+        mRoutinePropetiesCardView = (CardView) rootView.findViewById(R.id.routine_properties_cardview);
+        mRoutineNameLayout = (TextInputLayout) rootView.findViewById(R.id.input_layout_routine_name);
+        mRoutineDescriptionLayout = (TextInputLayout) rootView.findViewById(R.id.input_layout_routine_description);
+        mRoutineNameField = (EditText) rootView.findViewById(R.id.routine_name_edit_text);
+        mRoutineDescriptionField = (EditText) rootView.findViewById(R.id.routine_description_edit_text);
+        mRoutineGoalsSpinner = (Spinner) rootView.findViewById(R.id.routine_goal_spinner);
+        mRoutineLevelSpinner = (Spinner) rootView.findViewById(R.id.routine_level_spinner);
+        mSaveRoutinePropertiesText = (TextView) rootView.findViewById(R.id.routine_properties_ok_textview);
+        mSaveRoutinePropertiesText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveRoutineProperties();
+            }
+        });
+
+        mGoalsAdapter = ArrayAdapter.createFromResource(getContext(), R.array.routine_properties_goal, R.layout.simple_spinner_item);
+        mLevelAdapter = ArrayAdapter.createFromResource(getContext(), R.array.routine_properties_level, R.layout.simple_spinner_item);
+
+        mRoutineGoalsSpinner.setAdapter(mGoalsAdapter);
+        mRoutineLevelSpinner.setAdapter(mLevelAdapter);
+
+        if (mIsNewRoutine){
+            Log.i(TAG, "New routine being created");
+            mRoutinePropetiesCardView.setVisibility(View.VISIBLE);
+            mAddWorkoutCardView.setVisibility(GONE);
+            mFabAddWorkout.setVisibility(GONE);
         } else {
-            mFabAddWorkout.setVisibility(View.GONE);
-            mAddWorkoutLayout.setVisibility(View.VISIBLE);
+            mRoutinePropetiesCardView.setVisibility(GONE);
+        }
+
+        if (mShowAddWorkoutPanel == false && mIsNewRoutine == false){
+            mFabAddWorkout.setVisibility(View.VISIBLE);
+            mAddWorkoutCardView.setVisibility(GONE);
         }
 
         mFabAddWorkout.setOnClickListener(new View.OnClickListener() {
@@ -223,6 +273,34 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         return rootView;
     }
 
+    private void saveRoutineProperties(){
+        mRoutinePropetiesCardView.animate()
+                .translationX(mRoutinePropetiesCardView.getWidth())
+                .alpha(0.0f)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mRoutinePropetiesCardView.setVisibility(View.GONE);
+                        hideFabShowAddWorkout();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
     public void addWorkout(){
 
         if (mWorkoutNameField.getText().toString().equals("")){
@@ -257,10 +335,10 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
 
     public void hideFabShowAddWorkout(){
-        mAddWorkoutLayout.setVisibility(View.VISIBLE);
-        mAddWorkoutLayout.setAlpha(0.0f);
+        mAddWorkoutCardView.setVisibility(View.VISIBLE);
+        mAddWorkoutCardView.setAlpha(0.0f);
         mWorkoutNameField.requestFocus();
-        mAddWorkoutLayout.animate()
+        mAddWorkoutCardView.animate()
                 .translationY(0)
                 .alpha(1.0f)
                 .setListener(new Animator.AnimatorListener() {
@@ -272,7 +350,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
                     @Override
                     public void onAnimationEnd(Animator animator) {
                         mFabAddWorkout.animate().alpha(0.0f);
-                        mFabAddWorkout.setVisibility(View.GONE);
+                        mFabAddWorkout.setVisibility(GONE);
 
                     }
 
@@ -289,8 +367,8 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     }
 
     public void showFabHideAddWorkout(){
-        mAddWorkoutLayout.animate()
-                .translationY(-mAddWorkoutLayout.getHeight())
+        mAddWorkoutCardView.animate()
+                .translationY(-mAddWorkoutCardView.getHeight())
                 .setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animator) {
@@ -299,7 +377,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
                     @Override
                     public void onAnimationEnd(Animator animator) {
-                        mAddWorkoutLayout.setVisibility(View.GONE);
+                        mAddWorkoutCardView.setVisibility(GONE);
 
                         mFabAddWorkout.setVisibility(View.VISIBLE);
                         mFabAddWorkout.setAlpha(0.0f);
@@ -442,6 +520,10 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
     public void setShowAddWorkoutPanel(boolean showAddWorkoutPanel) {
         mShowAddWorkoutPanel = showAddWorkoutPanel;
+    }
+
+    public void setNewRoutine(boolean newRoutine) {
+        mIsNewRoutine = newRoutine;
     }
 
     // Set listener

@@ -116,7 +116,7 @@
     <string name="timer_autostart">Auto-start</string>
     <string name="menu_active_timer">0</string>
     <string name="dismiss">Dismiss</string>
-    <string name="routine_add_day">Add workout</string>
+    <string name="routine_add_workout">Add</string>
     <string name="no_exercises">Add exercises</string>
     <string name="action_done">Done</string>
     <string name="menu_edit_routine">Edit routine</string>

@@ -114,6 +114,7 @@ public class RoutineActivity extends BaseActivity {
                 Log.i(TAG, "Workout changed");
             }
         });
+        mRoutineDetailsFragment.setNewRoutine(true);
     }
 
     private void createViewRoutinesFragment(){
@@ -146,6 +147,7 @@ public class RoutineActivity extends BaseActivity {
 
                 mRoutineDetailsFragment.setRoutine(routine);
                 mRoutineDetailsFragment.setShowAddWorkoutPanel(false);
+                mRoutineDetailsFragment.setNewRoutine(false);
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
                 ft.replace(R.id.routine_fragment_container, mRoutineDetailsFragment).addToBackStack(null).commit();
