@@ -30,6 +30,9 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
+
+//TODO: IF THERE ARE NO ROUTINES, THEN LOADING NEVER COMPLETES
+
 public class ViewRoutinesFragment extends Fragment {
 
     private static final String TAG = "ViewRoutinesFragment";
@@ -223,7 +226,7 @@ public class ViewRoutinesFragment extends Fragment {
                     Exercise e = exercise.getValue(Exercise.class);
                     exercisesList.add(e);
 
-                    // hide loading dialog if all exercises have been loaded 
+                    // hide loading dialog if all exercises have been loaded
                     if (currentExercise == numExercises && lastRoutine == true && lastWorkout == true){
                         Log.i(TAG, "All exercises added to workouts. Routine Loading complete");
 

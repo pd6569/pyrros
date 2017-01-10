@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -82,6 +83,17 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         mRoutineFilterSpinner = (AppCompatSpinner) findViewById(R.id.toolbar_routine_filter_spinner);
         mSpinnerAdapter = new ArrayAdapter(this, R.layout.spinner_routines_filter, getResources().getStringArray(R.array.routine_filter));
         mRoutineFilterSpinner.setAdapter(mSpinnerAdapter);
+        mRoutineFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         createViewRoutinesFragment();
         createRoutineDetailFragment();
@@ -91,6 +103,7 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         FragmentTransaction ft = fm.beginTransaction();
         if (mFragmentToLoad == FRAGMENT_CREATE_ROUTINE) {
             ft.add(R.id.routine_fragment_container, mRoutineDetailsFragment);
+            mRoutineFilterSpinner.setVisibility(View.GONE);
         } else if (mFragmentToLoad == FRAGMENT_VIEW_ROUTINES){
             ft.add(R.id.routine_fragment_container, mViewRoutineFragment);
         }
@@ -150,9 +163,10 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
                 createRoutineDetailFragment();
 
 
-                // Change toolbar to display routine name and edit icons
+                // Change toolbar to display routine name, edit icon and set spinner invisible
                 mRoutineNameTextView.setText(routine.getName());
                 mEditRoutineMenuItem.setVisible(true);
+                mRoutineFilterSpinner.setVisibility(View.GONE);
                 setToolbarTitleClickListener();
 
                 mRoutineDetailsFragment.setRoutine(routine);
@@ -265,6 +279,7 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
             }
             mRoutineNameTextView.setText("Routines");
             mEditRoutineMenuItem.setVisible(false);
+            mRoutineFilterSpinner.setVisibility(View.VISIBLE);
         }
 
         super.onBackPressed();
