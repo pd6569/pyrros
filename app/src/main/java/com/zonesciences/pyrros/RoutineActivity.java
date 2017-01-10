@@ -5,12 +5,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.ViewStubCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -48,6 +50,10 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
     // View
     TextView mRoutineNameTextView;
     EditText mRoutineNameEditText;
+    AppCompatSpinner mRoutineFilterSpinner;
+
+    // Adapter
+    ArrayAdapter mSpinnerAdapter;
 
     // Menu items / toolbar
     Toolbar mToolbar;
@@ -72,6 +78,10 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mRoutineFilterSpinner = (AppCompatSpinner) findViewById(R.id.toolbar_routine_filter_spinner);
+        mSpinnerAdapter = new ArrayAdapter(this, R.layout.spinner_routines_filter, getResources().getStringArray(R.array.routine_filter));
+        mRoutineFilterSpinner.setAdapter(mSpinnerAdapter);
 
         createViewRoutinesFragment();
         createRoutineDetailFragment();
