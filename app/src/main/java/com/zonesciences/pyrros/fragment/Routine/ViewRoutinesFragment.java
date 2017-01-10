@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.zonesciences.pyrros.BaseActivity;
 import com.zonesciences.pyrros.R;
@@ -36,6 +37,13 @@ import java.util.List;
 public class ViewRoutinesFragment extends Fragment {
 
     private static final String TAG = "ViewRoutinesFragment";
+
+    // Filter constants
+    public static final String FILTER_PYROS = "PyrosRoutines";
+    public static final String FILTER_USER_ROUTINES = "UserRoutines";
+    public static final String FILTER_FAVOURITE_ROUTINES = "FavouriteRoutines";
+    public static final String FILTER_FRIENDS_ROUTINES = "FriendsRoutines";
+    public static final String FILTER_COMMUNITY_ROUTINES = "CommunityRoutines";
 
     // Firebase
     DatabaseReference mDatabase;
@@ -76,7 +84,7 @@ public class ViewRoutinesFragment extends Fragment {
         mUid = Utils.getUid();
 
         mLoadListener.onLoadStart();
-        loadRoutines();
+        loadRoutines(FILTER_USER_ROUTINES);
 
     }
 
@@ -125,8 +133,21 @@ public class ViewRoutinesFragment extends Fragment {
      * Load routines from database
      */
 
-    private void loadRoutines(){
-        mDatabase.child("user-routines").child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
+    public void loadRoutines(final String routinesFilter){
+
+        Query routinesQuery = mDatabase.child("user-routines").child(mUid);
+
+        switch (routinesFilter) {
+            case FILTER_USER_ROUTINES:
+                routinesQuery = mDatabase.child("user-routines").child(mUid);
+                break;
+
+            case FILTER_COMMUNITY_ROUTINES:
+                routinesQuery = mDatabase.child("routines").limitToFirst(50);
+                break;
+        }
+
+        routinesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -135,7 +156,7 @@ public class ViewRoutinesFragment extends Fragment {
                 int currentRoutine = 0;
                 boolean lastRoutine = false;
 
-                for (DataSnapshot routine : dataSnapshot.getChildren()){
+                for (DataSnapshot routine : dataSnapshot.getChildren()) {
                     currentRoutine++;
                     Log.i(TAG, "Num routines: " + numRoutines + " current routine: " + currentRoutine);
                     String routineKey = routine.getKey();
@@ -145,7 +166,7 @@ public class ViewRoutinesFragment extends Fragment {
 
                     if (currentRoutine == numRoutines) lastRoutine = true;
 
-                    createWorkouts(routineKey, r, lastRoutine);
+                    createWorkouts(routineKey, r, lastRoutine, routinesFilter);
 
                 }
             }
@@ -157,8 +178,19 @@ public class ViewRoutinesFragment extends Fragment {
         });
     }
 
-    private void createWorkouts(final String routineKey, final Routine routine, final boolean lastRoutine) {
-        mDatabase.child("user-routine-workouts").child(mUid).child(routineKey).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void createWorkouts(final String routineKey, final Routine routine, final boolean lastRoutine, final String routinesFilter) {
+        Query workouts = mDatabase.child("user-routine-workouts").child(mUid).child(routineKey);
+
+        switch (routinesFilter){
+            case FILTER_USER_ROUTINES:
+                workouts = mDatabase.child("user-routine-workouts").child(mUid).child(routineKey);
+                break;
+            case FILTER_COMMUNITY_ROUTINES:
+                workouts =  mDatabase.child("routine-workouts").child(routineKey);
+                break;
+        }
+
+        workouts.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -181,13 +213,14 @@ public class ViewRoutinesFragment extends Fragment {
 
                     Workout w = workout.getValue(Workout.class);
                     routine.addWorkoutToList(w);
+                    Log.i(TAG, "Added workout to list: " + w.getName());
                     if (w.getNumExercises() > 0) {
                         currentWorkoutWithExercises++;
                         if (currentWorkoutWithExercises == numWorkoutsWithExercises) {
                             Log.i(TAG, "Last workout with exercises. " + w.getName() + " number exercises: " + w.getNumExercises());
                             lastWorkout = true;
                         }
-                        addExercisesToWorkout(w, w.getWorkoutKey(), routineKey, lastRoutine, lastWorkout);
+                        addExercisesToWorkout(w, w.getWorkoutKey(), routineKey, lastRoutine, lastWorkout, routinesFilter);
                     }
 
                 }
@@ -211,8 +244,19 @@ public class ViewRoutinesFragment extends Fragment {
     }
 
 
-    private void addExercisesToWorkout(final Workout workout, String workoutKey, String routineKey, final boolean lastRoutine, final boolean lastWorkout) {
-        mDatabase.child("user-routine-workout-exercises").child(mUid).child(routineKey).child(workoutKey).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void addExercisesToWorkout(final Workout workout, String workoutKey, String routineKey, final boolean lastRoutine, final boolean lastWorkout, String routinesFilter) {
+        Query exercises = mDatabase.child("user-routine-workout-exercises").child(mUid).child(routineKey).child(workoutKey);
+
+        switch (routinesFilter){
+            case FILTER_USER_ROUTINES:
+                exercises = mDatabase.child("user-routine-workout-exercises").child(mUid).child(routineKey).child(workoutKey);
+                break;
+            case FILTER_COMMUNITY_ROUTINES:
+                exercises =  mDatabase.child("routine-workout-exercises").child(routineKey).child(workoutKey);
+                break;
+        }
+
+        exercises.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -250,6 +294,7 @@ public class ViewRoutinesFragment extends Fragment {
 
         // sort workout order
         for (int i = 0; i < mRoutines.size(); i++){
+            Log.i(TAG, "Sort workouts in routine: " + mRoutines.get(i).getName() + " Num workouts: " + mRoutines.get(i).getNumWorkouts());
             Collections.sort(mRoutines.get(i).getWorkoutsList());
         }
 
@@ -274,4 +319,14 @@ public class ViewRoutinesFragment extends Fragment {
         this.mRoutineSelectedListener = listener;
     }
 
+    // Getters and setters
+
+
+    public List<Routine> getRoutines() {
+        return mRoutines;
+    }
+
+    public void setRoutines(List<Routine> routines) {
+        mRoutines = routines;
+    }
 }

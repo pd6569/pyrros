@@ -74,8 +74,8 @@
     </string-array>
 
     <string-array name="routine_filter">
-        <item>Pyros</item>
         <item>My Routines</item>
+        <item>Pyros</item>
         <item>Favourites</item>
         <item>Friends</item>
         <item>Community</item>

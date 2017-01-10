@@ -67,6 +67,9 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
     // Routines
     List<Routine> mRoutinesList;
 
+    // Filter
+    String mCurrentFilter = "My Routines";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +89,27 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         mRoutineFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-
+                String filter = (String) parent.getItemAtPosition(pos);
+                switch(filter){
+                    case "Community":
+                        Log.i(TAG, "Community filter selected");
+                        if (!filter.equals(mCurrentFilter)) {
+                            mViewRoutineFragment.getRoutines().clear();
+                            showProgressDialog();
+                            mViewRoutineFragment.loadRoutines(ViewRoutinesFragment.FILTER_COMMUNITY_ROUTINES);
+                            mCurrentFilter = "Community";
+                        }
+                        break;
+                    case "My Routines":
+                        Log.i(TAG, "My Routines filter selected");
+                        if (!filter.equals(mCurrentFilter)) {
+                            mViewRoutineFragment.getRoutines().clear();
+                            showProgressDialog();
+                            mViewRoutineFragment.loadRoutines(ViewRoutinesFragment.FILTER_USER_ROUTINES);
+                            mCurrentFilter = "My Routines";
+                        }
+                        break;
+                }
             }
 
             @Override
