@@ -216,11 +216,15 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         mRoutineDescriptionLayout = (TextInputLayout) rootView.findViewById(R.id.input_layout_routine_description);
         mRoutineNameField = (EditText) rootView.findViewById(R.id.routine_name_edit_text);
         if (mRoutine.getName() != null){
-            mRoutineNameField.setText(mRoutine.getName());
+            String name = mRoutine.getName();
+            Log.i(TAG, "Set routine name: " + mRoutine.getName());
+            mRoutineNameField.setText(name);
         }
         mRoutineDescriptionField = (EditText) rootView.findViewById(R.id.routine_description_edit_text);
         if (mRoutine.getDescription() != null){
-            mRoutineDescriptionField.setText(mRoutine.getDescription());
+            String description = mRoutine.getDescription();
+            Log.i(TAG, "Set routine desc: " + description);
+            mRoutineDescriptionField.setText(description);
         }
 
         mRoutineGoalsSpinner = (Spinner) rootView.findViewById(R.id.routine_goal_spinner);
@@ -712,17 +716,21 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
         // Update routine local object
 
+
         List<Workout> workouts = mRoutine.getWorkoutsList();
-        int numWorkouts = workouts.size();
+        int numWorkouts = 0;
+        if (workouts != null) {
+            numWorkouts = workouts.size();
+
+            Map<String, Boolean> workoutsInRoutine = new HashMap<>();
+            for (Workout workout : workouts) {
+                String workoutKey = workout.getWorkoutKey();
+                workoutsInRoutine.put(workoutKey, true);
+            }
+            mRoutine.setWorkouts(workoutsInRoutine);
+        }
 
         mRoutine.setNumWorkouts(numWorkouts);
-
-        Map<String, Boolean> workoutsInRoutine = new HashMap<>();
-        for (Workout workout : workouts) {
-            String workoutKey = workout.getWorkoutKey();
-            workoutsInRoutine.put(workoutKey, true);
-        }
-        mRoutine.setWorkouts(workoutsInRoutine);
 
         // Clear data before rewriting
         Map<String, Object> clearRoutineData = new HashMap<>();
@@ -766,6 +774,17 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "onDestroy");
+    }
 
     // Getters and setters
 

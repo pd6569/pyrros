@@ -134,11 +134,11 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         }, new RoutineSelectedListener() {
             @Override
             public void onRoutineSelected(Routine routine) {
-                Log.i(TAG, "Routine selected: " + routine.getName() + " Number of workouts: " + routine.getWorkoutsList().size());
+                Log.i(TAG, "Routine selected: " + routine.getName() + "Description: " + routine.getDescription() + " Number of workouts: " + routine.getWorkoutsList().size());
 
-                if (mRoutineDetailsFragment == null){
-                    createRoutineDetailFragment();
-                }
+                mRoutineDetailsFragment = null;
+                createRoutineDetailFragment();
+
 
                 // Change toolbar to display routine name and edit icons
                 mRoutineNameTextView.setText(routine.getName());
