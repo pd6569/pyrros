@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -111,7 +112,8 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     boolean mRoutineChanged = false;
 
     // View to show on load
-    boolean mShowAddWorkoutPanel = true;
+    boolean mCreateNewRoutine;
+    boolean mShowAddWorkoutPanel = false;
 
     public static RoutineDetailsFragment newInstance() {
         Bundle args = new Bundle();
@@ -223,9 +225,17 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
     public void addWorkout(){
 
+        if (mWorkoutNameField.getText().toString().equals("")){
+            Snackbar sb = Snackbar.make(mWorkoutNameField, "Enter name for workout", Snackbar.LENGTH_SHORT);
+            sb.show();
+            return;
+        }
+
         mRoutineChanged = true;
 
         String workoutTitle = mWorkoutNameField.getText().toString();
+        mWorkoutNameField.setText("");
+
         Workout workout = new Workout (mUid, mUsername, mClientTimeStamp, workoutTitle, true);
         String workoutKey = mDatabase.child("user-routines").child(mRoutineKey).push().getKey();
         workout.setWorkoutKey(workoutKey);
@@ -249,6 +259,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     public void hideFabShowAddWorkout(){
         mAddWorkoutLayout.setVisibility(View.VISIBLE);
         mAddWorkoutLayout.setAlpha(0.0f);
+        mWorkoutNameField.requestFocus();
         mAddWorkoutLayout.animate()
                 .translationY(0)
                 .alpha(1.0f)

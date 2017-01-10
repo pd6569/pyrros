@@ -57,4 +57,24 @@
         <item>Pull</item>
     </string-array>
 
+    <string-array name="routine_properties_level">
+        <item>Beginner</item>
+        <item>Intermediate</item>
+        <item>Advanced</item>
+        <item>Any</item>
+    </string-array>
+
+
+    <string-array name="routine_properties_goal">
+        <item>Power</item>
+        <item>Strength</item>
+        <item>Mass</item>
+        <item>Fitness</item>
+        <item>Endurance</item>
+        <item>Aesthetics</item>
+        <item>Functional</item>
+        <item>Sport Specific</item>
+    </string-array>
+
+
 </resources>

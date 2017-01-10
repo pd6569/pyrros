@@ -127,5 +127,7 @@
     <string name="eccentric">Eccentric</string>
     <string name="pause">Pause</string>
     <string name="concentric">Concentric</string>
+    <string name="routine_name">Routine name</string>
+    <string name="routine_description">Description</string>
 
 </resources>
