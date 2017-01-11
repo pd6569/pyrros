@@ -147,6 +147,8 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     boolean mGoalPropertySet;
     boolean mLevelPropertySet;
 
+    // Editable
+    boolean mAllowEditing;
 
 
     public static RoutineDetailsFragment newInstance() {
@@ -171,7 +173,6 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         mUid = Utils.getUid();
         mClientTimeStamp = Utils.getClientTimeStamp(true);
 
-
         // Get username and update routine object
         mDatabase = Utils.getDatabase().getReference();
         mDatabase.child("users").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -188,8 +189,20 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             }
         });
 
+        // Check if user has priveleges to change routine
+        if (mRoutine != null){
+            Log.i(TAG, "Routine is not null");
+            Log.i(TAG, "mUid: " + mUid + " Routine user id: " + mRoutine.getUid());
+            if (mUid.equals(mRoutine.getUid())){
+                // User created this routine, so allow editing
+                mAllowEditing = true;
+                Log.i(TAG, "User: " + mUid + " matches creator of routine: " + mRoutine.getUid() + " set allow editing: " + mAllowEditing);
+            }
+        }
+
         // Generate unique routines key if new routine (routine can be set from viewroutines fragment via setter)
         if (mRoutine == null) {
+            mAllowEditing = true;
             mRoutine = new Routine(mUid, mClientTimeStamp, true);
             mRoutineKey = mDatabase.child("routines").push().getKey();
         } else {
@@ -205,7 +218,14 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         Log.i(TAG, "onCreateView");
 
         mFabAddWorkout = (FloatingActionButton) rootView.findViewById(R.id.fab_add_workout);
+        if (!mAllowEditing){
+            mFabAddWorkout.setVisibility(GONE);
+            mFabAddWorkout.setOnClickListener(null);
+        }
         mAddWorkoutCardView = (CardView) rootView.findViewById(R.id.add_workout_cardview);
+        if (!mAllowEditing){
+            mAddWorkoutCardView.setVisibility(GONE);
+        }
         mAddWorkoutLayout = (LinearLayout) rootView.findViewById(R.id.layout_add_workout);
         mWorkoutNameField = (AutoCompleteTextView) rootView.findViewById(R.id.autocomplete_field_workout_name);
         mAddWorkoutButton = (Button) rootView.findViewById(R.id.button_routine_add_workout);
@@ -342,6 +362,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         if (mRoutine.getWorkoutsList() != null) {
             Log.i(TAG, "Has workouts, set adapter");
             mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener, workoutChangedListener, this);
+            mAdapter.setAllowEditing(mAllowEditing);
             mRecycler.setAdapter(mAdapter);
 
             mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);
@@ -423,6 +444,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
 
         if (mAdapter == null){
             mAdapter = new RoutineWorkoutsAdapter(getActivity(), mRoutine.getWorkoutsList(), addExerciseListener, workoutChangedListener, this);
+            mAdapter.setAllowEditing(mAllowEditing);
             mRecycler.setAdapter(mAdapter);
 
             mItemTouchHelperCallback = new ItemTouchHelperCallback(mAdapter, true, false);

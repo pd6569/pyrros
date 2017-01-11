@@ -44,6 +44,9 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
     WorkoutChangedListener mWorkoutChangedListener;
     OnDragListener mDragListener;
 
+    // Allow editing of workout
+    boolean mAllowEditing;
+
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView workoutTitleTextView;
@@ -63,6 +66,9 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
             super(itemView);
             workoutTitleTextView = (TextView) itemView.findViewById(R.id.routine_workout_item_textview);
             deleteWorkoutImageView = (ImageView) itemView.findViewById(R.id.routine_workout_delete_imageview);
+            if (!mAllowEditing){
+                deleteWorkoutImageView.setVisibility(View.INVISIBLE);
+            }
             deleteWorkoutImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -72,22 +78,29 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
                 }
             });
             reorderHandle = (ImageView) itemView.findViewById(R.id.routine_workout_reorder_workouts);
+            if (!mAllowEditing){
+                reorderHandle.setVisibility(View.INVISIBLE);
+            }
             noExercisesTextView = (TextView) itemView.findViewById(R.id.no_exercises_textview);
-            noExercisesTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mAddExerciseListener.onAddFirstExercises(getAdapterPosition());
-                }
-            });
+            if (mAllowEditing) {
+                noExercisesTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mAddExerciseListener.onAddFirstExercises(getAdapterPosition());
+                    }
+                });
+            }
 
             exercisesContainerLinearLayout = (LinearLayout) itemView.findViewById(R.id.linear_layout_routine_workout_exercises_container);
-            exercisesContainerLinearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i(TAG, "Clicked workout: " + mWorkouts.get(getAdapterPosition()).getName() + " Position: " + getAdapterPosition());
-                    mAddExerciseListener.onChangeExistingExercises(getAdapterPosition());
-                }
-            });
+            if (mAllowEditing) {
+                exercisesContainerLinearLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i(TAG, "Clicked workout: " + mWorkouts.get(getAdapterPosition()).getName() + " Position: " + getAdapterPosition());
+                        mAddExerciseListener.onChangeExistingExercises(getAdapterPosition());
+                    }
+                });
+            }
 
             workoutOverviewContainer = (LinearLayout) itemView.findViewById(R.id.linear_layout_routine_workout_overview_container);
             numExercises = (TextView) itemView.findViewById(R.id.routine_workout_num_exercises_textview);
@@ -175,13 +188,16 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
 
     // Getters and setters
 
-
     public List<Workout> getWorkouts() {
         return mWorkouts;
     }
 
     public void setWorkouts(List<Workout> workouts) {
         this.mWorkouts = workouts;
+    }
+
+    public void setAllowEditing(boolean allowEditing) {
+        mAllowEditing = allowEditing;
     }
 
     // Listener
