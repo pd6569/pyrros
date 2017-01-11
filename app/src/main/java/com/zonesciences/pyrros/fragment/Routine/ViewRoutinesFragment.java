@@ -60,10 +60,12 @@ public class ViewRoutinesFragment extends Fragment {
     RecyclerView mRecycler;
     RoutinesAdapter mAdapter;
 
-
     // Listeners
     RoutineLoadListener mLoadListener;
     RoutineSelectedListener mRoutineSelectedListener;
+
+    //Filter
+    String mCurrentFilter;
 
     public static ViewRoutinesFragment newInstance(RoutineLoadListener routineLoadListener, RoutineSelectedListener routineSelectedListener) {
 
@@ -147,71 +149,80 @@ public class ViewRoutinesFragment extends Fragment {
         switch (routinesFilter) {
             case FILTER_USER_ROUTINES:
                 routinesQuery = mDatabase.child("user-routines").child(mUid);
+                mCurrentFilter = FILTER_USER_ROUTINES;
                 break;
 
             case FILTER_COMMUNITY_ROUTINES:
                 routinesQuery = mDatabase.child("routines").orderByKey().limitToLast(50);
+                mCurrentFilter = FILTER_COMMUNITY_ROUTINES;
                 break;
         }
 
+        if (routinesFilter.equals(FILTER_USER_ROUTINES)) {
 
-        routinesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            routinesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // Track last routine in order to stop showing loading dialog
-                int numRoutines = (int) dataSnapshot.getChildrenCount();
-                int currentRoutine = 0;
-                boolean lastRoutine = false;
+                    // Track last routine in order to stop showing loading dialog
+                    int numRoutines = (int) dataSnapshot.getChildrenCount();
+                    int currentRoutine = 0;
+                    boolean lastRoutine = false;
 
-                for (DataSnapshot routine : dataSnapshot.getChildren()) {
-                    currentRoutine++;
-                    Log.i(TAG, "Num routines: " + numRoutines + " current routine: " + currentRoutine);
-                    String routineKey = routine.getKey();
-                    Routine r = routine.getValue(Routine.class);
-                    r.setRoutineKey(routineKey);
-                    mRoutines.add(r);
+                    for (DataSnapshot routine : dataSnapshot.getChildren()) {
+                        currentRoutine++;
+                        Log.i(TAG, "Num routines: " + numRoutines + " current routine: " + currentRoutine);
+                        String routineKey = routine.getKey();
+                        Routine r = routine.getValue(Routine.class);
+                        r.setRoutineKey(routineKey);
+                        mRoutines.add(r);
 
-                    if (currentRoutine == numRoutines) lastRoutine = true;
+                        if (currentRoutine == numRoutines) lastRoutine = true;
 
-                    createWorkouts(routineKey, r, lastRoutine, routinesFilter);
+                        createWorkouts(routineKey, r, lastRoutine, routinesFilter);
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
                 }
-            }
+            });
+        } else {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+            routinesQuery.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Log.i(TAG, "child added: " + dataSnapshot.getKey());
+                    if (!mCurrentFilter.equals(FILTER_USER_ROUTINES)) {
+                        Routine routine = dataSnapshot.getValue(Routine.class);
+                        mRoutines.add(routine);
+                        createWorkouts(dataSnapshot.getKey(), routine, true, routinesFilter);
+                    }
+                }
 
-            }
-        });
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Log.i(TAG, "child changed: " + dataSnapshot.getKey());
+                }
 
-        routinesQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "child added: " + dataSnapshot.getKey());
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Log.i(TAG, "child removed: " + dataSnapshot.getKey());
+                }
 
-            }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    Log.i(TAG, "child moved: " + dataSnapshot.getKey());
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "child changed: " + dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.i(TAG, "child removed: " + dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.i(TAG, "child moved: " + dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.i(TAG, "onCancelled");
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.i(TAG, "onCancelled");
+                }
+            });
+        }
     }
 
     private void createWorkouts(final String routineKey, final Routine routine, final boolean lastRoutine, final String routinesFilter) {
@@ -333,18 +344,28 @@ public class ViewRoutinesFragment extends Fragment {
         // sort workout order
         for (int i = 0; i < mRoutines.size(); i++){
             Log.i(TAG, "Sort workouts in routine: " + mRoutines.get(i).getName() + " Num workouts: " + mRoutines.get(i).getNumWorkouts());
-            Collections.sort(mRoutines.get(i).getWorkoutsList());
+            if (mRoutines.get(i).getWorkoutsList() != null) {
+                Collections.sort(mRoutines.get(i).getWorkoutsList());
+            }
         }
 
-        mAdapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
-            @Override
-            public void onRoutineSelected(Routine routine) {
-                Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());
-                mRoutineSelectedListener.onRoutineSelected(routine);
-            }
-        });
 
-        mRecycler.setAdapter(mAdapter);
+        if (mCurrentFilter.equals(FILTER_COMMUNITY_ROUTINES)){
+            if (mAdapter != null){
+                mAdapter.notifyItemInserted(mRoutines.size() - 1);
+            }
+        } else {
+
+            mAdapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
+                @Override
+                public void onRoutineSelected(Routine routine) {
+/*                Log.i(TAG, "Routine selected: " + routine.getName() + " num workouts: " + routine.getWorkoutsList().size());*/
+                    mRoutineSelectedListener.onRoutineSelected(routine);
+                }
+            });
+
+            mRecycler.setAdapter(mAdapter);
+        }
     }
 
 

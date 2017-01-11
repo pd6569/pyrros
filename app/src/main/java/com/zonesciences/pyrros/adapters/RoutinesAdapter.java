@@ -92,7 +92,10 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.ViewHo
         holder.routineDescriptionTextview.setText(routineDescription);
 
         // workout overview
-        int numWorkouts = mRoutines.get(position).getWorkoutsList().size();
+        int numWorkouts = 0;
+        if (mRoutines.get(position).getWorkoutsList() != null) {
+            numWorkouts = mRoutines.get(position).getWorkoutsList().size();
+        }
         String focus = mRoutines.get(position).getGoal();
         if (focus == null){
             focus = "General";

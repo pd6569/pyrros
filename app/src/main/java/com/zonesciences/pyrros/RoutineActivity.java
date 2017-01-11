@@ -53,7 +53,8 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
     EditText mRoutineNameEditText;
     AppCompatSpinner mRoutineFilterSpinner;
 
-    // User
+    // User and database
+    DatabaseReference mDatabase;
     String mUid;
 
     // Adapter
@@ -81,6 +82,7 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         Intent intent = getIntent();
         mFragmentToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_LOAD, FRAGMENT_CREATE_ROUTINE);
 
+        mDatabase = Utils.getDatabase().getReference();
         mUid = Utils.getUid();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_routine);
