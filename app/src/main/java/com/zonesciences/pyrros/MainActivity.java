@@ -69,7 +69,7 @@ public class MainActivity extends BaseActivity {
     private boolean mAdmin;
 
     // Views
-    FloatingActionButton mFab;
+    FloatingActionMenu mFab;
     com.github.clans.fab.FloatingActionButton mFabCreateWorkout;
     com.github.clans.fab.FloatingActionButton mFabCreateRoutine;
 
@@ -113,13 +113,15 @@ public class MainActivity extends BaseActivity {
             toolbar.setTitleTextColor(Color.WHITE);
             getSupportActionBar().setTitle("Pyros Trainer");
 
-            //Button launches NewWorkoutActivity
 
+            // Set Fab Menu and button properties
+            mFab = (FloatingActionMenu) findViewById(R.id.fab_menu);
             mFabCreateWorkout = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_item_create_workout);
             mFabCreateWorkout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     startActivity(new Intent(MainActivity.this, CreateWorkoutActivity.class));
+                    mFab.close(true);
                 }
             });
             mFabCreateRoutine = (com.github.clans.fab.FloatingActionButton)  findViewById(R.id.fab_menu_item_create_routine);
@@ -129,6 +131,7 @@ public class MainActivity extends BaseActivity {
                     Intent intent = new Intent(getApplicationContext(), RoutineActivity.class);
                     intent.putExtra(RoutineActivity.EXTRA_FRAGMENT_TO_LOAD, RoutineActivity.FRAGMENT_CREATE_ROUTINE);
                     startActivity(intent);
+                    mFab.close(true);
                 }
             });
 
