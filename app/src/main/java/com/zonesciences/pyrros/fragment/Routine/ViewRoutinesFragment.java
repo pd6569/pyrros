@@ -11,7 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -98,7 +100,10 @@ public class ViewRoutinesFragment extends Fragment {
         Log.i(TAG, "onCreateView");
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_view_routines);
-        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+        mRecycler.setLayoutManager(layoutManager);
         mRecycler.setHasFixedSize(true);
         if (mAdapter != null){
             mRecycler.setAdapter(mAdapter);
@@ -145,9 +150,10 @@ public class ViewRoutinesFragment extends Fragment {
                 break;
 
             case FILTER_COMMUNITY_ROUTINES:
-                routinesQuery = mDatabase.child("routines").limitToFirst(50);
+                routinesQuery = mDatabase.child("routines").orderByKey().limitToLast(50);
                 break;
         }
+
 
         routinesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -176,6 +182,34 @@ public class ViewRoutinesFragment extends Fragment {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+
+        routinesQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "child added: " + dataSnapshot.getKey());
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "child changed: " + dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "child removed: " + dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.i(TAG, "child moved: " + dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.i(TAG, "onCancelled");
             }
         });
     }
@@ -230,7 +264,7 @@ public class ViewRoutinesFragment extends Fragment {
                 // ensure that loading completes if the final routine contains no workouts with exercises!
 
                 if (numWorkoutsWithExercises == 0){
-                    Log.i(TAG, "Routine contains empty workouts. Check if last routine and finish loading");
+                    Log.i(TAG, "Routine contains empty workouts. Check if last routine and finish loading. Routine: " + routine.getName() + " key: " + routineKey);
                     if (lastRoutine){
                         finishLoadingRoutines();
                     }
@@ -265,11 +299,13 @@ public class ViewRoutinesFragment extends Fragment {
                 int numExercises = (int) dataSnapshot.getChildrenCount();
                 int currentExercise = 0;
 
+                Log.i(TAG, "Loading exercises for workout: " + workout.getName() + " datasnapshot children: " + dataSnapshot.getChildrenCount());
                 List<Exercise> exercisesList = new ArrayList<Exercise>();
                 for (DataSnapshot exercise : dataSnapshot.getChildren()){
                     currentExercise++;
 
                     Exercise e = exercise.getValue(Exercise.class);
+                    Log.i(TAG, "Current Exercise: " + currentExercise + " Add exercise: " + e.getName());
                     exercisesList.add(e);
 
                     // hide loading dialog if all exercises have been loaded
