@@ -53,6 +53,9 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
     EditText mRoutineNameEditText;
     AppCompatSpinner mRoutineFilterSpinner;
 
+    // User
+    String mUid;
+
     // Adapter
     ArrayAdapter mSpinnerAdapter;
 
@@ -77,6 +80,8 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
 
         Intent intent = getIntent();
         mFragmentToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_LOAD, FRAGMENT_CREATE_ROUTINE);
+
+        mUid = Utils.getUid();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar_create_routine);
         setSupportActionBar(mToolbar);
@@ -142,6 +147,10 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         }
 
     }
+
+
+
+
     private void createRoutineDetailFragment(){
         mRoutineDetailsFragment = RoutineDetailsFragment.newInstance();
         mRoutineDetailsFragment.setOnWorkoutChangedListener(new WorkoutChangedListener() {
@@ -180,7 +189,11 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
         }, new RoutineSelectedListener() {
             @Override
             public void onRoutineSelected(Routine routine) {
-                Log.i(TAG, "Routine selected: " + routine.getName() + "Description: " + routine.getDescription() + " Number of workouts: " + routine.getWorkoutsList().size());
+                Log.i(TAG, "Routine selected: " + routine.getName() + "Description: " + routine.getDescription() + " Number of workouts: " + routine.getWorkoutsList().size() + " creator: " + routine.getCreator());
+
+                if (mUid.equals(routine.getUid())){
+                    Log.i(TAG, "User created this routine, allow editing");
+                }
 
                 mRoutineDetailsFragment = null;
                 createRoutineDetailFragment();

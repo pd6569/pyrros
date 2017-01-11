@@ -173,21 +173,8 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
         mUid = Utils.getUid();
         mClientTimeStamp = Utils.getClientTimeStamp(true);
 
-        // Get username and update routine object
+
         mDatabase = Utils.getDatabase().getReference();
-        mDatabase.child("users").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                mUsername = user.getUsername();
-                mRoutine.setCreator(mUsername);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         // Check if user has priveleges to change routine
         if (mRoutine != null){
@@ -197,14 +184,31 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
                 // User created this routine, so allow editing
                 mAllowEditing = true;
                 Log.i(TAG, "User: " + mUid + " matches creator of routine: " + mRoutine.getUid() + " set allow editing: " + mAllowEditing);
+
             }
         }
+
 
         // Generate unique routines key if new routine (routine can be set from viewroutines fragment via setter)
         if (mRoutine == null) {
             mAllowEditing = true;
             mRoutine = new Routine(mUid, mClientTimeStamp, true);
             mRoutineKey = mDatabase.child("routines").push().getKey();
+
+            // Get username and update routine object
+            mDatabase.child("users").child(Utils.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    mUsername = user.getUsername();
+                    mRoutine.setCreator(mUsername);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         } else {
             mRoutineKey = mRoutine.getRoutineKey();
         }
@@ -734,64 +738,68 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
     public void onPause(){
         super.onPause();
 
-        Log.i(TAG, "onPause. Write routine to database");
+        Log.i(TAG, "onPause. Write routine to database if user is creator of routine");
 
         // Update routine local object
 
+        Log.i(TAG, "routine creator: " + mRoutine.getCreator());
 
-        List<Workout> workouts = mRoutine.getWorkoutsList();
-        int numWorkouts = 0;
-        if (workouts != null) {
-            numWorkouts = workouts.size();
+        if (mAllowEditing) {
 
-            Map<String, Boolean> workoutsInRoutine = new HashMap<>();
-            for (Workout workout : workouts) {
-                String workoutKey = workout.getWorkoutKey();
-                workoutsInRoutine.put(workoutKey, true);
-            }
-            mRoutine.setWorkouts(workoutsInRoutine);
-        }
+            List<Workout> workouts = mRoutine.getWorkoutsList();
+            int numWorkouts = 0;
+            if (workouts != null) {
+                numWorkouts = workouts.size();
 
-        mRoutine.setNumWorkouts(numWorkouts);
-
-        // Clear data before rewriting
-        Map<String, Object> clearRoutineData = new HashMap<>();
-        if (numWorkouts == 0){
-            Log.i(TAG, "No exercises, so remove routine for now");
-            clearRoutineData.put("/routines/" + mRoutineKey, null);
-            clearRoutineData.put("/user-routines/" + mUid + "/" + mRoutineKey, null);
-        }
-        clearRoutineData.put("/routine-workouts/" + mRoutineKey, null);
-        clearRoutineData.put("/routine-workout-exercises/" + mRoutineKey, null);
-        clearRoutineData.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey, null);
-        clearRoutineData.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey, null);
-        mDatabase.updateChildren(clearRoutineData);
-
-        // Write to database
-        if (numWorkouts > 0) {
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
-            childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
-
-            for (int i = 0; i < workouts.size(); i++) {
-
-                List<Exercise> exercises = workouts.get(i).getExercises();
-                if (exercises != null) {
-                    workouts.get(i).setNumExercises(exercises.size());
-                    for (Exercise e : exercises) {
-                        String exerciseKey = e.getName();
-                        e.setExerciseId();
-                        childUpdates.put("/routine-workout-exercises/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
-                        childUpdates.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
-                    }
+                Map<String, Boolean> workoutsInRoutine = new HashMap<>();
+                for (Workout workout : workouts) {
+                    String workoutKey = workout.getWorkoutKey();
+                    workoutsInRoutine.put(workoutKey, true);
                 }
-
-
-                childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
-                childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
-
+                mRoutine.setWorkouts(workoutsInRoutine);
             }
-            mDatabase.updateChildren(childUpdates);
+
+            mRoutine.setNumWorkouts(numWorkouts);
+
+            // Clear data before rewriting
+            Map<String, Object> clearRoutineData = new HashMap<>();
+            if (numWorkouts == 0) {
+                Log.i(TAG, "No exercises, so remove routine for now");
+                clearRoutineData.put("/routines/" + mRoutineKey, null);
+                clearRoutineData.put("/user-routines/" + mUid + "/" + mRoutineKey, null);
+            }
+            clearRoutineData.put("/routine-workouts/" + mRoutineKey, null);
+            clearRoutineData.put("/routine-workout-exercises/" + mRoutineKey, null);
+            clearRoutineData.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey, null);
+            clearRoutineData.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey, null);
+            mDatabase.updateChildren(clearRoutineData);
+
+            // Write to database
+            if (numWorkouts > 0) {
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("/routines/" + mRoutineKey, mRoutine.toMap());
+                childUpdates.put("/user-routines/" + mUid + "/" + mRoutineKey, mRoutine.toMap());
+
+                for (int i = 0; i < workouts.size(); i++) {
+
+                    List<Exercise> exercises = workouts.get(i).getExercises();
+                    if (exercises != null) {
+                        workouts.get(i).setNumExercises(exercises.size());
+                        for (Exercise e : exercises) {
+                            String exerciseKey = e.getName();
+                            e.setExerciseId();
+                            childUpdates.put("/routine-workout-exercises/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
+                            childUpdates.put("/user-routine-workout-exercises/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey() + "/" + exerciseKey, e.toMap());
+                        }
+                    }
+
+
+                    childUpdates.put("/routine-workouts/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
+                    childUpdates.put("/user-routine-workouts/" + mUid + "/" + mRoutineKey + "/" + workouts.get(i).getWorkoutKey(), workouts.get(i).toMap());
+
+                }
+                mDatabase.updateChildren(childUpdates);
+            }
         }
 
     }

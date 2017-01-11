@@ -1,6 +1,7 @@
 package com.zonesciences.pyrros.fragment.Routine;
 
 
+import android.database.DefaultDatabaseErrorHandler;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,7 +17,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.zonesciences.pyrros.BaseActivity;
 import com.zonesciences.pyrros.R;
 import com.zonesciences.pyrros.adapters.RoutinesAdapter;
 import com.zonesciences.pyrros.models.Exercise;
@@ -26,7 +26,9 @@ import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.

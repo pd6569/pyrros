@@ -89,6 +89,8 @@ public class RoutineWorkoutsAdapter extends RecyclerView.Adapter<RoutineWorkouts
                         mAddExerciseListener.onAddFirstExercises(getAdapterPosition());
                     }
                 });
+            } else {
+                noExercisesTextView.setText("No Exercises added");
             }
 
             exercisesContainerLinearLayout = (LinearLayout) itemView.findViewById(R.id.linear_layout_routine_workout_exercises_container);
