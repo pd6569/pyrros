@@ -1,7 +1,6 @@
 package com.zonesciences.pyrros.fragment.Routine;
 
 
-import android.database.DefaultDatabaseErrorHandler;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -28,15 +26,14 @@ import com.zonesciences.pyrros.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 
-//TODO: IF THERE ARE NO ROUTINES, THEN LOADING NEVER COMPLETES
+    //TODO: IF THERE ARE NO ROUTINES, THEN LOADING NEVER COMPLETES
+    //TODO: MAKE SURE ROUTINES ONLY SHOW IN COMMUNITY FILTER WHEN THEY ARE ACTUALLY COMPLETED! NOT WITH 0 WORKOUTS
 
 public class ViewRoutinesFragment extends Fragment {
 
@@ -66,6 +63,11 @@ public class ViewRoutinesFragment extends Fragment {
 
     //Filter
     String mCurrentFilter;
+
+    // Firebase Listener tracking
+    boolean mRoutinesChildListenerIsSet = false;
+    int mNumRoutinesAdded;
+    int mNumRoutinesFirstLoad;
 
     public static ViewRoutinesFragment newInstance(RoutineLoadListener routineLoadListener, RoutineSelectedListener routineSelectedListener) {
 
@@ -158,71 +160,37 @@ public class ViewRoutinesFragment extends Fragment {
                 break;
         }
 
-        if (routinesFilter.equals(FILTER_USER_ROUTINES)) {
 
-            routinesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+        routinesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    // Track last routine in order to stop showing loading dialog
-                    int numRoutines = (int) dataSnapshot.getChildrenCount();
-                    int currentRoutine = 0;
-                    boolean lastRoutine = false;
+                // Track last routine in order to stop showing loading dialog
+                int numRoutines = (int) dataSnapshot.getChildrenCount();
+                int currentRoutine = 0;
+                boolean lastRoutine = false;
 
-                    for (DataSnapshot routine : dataSnapshot.getChildren()) {
-                        currentRoutine++;
-                        Log.i(TAG, "Num routines: " + numRoutines + " current routine: " + currentRoutine);
-                        String routineKey = routine.getKey();
-                        Routine r = routine.getValue(Routine.class);
-                        r.setRoutineKey(routineKey);
-                        mRoutines.add(r);
+                for (DataSnapshot routine : dataSnapshot.getChildren()) {
+                    currentRoutine++;
+                    Log.i(TAG, "Num routines: " + numRoutines + " current routine: " + currentRoutine);
+                    String routineKey = routine.getKey();
+                    Routine r = routine.getValue(Routine.class);
+                    r.setRoutineKey(routineKey);
+                    mRoutines.add(r);
 
-                        if (currentRoutine == numRoutines) lastRoutine = true;
+                    if (currentRoutine == numRoutines) lastRoutine = true;
 
-                        createWorkouts(routineKey, r, lastRoutine, routinesFilter);
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    createWorkouts(routineKey, r, lastRoutine, routinesFilter);
 
                 }
-            });
-        } else {
+            }
 
-            routinesQuery.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Log.i(TAG, "child added: " + dataSnapshot.getKey());
-                    if (!mCurrentFilter.equals(FILTER_USER_ROUTINES)) {
-                        Routine routine = dataSnapshot.getValue(Routine.class);
-                        mRoutines.add(routine);
-                        createWorkouts(dataSnapshot.getKey(), routine, true, routinesFilter);
-                    }
-                }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Log.i(TAG, "child changed: " + dataSnapshot.getKey());
-                }
+            }
+        });
 
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    Log.i(TAG, "child removed: " + dataSnapshot.getKey());
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                    Log.i(TAG, "child moved: " + dataSnapshot.getKey());
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.i(TAG, "onCancelled");
-                }
-            });
-        }
     }
 
     private void createWorkouts(final String routineKey, final Routine routine, final boolean lastRoutine, final String routinesFilter) {
@@ -339,6 +307,8 @@ public class ViewRoutinesFragment extends Fragment {
 
     private void finishLoadingRoutines(){
 
+        mNumRoutinesFirstLoad = mRoutines.size();
+
         mLoadListener.onLoadComplete(mRoutines);
 
         // sort workout order
@@ -366,6 +336,48 @@ public class ViewRoutinesFragment extends Fragment {
 
             mRecycler.setAdapter(mAdapter);
         }
+
+        // set listener for real time database changes for community filter
+        if (mCurrentFilter.equals(FILTER_COMMUNITY_ROUTINES) && mRoutinesChildListenerIsSet == false) {
+            Log.i(TAG, "Loading static information finished, now add listener for dynamic routine additions");
+            mDatabase.child("routines").addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                    Log.i(TAG, "child added: " + dataSnapshot.getKey());
+                    if (!mCurrentFilter.equals(FILTER_USER_ROUTINES)) {
+                        mNumRoutinesAdded++;
+                        if (mNumRoutinesAdded > mRoutines.size()) {
+                            Routine routine = dataSnapshot.getValue(Routine.class);
+                            mRoutines.add(routine);
+                            createWorkouts(dataSnapshot.getKey(), routine, true, FILTER_COMMUNITY_ROUTINES);
+                        }
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Log.i(TAG, "child changed: " + dataSnapshot.getKey());
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Log.i(TAG, "child removed: " + dataSnapshot.getKey());
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    Log.i(TAG, "child moved: " + dataSnapshot.getKey());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.i(TAG, "onCancelled");
+                }
+            });
+            mRoutinesChildListenerIsSet = true;
+        }
+
     }
 
 
