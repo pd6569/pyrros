@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#00838F</color>
     <color name="colorPrimaryLight">#B2EBF2</color>
     <color name="colorAccent">#FDD835</color>
+    <color name="colorAccentDark">#FBC02D</color>
     <color name="colorHighlight">#feefae</color>
     <color name="activityBackground">#edecee</color>
     <color name="cardBackground">#ffffff</color>

@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -69,6 +70,8 @@ public class MainActivity extends BaseActivity {
 
     // Views
     FloatingActionButton mFab;
+    com.github.clans.fab.FloatingActionButton mFabCreateWorkout;
+    com.github.clans.fab.FloatingActionButton mFabCreateRoutine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,14 +114,24 @@ public class MainActivity extends BaseActivity {
             getSupportActionBar().setTitle("Pyros Trainer");
 
             //Button launches NewWorkoutActivity
-            mFab = (FloatingActionButton) findViewById(R.id.fab_new_workout);
-            mFab.setOnClickListener(new View.OnClickListener(){
+
+            mFabCreateWorkout = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_item_create_workout);
+            mFabCreateWorkout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /*startActivity(new Intent(MainActivity.this, NewWorkoutActivity.class));*/
                     startActivity(new Intent(MainActivity.this, CreateWorkoutActivity.class));
                 }
             });
+            mFabCreateRoutine = (com.github.clans.fab.FloatingActionButton)  findViewById(R.id.fab_menu_item_create_routine);
+            mFabCreateRoutine.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getApplicationContext(), RoutineActivity.class);
+                    intent.putExtra(RoutineActivity.EXTRA_FRAGMENT_TO_LOAD, RoutineActivity.FRAGMENT_CREATE_ROUTINE);
+                    startActivity(intent);
+                }
+            });
+
         }
 
     }
