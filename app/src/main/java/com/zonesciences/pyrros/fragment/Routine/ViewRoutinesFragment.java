@@ -10,6 +10,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -56,10 +59,15 @@ public class ViewRoutinesFragment extends Fragment {
     // RecyclerView
     RecyclerView mRecycler;
     RoutinesAdapter mAdapter;
+    LinearLayoutManager mLinearLayoutManager;
+    TextView mNewRoutinesNotificationText;
 
     // Listeners
     RoutineLoadListener mLoadListener;
     RoutineSelectedListener mRoutineSelectedListener;
+
+    // Loading
+    int mNumLoads;
 
     //Filter
     String mCurrentFilter;
@@ -103,11 +111,19 @@ public class ViewRoutinesFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_view_routines, container, false);
         Log.i(TAG, "onCreateView");
 
+        mNewRoutinesNotificationText = (TextView) rootView.findViewById(R.id.new_routines_published_textview);
+        mNewRoutinesNotificationText.setVisibility(View.INVISIBLE);
+        mNewRoutinesNotificationText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mRecycler.smoothScrollToPosition(mRoutines.size()-1);
+            }
+        });
         mRecycler = (RecyclerView) rootView.findViewById(R.id.recycler_view_routines);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
-        mRecycler.setLayoutManager(layoutManager);
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
+        mLinearLayoutManager.setReverseLayout(true);
+        mLinearLayoutManager.setStackFromEnd(true);
+        mRecycler.setLayoutManager(mLinearLayoutManager);
         mRecycler.setHasFixedSize(true);
         if (mAdapter != null){
             mRecycler.setAdapter(mAdapter);
@@ -306,25 +322,22 @@ public class ViewRoutinesFragment extends Fragment {
     }
 
     private void finishLoadingRoutines(){
-
-        mNumRoutinesFirstLoad = mRoutines.size();
+        mNumLoads++;
 
         mLoadListener.onLoadComplete(mRoutines);
 
-        // sort workout order
-        for (int i = 0; i < mRoutines.size(); i++){
-            Log.i(TAG, "Sort workouts in routine: " + mRoutines.get(i).getName() + " Num workouts: " + mRoutines.get(i).getNumWorkouts());
-            if (mRoutines.get(i).getWorkoutsList() != null) {
-                Collections.sort(mRoutines.get(i).getWorkoutsList());
-            }
-        }
+        // Check if it is the first load of routines
+        if (mNumLoads == 1) {
+            mNumRoutinesFirstLoad = mRoutines.size();
 
-
-        if (mCurrentFilter.equals(FILTER_COMMUNITY_ROUTINES)){
-            if (mAdapter != null){
-                mAdapter.notifyItemInserted(mRoutines.size() - 1);
+            // sort workout order
+            for (int i = 0; i < mRoutines.size(); i++) {
+                Log.i(TAG, "Sort workouts in routine: " + mRoutines.get(i).getName() + " Num workouts: " + mRoutines.get(i).getNumWorkouts());
+                if (mRoutines.get(i).getWorkoutsList() != null) {
+                    Collections.sort(mRoutines.get(i).getWorkoutsList());
+                }
             }
-        } else {
+            mLinearLayoutManager.scrollToPosition(mRoutines.size() - 1);
 
             mAdapter = new RoutinesAdapter(getContext(), mRoutines, new RoutineSelectedListener() {
                 @Override
@@ -335,6 +348,11 @@ public class ViewRoutinesFragment extends Fragment {
             });
 
             mRecycler.setAdapter(mAdapter);
+        } else {
+            if (mAdapter != null) {
+                mAdapter.notifyItemInserted(mRoutines.size() - 1);
+                notifyNewRoutinesAdded();
+            }
         }
 
         // set listener for real time database changes for community filter
@@ -347,6 +365,7 @@ public class ViewRoutinesFragment extends Fragment {
                     Log.i(TAG, "child added: " + dataSnapshot.getKey());
                     if (!mCurrentFilter.equals(FILTER_USER_ROUTINES)) {
                         mNumRoutinesAdded++;
+                        // Do not add routines that have already been added by the single value event listener on first load
                         if (mNumRoutinesAdded > mRoutines.size()) {
                             Routine routine = dataSnapshot.getValue(Routine.class);
                             mRoutines.add(routine);
@@ -380,6 +399,37 @@ public class ViewRoutinesFragment extends Fragment {
 
     }
 
+    private void notifyNewRoutinesAdded(){
+        // Fade in
+        mNewRoutinesNotificationText.setAlpha(0.0f);
+        mNewRoutinesNotificationText.setVisibility(View.VISIBLE);
+        mNewRoutinesNotificationText.animate()
+                .setDuration(500)
+                .alpha(1.0f);
+
+        //Fade out
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
+        alphaAnimation.setStartOffset(5000);
+        alphaAnimation.setDuration(500);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mNewRoutinesNotificationText.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mNewRoutinesNotificationText.setAnimation(alphaAnimation);
+
+    }
 
     // Load listener
     public void setRoutineLoadListener (RoutineLoadListener listener){
@@ -399,5 +449,9 @@ public class ViewRoutinesFragment extends Fragment {
 
     public void setRoutines(List<Routine> routines) {
         mRoutines = routines;
+    }
+
+    public void setNumLoads(int numLoads) {
+        mNumLoads = numLoads;
     }
 }

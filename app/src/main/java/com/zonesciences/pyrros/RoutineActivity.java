@@ -101,6 +101,7 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
                     case "Community":
                         Log.i(TAG, "Community filter selected");
                         if (!filter.equals(mCurrentFilter)) {
+                            mViewRoutineFragment.setNumLoads(0); // used for tracking first load of routines
                             mViewRoutineFragment.getRoutines().clear();
                             showProgressDialog();
                             mViewRoutineFragment.loadRoutines(ViewRoutinesFragment.FILTER_COMMUNITY_ROUTINES);
@@ -110,6 +111,7 @@ public class RoutineActivity extends BaseActivity implements RoutineDetailsFragm
                     case "My Routines":
                         Log.i(TAG, "My Routines filter selected");
                         if (!filter.equals(mCurrentFilter)) {
+                            mViewRoutineFragment.setNumLoads(0);
                             mViewRoutineFragment.getRoutines().clear();
                             showProgressDialog();
                             mViewRoutineFragment.loadRoutines(ViewRoutinesFragment.FILTER_USER_ROUTINES);

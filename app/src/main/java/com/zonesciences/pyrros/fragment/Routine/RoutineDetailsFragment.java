@@ -760,6 +760,7 @@ public class RoutineDetailsFragment extends Fragment implements OnDragListener {
             }
 
             mRoutine.setNumWorkouts(numWorkouts);
+            mRoutine.setRoutineKey(mRoutineKey);
 
             // Clear data before rewriting
             Map<String, Object> clearRoutineData = new HashMap<>();

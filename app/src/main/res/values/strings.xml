@@ -130,5 +130,6 @@
     <string name="routine_name">Routine name</string>
     <string name="routine_description">Description</string>
     <string name="error_routine_name">Routine name required</string>
+    <string name="new_routines_published">New routines added!</string>
 
 </resources>

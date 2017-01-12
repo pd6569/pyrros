@@ -1,9 +1,8 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.zonesciences.pyrros.fragment.CreateWorkout.SortWorkoutFragment">
+    tools:context="com.zonesciences.pyrros.fragment.Routine.ViewRoutinesFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_routines"
@@ -13,4 +12,16 @@
         tools:listitem="@layout/item_routines">
     </android.support.v7.widget.RecyclerView>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/new_routines_published_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_gravity="center_horizontal|top"
+        android:text="@string/new_routines_published"
+        android:padding="5dp"
+        android:textAllCaps="true"
+        android:textColor="#fff"
+        android:background="@drawable/border_new_routines_notification"/>
+
+</FrameLayout>
