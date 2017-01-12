@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -73,6 +75,10 @@ public class MainActivity extends BaseActivity {
     com.github.clans.fab.FloatingActionButton mFabCreateWorkout;
     com.github.clans.fab.FloatingActionButton mFabCreateRoutine;
 
+    // Nav
+    NavigationView mNavigationView;
+    TextView mUserEmailNavTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +108,9 @@ public class MainActivity extends BaseActivity {
             mDatabase.child("user-workout-exercises").child(mUserId).keepSynced(true);
             mDatabase.child("user-workouts").child(mUserId).keepSynced(true);
             mDatabase.child("user-records").child(mUserId).keepSynced(true);
+            mDatabase.child("user-routines").child(mUserId).keepSynced(true);
+            mDatabase.child("user-routine-workouts").child(mUserId).keepSynced(true);
+            mDatabase.child("user-routine-workout-exercises").child(mUserId).keepSynced(true);
 
 
             //Give the TabLayout for region selection the ViewPager
@@ -113,6 +122,11 @@ public class MainActivity extends BaseActivity {
             toolbar.setTitleTextColor(Color.WHITE);
             getSupportActionBar().setTitle("Pyros Trainer");
 
+            // Nav
+            mNavigationView = (NavigationView) findViewById(R.id.navigation_view_main_activity);
+            View header = mNavigationView.getHeaderView(0);
+            mUserEmailNavTextView = (TextView) header.findViewById(R.id.nav_header_email);
+            mUserEmailNavTextView.setText(mFirebaseUser.getEmail());
 
             // Set Fab Menu and button properties
             mFab = (FloatingActionMenu) findViewById(R.id.fab_menu);
@@ -134,6 +148,8 @@ public class MainActivity extends BaseActivity {
                     mFab.close(true);
                 }
             });
+
+
 
         }
 
